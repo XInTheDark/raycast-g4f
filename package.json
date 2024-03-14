@@ -88,8 +88,8 @@
       "mode": "view"
     },
     {
-      "name": "synonym",
-      "title": "Find Synonym",
+      "name": "synonyms",
+      "title": "Find Synonyms",
       "icon": "synonym-icon.png",
       "description": "Find synonym of selected word",
       "mode": "view"
