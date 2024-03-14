@@ -2,10 +2,9 @@
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "raycast-g4f",
   "title": "GPT4Free",
-  "description": "Use the powerful GPT-4 models for FREE, on Raycast - no API Key required.",
-  "icon": "gemini-icon.png",
+  "description": "Use GPT-4 for FREE, on Raycast - no API Key required.",
+  "icon": "gpt-icon.png",
   "author": "muzhen_gaming",
-  "owner": "jmuzhen",
   "categories": [
     "Productivity",
     "Developer Tools"
@@ -18,7 +17,7 @@
       "subtitle": "GPT4Free",
       "description": "Ask GPT a question",
       "mode": "view",
-      "icon": "gemini-icon.png",
+      "icon": "gpt-icon.png",
       "arguments": [
         {
           "name": "query",
