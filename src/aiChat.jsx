@@ -14,8 +14,7 @@ import { useState, useEffect } from "react";
 import * as G4F from "g4f";
 const g4f = new G4F.G4F();
 import { g4f_providers } from "./api/gpt";
-import fetch from "node-fetch-polyfill";
-import { LocalStorage } from "@raycast/api";
+import { LocalStorage, Clipboard } from "@raycast/api";
 
 export default function Chat({ launchContext }) {
   let toast = async (style, title, message) => {
@@ -92,7 +91,7 @@ export default function Chat({ launchContext }) {
             const query = searchText;
             setSearchText("");
             if (
-              getChat(chatData.currentChat).messages.length == 0 ||
+              getChat(chatData.currentChat).messages.length === 0 ||
               getChat(chatData.currentChat).messages[0].finished
             ) {
               toast(Toast.Style.Animated, "Response Loading", "Please Wait");
@@ -213,6 +212,20 @@ export default function Chat({ launchContext }) {
               }
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "arrowUp" }}
+          />
+          <Action
+            icon={Icon.Clipboard}
+            title="Copy Chat Transcript"
+            onAction={async () => {
+              let chat = getChat(chatData.currentChat);
+              let transcript = "";
+              for (let i = chat.messages.length - 1; i >= 0; i--) {
+                transcript += `User: ${chat.messages[i].prompt}\n`;
+                transcript += `GPT: ${chat.messages[i].answer}\n\n`;
+              }
+              await Clipboard.copy(transcript);
+              toast(Toast.Style.Success, "Transcript Copied");
+            }}
           />
         </ActionPanel.Section>
         <ActionPanel.Section title="Danger zone">
