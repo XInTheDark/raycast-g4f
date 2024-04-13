@@ -91,7 +91,7 @@ export default function genImage({ launchContext }) {
             const query = searchText;
             setSearchText("");
             if (
-              getChat(chatData.currentChat).messages.length == 0 ||
+              getChat(chatData.currentChat).messages.length === 0 ||
               getChat(chatData.currentChat).messages[0].finished
             ) {
               toast(Toast.Style.Animated, "Response Loading", "Please Wait");
@@ -115,11 +115,15 @@ export default function genImage({ launchContext }) {
                     console.log(environment.supportPath);
                     let imagePath = "";
 
+                    // Each image chat has its own folder
+                    // Ensure the folder exists
+                    const folderPath =
+                      environment.supportPath + "/g4f-image-chats/" + get_folder_name(chatData.currentChat);
+                    if (!fs.existsSync(folderPath)) {
+                      fs.mkdirSync(folderPath, { recursive: true });
+                    }
                     const filePath =
-                      environment.supportPath +
-                      "/g4f-image_" +
-                      new Date().toISOString().replace(/:/g, "-").split(".")[0] +
-                      ".png";
+                      folderPath + "/g4f-image_" + new Date().toISOString().replace(/:/g, "-").split(".")[0] + ".png";
 
                     imagePath = filePath;
 
@@ -263,6 +267,14 @@ export default function genImage({ launchContext }) {
                       toast(Toast.Style.Failure, "Cannot delete only chat");
                       return;
                     }
+
+                    // Delete the image chat folder
+                    const folderPath =
+                      environment.supportPath + "/g4f-image-chats/" + get_folder_name(chatData.currentChat);
+                    fs.rm(folderPath, { recursive: true }, (err) => {
+                      return null;
+                    });
+
                     if (chatIdx === chatData.chats.length - 1) {
                       setChatData((oldData) => {
                         let newChatData = structuredClone(oldData);
@@ -305,6 +317,11 @@ export default function genImage({ launchContext }) {
                         title: "Delete ALL Chats Forever",
                         style: Action.Style.Destructive,
                         onAction: () => {
+                          // Delete all image chat folders
+                          const folderPath = environment.supportPath + "/g4f-image-chats";
+                          fs.rm(folderPath, { recursive: true }, (err) => {
+                            return null;
+                          });
                           setChatData({
                             currentChat: "New Image Chat",
                             chats: [
@@ -515,4 +532,8 @@ export const loadImageOptions = () => {
     provider: provider,
     providerOptions: providerOptions,
   };
+};
+
+export const get_folder_name = (chatName) => {
+  return chatName.replace(/[/\\?%*:|"<>]/g, "_");
 };
