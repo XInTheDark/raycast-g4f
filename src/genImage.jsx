@@ -263,10 +263,6 @@ export default function genImage({ launchContext }) {
                         break;
                       }
                     }
-                    if (chatData.chats.length === 1) {
-                      toast(Toast.Style.Failure, "Cannot delete only chat");
-                      return;
-                    }
 
                     // Delete the image chat folder
                     const folderPath =
@@ -274,6 +270,20 @@ export default function genImage({ launchContext }) {
                     fs.rm(folderPath, { recursive: true }, (err) => {
                       return null;
                     });
+
+                    if (chatData.chats.length === 1) {
+                      setChatData({
+                        currentChat: "New Image Chat",
+                        chats: [
+                          {
+                            name: "New Image Chat",
+                            creationDate: new Date(),
+                            messages: [],
+                          },
+                        ],
+                      });
+                      return;
+                    }
 
                     if (chatIdx === chatData.chats.length - 1) {
                       setChatData((oldData) => {

@@ -248,10 +248,21 @@ export default function Chat({ launchContext }) {
                         break;
                       }
                     }
+
                     if (chatData.chats.length === 1) {
-                      toast(Toast.Style.Failure, "Cannot delete only chat");
+                      setChatData({
+                        currentChat: "New Chat",
+                        chats: [
+                          {
+                            name: "New Chat",
+                            creationDate: new Date(),
+                            messages: [],
+                          },
+                        ],
+                      });
                       return;
                     }
+
                     if (chatIdx === chatData.chats.length - 1) {
                       setChatData((oldData) => {
                         let newChatData = structuredClone(oldData);
