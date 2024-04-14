@@ -28,6 +28,19 @@ export default function genImage({ launchContext }) {
     });
   };
 
+  let default_chat_data = () => {
+    return {
+      currentChat: "New Image Chat",
+      chats: [
+        {
+          name: "New Image Chat",
+          creationDate: new Date(),
+          messages: [],
+        },
+      ],
+    };
+  };
+
   let CreateChat = () => {
     const { pop } = useNavigation();
 
@@ -272,16 +285,7 @@ export default function genImage({ launchContext }) {
                     });
 
                     if (chatData.chats.length === 1) {
-                      setChatData({
-                        currentChat: "New Image Chat",
-                        chats: [
-                          {
-                            name: "New Image Chat",
-                            creationDate: new Date(),
-                            messages: [],
-                          },
-                        ],
-                      });
+                      setChatData(default_chat_data());
                       return;
                     }
 
@@ -332,16 +336,7 @@ export default function genImage({ launchContext }) {
                           fs.rm(folderPath, { recursive: true }, (err) => {
                             return null;
                           });
-                          setChatData({
-                            currentChat: "New Image Chat",
-                            chats: [
-                              {
-                                name: "New Image Chat",
-                                creationDate: new Date(),
-                                messages: [],
-                              },
-                            ],
-                          });
+                          setChatData(default_chat_data());
                         },
                       },
                     });
@@ -374,16 +369,7 @@ export default function genImage({ launchContext }) {
         let newData = JSON.parse(storedChatData);
         setChatData(structuredClone(newData));
       } else {
-        const newChatData = {
-          currentChat: "New Image Chat",
-          chats: [
-            {
-              name: "New Image Chat",
-              creationDate: new Date(),
-              messages: [],
-            },
-          ],
-        };
+        const newChatData = default_chat_data();
 
         await LocalStorage.setItem("imageChatData", JSON.stringify(newChatData));
         setChatData(newChatData);

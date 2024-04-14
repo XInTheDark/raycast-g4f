@@ -25,6 +25,19 @@ export default function Chat({ launchContext }) {
     });
   };
 
+  let default_chat_data = () => {
+    return {
+      currentChat: "New Chat",
+      chats: [
+        {
+          name: "New Chat",
+          creationDate: new Date(),
+          messages: [],
+        },
+      ],
+    };
+  };
+
   let CreateChat = () => {
     const { pop } = useNavigation();
 
@@ -250,16 +263,7 @@ export default function Chat({ launchContext }) {
                     }
 
                     if (chatData.chats.length === 1) {
-                      setChatData({
-                        currentChat: "New Chat",
-                        chats: [
-                          {
-                            name: "New Chat",
-                            creationDate: new Date(),
-                            messages: [],
-                          },
-                        ],
-                      });
+                      setChatData(default_chat_data());
                       return;
                     }
 
@@ -305,16 +309,7 @@ export default function Chat({ launchContext }) {
                         title: "Delete ALL Chats Forever",
                         style: Action.Style.Destructive,
                         onAction: () => {
-                          setChatData({
-                            currentChat: "New Chat",
-                            chats: [
-                              {
-                                name: "New Chat",
-                                creationDate: new Date(),
-                                messages: [],
-                              },
-                            ],
-                          });
+                          setChatData(default_chat_data());
                         },
                       },
                     });
@@ -398,16 +393,7 @@ export default function Chat({ launchContext }) {
 
         setChatData(structuredClone(newData));
       } else {
-        const newChatData = {
-          currentChat: "New Chat",
-          chats: [
-            {
-              name: "New Chat",
-              creationDate: new Date(),
-              messages: [],
-            },
-          ],
-        };
+        const newChatData = default_chat_data();
         await LocalStorage.setItem("chatData", JSON.stringify(newChatData));
         setChatData(newChatData);
       }
