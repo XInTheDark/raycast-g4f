@@ -178,3 +178,31 @@ export const g4f_providers = {
   Bing: [g4f.providers.Bing, "gpt-4"],
   ChatBase: [g4f.providers.ChatBase, "gpt-3.5-turbo"],
 };
+
+export const getChatResponse = async (currentChat, query) => {
+  let aiChat = [];
+  if (currentChat.systemPrompt.length > 0)
+    // The system prompt is currently not acknowledged by GPT
+    // so we use it as first user prompt instead
+    aiChat.push({ role: "user", content: currentChat.systemPrompt });
+
+  // start from back
+  for (let i = currentChat.messages.length - 1; i >= 0; i--) {
+    aiChat.push({ role: "user", content: currentChat.messages[i].prompt });
+    aiChat.push({ role: "assistant", content: currentChat.messages[i].answer });
+  }
+  if (query.length > 0) aiChat.push({ role: "user", content: query });
+
+  // load provider and model from preferences
+  const preferences = getPreferenceValues();
+  const providerString = preferences["gptProvider"];
+  const [provider, model] = g4f_providers[providerString];
+  const options = {
+    provider: provider,
+    model: model,
+  };
+
+  // generate response
+  let response = await g4f.chatCompletion(aiChat, options);
+  return response;
+};

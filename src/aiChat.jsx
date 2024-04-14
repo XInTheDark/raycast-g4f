@@ -1,19 +1,8 @@
-import {
-  List,
-  ActionPanel,
-  Action,
-  Toast,
-  Icon,
-  showToast,
-  Form,
-  useNavigation,
-  confirmAlert,
-  getPreferenceValues,
-} from "@raycast/api";
+import { List, ActionPanel, Action, Toast, Icon, showToast, Form, useNavigation, confirmAlert } from "@raycast/api";
 import { useState, useEffect } from "react";
 import * as G4F from "g4f";
 const g4f = new G4F.G4F();
-import { g4f_providers } from "./api/gpt";
+import { getChatResponse } from "./api/gpt";
 import { LocalStorage, Clipboard } from "@raycast/api";
 
 export default function Chat({ launchContext }) {
@@ -32,6 +21,7 @@ export default function Chat({ launchContext }) {
         {
           name: "New Chat",
           creationDate: new Date(),
+          systemPrompt: "",
           messages: [],
         },
       ],
@@ -59,6 +49,7 @@ export default function Chat({ launchContext }) {
                     newChatData.chats.push({
                       name: values.chatName,
                       creationDate: new Date(),
+                      systemPrompt: values.systemPrompt,
                       messages: [],
                     });
                     newChatData.currentChat = values.chatName;
@@ -85,6 +76,8 @@ export default function Chat({ launchContext }) {
             second: "2-digit",
           })}`}
         />
+        <Form.Description title="System Prompt" text="This prompt will be sent to GPT to start the conversation." />
+        <Form.TextArea id="systemPrompt" defaultValue="" />
       </Form>
     );
   };
@@ -125,27 +118,7 @@ export default function Chat({ launchContext }) {
 
                     // currentChat.messages is stored in the format of [prompt, answer]. We first convert it to
                     // { role: "user", content: prompt }, { role: "assistant", content: answer }, etc.
-
-                    let aiChat = [];
-                    // start from back
-                    for (let i = currentChat.messages.length - 1; i >= 0; i--) {
-                      aiChat.push({ role: "user", content: currentChat.messages[i].prompt });
-                      aiChat.push({ role: "assistant", content: currentChat.messages[i].answer });
-                    }
-
-                    aiChat.push({ role: "user", content: query });
-
-                    // load provider and model from preferences
-                    const preferences = getPreferenceValues();
-                    const providerString = preferences["gptProvider"];
-                    const [provider, model] = g4f_providers[providerString];
-                    const options = {
-                      provider: provider,
-                      model: model,
-                    };
-
-                    // generate response
-                    let response = await g4f.chatCompletion(aiChat, options);
+                    let response = await getChatResponse(currentChat, query);
 
                     setChatData((oldData) => {
                       let newChatData = structuredClone(oldData);
@@ -342,30 +315,12 @@ export default function Chat({ launchContext }) {
 
         if (getChat(newData.currentChat, newData.chats).messages[0]?.finished === false) {
           let currentChat = getChat(newData.currentChat, newData.chats);
-          console.log(currentChat);
-          let aiChat = [];
-          // start from back
-          for (let i = currentChat.messages.length - 1; i >= 0; i--) {
-            aiChat.push({ role: "user", content: currentChat.messages[i].prompt });
-            aiChat.push({ role: "assistant", content: currentChat.messages[i].answer });
-          }
-
           currentChat.messages[0].answer = "";
-          console.log(toast);
+
           toast(Toast.Style.Animated, "Regenerating Last Message");
           await (async () => {
             try {
-              // load provider and model from preferences
-              const preferences = getPreferenceValues();
-              const providerString = preferences["gptProvider"];
-              const [provider, model] = g4f_providers[providerString];
-              const options = {
-                provider: provider,
-                model: model,
-              };
-
-              // generate response
-              let response = await g4f.chatCompletion(aiChat, options);
+              let response = await getChatResponse(currentChat, "");
 
               setChatData((oldData) => {
                 let newChatData = structuredClone(oldData);
