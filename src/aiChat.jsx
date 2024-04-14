@@ -1,4 +1,15 @@
-import { List, ActionPanel, Action, Toast, Icon, showToast, Form, useNavigation, confirmAlert } from "@raycast/api";
+import {
+  List,
+  ActionPanel,
+  Action,
+  Toast,
+  Icon,
+  showToast,
+  Form,
+  useNavigation,
+  confirmAlert,
+  getPreferenceValues,
+} from "@raycast/api";
 import { useState, useEffect } from "react";
 import * as G4F from "g4f";
 const g4f = new G4F.G4F();
@@ -31,6 +42,9 @@ export default function Chat({ launchContext }) {
 
   let CreateChat = () => {
     const { pop } = useNavigation();
+
+    const preferences = getPreferenceValues();
+    const defaultProviderString = preferences["gptProvider"];
 
     return (
       <Form
@@ -81,7 +95,7 @@ export default function Chat({ launchContext }) {
         <Form.Description title="System Prompt" text="This prompt will be sent to GPT to start the conversation." />
         <Form.TextArea id="systemPrompt" defaultValue="" />
         <Form.Description title="GPT Model" text="The provider and model used for this chat." />
-        <Form.Dropdown id="provider" defaultValue="GPT">
+        <Form.Dropdown id="provider" defaultValue={defaultProviderString}>
           <Form.Dropdown.Item title="chatgpt.ai (gpt-4-32k)" value="GPT" />
           <Form.Dropdown.Item title="Bing (gpt-4)" value="Bing" />
           <Form.Dropdown.Item title="ChatBase (gpt-3.5-turbo)" value="ChatBase" />

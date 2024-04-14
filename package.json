@@ -133,6 +133,28 @@
   ],
 
   "preferences": [
+    {
+    "description": "The default provider and model used in this extension.",
+      "name": "gptProvider",
+      "required": false,
+      "title": "Default GPT Provider",
+      "type": "dropdown",
+      "data": [
+        {
+          "title": "chatgpt.ai (gpt-4-32k)",
+          "value": "GPT"
+        },
+        {
+          "title": "Bing (gpt-4)",
+          "value": "Bing"
+        },
+        {
+          "title": "ChatBase (gpt-3.5-turbo)",
+          "value": "ChatBase"
+        }
+      ],
+      "default": "GPT"
+    }
   ],
 
   "dependencies": {
