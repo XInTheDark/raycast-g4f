@@ -134,28 +134,6 @@
 
   "preferences": [
     {
-      "description": "GPT Provider",
-      "name": "gptProvider",
-      "required": false,
-      "title": "GPT Provider",
-      "type": "dropdown",
-      "data": [
-        {
-          "title": "chatgpt.ai (gpt-4-32k)",
-          "value": "GPT"
-        },
-        {
-          "title": "Bing (gpt-4)",
-          "value": "Bing"
-        },
-        {
-          "title": "ChatBase (gpt-3.5-turbo)",
-          "value": "ChatBase"
-        }
-      ],
-      "default": "GPT"
-    },
-    {
       "description": "Image Provider",
       "name": "imageProvider",
       "required": false,

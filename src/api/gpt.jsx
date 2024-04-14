@@ -193,9 +193,8 @@ export const getChatResponse = async (currentChat, query) => {
   }
   if (query.length > 0) aiChat.push({ role: "user", content: query });
 
-  // load provider and model from preferences
-  const preferences = getPreferenceValues();
-  const providerString = preferences["gptProvider"];
+  // load provider and model
+  const providerString = currentChat.provider;
   const [provider, model] = g4f_providers[providerString];
   const options = {
     provider: provider,
