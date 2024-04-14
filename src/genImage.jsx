@@ -93,6 +93,7 @@ export default function genImage({ launchContext }) {
         <Form.Dropdown id="provider" defaultValue="Prodia">
           <Form.Dropdown.Item title="Prodia" value="Prodia" />
           <Form.Dropdown.Item title="ProdiaStableDiffusionXL" value="ProdiaStableDiffusionXL" />
+          <Form.Dropdown.Item title="DALL-E 2" value="Dalle2" />
           <Form.Dropdown.Item title="Pixart" value="Pixart" />
           <Form.Dropdown.Item title="PixartLCM" value="PixartLCM" />
         </Form.Dropdown>
@@ -525,6 +526,7 @@ export const image_providers = {
       negativePrompt: _NegativePrompt,
     },
   ],
+  Dalle2: [g4f.providers.Dalle2, {}],
   Pixart: [
     g4f.providers.Pixart,
     {
@@ -562,10 +564,15 @@ export const loadImageOptions = (currentChat) => {
     providerOptions.lcmInferenceSteps = imageQuality === "Medium" ? 9 : imageQuality === "High" ? 15 : 20;
   }
 
-  return {
-    provider: provider,
-    providerOptions: providerOptions,
-  };
+  if (providerOptions)
+    return {
+      provider: provider,
+      providerOptions: providerOptions,
+    };
+  else
+    return {
+      provider: provider,
+    };
 };
 
 export const get_folder_name = (chatName) => {
