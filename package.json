@@ -133,46 +133,6 @@
   ],
 
   "preferences": [
-    {
-      "description": "Image Provider",
-      "name": "imageProvider",
-      "required": false,
-      "title": "Image Provider",
-      "type": "dropdown",
-      "data": [
-          {
-          "title": "Prodia",
-          "value": "Prodia"
-          },
-          {
-          "title": "ProdiaStableDiffusionXL",
-          "value": "ProdiaStableDiffusionXL"
-          }
-      ],
-      "default": "Prodia"
-    },
-    {
-      "description": "Image Quality (higher takes longer to generate)",
-      "name": "imageQuality",
-      "required": false,
-      "title": "Image Quality",
-      "type": "dropdown",
-      "data": [
-          {
-          "title": "Medium",
-          "value": "Medium"
-          },
-          {
-          "title": "High",
-          "value": "High"
-          },
-          {
-          "title": "Extreme",
-          "value": "Extreme"
-          }
-      ],
-      "default": "High"
-    }
   ],
 
   "dependencies": {

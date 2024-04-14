@@ -35,6 +35,8 @@ export default function genImage({ launchContext }) {
         {
           name: "New Image Chat",
           creationDate: new Date(),
+          provider: "Prodia",
+          imageQuality: "High",
           messages: [],
         },
       ],
@@ -62,6 +64,8 @@ export default function genImage({ launchContext }) {
                     newChatData.chats.push({
                       name: values.chatName,
                       creationDate: new Date(),
+                      provider: values.provider,
+                      imageQuality: values.imageQuality,
                       messages: [],
                     });
                     newChatData.currentChat = values.chatName;
@@ -85,6 +89,18 @@ export default function genImage({ launchContext }) {
             second: "2-digit",
           })}`}
         />
+        <Form.Description title="Image Model" text="The provider and model used for this Image Chat." />
+        <Form.Dropdown id="provider" defaultValue="Prodia">
+          <Form.Dropdown.Item title="Prodia" value="Prodia" />
+          <Form.Dropdown.Item title="ProdiaStableDiffusionXL" value="ProdiaStableDiffusionXL" />
+        </Form.Dropdown>
+
+        <Form.Description title="Image Quality" text="Higher quality images need more time to generate." />
+        <Form.Dropdown id="imageQuality" defaultValue="High">
+          <Form.Dropdown.Item title="Medium" value="Medium" />
+          <Form.Dropdown.Item title="High" value="High" />
+          <Form.Dropdown.Item title="Extreme" value="Extreme" />
+        </Form.Dropdown>
       </Form>
     );
   };
@@ -121,7 +137,7 @@ export default function genImage({ launchContext }) {
 
                 (async () => {
                   try {
-                    const options = loadImageOptions();
+                    const options = loadImageOptions(currentChat);
                     const base64Image = await g4f.imageGeneration(query, options);
 
                     // save image
@@ -509,11 +525,10 @@ export const image_providers = {
   ],
 };
 
-export const loadImageOptions = () => {
-  // load provider and model from preferences
-  const preferences = getPreferenceValues();
-  const providerString = preferences["imageProvider"],
-    imageQuality = preferences["imageQuality"];
+export const loadImageOptions = (currentChat) => {
+  // load provider and options
+  const providerString = currentChat.provider,
+    imageQuality = currentChat.imageQuality;
   const [provider, providerOptions] = image_providers[providerString];
 
   // image quality and creativity settings are handled separately
