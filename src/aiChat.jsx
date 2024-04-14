@@ -51,6 +51,7 @@ export default function Chat({ launchContext }) {
                       name: values.chatName,
                       creationDate: new Date(),
                       systemPrompt: values.systemPrompt,
+                      provider: values.provider,
                       messages: [],
                     });
                     newChatData.currentChat = values.chatName;
@@ -79,7 +80,6 @@ export default function Chat({ launchContext }) {
         />
         <Form.Description title="System Prompt" text="This prompt will be sent to GPT to start the conversation." />
         <Form.TextArea id="systemPrompt" defaultValue="" />
-
         <Form.Description title="GPT Model" text="The provider and model used for this chat." />
         <Form.Dropdown id="provider" defaultValue="GPT">
           <Form.Dropdown.Item title="chatgpt.ai (gpt-4-32k)" value="GPT" />
