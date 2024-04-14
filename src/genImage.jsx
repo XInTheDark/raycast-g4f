@@ -93,7 +93,7 @@ export default function genImage({ launchContext }) {
         <Form.Dropdown id="provider" defaultValue="Prodia">
           <Form.Dropdown.Item title="Prodia" value="Prodia" />
           <Form.Dropdown.Item title="ProdiaStableDiffusionXL" value="ProdiaStableDiffusionXL" />
-          <Form.DropDown.Item title="Pixart" value="Pixart" />
+          <Form.Dropdown.Item title="Pixart" value="Pixart" />
           <Form.Dropdown.Item title="PixartLCM" value="PixartLCM" />
         </Form.Dropdown>
 
