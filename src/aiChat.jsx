@@ -172,6 +172,53 @@ export default function Chat({ launchContext }) {
             }
           }}
         />
+        <ActionPanel.Section title="Current Chat">
+          <Action
+            icon={Icon.Clipboard}
+            title="Copy Chat Transcript"
+            onAction={async () => {
+              let chat = getChat(chatData.currentChat);
+              let transcript = "";
+              for (let i = chat.messages.length - 1; i >= 0; i--) {
+                transcript += `User: ${chat.messages[i].prompt}\n`;
+                transcript += `GPT: ${chat.messages[i].answer}\n\n`;
+              }
+              await Clipboard.copy(transcript);
+              toast(Toast.Style.Success, "Transcript Copied");
+            }}
+          />
+          <Action
+            icon={Icon.Trash}
+            title="Delete Last Message"
+            onAction={async () => {
+              await confirmAlert({
+                title: "Are you sure?",
+                message: "You cannot recover deleted messages!",
+                icon: Icon.Trash,
+                primaryAction: {
+                  title: "Delete Message",
+                  style: Action.Style.Destructive,
+                  onAction: () => {
+                    let chat = getChat(chatData.currentChat);
+                    if (chat.messages.length === 0) {
+                      toast(Toast.Style.Failure, "No Messages to Delete");
+                      return;
+                    }
+                    // delete index 0
+                    chat.messages.shift();
+                    setChatData((oldData) => {
+                      let newChatData = structuredClone(oldData);
+                      getChat(chatData.currentChat, newChatData.chats).messages = chat.messages;
+                      return newChatData;
+                    });
+                    toast(Toast.Style.Success, "Message Deleted");
+                  },
+                },
+              });
+            }}
+            shortcut={{ modifiers: ["option"], key: "delete" }}
+          />
+        </ActionPanel.Section>
         <ActionPanel.Section title="Manage Chats">
           <Action.Push
             icon={Icon.PlusCircle}
@@ -220,20 +267,6 @@ export default function Chat({ launchContext }) {
               }
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "arrowUp" }}
-          />
-          <Action
-            icon={Icon.Clipboard}
-            title="Copy Chat Transcript"
-            onAction={async () => {
-              let chat = getChat(chatData.currentChat);
-              let transcript = "";
-              for (let i = chat.messages.length - 1; i >= 0; i--) {
-                transcript += `User: ${chat.messages[i].prompt}\n`;
-                transcript += `GPT: ${chat.messages[i].answer}\n\n`;
-              }
-              await Clipboard.copy(transcript);
-              toast(Toast.Style.Success, "Transcript Copied");
-            }}
           />
         </ActionPanel.Section>
         <ActionPanel.Section title="Danger zone">
