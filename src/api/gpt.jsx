@@ -58,7 +58,7 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
       };
 
       // generate response
-      let response = await g4f.chatCompletion(messages, options);
+      let response = await chatCompletion(messages, options);
       setMarkdown(response);
       setLastResponse(response);
 
@@ -179,6 +179,16 @@ export const g4f_providers = {
   ChatBase: [g4f.providers.ChatBase, "gpt-3.5-turbo"],
 };
 
+// generate response using a chat context and options
+// returned response is ready for use directly
+export const chatCompletion = async (chat, options) => {
+  let response = await g4f.chatCompletion(chat, options);
+  // format response
+  response = formatResponse(response);
+  return response;
+};
+
+// generate response using a chat context and a query (optional)
 export const getChatResponse = async (currentChat, query) => {
   let aiChat = [];
   if (currentChat.systemPrompt.length > 0)
@@ -202,6 +212,13 @@ export const getChatResponse = async (currentChat, query) => {
   };
 
   // generate response
-  let response = await g4f.chatCompletion(aiChat, options);
+  let response = await chatCompletion(aiChat, options);
+  return response;
+};
+
+// format response using some heuristics
+export const formatResponse = (response) => {
+  // replace \n to a real newline
+  response = response.replace(/\\n/g, "\n");
   return response;
 };
