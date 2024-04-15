@@ -93,9 +93,7 @@ export default function genImage({ launchContext }) {
         <Form.Dropdown id="provider" defaultValue="Prodia">
           <Form.Dropdown.Item title="Prodia" value="Prodia" />
           <Form.Dropdown.Item title="ProdiaStableDiffusionXL" value="ProdiaStableDiffusionXL" />
-          <Form.Dropdown.Item title="DALL-E 2" value="Dalle2" />
-          <Form.Dropdown.Item title="Pixart" value="Pixart" />
-          <Form.Dropdown.Item title="PixartLCM" value="PixartLCM" />
+          <Form.Dropdown.Item title="DALL-E" value="Dalle" />
         </Form.Dropdown>
 
         <Form.Description title="Image Quality" text="Higher quality images need more time to generate." />
@@ -526,23 +524,7 @@ export const image_providers = {
       negativePrompt: _NegativePrompt,
     },
   ],
-  Dalle2: [g4f.providers.Dalle2, {}],
-  Pixart: [
-    g4f.providers.Pixart,
-    {
-      imageStyle: "Photographic",
-      height: 1024,
-      width: 1024,
-    },
-  ],
-  PixartLCM: [
-    g4f.providers.PixartLCM,
-    {
-      imageStyle: "Photographic",
-      height: 1024,
-      width: 1024,
-    },
-  ],
+  Dalle: [g4f.providers.Dalle, {}],
 };
 
 export const loadImageOptions = (currentChat) => {
@@ -557,11 +539,6 @@ export const loadImageOptions = (currentChat) => {
     providerOptions.samplingSteps = imageQuality === "Medium" ? 10 : imageQuality === "High" ? 15 : 20;
   } else if (provider === g4f.providers.ProdiaStableDiffusionXL) {
     providerOptions.samplingSteps = imageQuality === "Medium" ? 20 : imageQuality === "High" ? 25 : 30;
-  } else if (provider === g4f.providers.Pixart) {
-    providerOptions.dpmInferenceSteps = imageQuality === "Medium" ? 14 : imageQuality === "High" ? 16 : 20;
-    providerOptions.saInferenceSteps = imageQuality === "Medium" ? 25 : imageQuality === "High" ? 30 : 40;
-  } else if (provider === g4f.providers.PixartLCM) {
-    providerOptions.lcmInferenceSteps = imageQuality === "Medium" ? 9 : imageQuality === "High" ? 15 : 20;
   }
 
   if (providerOptions)
