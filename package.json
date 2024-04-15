@@ -131,10 +131,9 @@
       "mode": "view"
     }
   ],
-
   "preferences": [
     {
-    "description": "The default provider and model used in this extension.",
+      "description": "The default provider and model used in this extension.",
       "name": "gptProvider",
       "required": false,
       "title": "Default GPT Provider",
@@ -156,13 +155,10 @@
       "default": "GPT"
     }
   ],
-
   "dependencies": {
     "@raycast/api": "^1.62.0",
     "@raycast/utils": "^1.9.0",
-    "g4f": "^1.4.2",
-    "jimp": "^0.22.10",
-    "node-fetch-polyfill": "^2.0.6"
+    "g4f": "^1.4.2"
   },
   "devDependencies": {
     "@raycast/eslint-config": "1.0.5",
