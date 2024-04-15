@@ -173,14 +173,20 @@ export default function Chat({ launchContext }) {
             title="Copy Chat Transcript"
             onAction={async () => {
               let chat = getChat(chatData.currentChat);
+              if (chat.messages.length === 0) {
+                toast(Toast.Style.Failure, "No Messages to Copy");
+                return;
+              }
+
               let transcript = "";
               for (let i = chat.messages.length - 1; i >= 0; i--) {
                 transcript += `User: ${chat.messages[i].prompt}\n`;
                 transcript += `GPT: ${chat.messages[i].answer}\n\n`;
               }
               await Clipboard.copy(transcript);
-              toast(Toast.Style.Success, "Transcript Copied");
+              toast(Toast.Style.Success, "Chat Transcript Copied");
             }}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
           />
           <Action
             icon={Icon.Trash}
