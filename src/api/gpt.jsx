@@ -14,7 +14,6 @@ import {
   getPreferenceValues,
 } from "@raycast/api";
 import { useState, useEffect } from "react";
-import fetch from "node-fetch-polyfill";
 import * as G4F from "g4f";
 const g4f = new G4F.G4F();
 import fs from "fs";

@@ -4,7 +4,6 @@ import {
   confirmAlert,
   environment,
   Form,
-  getPreferenceValues,
   Grid,
   Icon,
   LocalStorage,
@@ -92,6 +91,7 @@ export default function genImage({ launchContext }) {
         <Form.Description title="Image Model" text="The provider and model used for this Image Chat." />
         <Form.Dropdown id="provider" defaultValue="Prodia">
           <Form.Dropdown.Item title="Prodia" value="Prodia" />
+          <Form.Dropdown.Item title="ProdiaStableDiffusion" value="ProdiaStableDiffusion" />
           <Form.Dropdown.Item title="ProdiaStableDiffusionXL" value="ProdiaStableDiffusionXL" />
           <Form.Dropdown.Item title="DALL-E" value="Dalle" />
         </Form.Dropdown>
@@ -507,8 +507,16 @@ export const image_providers = {
     {
       // list of available models: https://rentry.co/b6i53fnm
       model: "ICantBelieveItsNotPhotography_seco.safetensors [4e7a3dfd]",
-      // samplingSteps: 15,
       cfgScale: 25,
+      negativePrompt: _NegativePrompt,
+    },
+  ],
+  ProdiaStableDiffusion: [
+    g4f.providers.ProdiaStableDiffusion,
+    {
+      // list of available models: https://rentry.co/pfwmx6y5
+      model: "ICantBelieveItsNotPhotography_seco.safetensors [4e7a3dfd]",
+      cfgScale: 10,
       negativePrompt: _NegativePrompt,
     },
   ],
@@ -519,8 +527,7 @@ export const image_providers = {
       model: "dreamshaperXL10_alpha2.safetensors [c8afe2ef]",
       height: 1024,
       width: 1024,
-      // samplingSteps: 25,
-      cfgScale: 18,
+      cfgScale: 10,
       negativePrompt: _NegativePrompt,
     },
   ],
@@ -537,7 +544,7 @@ export const loadImageOptions = (currentChat) => {
   // only initialise samplingSteps if supported by the provider
   if (provider === g4f.providers.Prodia) {
     providerOptions.samplingSteps = imageQuality === "Medium" ? 10 : imageQuality === "High" ? 15 : 20;
-  } else if (provider === g4f.providers.ProdiaStableDiffusionXL) {
+  } else if (provider === g4f.providers.ProdiaStableDiffusion || provider === g4f.providers.ProdiaStableDiffusionXL) {
     providerOptions.samplingSteps = imageQuality === "Medium" ? 20 : imageQuality === "High" ? 25 : 30;
   }
 
