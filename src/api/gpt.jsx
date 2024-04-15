@@ -196,8 +196,10 @@ export const getChatResponse = async (currentChat, query) => {
     // so we use it as first user prompt instead
     aiChat.push({ role: "user", content: currentChat.systemPrompt });
 
-  // start from back
+  // currentChat.messages is stored in the format of [prompt, answer]. We first convert it to
+  // { role: "user", content: prompt }, { role: "assistant", content: answer }, etc.
   for (let i = currentChat.messages.length - 1; i >= 0; i--) {
+    // reverse order, index 0 is latest message
     aiChat.push({ role: "user", content: currentChat.messages[i].prompt });
     aiChat.push({ role: "assistant", content: currentChat.messages[i].answer });
   }

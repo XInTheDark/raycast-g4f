@@ -11,8 +11,6 @@ import {
   getPreferenceValues,
 } from "@raycast/api";
 import { useState, useEffect } from "react";
-import * as G4F from "g4f";
-const g4f = new G4F.G4F();
 import { getChatResponse } from "./api/gpt";
 import { LocalStorage, Clipboard } from "@raycast/api";
 
@@ -137,9 +135,6 @@ export default function Chat({ launchContext }) {
                 (async () => {
                   try {
                     let currentChat = getChat(chatData.currentChat);
-
-                    // currentChat.messages is stored in the format of [prompt, answer]. We first convert it to
-                    // { role: "user", content: prompt }, { role: "assistant", content: answer }, etc.
                     let response = await getChatResponse(currentChat, query);
 
                     setChatData((oldData) => {
@@ -216,7 +211,7 @@ export default function Chat({ launchContext }) {
                 },
               });
             }}
-            shortcut={{ modifiers: ["option"], key: "delete" }}
+            shortcut={{ modifiers: ["shift"], key: "delete" }}
           />
         </ActionPanel.Section>
         <ActionPanel.Section title="Manage Chats">
