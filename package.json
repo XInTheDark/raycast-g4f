@@ -152,17 +152,26 @@
           "value": "Bing"
         },
         {
-          "title": "ChatBase (gpt-3.5-turbo)",
-          "value": "ChatBase"
+          "title": "Google Gemini (requires API Key)",
+          "value": "GoogleGemini"
         }
       ],
       "default": "GPT"
+    },
+    {
+      "description": "Optional. Only used if Gemini model is selected.",
+      "name": "GeminiAPIKey",
+      "required": false,
+      "title": "Google Gemini API Key",
+      "type": "password",
+      "default": ""
     }
   ],
   "dependencies": {
     "@raycast/api": "^1.62.0",
     "@raycast/utils": "^1.9.0",
-    "g4f": "^1.4.2"
+    "g4f": "^1.4.2",
+    "gemini-ai": "^1.1.0"
   },
   "devDependencies": {
     "@raycast/eslint-config": "1.0.5",

@@ -14,8 +14,16 @@ import {
   getPreferenceValues,
 } from "@raycast/api";
 import { useState, useEffect } from "react";
+import fetch from "node-fetch";
+
+// G4F module
 import * as G4F from "g4f";
 const g4f = new G4F.G4F();
+
+// Google Gemini module
+import Gemini from "gemini-ai";
+export const GeminiProvider = "GeminiProvider";
+
 import fs from "fs";
 
 export default (props, { context = undefined, allowPaste = false, useSelected = false, buffer = [] }) => {
@@ -50,7 +58,7 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
       // load provider and model from preferences
       const preferences = getPreferenceValues();
       const providerString = preferences["gptProvider"];
-      const [provider, model] = g4f_providers[providerString];
+      const [provider, model] = providers[providerString];
       const options = {
         provider: provider,
         model: model,
@@ -172,17 +180,36 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
   );
 };
 
-export const g4f_providers = {
+export const providers = {
   GPT4: [g4f.providers.GPT, "gpt-4-32k"],
   GPT35: [g4f.providers.GPT, "gpt-3.5-turbo"],
   Bing: [g4f.providers.Bing, "gpt-4"],
-  ChatBase: [g4f.providers.ChatBase, "gpt-3.5-turbo"],
+  GoogleGemini: [GeminiProvider, "gemini-pro"],
 };
 
 // generate response using a chat context and options
 // returned response is ready for use directly
 export const chatCompletion = async (chat, options) => {
-  let response = await g4f.chatCompletion(chat, options);
+  let response = "";
+  if (options.provider !== GeminiProvider) {
+    // GPT
+    response = await g4f.chatCompletion(chat, options);
+  } else {
+    // Google Gemini
+    const APIKey = getPreferenceValues()["GeminiAPIKey"];
+    const googleGemini = new Gemini(APIKey, { fetch: fetch });
+    let formattedChat = GeminiFormatChat(chat);
+
+    // Send message
+    formattedChat.pop(); // remove last message as it is the query
+    let query = chat[chat.length - 1].content;
+    const geminiChat = googleGemini.createChat({
+      model: options.model,
+      messages: formattedChat,
+    });
+    response = await geminiChat.ask(query);
+  }
+
   // format response
   response = formatResponse(response);
   return response;
@@ -190,31 +217,31 @@ export const chatCompletion = async (chat, options) => {
 
 // generate response using a chat context and a query (optional)
 export const getChatResponse = async (currentChat, query) => {
-  let aiChat = [];
+  let chat = [];
   if (currentChat.systemPrompt.length > 0)
     // The system prompt is currently not acknowledged by GPT
     // so we use it as first user prompt instead
-    aiChat.push({ role: "user", content: currentChat.systemPrompt });
+    chat.push({ role: "user", content: currentChat.systemPrompt });
 
   // currentChat.messages is stored in the format of [prompt, answer]. We first convert it to
   // { role: "user", content: prompt }, { role: "assistant", content: answer }, etc.
   for (let i = currentChat.messages.length - 1; i >= 0; i--) {
     // reverse order, index 0 is latest message
-    aiChat.push({ role: "user", content: currentChat.messages[i].prompt });
-    aiChat.push({ role: "assistant", content: currentChat.messages[i].answer });
+    chat.push({ role: "user", content: currentChat.messages[i].prompt });
+    chat.push({ role: "assistant", content: currentChat.messages[i].answer });
   }
-  if (query.length > 0) aiChat.push({ role: "user", content: query });
+  if (query.length > 0) chat.push({ role: "user", content: query });
 
   // load provider and model
   const providerString = currentChat.provider;
-  const [provider, model] = g4f_providers[providerString];
+  const [provider, model] = providers[providerString];
   const options = {
     provider: provider,
     model: model,
   };
 
   // generate response
-  let response = await chatCompletion(aiChat, options);
+  let response = await chatCompletion(chat, options);
   return response;
 };
 
@@ -223,4 +250,27 @@ export const formatResponse = (response) => {
   // replace \n to a real newline
   response = response.replace(/\\n/g, "\n");
   return response;
+};
+
+// Reformat chat to be in google gemini format
+export const GeminiFormatChat = (chat) => {
+  let formattedChat = [];
+
+  // Discard system prompt as it is not supported by the API
+  if (chat.length >= 2 && chat[0].role === "user" && chat[1].role === "user") {
+    chat.shift(); // remove first user message (system prompt)
+  }
+
+  let currentPair = [];
+  for (let i = 0; i < chat.length; i++) {
+    const message = chat[i];
+    if (currentPair.length === 0) {
+      currentPair.push(message.content);
+    } else {
+      currentPair.push(message.content);
+      formattedChat.push(currentPair);
+      currentPair = [];
+    }
+  }
+  return formattedChat;
 };
