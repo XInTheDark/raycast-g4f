@@ -1,9 +1,18 @@
 ## Raycast-G4F Changelog
 
+### 2024-04-16: Add Google Gemini model
+
+We have brought back the Google Gemini model, a tribute to our roots from the Google Gemini extension!
+The generation library is also the exact same as the one used before.
+
+Note that you need an API Key to use the Gemini model, but it is completely optional, and non-users will experience no
+change.
+
 ### 2024-04-16: Add gpt-3.5-turbo model
 
 This model is hosted by the same GPT provider as the gpt-4-32k model. It is significantly faster
-but of course, may be less accurate. With a reasonably sized 16k context window, t  xhis makes it suitable for tasks like processing large amounts of text,
+but of course, may be less accurate. With a reasonably sized 16k context window, t xhis makes it suitable for tasks like
+processing large amounts of text,
 so you may consider switching to it in the preferences if you are experiencing slow chat loading times.
 
 ### 2024-04: Miscellaneous updates
