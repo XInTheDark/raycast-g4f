@@ -173,7 +173,8 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
 };
 
 export const g4f_providers = {
-  GPT: [g4f.providers.GPT, "gpt-4-32k"],
+  GPT4: [g4f.providers.GPT, "gpt-4-32k"],
+  GPT35: [g4f.providers.GPT, "gpt-3.5-turbo"],
   Bing: [g4f.providers.Bing, "gpt-4"],
   ChatBase: [g4f.providers.ChatBase, "gpt-3.5-turbo"],
 };

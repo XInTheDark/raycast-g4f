@@ -94,7 +94,8 @@ export default function Chat({ launchContext }) {
         <Form.TextArea id="systemPrompt" defaultValue="" />
         <Form.Description title="GPT Model" text="The provider and model used for this chat." />
         <Form.Dropdown id="provider" defaultValue={defaultProviderString}>
-          <Form.Dropdown.Item title="chatgpt.ai (gpt-4-32k)" value="GPT" />
+          <Form.Dropdown.Item title="ChatGPT (gpt-4-32k)" value="GPT4" />
+          <Form.Dropdown.Item title="ChatGPT (gpt-3.5-turbo)" value="GPT35" />
           <Form.Dropdown.Item title="Bing (gpt-4)" value="Bing" />
           <Form.Dropdown.Item title="ChatBase (gpt-3.5-turbo)" value="ChatBase" />
         </Form.Dropdown>

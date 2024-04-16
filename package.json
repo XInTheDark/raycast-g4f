@@ -140,8 +140,12 @@
       "type": "dropdown",
       "data": [
         {
-          "title": "chatgpt.ai (gpt-4-32k)",
-          "value": "GPT"
+          "title": "ChatGPT (gpt-4-32k)",
+          "value": "GPT4"
+        },
+        {
+          "title": "ChatGPT (gpt-3.5-turbo)",
+          "value": "GPT35"
         },
         {
           "title": "Bing (gpt-4)",
