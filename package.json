@@ -66,9 +66,9 @@
       "mode": "view"
     },
     {
-      "name": "comment",
-      "title": "Add Comments to Code",
-      "description": "Add comments to code",
+      "name": "fixCode",
+      "title": "Fix Code",
+      "description": "Fix errors and bugs in code",
       "icon": "code-icon.png",
       "mode": "view"
     },
