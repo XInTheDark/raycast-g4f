@@ -80,18 +80,17 @@
       "mode": "view"
     },
     {
-      "name": "genImage",
-      "title": "Generate Images",
-      "subtitle": "GPT4Free",
-      "icon": "image-icon.png",
-      "description": "Generate images from a text prompt",
-      "mode": "view"
-    },
-    {
       "name": "professional",
       "title": "Change Tone to Professional",
       "icon": "text-icon.png",
       "description": "Change tone of selected text to professional",
+      "mode": "view"
+    },
+    {
+      "name": "paraphrase",
+      "title": "Paraphrase",
+      "icon": "text-icon.png",
+      "description": "Paraphrase selected text",
       "mode": "view"
     },
     {
@@ -129,14 +128,22 @@
       "icon": "shorten-icon.png",
       "description": "Make selected text shorter",
       "mode": "view"
+    },
+    {
+      "name": "genImage",
+      "title": "Generate Images",
+      "subtitle": "GPT4Free",
+      "icon": "image-icon.png",
+      "description": "Generate images from a text prompt",
+      "mode": "view"
     }
   ],
   "preferences": [
     {
-      "description": "The default provider and model used in this extension.",
       "name": "gptProvider",
-      "required": false,
       "title": "Default GPT Provider",
+      "description": "The default provider and model used in this extension.",
+      "required": false,
       "type": "dropdown",
       "data": [
         {
