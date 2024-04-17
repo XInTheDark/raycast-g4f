@@ -15,13 +15,15 @@ import {
 } from "@raycast/api";
 import { useState, useEffect } from "react";
 import fetch from "node-fetch";
+global.fetch = fetch;
+global.Headers = fetch.Headers;
 
 // G4F module
 import * as G4F from "g4f";
 const g4f = new G4F.G4F();
 
 // Google Gemini module
-import Gemini from "gemini-ai";
+import { GoogleGenerativeAI as GoogleGemini } from "@google/generative-ai";
 export const GeminiProvider = "GeminiProvider";
 
 import fs from "fs";
@@ -197,17 +199,22 @@ export const chatCompletion = async (chat, options) => {
   } else {
     // Google Gemini
     const APIKey = getPreferenceValues()["GeminiAPIKey"];
-    const googleGemini = new Gemini(APIKey, { fetch: fetch });
+    const geminiInstance = new GoogleGemini(APIKey);
+    const googleGemini = geminiInstance.getGenerativeModel({
+      model: options.model,
+    });
     let formattedChat = GeminiFormatChat(chat);
 
     // Send message
     formattedChat.pop(); // remove last message as it is the query
     let query = chat[chat.length - 1].content;
-    const geminiChat = googleGemini.createChat({
-      model: options.model,
-      messages: formattedChat,
+    const geminiChat = googleGemini.startChat({
+      history: formattedChat,
     });
-    response = await geminiChat.ask(query);
+
+    const result = await geminiChat.sendMessage(query);
+    const r = await result.response;
+    response = r.text();
   }
 
   // format response
@@ -256,21 +263,12 @@ export const formatResponse = (response) => {
 export const GeminiFormatChat = (chat) => {
   let formattedChat = [];
 
-  // Discard system prompt as it is not supported by the API
-  if (chat.length >= 2 && chat[0].role === "user" && chat[1].role === "user") {
-    chat.shift(); // remove first user message (system prompt)
-  }
-
-  let currentPair = [];
   for (let i = 0; i < chat.length; i++) {
     const message = chat[i];
-    if (currentPair.length === 0) {
-      currentPair.push(message.content);
-    } else {
-      currentPair.push(message.content);
-      formattedChat.push(currentPair);
-      currentPair = [];
-    }
+    formattedChat.push({
+      role: message.role === "user" ? "user" : "model",
+      parts: [{ text: message.content }],
+    });
   }
   return formattedChat;
 };
