@@ -163,13 +163,13 @@
           "value": "GoogleGemini"
         }
       ],
-      "default": "GPT"
+      "default": "GPT4"
     },
     {
-      "description": "Optional. Only used if Gemini model is selected.",
       "name": "GeminiAPIKey",
-      "required": false,
       "title": "Google Gemini API Key",
+      "description": "Optional. Only used if Gemini model is selected.",
+      "required": false,
       "type": "password",
       "default": ""
     }
