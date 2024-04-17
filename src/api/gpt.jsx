@@ -201,7 +201,6 @@ export const chatCompletion = async (chat, options) => {
     let formattedChat = GeminiFormatChat(chat);
 
     // Send message
-    formattedChat.pop(); // remove last message as it is the query
     let query = chat[chat.length - 1].content;
     const geminiChat = googleGemini.createChat({
       model: options.model,
