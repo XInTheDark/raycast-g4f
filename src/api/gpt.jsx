@@ -25,6 +25,7 @@ import Gemini from "gemini-ai";
 export const GeminiProvider = "GeminiProvider";
 
 import fs from "fs";
+import { chunkProcessor } from "g4f";
 
 export default (props, { context = undefined, allowPaste = false, useSelected = false, buffer = [] }) => {
   const Pages = {
@@ -58,15 +59,26 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
       // load provider and model from preferences
       const preferences = getPreferenceValues();
       const providerString = preferences["gptProvider"];
-      const [provider, model] = providers[providerString];
+      const [provider, model, stream] = providers[providerString];
       const options = {
         provider: provider,
         model: model,
+        stream: stream,
       };
 
       // generate response
-      let response = await chatCompletion(messages, options);
-      setMarkdown(response);
+      let response = "";
+      if (!stream) {
+        response = await chatCompletion(messages, options);
+        setMarkdown(response);
+      }
+      else {
+        let r = await chatCompletion(messages, options);
+        for await (const chunk of chunkProcessor(r)) {
+          response += chunk;
+          setMarkdown(response);
+        }
+      }
       setLastResponse(response);
 
       await showToast({
@@ -181,10 +193,10 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
 };
 
 export const providers = {
-  GPT4: [g4f.providers.GPT, "gpt-4-32k"],
-  GPT35: [g4f.providers.GPT, "gpt-3.5-turbo"],
-  Bing: [g4f.providers.Bing, "gpt-4"],
-  GoogleGemini: [GeminiProvider, "gemini-pro"],
+  GPT4: [g4f.providers.GPT, "gpt-4-32k", false],
+  GPT35: [g4f.providers.GPT, "gpt-3.5-turbo", false],
+  Bing: [g4f.providers.Bing, "gpt-4", true],
+  GoogleGemini: [GeminiProvider, "gemini-pro", true],
 };
 
 // generate response using a chat context and options
@@ -233,10 +245,11 @@ export const getChatResponse = async (currentChat, query) => {
 
   // load provider and model
   const providerString = currentChat.provider;
-  const [provider, model] = providers[providerString];
+  const [provider, model, stream] = providers[providerString];
   const options = {
     provider: provider,
     model: model,
+    stream: stream,
   };
 
   // generate response
