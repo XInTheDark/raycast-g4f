@@ -98,6 +98,7 @@ export default function Chat({ launchContext }) {
           <Form.Dropdown.Item title="ChatGPT (gpt-3.5-turbo)" value="GPT35" />
           <Form.Dropdown.Item title="Bing (gpt-4)" value="Bing" />
           <Form.Dropdown.Item title="Google Gemini (requires API Key)" value="GoogleGemini" />
+          <Form.Dropdown.Item title="Local Inference" value="Local" />
         </Form.Dropdown>
       </Form>
     );

@@ -22,7 +22,17 @@ const g4f = new G4F.G4F();
 
 // Google Gemini module
 import Gemini from "gemini-ai";
+
+// Providers
 export const GeminiProvider = "GeminiProvider";
+export const LocalProvider = "LocalProvider";
+export const providers = {
+  GPT4: [g4f.providers.GPT, "gpt-4-32k"],
+  GPT35: [g4f.providers.GPT, "gpt-3.5-turbo"],
+  Bing: [g4f.providers.Bing, "gpt-4"],
+  GoogleGemini: [GeminiProvider, "gemini-pro"],
+  Local: [LocalProvider, ""],
+};
 
 import fs from "fs";
 
@@ -180,21 +190,11 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
   );
 };
 
-export const providers = {
-  GPT4: [g4f.providers.GPT, "gpt-4-32k"],
-  GPT35: [g4f.providers.GPT, "gpt-3.5-turbo"],
-  Bing: [g4f.providers.Bing, "gpt-4"],
-  GoogleGemini: [GeminiProvider, "gemini-pro"],
-};
-
 // generate response using a chat context and options
 // returned response is ready for use directly
 export const chatCompletion = async (chat, options) => {
   let response = "";
-  if (options.provider !== GeminiProvider) {
-    // GPT
-    response = await g4f.chatCompletion(chat, options);
-  } else {
+  if (options.provider === GeminiProvider) {
     // Google Gemini
     const APIKey = getPreferenceValues()["GeminiAPIKey"];
     const googleGemini = new Gemini(APIKey, { fetch: fetch });
@@ -207,6 +207,12 @@ export const chatCompletion = async (chat, options) => {
       messages: formattedChat,
     });
     response = await geminiChat.ask(query);
+  } else if (options.provider === LocalProvider) {
+    // Local
+    // @TODO
+  } else {
+    // GPT
+    response = await g4f.chatCompletion(chat, options);
   }
 
   // format response
