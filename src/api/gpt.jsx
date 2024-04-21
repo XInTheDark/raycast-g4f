@@ -259,8 +259,15 @@ export const getChatResponse = async (currentChat, query) => {
 
 // format response using some heuristics
 export const formatResponse = (response) => {
-  // replace \n to a real newline
+  // replace \n with a real newline, \t with a real tab, etc.
   response = response.replace(/\\n/g, "\n");
+  response = response.replace(/\\t/g, "\t");
+  response = response.replace(/\\r/g, "\r");
+
+  // convert <sup> and <sub>
+  response = response.replace(/<sup>(.*?)<\/sup>/g, " [$1]");
+  response = response.replace(/<sub>(.*?)<\/sub>/g, " [$1]");
+
   return response;
 };
 
