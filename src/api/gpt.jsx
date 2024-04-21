@@ -27,6 +27,7 @@ import { GoogleGenerativeAI as GoogleGemini } from "@google/generative-ai";
 export const GeminiProvider = "GeminiProvider";
 
 import fs from "fs";
+import { chunkProcessor } from "g4f";
 
 export default (props, { context = undefined, allowPaste = false, useSelected = false, buffer = [] }) => {
   const Pages = {
@@ -60,15 +61,26 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
       // load provider and model from preferences
       const preferences = getPreferenceValues();
       const providerString = preferences["gptProvider"];
-      const [provider, model] = providers[providerString];
+      const [provider, model, stream] = providers[providerString];
       const options = {
         provider: provider,
         model: model,
+        stream: stream,
       };
 
       // generate response
-      let response = await chatCompletion(messages, options);
-      setMarkdown(response);
+      let response = "";
+      if (!stream) {
+        response = await chatCompletion(messages, options);
+        setMarkdown(response);
+      } else {
+        let stream = await chatCompletion(messages, options);
+        for await (const chunk of stream) {
+          response += getTextFromChunk(chunk);
+          response = formatResponse(response);
+          setMarkdown(response);
+        }
+      }
       setLastResponse(response);
 
       await showToast({
@@ -183,19 +195,21 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
 };
 
 export const providers = {
-  GPT4: [g4f.providers.GPT, "gpt-4-32k"],
-  GPT35: [g4f.providers.GPT, "gpt-3.5-turbo"],
-  Bing: [g4f.providers.Bing, "gpt-4"],
-  GoogleGemini: [GeminiProvider, "gemini-pro"],
+  GPT4: [g4f.providers.GPT, "gpt-4-32k", false],
+  GPT35: [g4f.providers.GPT, "gpt-3.5-turbo", false],
+  Bing: [g4f.providers.Bing, "gpt-4", true],
+  GoogleGemini: [GeminiProvider, "gemini-pro", true],
 };
 
 // generate response using a chat context and options
-// returned response is ready for use directly
+// the response is expected to be formatted if it's a string,
+// else it returns either a chunkProcessor (for GPT) or a stream (for Google Gemini)
 export const chatCompletion = async (chat, options) => {
   let response = "";
   if (options.provider !== GeminiProvider) {
     // GPT
     response = await g4f.chatCompletion(chat, options);
+    return options.stream ? chunkProcessor(response) : formatResponse(response);
   } else {
     // Google Gemini
     const APIKey = getPreferenceValues()["GeminiAPIKey"];
@@ -212,14 +226,18 @@ export const chatCompletion = async (chat, options) => {
       history: formattedChat,
     });
 
-    const result = await geminiChat.sendMessage(query);
-    const r = await result.response;
-    response = r.text();
-  }
+    if (!options.stream) {
+      const result = await geminiChat.sendMessage(query);
+      const r = await result.response;
+      response = r.text();
+      response = formatResponse(response);
+    } else {
+      const result = await geminiChat.sendMessageStream(query);
+      response = result.stream;
+    }
 
-  // format response
-  response = formatResponse(response);
-  return response;
+    return response;
+  }
 };
 
 // generate response using a chat context and a query (optional)
@@ -241,10 +259,11 @@ export const getChatResponse = async (currentChat, query) => {
 
   // load provider and model
   const providerString = currentChat.provider;
-  const [provider, model] = providers[providerString];
+  const [provider, model, stream] = providers[providerString];
   const options = {
     provider: provider,
     model: model,
+    stream: stream,
   };
 
   // generate response
@@ -254,8 +273,15 @@ export const getChatResponse = async (currentChat, query) => {
 
 // format response using some heuristics
 export const formatResponse = (response) => {
-  // replace \n to a real newline
+  // replace \n with a real newline, \t with a real tab, etc.
   response = response.replace(/\\n/g, "\n");
+  response = response.replace(/\\t/g, "\t");
+  response = response.replace(/\\r/g, "\r");
+
+  // remove <sup>, </sup> tags (not supported apparently)
+  response = response.replace(/<sup>/g, "");
+  response = response.replace(/<\/sup>/g, "");
+
   return response;
 };
 
@@ -272,3 +298,8 @@ export const GeminiFormatChat = (chat) => {
   }
   return formattedChat;
 };
+
+export const getTextFromChunk = (chunk) => {
+  // for GPT, chunk is a string; for Google Gemini, chunk has a text() method
+  return chunk.text?.() ?? chunk;
+}

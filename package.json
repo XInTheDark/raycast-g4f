@@ -80,18 +80,17 @@
       "mode": "view"
     },
     {
-      "name": "genImage",
-      "title": "Generate Images",
-      "subtitle": "GPT4Free",
-      "icon": "image-icon.png",
-      "description": "Generate images from a text prompt",
-      "mode": "view"
-    },
-    {
       "name": "professional",
       "title": "Change Tone to Professional",
       "icon": "text-icon.png",
       "description": "Change tone of selected text to professional",
+      "mode": "view"
+    },
+    {
+      "name": "paraphrase",
+      "title": "Paraphrase",
+      "icon": "text-icon.png",
+      "description": "Paraphrase selected text",
       "mode": "view"
     },
     {
@@ -129,14 +128,22 @@
       "icon": "shorten-icon.png",
       "description": "Make selected text shorter",
       "mode": "view"
+    },
+    {
+      "name": "genImage",
+      "title": "Generate Images",
+      "subtitle": "GPT4Free",
+      "icon": "image-icon.png",
+      "description": "Generate images from a text prompt",
+      "mode": "view"
     }
   ],
   "preferences": [
     {
-      "description": "The default provider and model used in this extension.",
       "name": "gptProvider",
-      "required": false,
       "title": "Default GPT Provider",
+      "description": "The default provider and model used in this extension.",
+      "required": false,
       "type": "dropdown",
       "data": [
         {
@@ -156,13 +163,13 @@
           "value": "GoogleGemini"
         }
       ],
-      "default": "GPT"
+      "default": "GPT4"
     },
     {
-      "description": "Optional. Only used if Gemini model is selected.",
       "name": "GeminiAPIKey",
-      "required": false,
       "title": "Google Gemini API Key",
+      "description": "Optional. Only used if Gemini model is selected.",
+      "required": false,
       "type": "password",
       "default": ""
     }
@@ -172,7 +179,7 @@
     "@raycast/api": "^1.62.0",
     "@raycast/utils": "^1.9.0",
     "g4f": "^1.4.2",
-    "gemini-ai": "^1.1.0"
+    "node-fetch": "^3.3.2"
   },
   "devDependencies": {
     "@raycast/eslint-config": "1.0.5",
@@ -181,7 +188,7 @@
     "eslint": "^7.32.0",
     "prettier": "^2.5.1",
     "react": "^18.2.0",
-    "typescript": "^4.4.3"
+    "typescript": "^5.4.5"
   },
   "scripts": {
     "build": "ray build -e dist",

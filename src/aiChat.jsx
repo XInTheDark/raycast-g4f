@@ -11,7 +11,7 @@ import {
   getPreferenceValues,
 } from "@raycast/api";
 import { useState, useEffect } from "react";
-import { getChatResponse } from "./api/gpt";
+import { getChatResponse, getTextFromChunk, formatResponse, providers } from "./api/gpt";
 import { LocalStorage, Clipboard } from "@raycast/api";
 
 export default function Chat({ launchContext }) {
@@ -36,6 +36,50 @@ export default function Chat({ launchContext }) {
         },
       ],
     };
+  };
+
+  let _setChatData = (chatData, setChatData, query = "", response = "") => {
+    setChatData((oldData) => {
+      let newChatData = structuredClone(oldData);
+      if (query) getChat(chatData.currentChat, newChatData.chats).messages[0].prompt = query;
+      if (response) getChat(chatData.currentChat, newChatData.chats).messages[0].answer = response;
+      return newChatData;
+    });
+  };
+
+  let updateChatResponse = async (chatData, setChatData, query) => {
+    let currentChat = getChat(chatData.currentChat, chatData.chats);
+    const [_, __, stream] = providers[currentChat.provider];
+
+    _setChatData(chatData, setChatData, query, "");
+
+    if (!stream) {
+      let response = await getChatResponse(currentChat, query);
+      _setChatData(chatData, setChatData, "", response);
+    } else {
+      let response = "",
+        prevChunk = "";
+      let stream = await getChatResponse(currentChat, query);
+      for await (const chunk of stream) {
+        response += prevChunk;
+        response = formatResponse(response);
+        _setChatData(chatData, setChatData, "", response);
+        prevChunk = getTextFromChunk(chunk);
+      }
+
+      // for Bing provider, the last chunk must not be added
+      if (currentChat.provider !== "Bing") {
+        response += prevChunk;
+        response = formatResponse(response);
+        _setChatData(chatData, setChatData, "", response);
+      }
+    }
+
+    setChatData((oldData) => {
+      let newChatData = structuredClone(oldData);
+      getChat(chatData.currentChat, newChatData.chats).messages[0].finished = true;
+      return newChatData;
+    });
   };
 
   let CreateChat = () => {
@@ -135,21 +179,7 @@ export default function Chat({ launchContext }) {
 
                 (async () => {
                   try {
-                    let currentChat = getChat(chatData.currentChat);
-                    let response = await getChatResponse(currentChat, query);
-
-                    setChatData((oldData) => {
-                      let newChatData = structuredClone(oldData);
-                      getChat(chatData.currentChat, newChatData.chats).messages[0].prompt = query;
-                      getChat(chatData.currentChat, newChatData.chats).messages[0].answer = response;
-                      return newChatData;
-                    });
-
-                    setChatData((oldData) => {
-                      let newChatData = structuredClone(oldData);
-                      getChat(chatData.currentChat, newChatData.chats).messages[0].finished = true;
-                      return newChatData;
-                    });
+                    await updateChatResponse(chatData, setChatData, query);
 
                     toast(Toast.Style.Success, "Response Loaded");
                   } catch {
@@ -377,20 +407,7 @@ export default function Chat({ launchContext }) {
           toast(Toast.Style.Animated, "Regenerating Last Message");
           await (async () => {
             try {
-              let response = await getChatResponse(currentChat, "");
-
-              setChatData((oldData) => {
-                let newChatData = structuredClone(oldData);
-                getChat(chatData.currentChat, newChatData.chats).messages[0].answer = response;
-                return newChatData;
-              });
-
-              setChatData((oldData) => {
-                let newChatData = structuredClone(oldData);
-                getChat(newData.currentChat, newChatData.chats).messages[0].finished = true;
-                return newChatData;
-              });
-
+              await updateChatResponse(newData, setChatData, "");
               toast(Toast.Style.Success, "Response Loaded");
             } catch {
               setChatData((oldData) => {
