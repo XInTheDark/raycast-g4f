@@ -71,11 +71,11 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
       if (!stream) {
         response = await chatCompletion(messages, options);
         setMarkdown(response);
-      }
-      else {
+      } else {
         let r = await chatCompletion(messages, options);
         for await (const chunk of chunkProcessor(r)) {
           response += chunk;
+          response = formatResponse(response);
           setMarkdown(response);
         }
       }
@@ -222,7 +222,11 @@ export const chatCompletion = async (chat, options) => {
   }
 
   // format response
-  response = formatResponse(response);
+  if (typeof response === "string") {
+    // will not be a string if stream is enabled
+    response = formatResponse(response);
+  }
+
   return response;
 };
 
@@ -259,14 +263,15 @@ export const getChatResponse = async (currentChat, query) => {
 
 // format response using some heuristics
 export const formatResponse = (response) => {
+  console.log(response);
   // replace \n with a real newline, \t with a real tab, etc.
   response = response.replace(/\\n/g, "\n");
   response = response.replace(/\\t/g, "\t");
   response = response.replace(/\\r/g, "\r");
 
-  // convert <sup> and <sub>
-  response = response.replace(/<sup>(.*?)<\/sup>/g, " [$1]");
-  response = response.replace(/<sub>(.*?)<\/sub>/g, " [$1]");
+  // remove <sup>, </sup> tags (not supported apparently)
+  response = response.replace(/<sup>/g, "");
+  response = response.replace(/<\/sup>/g, "");
 
   return response;
 };
