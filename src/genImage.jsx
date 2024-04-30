@@ -497,18 +497,19 @@ export default function genImage({ launchContext }) {
 }
 
 export const _NegativePrompt =
-  "low quality disfigured bad gross disgusting mutation ugly morbid mutated deformed mutilated mangled poorly drawn face" +
-  " extra limb missing limb floating limbs disconnected limbs malformed limbs oversaturated duplicate bodies cloned" +
-  " faces low-res blurry blur out of focus out of frame extra missing";
+  "low quality, normal quality, bad quality, disfigured, bad, ugly, poorly drawn face," +
+  " extra limb, missing limb, floating limbs, disconnected limbs, malformed limbs, oversaturated, duplicate," +
+  " low-res, blurry, out of focus, out of frame, extra, missing";
 
 export const image_providers = {
   Prodia: [
     g4f.providers.Prodia,
     {
       // list of available models: https://rentry.co/b6i53fnm
-      model: "ICantBelieveItsNotPhotography_seco.safetensors [4e7a3dfd]",
-      cfgScale: 25,
+      model: "neverendingDream_v122.safetensors [f964ceeb]",
+      cfgScale: 10,
       negativePrompt: _NegativePrompt,
+      samplingMethod: "Heun",
     },
   ],
   ProdiaStableDiffusion: [
@@ -518,6 +519,7 @@ export const image_providers = {
       model: "ICantBelieveItsNotPhotography_seco.safetensors [4e7a3dfd]",
       cfgScale: 10,
       negativePrompt: _NegativePrompt,
+      samplingMethod: "Heun",
     },
   ],
   ProdiaStableDiffusionXL: [
@@ -529,6 +531,7 @@ export const image_providers = {
       width: 1024,
       cfgScale: 10,
       negativePrompt: _NegativePrompt,
+      samplingMethod: "Heun",
     },
   ],
   Dalle: [g4f.providers.Dalle, {}],
