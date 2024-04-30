@@ -27,6 +27,14 @@ export const GeminiProvider = "GeminiProvider";
 import fs from "fs";
 import { chunkProcessor } from "g4f";
 
+// Providers
+export const providers = {
+  GPT4: [g4f.providers.GPT, "gpt-4-32k", false],
+  GPT35: [g4f.providers.GPT, "gpt-3.5-turbo", false],
+  Bing: [g4f.providers.Bing, "gpt-4", true],
+  GoogleGemini: [GeminiProvider, "gemini-pro", false],
+};
+
 export default (props, { context = undefined, allowPaste = false, useSelected = false, buffer = [] }) => {
   const Pages = {
     Form: 0,
@@ -192,12 +200,6 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
   );
 };
 
-export const providers = {
-  GPT4: [g4f.providers.GPT, "gpt-4-32k", false],
-  GPT35: [g4f.providers.GPT, "gpt-3.5-turbo", false],
-  Bing: [g4f.providers.Bing, "gpt-4", true],
-  GoogleGemini: [GeminiProvider, "gemini-pro", true],
-};
 
 // generate response using a chat context and options
 // returned response is ready for use directly
