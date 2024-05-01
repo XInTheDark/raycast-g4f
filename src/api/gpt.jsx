@@ -20,7 +20,7 @@ import * as G4F from "g4f";
 const g4f = new G4F.G4F();
 
 // Google Gemini module
-import {GeminiProvider, getGoogleGeminiResponse } from "./google_gemini";
+import { GeminiChunkProcessor, GeminiProvider, getGoogleGeminiResponse } from "./google_gemini";
 
 // Meta Llama 3 module
 import { MetaLlama3Provider, getMetaLlama3Response } from "./meta_llama3";
@@ -35,7 +35,7 @@ export const providers = {
   GPT35: [g4f.providers.GPT, "gpt-3.5-turbo", false],
   Bing: [g4f.providers.Bing, "gpt-4", true],
   MetaLlama3: [MetaLlama3Provider, "", true],
-  GoogleGemini: [GeminiProvider, "", false],
+  GoogleGemini: [GeminiProvider, "", true],
 };
 
 export default (props, { context = undefined, allowPaste = false, useSelected = false, buffer = [] }) => {
@@ -212,7 +212,9 @@ export const chatCompletion = async (chat, options) => {
     response = await getMetaLlama3Response(chat);
   } else if (options.provider === GeminiProvider) {
     // Google Gemini
-    response = await getGoogleGeminiResponse(chat);
+    let [chunk, setChunk] = useState("");
+    await getGoogleGeminiResponse(chat, setChunk);
+    response = await GeminiChunkProcessor(chunk, setChunk);  // note: passed by reference
   } else {
     // GPT
     response = await g4f.chatCompletion(chat, options);
@@ -276,7 +278,7 @@ export const formatResponse = (response) => {
 export const processChunks = (response, provider) => {
   if (provider === g4f.providers.Bing) {
     return chunkProcessor(response);
-  } else if (provider === MetaLlama3Provider) {
+  } else if (provider === MetaLlama3Provider || provider === GeminiProvider) {
     return response;
   } else {
     throw new Error("Streaming is not supported for this provider.");

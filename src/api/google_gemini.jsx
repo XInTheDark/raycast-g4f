@@ -1,9 +1,11 @@
 import Gemini from "gemini-ai";
 import { getPreferenceValues } from "@raycast/api";
 import fetch from "node-fetch-polyfill";
+import { useState } from "react";
+
 export const GeminiProvider = "GeminiProvider";
 
-export const getGoogleGeminiResponse = async (chat) => {
+export const getGoogleGeminiResponse = async function (chat, setChunk) {
     const APIKey = getPreferenceValues()["GeminiAPIKey"];
     const googleGemini = new Gemini(APIKey, { fetch: fetch });
     let formattedChat = GeminiFormatChat(chat);
@@ -14,8 +16,23 @@ export const getGoogleGeminiResponse = async (chat) => {
       model: "gemini-pro",
       messages: formattedChat,
     });
-    let response = await geminiChat.ask(query);
-    return response;
+
+    await geminiChat.ask(query,
+      {
+        stream: (x) => { setChunk(x);},
+      });
+
+}
+
+export const GeminiChunkProcessor = async function* (chunk, setChunk) {
+  // every 20ms, yield chunk
+  while (true) {
+    if (chunk.length > 0) {
+      yield chunk;
+      setChunk("");
+    }
+    await new Promise((resolve) => setTimeout(resolve, 20));
+  }
 }
 
 // Reformat chat to be in google gemini format
