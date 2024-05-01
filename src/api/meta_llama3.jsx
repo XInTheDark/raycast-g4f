@@ -25,11 +25,9 @@ export const getMetaLlama3Response = async function* (chat) {
   });
 
   const responseJson = await response.json();
-  console.log(responseJson);
 
   // GET from response.json()["urls"]["stream"]
   const streamUrl = responseJson.urls.stream;
-  console.log(streamUrl);
 
   const new_headers = {
     Accept: "text/event-stream",
@@ -48,7 +46,6 @@ export const getMetaLlama3Response = async function* (chat) {
     if (done) break;
 
     let str = new TextDecoder().decode(value);
-    console.log(str);
 
     // iterate through each line
     // implementation ported from gpt4free.

@@ -14,15 +14,13 @@ import {
   getPreferenceValues,
 } from "@raycast/api";
 import { useState, useEffect } from "react";
-import fetch from "node-fetch-polyfill";
 
 // G4F module
 import * as G4F from "g4f";
 const g4f = new G4F.G4F();
 
 // Google Gemini module
-import Gemini from "gemini-ai";
-export const GeminiProvider = "GeminiProvider";
+import { GeminiProvider, getGoogleGeminiResponse } from "./google_gemini";
 
 // Meta Llama 3 module
 import { MetaLlama3Provider, getMetaLlama3Response } from "./meta_llama3";
@@ -37,7 +35,7 @@ export const providers = {
   GPT35: [g4f.providers.GPT, "gpt-3.5-turbo", false],
   Bing: [g4f.providers.Bing, "gpt-4", true],
   MetaLlama3: [MetaLlama3Provider, "", true],
-  GoogleGemini: [GeminiProvider, "gemini-pro", false],
+  GoogleGemini: [GeminiProvider, "", false],
 };
 
 export default (props, { context = undefined, allowPaste = false, useSelected = false, buffer = [] }) => {
@@ -214,17 +212,7 @@ export const chatCompletion = async (chat, options) => {
     response = await getMetaLlama3Response(chat);
   } else if (options.provider === GeminiProvider) {
     // Google Gemini
-    const APIKey = getPreferenceValues()["GeminiAPIKey"];
-    const googleGemini = new Gemini(APIKey, { fetch: fetch });
-    let formattedChat = GeminiFormatChat(chat);
-
-    // Send message
-    let query = chat[chat.length - 1].content;
-    const geminiChat = googleGemini.createChat({
-      model: options.model,
-      messages: formattedChat,
-    });
-    response = await geminiChat.ask(query);
+    response = await getGoogleGeminiResponse(chat);
   } else {
     // GPT
     response = await g4f.chatCompletion(chat, options);
@@ -282,29 +270,6 @@ export const formatResponse = (response) => {
   response = response.replace(/<\/sup>/g, "");
 
   return response;
-};
-
-// Reformat chat to be in google gemini format
-export const GeminiFormatChat = (chat) => {
-  let formattedChat = [];
-
-  // Discard system prompt as it is not supported by the API
-  if (chat.length >= 2 && chat[0].role === "user" && chat[1].role === "user") {
-    chat.shift(); // remove first user message (system prompt)
-  }
-
-  let currentPair = [];
-  for (let i = 0; i < chat.length; i++) {
-    const message = chat[i];
-    if (currentPair.length === 0) {
-      currentPair.push(message.content);
-    } else {
-      currentPair.push(message.content);
-      formattedChat.push(currentPair);
-      currentPair = [];
-    }
-  }
-  return formattedChat;
 };
 
 // Returns an async generator that can be used directly.
