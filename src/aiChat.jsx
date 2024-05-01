@@ -11,9 +11,8 @@ import {
   getPreferenceValues,
 } from "@raycast/api";
 import { useState, useEffect } from "react";
-import { getChatResponse, formatResponse, providers } from "./api/gpt";
+import { getChatResponse, formatResponse, providers, processChunks } from "./api/gpt";
 import { LocalStorage, Clipboard } from "@raycast/api";
-import { chunkProcessor } from "g4f";
 
 export default function Chat({ launchContext }) {
   let toast = async (style, title, message) => {
@@ -50,7 +49,7 @@ export default function Chat({ launchContext }) {
 
   let updateChatResponse = async (chatData, setChatData, query) => {
     let currentChat = getChat(chatData.currentChat, chatData.chats);
-    const [_, __, stream] = providers[currentChat.provider];
+    const [provider, model, stream] = providers[currentChat.provider];
 
     _setChatData(chatData, setChatData, query, "");
 
@@ -61,7 +60,7 @@ export default function Chat({ launchContext }) {
       let response = "",
         prevChunk = "";
       let r = await getChatResponse(currentChat, query);
-      for await (const chunk of chunkProcessor(r)) {
+      for await (const chunk of processChunks(r, provider)) {
         response += prevChunk;
         response = formatResponse(response);
         _setChatData(chatData, setChatData, "", response);
@@ -142,6 +141,7 @@ export default function Chat({ launchContext }) {
           <Form.Dropdown.Item title="ChatGPT (gpt-4-32k)" value="GPT4" />
           <Form.Dropdown.Item title="ChatGPT (gpt-3.5-turbo)" value="GPT35" />
           <Form.Dropdown.Item title="Bing (gpt-4)" value="Bing" />
+          <Form.Dropdown.Item title="Meta Llama 3 (meta-llama-3-70b-instruct)" value="MetaLlama3" />
           <Form.Dropdown.Item title="Google Gemini (requires API Key)" value="GoogleGemini" />
         </Form.Dropdown>
       </Form>

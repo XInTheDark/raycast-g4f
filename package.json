@@ -159,6 +159,10 @@
           "value": "Bing"
         },
         {
+          "title": "Meta Llama 3 (meta-llama-3-70b-instruct)",
+          "value": "MetaLlama3"
+        },
+        {
           "title": "Google Gemini (requires API Key)",
           "value": "GoogleGemini"
         }
@@ -179,7 +183,7 @@
     "@raycast/utils": "^1.9.0",
     "g4f": "^1.4.2",
     "gemini-ai": "^1.1.0",
-    "node-fetch": "^3.3.2"
+    "node-fetch-polyfill": "^2.0.6"
   },
   "devDependencies": {
     "@raycast/eslint-config": "1.0.5",
