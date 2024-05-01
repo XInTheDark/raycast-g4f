@@ -143,6 +143,7 @@ export default function Chat({ launchContext }) {
           <Form.Dropdown.Item title="Bing (gpt-4)" value="Bing" />
           <Form.Dropdown.Item title="Meta Llama 3 (meta-llama-3-70b-instruct)" value="MetaLlama3" />
           <Form.Dropdown.Item title="Google Gemini (requires API Key)" value="GoogleGemini" />
+          <Form.Dropdown.Item title="Local Inference (requires model file)" value="LocalInference" />
         </Form.Dropdown>
       </Form>
     );

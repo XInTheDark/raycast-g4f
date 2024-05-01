@@ -25,6 +25,9 @@ import { GeminiProvider, getGoogleGeminiResponse } from "./google_gemini";
 // Meta Llama 3 module
 import { MetaLlama3Provider, getMetaLlama3Response } from "./meta_llama3";
 
+// Local Inference module
+import { LocalInferenceProvider, getLocalInferenceResponse } from "./local_inference";
+
 import fs from "fs";
 import { chunkProcessor } from "g4f";
 
@@ -36,6 +39,7 @@ export const providers = {
   Bing: [g4f.providers.Bing, "gpt-4", true],
   MetaLlama3: [MetaLlama3Provider, "", true],
   GoogleGemini: [GeminiProvider, "", false],
+  LocalInference: [LocalInferenceProvider, "", false],
 };
 
 export default (props, { context = undefined, allowPaste = false, useSelected = false, buffer = [] }) => {

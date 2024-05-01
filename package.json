@@ -165,6 +165,10 @@
         {
           "title": "Google Gemini (requires API Key)",
           "value": "GoogleGemini"
+        },
+        {
+          "title": "Local Inference (requires model file)",
+          "value": "LocalInference"
         }
       ],
       "default": "GPT4"
@@ -176,9 +180,18 @@
       "required": false,
       "type": "password",
       "default": ""
+    },
+    {
+      "name": "LocalModelPath",
+      "title": "Local Model Path",
+      "description": "Optional. Path to local local model file. Only used if Local Inference is selected.",
+      "required": false,
+      "type": "file",
+      "default": ""
     }
   ],
   "dependencies": {
+    "@llama-node/llama-cpp": "^0.1.6",
     "@raycast/api": "^1.62.0",
     "@raycast/utils": "^1.9.0",
     "g4f": "^1.4.2",
