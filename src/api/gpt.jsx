@@ -14,7 +14,7 @@ import {
   getPreferenceValues,
 } from "@raycast/api";
 import { useState, useEffect } from "react";
-import fetch from "node-fetch";
+import fetch from "node-fetch-polyfill";
 
 // G4F module
 import * as G4F from "g4f";
@@ -24,14 +24,19 @@ const g4f = new G4F.G4F();
 import Gemini from "gemini-ai";
 export const GeminiProvider = "GeminiProvider";
 
+// Meta Llama 3 module
+import { MetaLlama3Provider, getMetaLlama3Response } from "./meta_llama3";
+
 import fs from "fs";
 import { chunkProcessor } from "g4f";
 
 // Providers
+// [Provider, Model, Stream]
 export const providers = {
   GPT4: [g4f.providers.GPT, "gpt-4-32k", false],
   GPT35: [g4f.providers.GPT, "gpt-3.5-turbo", false],
   Bing: [g4f.providers.Bing, "gpt-4", true],
+  MetaLlama3: [MetaLlama3Provider, "", true],
   GoogleGemini: [GeminiProvider, "gemini-pro", false],
 };
 
@@ -81,7 +86,7 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
         setMarkdown(response);
       } else {
         let r = await chatCompletion(messages, options);
-        for await (const chunk of chunkProcessor(r)) {
+        for await (const chunk of processChunks(r, provider)) {
           response += chunk;
           response = formatResponse(response);
           setMarkdown(response);
@@ -200,15 +205,14 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
   );
 };
 
-
 // generate response using a chat context and options
 // returned response is ready for use directly
 export const chatCompletion = async (chat, options) => {
   let response = "";
-  if (options.provider !== GeminiProvider) {
-    // GPT
-    response = await g4f.chatCompletion(chat, options);
-  } else {
+  if (options.provider === MetaLlama3Provider) {
+    // Meta Llama 3
+    response = await getMetaLlama3Response(chat);
+  } else if (options.provider === GeminiProvider) {
     // Google Gemini
     const APIKey = getPreferenceValues()["GeminiAPIKey"];
     const googleGemini = new Gemini(APIKey, { fetch: fetch });
@@ -221,6 +225,9 @@ export const chatCompletion = async (chat, options) => {
       messages: formattedChat,
     });
     response = await geminiChat.ask(query);
+  } else {
+    // GPT
+    response = await g4f.chatCompletion(chat, options);
   }
 
   // format response
@@ -298,4 +305,15 @@ export const GeminiFormatChat = (chat) => {
     }
   }
   return formattedChat;
+};
+
+// Returns an async generator that can be used directly.
+export const processChunks = (response, provider) => {
+  if (provider === g4f.providers.Bing) {
+    return chunkProcessor(response);
+  } else if (provider === MetaLlama3Provider) {
+    return response;
+  } else {
+    throw new Error("Streaming is not supported for this provider.");
+  }
 };
