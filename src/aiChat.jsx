@@ -403,25 +403,28 @@ export default function Chat({ launchContext }) {
       if (storedChatData) {
         let newData = JSON.parse(storedChatData);
 
-        if (getChat(newData.currentChat, newData.chats).messages[0]?.finished === false) {
-          let currentChat = getChat(newData.currentChat, newData.chats);
-          currentChat.messages[0].answer = "";
-
-          toast(Toast.Style.Animated, "Regenerating Last Message");
-          await (async () => {
-            try {
-              await updateChatResponse(newData, setChatData, "");
-              toast(Toast.Style.Success, "Response Loaded");
-            } catch {
-              setChatData((oldData) => {
-                let newChatData = structuredClone(oldData);
-                getChat(newData.currentChat, newChatData.chats).messages.shift();
-                return newChatData;
-              });
-              toast(Toast.Style.Failure, "GPT cannot process this message.");
-            }
-          })();
-        }
+        // Legacy feature to regenerate last message, from raycast-gemini.
+        // This feature no longer works because of how we handle streaming.
+        //
+        // if (getChat(newData.currentChat, newData.chats).messages[0]?.finished === false) {
+        //   let currentChat = getChat(newData.currentChat, newData.chats);
+        //   currentChat.messages[0].answer = "";
+        //
+        //   toast(Toast.Style.Animated, "Regenerating Last Message");
+        //   await (async () => {
+        //     try {
+        //       await updateChatResponse(newData, setChatData, "");
+        //       toast(Toast.Style.Success, "Response Loaded");
+        //     } catch {
+        //       setChatData((oldData) => {
+        //         let newChatData = structuredClone(oldData);
+        //         getChat(newData.currentChat, newChatData.chats).messages.shift();
+        //         return newChatData;
+        //       });
+        //       toast(Toast.Style.Failure, "GPT cannot process this message.");
+        //     }
+        //   })();
+        // }
 
         setChatData(structuredClone(newData));
       } else {
