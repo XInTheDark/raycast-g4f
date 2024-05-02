@@ -38,7 +38,8 @@ export const providers = {
   GPT35: [g4f.providers.GPT, "gpt-3.5-turbo", false],
   Bing: [g4f.providers.Bing, "gpt-4", true],
   ReplicateLlama3: [ReplicateLlama3Provider, "", true],
-  DeepInfraLlama3: [DeepInfraLlama3Provider, "", true],
+  DeepInfraLlama3_8B: [DeepInfraLlama3Provider, "meta-llama/Meta-Llama-3-8B-Instruct", true],
+  DeepInfraLlama3_70B: [DeepInfraLlama3Provider, "meta-llama/Meta-Llama-3-70B-Instruct", true],
   GoogleGemini: [GeminiProvider, "", false],
 };
 
@@ -210,13 +211,13 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
 // generate response using a chat context and options
 // returned response is ready for use directly
 export const chatCompletion = async (chat, options) => {
-  let response = "";
+  let response = null;
   if (options.provider === ReplicateLlama3Provider) {
     // Meta Llama 3
     response = await getReplicateLlama3Response(chat);
   } else if (options.provider === DeepInfraLlama3Provider) {
-    // Llama 2 AI
-    response = await getDeepInfraResponse(chat);
+    // Deep Infra Llama 3
+    response = await getDeepInfraResponse(chat, options.model);
   } else if (options.provider === GeminiProvider) {
     // Google Gemini
     response = await getGoogleGeminiResponse(chat);

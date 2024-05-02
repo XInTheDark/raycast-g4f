@@ -4,7 +4,6 @@ import fetch from "node-fetch-polyfill";
 // Implementation ported from gpt4free DeepInfra provider.
 
 const api_url = "https://api.deepinfra.com/v1/openai/chat/completions";
-const model_str = "meta-llama/Meta-Llama-3-70B-Instruct";
 const headers = {
   Accept: "text/event-stream",
   "Accept-Encoding": "gzip, deflate, br",
@@ -24,9 +23,9 @@ const headers = {
   "sec-ch-ua-platform": '"macOS"',
 };
 
-export const getDeepInfraResponse = async function* (chat, max_retries = 5) {
+export const getDeepInfraResponse = async function* (chat, model, max_retries = 5) {
   let data = {
-    model: model_str,
+    model: model,
     messages: chat,
     temperature: 0.7,
     max_tokens: 1028,
@@ -42,18 +41,14 @@ export const getDeepInfraResponse = async function* (chat, max_retries = 5) {
       body: JSON.stringify(data),
     });
 
-    console.log(response);
-
     // Implementation taken from gpt4free: g4f/Provider/needs_auth/Openai.py at async def create_async_generator()
     let first = true;
     let reader = response.body.getReader();
-    console.log(reader);
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
 
       let str = new TextDecoder().decode(value);
-      console.log(str);
       let lines = str.split("\n");
       for (let i = 0; i < lines.length; i++) {
         let line = lines[i];
@@ -62,18 +57,15 @@ export const getDeepInfraResponse = async function* (chat, max_retries = 5) {
           if (chunk.trim() === "[DONE]") return; // trim() is important
 
           let data = JSON.parse(chunk);
-          console.log(data);
           let choice = data["choices"][0];
           // python: if "content" in choice["delta"] and choice["delta"]["content"]:
           if ("delta" in choice && "content" in choice["delta"] && choice["delta"]["content"]) {
-            console.log("trying to get delta");
             let delta = choice["delta"]["content"];
             if (first) {
               delta = delta.trimStart();
             }
             if (delta) {
               first = false;
-              console.log(delta);
               yield delta;
             }
           }
@@ -83,7 +75,7 @@ export const getDeepInfraResponse = async function* (chat, max_retries = 5) {
   } catch (e) {
     if (max_retries > 0) {
       console.log(e, "Retrying...");
-      yield* getDeepInfraResponse(chat, max_retries - 1);
+      yield* getDeepInfraResponse(chat, model, max_retries - 1);
     } else {
       throw e;
     }
