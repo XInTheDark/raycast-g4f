@@ -7,9 +7,7 @@ const headers = {
   "Content-Type": "application/json",
 };
 
-export const getMetaLlama3Response = async function* (chat) {
-  // we should return an async generator here
-
+export const getMetaLlama3Response = async function* (chat, max_retries = 6) {
   let data = {
     stream: true,
     input: {
@@ -17,55 +15,64 @@ export const getMetaLlama3Response = async function* (chat) {
     },
   };
 
-  // POST
-  const response = await fetch(url, {
-    method: "POST",
-    headers: headers,
-    body: JSON.stringify(data),
-  });
+  try {
+    // POST
+    const response = await fetch(url, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(data),
+    });
 
-  const responseJson = await response.json();
+    const responseJson = await response.json();
 
-  // GET from response.json()["urls"]["stream"]
-  const streamUrl = responseJson.urls.stream;
+    // GET from response.json()["urls"]["stream"]
+    const streamUrl = responseJson.urls.stream;
 
-  const new_headers = {
-    Accept: "text/event-stream",
-    "Content-Type": "application/json",
-  };
-  const streamResponse = await fetch(streamUrl, {
-    method: "GET",
-    headers: new_headers,
-  });
+    const new_headers = {
+      Accept: "text/event-stream",
+      "Content-Type": "application/json",
+    };
+    const streamResponse = await fetch(streamUrl, {
+      method: "GET",
+      headers: new_headers,
+    });
 
-  const reader = streamResponse.body.getReader();
-  // eslint-disable-next-line no-constant-condition
-  let curr_event = "";
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
+    const reader = streamResponse.body.getReader();
+    // eslint-disable-next-line no-constant-condition
+    let curr_event = "";
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
 
-    let str = new TextDecoder().decode(value);
+      let str = new TextDecoder().decode(value);
 
-    // iterate through each line
-    // implementation ported from gpt4free.
-    let lines = str.split("\n");
-    let is_only_line = true;
-    for (let i = 0; i < lines.length; i++) {
-      let line = lines[i];
-      if (line.startsWith("event: ")) {
-        curr_event = line.substring(7);
-        if (curr_event === "done") return;
-      } else if (line.startsWith("data: ") && curr_event === "output") {
-        let data = line.substring(6);
+      // iterate through each line
+      // implementation ported from gpt4free.
+      let lines = str.split("\n");
+      let is_only_line = true;
+      for (let i = 0; i < lines.length; i++) {
+        let line = lines[i];
+        if (line.startsWith("event: ")) {
+          curr_event = line.substring(7);
+          if (curr_event === "done") return;
+        } else if (line.startsWith("data: ") && curr_event === "output") {
+          let data = line.substring(6);
 
-        if (data.length === 0) data = "\n";
-        if (!is_only_line) data = "\n" + data;
+          if (data.length === 0) data = "\n";
+          if (!is_only_line) data = "\n" + data;
 
-        is_only_line = false;
+          is_only_line = false;
 
-        yield data;
+          yield data;
+        }
       }
+    }
+  } catch (e) {
+    if (max_retries > 0) {
+      console.log(e, "Retrying...");
+      yield* getMetaLlama3Response(chat, max_retries - 1);
+    } else {
+      throw e;
     }
   }
 };
