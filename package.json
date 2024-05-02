@@ -163,6 +163,10 @@
           "value": "ReplicateLlama3"
         },
         {
+          "title": "DeepInfra (meta-llama-3-70b-instruct)",
+          "value": "DeepInfraLlama3"
+        },
+        {
           "title": "Google Gemini (requires API Key)",
           "value": "GoogleGemini"
         }

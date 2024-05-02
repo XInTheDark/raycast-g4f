@@ -22,8 +22,11 @@ const g4f = new G4F.G4F();
 // Google Gemini module
 import { GeminiProvider, getGoogleGeminiResponse } from "./google_gemini";
 
-// Meta Llama 3 module
+// Replicate Llama 3 module
 import { ReplicateLlama3Provider, getReplicateLlama3Response } from "./replicate_llama3";
+
+// DeepInfra Llama 3 module
+import { DeepInfraLlama3Provider, getDeepInfraResponse } from "./deepinfra_llama3";
 
 import fs from "fs";
 import { chunkProcessor } from "g4f";
@@ -35,6 +38,7 @@ export const providers = {
   GPT35: [g4f.providers.GPT, "gpt-3.5-turbo", false],
   Bing: [g4f.providers.Bing, "gpt-4", true],
   ReplicateLlama3: [ReplicateLlama3Provider, "", true],
+  DeepInfraLlama3: [DeepInfraLlama3Provider, "", true],
   GoogleGemini: [GeminiProvider, "", false],
 };
 
@@ -210,6 +214,9 @@ export const chatCompletion = async (chat, options) => {
   if (options.provider === ReplicateLlama3Provider) {
     // Meta Llama 3
     response = await getReplicateLlama3Response(chat);
+  } else if (options.provider === DeepInfraLlama3Provider) {
+    // Llama 2 AI
+    response = await getDeepInfraResponse(chat);
   } else if (options.provider === GeminiProvider) {
     // Google Gemini
     response = await getGoogleGeminiResponse(chat);
@@ -276,7 +283,7 @@ export const formatResponse = (response) => {
 export const processChunks = (response, provider) => {
   if (provider === g4f.providers.Bing) {
     return chunkProcessor(response);
-  } else if (provider === ReplicateLlama3Provider) {
+  } else if (provider === ReplicateLlama3Provider || provider === DeepInfraLlama3Provider) {
     return response;
   } else {
     throw new Error("Streaming is not supported for this provider.");

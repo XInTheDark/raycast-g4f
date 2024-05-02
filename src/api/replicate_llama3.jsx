@@ -78,7 +78,7 @@ export const getReplicateLlama3Response = async function* (chat, max_retries = 1
 };
 
 // Format a series of messages into a single string
-export const formatChatToPrompt = (chat) => {
+const formatChatToPrompt = (chat) => {
   let prompt = "";
   for (let i = 0; i < chat.length; i++) {
     prompt += chat[i].role + ": " + chat[i].content + "\n";
