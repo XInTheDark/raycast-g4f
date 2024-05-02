@@ -159,8 +159,8 @@
           "value": "Bing"
         },
         {
-          "title": "Meta Llama 3 (meta-llama-3-70b-instruct)",
-          "value": "MetaLlama3"
+          "title": "Replicate (meta-llama-3-70b-instruct)",
+          "value": "ReplicateLlama3"
         },
         {
           "title": "Google Gemini (requires API Key)",
