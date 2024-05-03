@@ -52,6 +52,22 @@
       ]
     },
     {
+      "name": "askAboutScreenContent",
+      "title": "Ask About Screen Content",
+      "subtitle": "GPT4Free",
+      "description": "Ask GPT about the text on your screen",
+      "mode": "view",
+      "icon": "screen-icon.png",
+      "arguments": [
+        {
+          "name": "query",
+          "placeholder": "Query",
+          "type": "text",
+          "required": false
+        }
+      ]
+    },
+    {
       "name": "summarize",
       "title": "Summarize",
       "description": "Summarize text",
