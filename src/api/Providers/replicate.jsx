@@ -1,4 +1,4 @@
-export const ReplicateLlama3Provider = "ReplicateLlama3Provider";
+export const ReplicateProvider = "ReplicateProvider";
 import fetch from "node-fetch-polyfill";
 
 const url = "https://replicate.com/api/models/meta/meta-llama-3-70b-instruct/predictions";
@@ -7,7 +7,7 @@ const headers = {
   "Content-Type": "application/json",
 };
 
-export const getReplicateLlama3Response = async function* (chat, max_retries = 10) {
+export const getReplicateResponse = async function* (chat, max_retries = 10) {
   let data = {
     stream: true,
     input: {
@@ -70,7 +70,7 @@ export const getReplicateLlama3Response = async function* (chat, max_retries = 1
   } catch (e) {
     if (max_retries > 0) {
       console.log(e, "Retrying...");
-      yield* getReplicateLlama3Response(chat, max_retries - 1);
+      yield* getReplicateResponse(chat, max_retries - 1);
     } else {
       throw e;
     }

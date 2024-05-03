@@ -1,4 +1,4 @@
-export const DeepInfraLlama3Provider = "DeepInfraLlama3Provider";
+export const DeepInfraProvider = "DeepInfraProvider";
 import fetch from "node-fetch-polyfill";
 
 // Implementation ported from gpt4free DeepInfra provider.
@@ -28,7 +28,7 @@ export const getDeepInfraResponse = async function* (chat, model, max_retries = 
     model: model,
     messages: chat,
     temperature: 0.7,
-    max_tokens: 1028,
+    max_tokens: model === "mistralai/Mixtral-8x22B-Instruct-v0.1" ? null : 1028,
     stream: true,
     headers: headers,
   };

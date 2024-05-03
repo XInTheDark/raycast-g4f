@@ -141,9 +141,10 @@ export default function Chat({ launchContext }) {
           <Form.Dropdown.Item title="ChatGPT (gpt-4-32k)" value="GPT4" />
           <Form.Dropdown.Item title="ChatGPT (gpt-3.5-turbo)" value="GPT35" />
           <Form.Dropdown.Item title="Bing (gpt-4)" value="Bing" />
-          <Form.Dropdown.Item title="Replicate (meta-llama-3-70b-instruct)" value="ReplicateLlama3" />
-          <Form.Dropdown.Item title="DeepInfra (meta-llama-3-8b-instruct)" value="DeepInfraLlama3_8B" />
-          <Form.Dropdown.Item title="DeepInfra (meta-llama-3-70b-instruct)" value="DeepInfraLlama3_70B" />
+          <Form.Dropdown.Item title="Replicate (meta-llama-3-70b)" value="ReplicateLlama3" />
+          <Form.Dropdown.Item title="DeepInfra (meta-llama-3-8b)" value="DeepInfraLlama3_8B" />
+          <Form.Dropdown.Item title="DeepInfra (meta-llama-3-70b)" value="DeepInfraLlama3_70B" />
+          <Form.Dropdown.Item title="DeepInfra (Mixtral-8x22B)" value="DeepInfraMixtral_8x22B" />
           <Form.Dropdown.Item title="Google Gemini (requires API Key)" value="GoogleGemini" />
         </Form.Dropdown>
       </Form>

@@ -20,13 +20,13 @@ import * as G4F from "g4f";
 const g4f = new G4F.G4F();
 
 // Google Gemini module
-import { GeminiProvider, getGoogleGeminiResponse } from "./google_gemini";
+import { GeminiProvider, getGoogleGeminiResponse } from "./Providers/google_gemini";
 
 // Replicate Llama 3 module
-import { ReplicateLlama3Provider, getReplicateLlama3Response } from "./replicate_llama3";
+import { ReplicateProvider, getReplicateResponse } from "./Providers/replicate";
 
 // DeepInfra Llama 3 module
-import { DeepInfraLlama3Provider, getDeepInfraResponse } from "./deepinfra_llama3";
+import { DeepInfraProvider, getDeepInfraResponse } from "./Providers/deepinfra";
 
 import fs from "fs";
 import { chunkProcessor } from "g4f";
@@ -37,9 +37,10 @@ export const providers = {
   GPT4: [g4f.providers.GPT, "gpt-4-32k", false],
   GPT35: [g4f.providers.GPT, "gpt-3.5-turbo", false],
   Bing: [g4f.providers.Bing, "gpt-4", true],
-  ReplicateLlama3: [ReplicateLlama3Provider, "", true],
-  DeepInfraLlama3_8B: [DeepInfraLlama3Provider, "meta-llama/Meta-Llama-3-8B-Instruct", true],
-  DeepInfraLlama3_70B: [DeepInfraLlama3Provider, "meta-llama/Meta-Llama-3-70B-Instruct", true],
+  ReplicateLlama3: [ReplicateProvider, "", true],
+  DeepInfraLlama3_8B: [DeepInfraProvider, "meta-llama/Meta-Llama-3-8B-Instruct", true],
+  DeepInfraLlama3_70B: [DeepInfraProvider, "meta-llama/Meta-Llama-3-70B-Instruct", true],
+  DeepInfraMixtral_8x22B: [DeepInfraProvider, "mistralai/Mixtral-8x22B-Instruct-v0.1", true],
   GoogleGemini: [GeminiProvider, "", false],
 };
 
@@ -212,10 +213,10 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
 // returned response is ready for use directly
 export const chatCompletion = async (chat, options) => {
   let response = null;
-  if (options.provider === ReplicateLlama3Provider) {
+  if (options.provider === ReplicateProvider) {
     // Meta Llama 3
-    response = await getReplicateLlama3Response(chat);
-  } else if (options.provider === DeepInfraLlama3Provider) {
+    response = await getReplicateResponse(chat);
+  } else if (options.provider === DeepInfraProvider) {
     // Deep Infra Llama 3
     response = await getDeepInfraResponse(chat, options.model);
   } else if (options.provider === GeminiProvider) {
@@ -284,7 +285,7 @@ export const formatResponse = (response) => {
 export const processChunks = (response, provider) => {
   if (provider === g4f.providers.Bing) {
     return chunkProcessor(response);
-  } else if (provider === ReplicateLlama3Provider || provider === DeepInfraLlama3Provider) {
+  } else if (provider === ReplicateProvider || provider === DeepInfraProvider) {
     return response;
   } else {
     throw new Error("Streaming is not supported for this provider.");
