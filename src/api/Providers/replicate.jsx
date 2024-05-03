@@ -1,6 +1,8 @@
 export const ReplicateProvider = "ReplicateProvider";
 import fetch from "node-fetch-polyfill";
 
+// Implementation ported from gpt4free Replicate provider.
+
 const url = "https://replicate.com/api/models/meta/meta-llama-3-70b-instruct/predictions";
 const headers = {
   accept: "application/json",

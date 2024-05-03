@@ -175,6 +175,10 @@
           "value": "DeepInfraMixtral_8x22B"
         },
         {
+          "title": "Blackbox (custom-model)",
+          "value": "Blackbox"
+        },
+        {
           "title": "Google Gemini (requires API Key)",
           "value": "GoogleGemini"
         }

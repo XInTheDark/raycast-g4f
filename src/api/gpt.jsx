@@ -28,6 +28,9 @@ import { ReplicateProvider, getReplicateResponse } from "./Providers/replicate";
 // DeepInfra Llama 3 module
 import { DeepInfraProvider, getDeepInfraResponse } from "./Providers/deepinfra";
 
+// Blackbox module
+import { BlackboxProvider, getBlackboxResponse } from "./Providers/blackbox";
+
 import fs from "fs";
 import { chunkProcessor } from "g4f";
 
@@ -41,6 +44,7 @@ export const providers = {
   DeepInfraLlama3_8B: [DeepInfraProvider, "meta-llama/Meta-Llama-3-8B-Instruct", true],
   DeepInfraLlama3_70B: [DeepInfraProvider, "meta-llama/Meta-Llama-3-70B-Instruct", true],
   DeepInfraMixtral_8x22B: [DeepInfraProvider, "mistralai/Mixtral-8x22B-Instruct-v0.1", true],
+  Blackbox: [BlackboxProvider, "", true],
   GoogleGemini: [GeminiProvider, "", false],
 };
 
@@ -223,6 +227,9 @@ export const chatCompletion = async (chat, options) => {
   } else if (provider === GeminiProvider) {
     // Google Gemini
     response = await getGoogleGeminiResponse(chat);
+  } else if (provider === BlackboxProvider) {
+    // Blackbox
+    response = await getBlackboxResponse(chat);
   } else {
     // GPT
     response = await g4f.chatCompletion(chat, options);
@@ -296,7 +303,7 @@ export const formatResponse = (response, provider) => {
 export const processChunks = (response, provider) => {
   if (provider === g4f.providers.Bing) {
     return chunkProcessor(response);
-  } else if (provider === ReplicateProvider || provider === DeepInfraProvider) {
+  } else if (provider === ReplicateProvider || provider === DeepInfraProvider || provider === BlackboxProvider) {
     return response;
   } else {
     throw new Error("Streaming is not supported for this provider.");

@@ -145,6 +145,7 @@ export default function Chat({ launchContext }) {
           <Form.Dropdown.Item title="DeepInfra (meta-llama-3-8b)" value="DeepInfraLlama3_8B" />
           <Form.Dropdown.Item title="DeepInfra (meta-llama-3-70b)" value="DeepInfraLlama3_70B" />
           <Form.Dropdown.Item title="DeepInfra (Mixtral-8x22B)" value="DeepInfraMixtral_8x22B" />
+          <Form.Dropdown.Item title="Blackbox (custom-model)" value="Blackbox" />
           <Form.Dropdown.Item title="Google Gemini (requires API Key)" value="GoogleGemini" />
         </Form.Dropdown>
       </Form>
