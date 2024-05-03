@@ -183,14 +183,14 @@ export default function genImage({ launchContext }) {
                       return newChatData;
                     });
 
-                    toast(Toast.Style.Success, "Image Generated");
+                    await toast(Toast.Style.Success, "Image Generated");
                   } catch {
                     setChatData((oldData) => {
                       let newChatData = structuredClone(oldData);
                       getChat(chatData.currentChat, newChatData.chats).messages.shift();
                       return newChatData;
                     });
-                    toast(Toast.Style.Failure, "GPT cannot process this prompt.");
+                    await toast(Toast.Style.Failure, "GPT cannot process this prompt.");
                   }
                 })();
                 return newChatData;
@@ -219,7 +219,7 @@ export default function genImage({ launchContext }) {
             }
 
             if (!found) {
-              toast(Toast.Style.Failure, "Image Chat is empty");
+              await toast(Toast.Style.Failure, "Image Chat is empty");
             }
           }}
         />
@@ -297,7 +297,7 @@ export default function genImage({ launchContext }) {
                     // Delete the image chat folder
                     const folderPath =
                       environment.supportPath + "/g4f-image-chats/" + get_folder_name(chatData.currentChat);
-                    fs.rm(folderPath, { recursive: true }, (err) => {
+                    fs.rm(folderPath, { recursive: true }, () => {
                       return null;
                     });
 

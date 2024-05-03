@@ -33,7 +33,6 @@ const uuid4 = function () {
 export const getBlackboxResponse = async function* (chat, max_retries = 5) {
   let random_id = token_hex(16);
   let random_user_id = uuid4();
-  console.log(random_id, random_user_id);
 
   let data = {
     messages: chat,
@@ -49,7 +48,6 @@ export const getBlackboxResponse = async function* (chat, max_retries = 5) {
     userSystemPrompt: "",
     githubToken: null,
   };
-  console.log(data);
 
   try {
     // POST
@@ -58,8 +56,6 @@ export const getBlackboxResponse = async function* (chat, max_retries = 5) {
       headers: headers,
       body: JSON.stringify(data),
     });
-
-    console.log(response);
 
     let reader = response.body.getReader();
     while (true) {

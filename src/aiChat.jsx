@@ -186,14 +186,14 @@ export default function Chat({ launchContext }) {
                   try {
                     await updateChatResponse(chatData, setChatData, query);
 
-                    toast(Toast.Style.Success, "Response Loaded");
+                    await toast(Toast.Style.Success, "Response Loaded");
                   } catch {
                     setChatData((oldData) => {
                       let newChatData = structuredClone(oldData);
                       getChat(chatData.currentChat, newChatData.chats).messages.shift();
                       return newChatData;
                     });
-                    toast(Toast.Style.Failure, "GPT cannot process this message.");
+                    await toast(Toast.Style.Failure, "GPT cannot process this message.");
                   }
                 })();
                 return newChatData;
@@ -210,7 +210,7 @@ export default function Chat({ launchContext }) {
             onAction={async () => {
               let chat = getChat(chatData.currentChat);
               if (chat.messages.length === 0) {
-                toast(Toast.Style.Failure, "No Messages to Copy");
+                await toast(Toast.Style.Failure, "No Messages to Copy");
                 return;
               }
 
@@ -220,7 +220,7 @@ export default function Chat({ launchContext }) {
                 transcript += `GPT: ${chat.messages[i].answer}\n\n`;
               }
               await Clipboard.copy(transcript);
-              toast(Toast.Style.Success, "Chat Transcript Copied");
+              await toast(Toast.Style.Success, "Chat Transcript Copied");
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
           />

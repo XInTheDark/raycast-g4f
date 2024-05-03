@@ -1,19 +1,19 @@
 import {
-  Form,
-  Detail,
-  ActionPanel,
   Action,
-  Toast,
-  showToast,
+  ActionPanel,
+  Detail,
+  Form,
+  getPreferenceValues,
   getSelectedText,
-  popToRoot,
+  Icon,
   Keyboard,
   launchCommand,
   LaunchType,
-  Icon,
-  getPreferenceValues,
+  popToRoot,
+  showToast,
+  Toast,
 } from "@raycast/api";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 // G4F module
 import * as G4F from "g4f";
@@ -32,7 +32,6 @@ import { DeepInfraProvider, getDeepInfraResponse } from "./Providers/deepinfra";
 import { BlackboxProvider, getBlackboxResponse } from "./Providers/blackbox";
 
 import fs from "fs";
-import { chunkProcessor } from "g4f";
 
 // Providers
 // [Provider, Model, Stream]
@@ -132,11 +131,11 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
               setSelected(selected);
               setPage(Pages.Form);
             } else {
-              getResponse(`${argQuery}\n${selected}`);
+              await getResponse(`${argQuery}\n${selected}`);
             }
             return;
           }
-          getResponse(`${context}\n${selected}`);
+          await getResponse(`${context}\n${selected}`);
         } catch (e) {
           console.error(e);
           await popToRoot();
@@ -149,7 +148,7 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
         if (argQuery === "") {
           setPage(Pages.Form);
         } else {
-          getResponse(argQuery);
+          await getResponse(argQuery);
         }
       }
     })();
@@ -216,7 +215,7 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
 // generate response using a chat context and options
 // returned response is ready for use directly
 export const chatCompletion = async (chat, options) => {
-  let response = null;
+  let response;
   const provider = options.provider;
   if (provider === ReplicateProvider) {
     // Meta Llama 3
@@ -248,8 +247,7 @@ export const chatCompletion = async (chat, options) => {
 export const getChatResponse = async (currentChat, query) => {
   let chat = [];
   if (currentChat.systemPrompt.length > 0)
-    // The system prompt is currently not acknowledged by GPT
-    // so we use it as first user prompt instead
+    // The system prompt is not acknowledged by most providers, so we use it as first user prompt instead
     chat.push({ role: "user", content: currentChat.systemPrompt });
 
   // currentChat.messages is stored in the format of [prompt, answer]. We first convert it to
@@ -271,8 +269,7 @@ export const getChatResponse = async (currentChat, query) => {
   };
 
   // generate response
-  let response = await chatCompletion(chat, options);
-  return response;
+  return await chatCompletion(chat, options);
 };
 
 // format response using some heuristics
@@ -302,7 +299,7 @@ export const formatResponse = (response, provider) => {
 // Returns an async generator that can be used directly.
 export const processChunks = (response, provider) => {
   if (provider === g4f.providers.Bing) {
-    return chunkProcessor(response);
+    return G4F.chunkProcessor(response);
   } else if (provider === ReplicateProvider || provider === DeepInfraProvider || provider === BlackboxProvider) {
     return response;
   } else {
