@@ -70,7 +70,7 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
   const [lastQuery, setLastQuery] = useState("");
   const [lastResponse, setLastResponse] = useState("");
 
-  const getResponse = async (query, data) => {
+  const getResponse = async (query) => {
     setLastQuery(query);
     setPage(Pages.Detail);
 
@@ -82,7 +82,7 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
     const start = Date.now();
 
     try {
-      console.log(query, data ?? buffer);
+      console.log(query);
       const messages = [{ role: "user", content: query }];
       // load provider and model from preferences
       const preferences = getPreferenceValues();
@@ -197,25 +197,17 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
             onSubmit={(values) => {
               setMarkdown("");
 
-              let files = undefined;
-              if (values.files) {
-                files = values.files
-                  .filter((file) => fs.existsSync(file) && fs.lstatSync(file).isFile())
-                  .map((file) => fs.readFileSync(file));
-              }
-
               if (useSelected) {
-                getResponse(`${values.query}\n${selectedState}`, files);
+                getResponse(`${values.query}\n${selectedState}`);
                 return;
               }
-              getResponse(`${context ? `${context}\n\n` : ""}${values.query}`, files);
+              getResponse(`${context ? `${context}\n\n` : ""}${values.query}`);
             }}
           />
         </ActionPanel>
       }
     >
       <Form.TextArea title="Prompt" id="query" />
-      {!buffer.length}
     </Form>
   );
 };
