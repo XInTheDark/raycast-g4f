@@ -19,7 +19,8 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}  # to check out the actual pull request commit, not the merge commit
           fetch-depth: 0  # a full history is required for pull request analysis
-      - name: 'Detect package manager'
+      - name: Detect package manager
+        id: detect-package-manager
         run: |
             if [ -f "${{ github.workspace }}/yarn.lock" ]; then
             echo "manager=yarn" >> $GITHUB_OUTPUT
@@ -35,13 +36,13 @@ jobs:
             echo "Unable to determine package manager"
             exit 1
             fi
-            - name: Setup Node
-              uses: actions/setup-node@v3
-              with:
-                node-version: '16'
-                cache: ${{ steps.detect-package-manager.outputs.manager }}
-            - name: Install dependencies
-              run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: ${{ steps.detect-package-manager.outputs.manager }}
+      - name: Install dependencies
+        run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
       - name: 'Qodana Scan'
         uses: JetBrains/qodana-action@v2024.1
         env:
