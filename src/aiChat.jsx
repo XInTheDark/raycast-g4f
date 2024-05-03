@@ -50,9 +50,6 @@ export default function Chat({ launchContext }) {
   let _setChatData = (chatData, setChatData, query = "", response = "") => {
     setChatData((oldData) => {
       let newChatData = structuredClone(oldData);
-      if (getChat(chatData.currentChat, newChatData.chats).messages.length === 0) {
-        getChat(chatData.currentChat, newChatData.chats).messages.push(default_message_data());
-      }
       if (query) getChat(chatData.currentChat, newChatData.chats).messages[0].prompt = query;
       if (response) getChat(chatData.currentChat, newChatData.chats).messages[0].answer = response;
       return newChatData;
