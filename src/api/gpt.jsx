@@ -47,6 +47,10 @@ export const providers = {
   GoogleGemini: [GeminiProvider, "", false],
 };
 
+export const defaultProvider = () => {
+  return getPreferenceValues()["gptProvider"];
+};
+
 export default (props, { context = undefined, allowPaste = false, useSelected = false, buffer = [] }) => {
   const Pages = {
     Form: 0,

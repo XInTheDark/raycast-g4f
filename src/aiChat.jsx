@@ -11,7 +11,7 @@ import {
   getPreferenceValues,
 } from "@raycast/api";
 import { useState, useEffect } from "react";
-import { getChatResponse, formatResponse, providers, processChunks } from "./api/gpt";
+import { defaultProvider, getChatResponse, formatResponse, providers, processChunks } from "./api/gpt";
 import { LocalStorage, Clipboard } from "@raycast/api";
 
 export default function Chat({ launchContext }) {
@@ -30,7 +30,7 @@ export default function Chat({ launchContext }) {
         {
           name: "New Chat",
           creationDate: new Date(),
-          provider: "GPT",
+          provider: defaultProvider(),
           systemPrompt: "",
           messages: [],
         },
@@ -438,15 +438,18 @@ export default function Chat({ launchContext }) {
       if (launchContext?.query) {
         setChatData((oldData) => {
           let newChatData = structuredClone(oldData);
+          let newChatName = `From Quick AI at ${new Date().toLocaleString("en-US", {
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          })}`;
           newChatData.chats.push({
-            name: `From Quick AI at ${new Date().toLocaleString("en-US", {
-              month: "2-digit",
-              day: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-            })}`,
+            name: newChatName,
             creationDate: new Date(),
+            provider: defaultProvider(), // if called from an AI action, the provider used must be the default
+            systemPrompt: "",
             messages: [
               {
                 prompt: launchContext.query,
@@ -456,13 +459,7 @@ export default function Chat({ launchContext }) {
               },
             ],
           });
-          newChatData.currentChat = `From Quick AI at ${new Date().toLocaleString("en-US", {
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-          })}`;
+          newChatData.currentChat = newChatName;
           return newChatData;
         });
       }

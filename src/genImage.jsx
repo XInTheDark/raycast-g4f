@@ -18,7 +18,53 @@ import fs from "fs";
 
 const g4f = new G4F.G4F();
 
-export default function genImage({ launchContext }) {
+export const _NegativePrompt =
+  "low quality, normal quality, bad quality, disfigured, bad, ugly, poorly drawn face," +
+  " extra limb, missing limb, floating limbs, disconnected limbs, malformed limbs, oversaturated, duplicate," +
+  " low-res, blurry, out of focus, out of frame, extra, missing";
+
+// Image Providers
+export const image_providers = {
+  Prodia: [
+    g4f.providers.Prodia,
+    {
+      // list of available models: https://rentry.co/b6i53fnm
+      model: "neverendingDream_v122.safetensors [f964ceeb]",
+      cfgScale: 10,
+      negativePrompt: _NegativePrompt,
+      samplingMethod: "Heun",
+    },
+  ],
+  ProdiaStableDiffusion: [
+    g4f.providers.ProdiaStableDiffusion,
+    {
+      // list of available models: https://rentry.co/pfwmx6y5
+      model: "ICantBelieveItsNotPhotography_seco.safetensors [4e7a3dfd]",
+      cfgScale: 10,
+      negativePrompt: _NegativePrompt,
+      samplingMethod: "Heun",
+    },
+  ],
+  ProdiaStableDiffusionXL: [
+    g4f.providers.ProdiaStableDiffusionXL,
+    {
+      // list of available models: https://rentry.co/wfhsk8sv
+      model: "dreamshaperXL10_alpha2.safetensors [c8afe2ef]",
+      height: 1024,
+      width: 1024,
+      cfgScale: 10,
+      negativePrompt: _NegativePrompt,
+      samplingMethod: "Heun",
+    },
+  ],
+  Dalle: [g4f.providers.Dalle, {}],
+};
+
+const defaultImageProvider = () => {
+  return "Prodia";
+};
+
+export default function genImage() {
   let toast = async (style, title, message) => {
     await showToast({
       style,
@@ -34,7 +80,7 @@ export default function genImage({ launchContext }) {
         {
           name: "New Image Chat",
           creationDate: new Date(),
-          provider: "Prodia",
+          provider: defaultImageProvider(),
           imageQuality: "High",
           messages: [],
         },
@@ -391,38 +437,6 @@ export default function genImage({ launchContext }) {
         await LocalStorage.setItem("imageChatData", JSON.stringify(newChatData));
         setChatData(newChatData);
       }
-
-      if (launchContext?.query) {
-        setChatData((oldData) => {
-          let newChatData = structuredClone(oldData);
-          newChatData.chats.push({
-            name: `From Quick AI at ${new Date().toLocaleString("en-US", {
-              month: "2-digit",
-              day: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-            })}`,
-            creationDate: new Date(),
-            messages: [
-              {
-                prompt: launchContext.query,
-                answer: launchContext.response,
-                creationDate: new Date().toISOString(),
-                finished: true,
-              },
-            ],
-          });
-          newChatData.currentChat = `From Quick AI at ${new Date().toLocaleString("en-US", {
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-          })}`;
-          return newChatData;
-        });
-      }
     })();
   }, []);
 
@@ -495,47 +509,6 @@ export default function genImage({ launchContext }) {
     </Grid>
   );
 }
-
-export const _NegativePrompt =
-  "low quality, normal quality, bad quality, disfigured, bad, ugly, poorly drawn face," +
-  " extra limb, missing limb, floating limbs, disconnected limbs, malformed limbs, oversaturated, duplicate," +
-  " low-res, blurry, out of focus, out of frame, extra, missing";
-
-export const image_providers = {
-  Prodia: [
-    g4f.providers.Prodia,
-    {
-      // list of available models: https://rentry.co/b6i53fnm
-      model: "neverendingDream_v122.safetensors [f964ceeb]",
-      cfgScale: 10,
-      negativePrompt: _NegativePrompt,
-      samplingMethod: "Heun",
-    },
-  ],
-  ProdiaStableDiffusion: [
-    g4f.providers.ProdiaStableDiffusion,
-    {
-      // list of available models: https://rentry.co/pfwmx6y5
-      model: "ICantBelieveItsNotPhotography_seco.safetensors [4e7a3dfd]",
-      cfgScale: 10,
-      negativePrompt: _NegativePrompt,
-      samplingMethod: "Heun",
-    },
-  ],
-  ProdiaStableDiffusionXL: [
-    g4f.providers.ProdiaStableDiffusionXL,
-    {
-      // list of available models: https://rentry.co/wfhsk8sv
-      model: "dreamshaperXL10_alpha2.safetensors [c8afe2ef]",
-      height: 1024,
-      width: 1024,
-      cfgScale: 10,
-      negativePrompt: _NegativePrompt,
-      samplingMethod: "Heun",
-    },
-  ],
-  Dalle: [g4f.providers.Dalle, {}],
-};
 
 export const loadImageOptions = (currentChat) => {
   // load provider and options
