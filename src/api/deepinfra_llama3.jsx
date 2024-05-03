@@ -1,4 +1,4 @@
-export const DeepInfraLlama3Provider = "DeepInfraProvider";
+export const DeepInfraLlama3Provider = "DeepInfraLlama3Provider";
 import fetch from "node-fetch-polyfill";
 
 // Implementation ported from gpt4free DeepInfra provider.
