@@ -19,17 +19,17 @@ import { useEffect, useState } from "react";
 import * as G4F from "g4f";
 const g4f = new G4F.G4F();
 
-// Google Gemini module
-import { GeminiProvider, getGoogleGeminiResponse } from "./Providers/google_gemini";
-
-// Replicate Llama 3 module
-import { ReplicateProvider, getReplicateResponse } from "./Providers/replicate";
-
 // DeepInfra Llama 3 module
 import { DeepInfraProvider, getDeepInfraResponse } from "./Providers/deepinfra";
 
 // Blackbox module
 import { BlackboxProvider, getBlackboxResponse } from "./Providers/blackbox";
+
+// Replicate Llama 3 module
+import { ReplicateProvider, getReplicateResponse } from "./Providers/replicate";
+
+// Google Gemini module
+import { GeminiProvider, getGoogleGeminiResponse } from "./Providers/google_gemini";
 
 import fs from "fs";
 
@@ -39,11 +39,11 @@ export const providers = {
   GPT4: [g4f.providers.GPT, "gpt-4-32k", false],
   GPT35: [g4f.providers.GPT, "gpt-3.5-turbo", false],
   Bing: [g4f.providers.Bing, "gpt-4", true],
-  ReplicateLlama3: [ReplicateProvider, "", true],
+  DeepInfraMixtral_8x22B: [DeepInfraProvider, "mistralai/Mixtral-8x22B-Instruct-v0.1", true],
   DeepInfraLlama3_8B: [DeepInfraProvider, "meta-llama/Meta-Llama-3-8B-Instruct", true],
   DeepInfraLlama3_70B: [DeepInfraProvider, "meta-llama/Meta-Llama-3-70B-Instruct", true],
-  DeepInfraMixtral_8x22B: [DeepInfraProvider, "mistralai/Mixtral-8x22B-Instruct-v0.1", true],
   Blackbox: [BlackboxProvider, "", true],
+  ReplicateLlama3: [ReplicateProvider, "", true],
   GoogleGemini: [GeminiProvider, "", false],
 };
 
@@ -221,18 +221,18 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
 export const chatCompletion = async (chat, options) => {
   let response;
   const provider = options.provider;
-  if (provider === ReplicateProvider) {
-    // Meta Llama 3
-    response = await getReplicateResponse(chat);
-  } else if (provider === DeepInfraProvider) {
+  if (provider === DeepInfraProvider) {
     // Deep Infra Llama 3
     response = await getDeepInfraResponse(chat, options.model);
-  } else if (provider === GeminiProvider) {
-    // Google Gemini
-    response = await getGoogleGeminiResponse(chat);
   } else if (provider === BlackboxProvider) {
     // Blackbox
     response = await getBlackboxResponse(chat);
+  } else if (provider === ReplicateProvider) {
+    // Meta Llama 3
+    response = await getReplicateResponse(chat);
+  } else if (provider === GeminiProvider) {
+    // Google Gemini
+    response = await getGoogleGeminiResponse(chat);
   } else {
     // GPT
     response = await g4f.chatCompletion(chat, options);

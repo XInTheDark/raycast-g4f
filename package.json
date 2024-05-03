@@ -159,8 +159,8 @@
           "value": "Bing"
         },
         {
-          "title": "Replicate (meta-llama-3-70b)",
-          "value": "ReplicateLlama3"
+          "title": "DeepInfra (Mixtral-8x22B)",
+          "value": "DeepInfraMixtral_8x22B"
         },
         {
           "title": "DeepInfra (meta-llama-3-8b)",
@@ -171,12 +171,12 @@
           "value": "DeepInfraLlama3_70B"
         },
         {
-          "title": "DeepInfra (Mixtral-8x22B)",
-          "value": "DeepInfraMixtral_8x22B"
-        },
-        {
           "title": "Blackbox (custom-model)",
           "value": "Blackbox"
+        },
+        {
+          "title": "Replicate (meta-llama-3-70b)",
+          "value": "ReplicateLlama3"
         },
         {
           "title": "Google Gemini (requires API Key)",
