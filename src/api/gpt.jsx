@@ -92,7 +92,7 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
         let r = await chatCompletion(messages, options);
         for await (const chunk of processChunks(r, provider)) {
           response += chunk;
-          response = formatResponse(response);
+          response = formatResponse(response, provider);
           setMarkdown(response);
         }
       }
@@ -213,13 +213,14 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
 // returned response is ready for use directly
 export const chatCompletion = async (chat, options) => {
   let response = null;
-  if (options.provider === ReplicateProvider) {
+  const provider = options.provider;
+  if (provider === ReplicateProvider) {
     // Meta Llama 3
     response = await getReplicateResponse(chat);
-  } else if (options.provider === DeepInfraProvider) {
+  } else if (provider === DeepInfraProvider) {
     // Deep Infra Llama 3
     response = await getDeepInfraResponse(chat, options.model);
-  } else if (options.provider === GeminiProvider) {
+  } else if (provider === GeminiProvider) {
     // Google Gemini
     response = await getGoogleGeminiResponse(chat);
   } else {
@@ -230,7 +231,7 @@ export const chatCompletion = async (chat, options) => {
   // format response
   if (typeof response === "string") {
     // will not be a string if stream is enabled
-    response = formatResponse(response);
+    response = formatResponse(response, provider);
   }
 
   return response;
@@ -268,15 +269,25 @@ export const getChatResponse = async (currentChat, query) => {
 };
 
 // format response using some heuristics
-export const formatResponse = (response) => {
-  // replace \n with a real newline, \t with a real tab, etc.
-  response = response.replace(/\\n/g, "\n");
-  response = response.replace(/\\t/g, "\t");
-  response = response.replace(/\\r/g, "\r");
+export const formatResponse = (response, provider) => {
+  const is_code = response.includes("```");
 
-  // remove <sup>, </sup> tags (not supported apparently)
-  response = response.replace(/<sup>/g, "");
-  response = response.replace(/<\/sup>/g, "");
+  if (provider === g4f.providers.Bing || !is_code) {
+    // replace \n with a real newline, \t with a real tab, etc.
+    // unless code blocks are detected and provider is not Bing
+    response = response.replace(/\\n/g, "\n");
+    response = response.replace(/\\t/g, "\t");
+    response = response.replace(/\\r/g, "\r");
+
+    // remove <sup>, </sup> tags (not supported apparently)
+    response = response.replace(/<sup>/g, "");
+    response = response.replace(/<\/sup>/g, "");
+  }
+
+  // Bing: replace [^x> with a space where x is any string from 1 to 5 characters
+  if (provider === g4f.providers.Bing) {
+    response = response.replace(/\[\^.{1,5}>/g, " ");
+  }
 
   return response;
 };
