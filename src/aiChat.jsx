@@ -38,6 +38,15 @@ export default function Chat({ launchContext }) {
     };
   };
 
+  let default_message_data = () => {
+    return {
+      prompt: "",
+      answer: "",
+      creationDate: new Date().toISOString(),
+      finished: false,
+    };
+  };
+
   let _setChatData = (chatData, setChatData, query = "", response = "") => {
     setChatData((oldData) => {
       let newChatData = structuredClone(oldData);
@@ -204,6 +213,35 @@ export default function Chat({ launchContext }) {
           }}
         />
         <ActionPanel.Section title="Current Chat">
+          <Action
+            icon={Icon.ArrowClockwise}
+            title="Regenerate Last Message"
+            onAction={async () => {
+              let chat = getChat(chatData.currentChat);
+
+              if (chat.messages.length === 0) {
+                await toast(Toast.Style.Failure, "No Messages to Regenerate");
+                return;
+              }
+              if (chat.messages[0].finished === false) {
+                await toast(Toast.Style.Failure, "Please Wait", "Only one message at a time.");
+                return;
+              }
+
+              await toast(Toast.Style.Animated, "Regenerating Last Message");
+
+              // We first remove the last message, then insert a null (default) message.
+              // This null message is not sent to the API (see getChatResponse() in api/gpt.jsx)
+              let query = chat.messages[0].prompt;
+              chat.messages.shift();
+              chat.messages.unshift(default_message_data());
+
+              await updateChatResponse(chatData, setChatData, query).then(() => {
+                toast(Toast.Style.Success, "Response Loaded");
+              });
+            }}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "r" }}
+          />
           <Action
             icon={Icon.Clipboard}
             title="Copy Chat Transcript"

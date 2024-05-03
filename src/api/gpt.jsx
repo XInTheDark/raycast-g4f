@@ -51,6 +51,10 @@ export const defaultProvider = () => {
   return getPreferenceValues()["gptProvider"];
 };
 
+export const is_null_message = (message) => {
+  return !message || ((message?.prompt || "").length === 0 && (message?.answer || "").length === 0);
+};
+
 export default (props, { context = undefined, allowPaste = false, useSelected = false, buffer = [] }) => {
   const Pages = {
     Form: 0,
@@ -257,6 +261,7 @@ export const getChatResponse = async (currentChat, query) => {
   // currentChat.messages is stored in the format of [prompt, answer]. We first convert it to
   // { role: "user", content: prompt }, { role: "assistant", content: answer }, etc.
   for (let i = currentChat.messages.length - 1; i >= 0; i--) {
+    if (is_null_message(currentChat.messages[i])) continue;
     // reverse order, index 0 is latest message
     chat.push({ role: "user", content: currentChat.messages[i].prompt });
     chat.push({ role: "assistant", content: currentChat.messages[i].answer });
