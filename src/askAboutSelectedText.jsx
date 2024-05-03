@@ -1,5 +1,5 @@
 import useGPT from "./api/gpt";
 
-export default function AskAI(props) {
-  return useGPT(props, { allowPaste: true, useSelected: true });
+export default function AskAboutSelectedText(props) {
+  return useGPT(props, { allowPaste: true, useSelected: true, useSelectedAsQuery: false, showFormText: "Query" });
 }

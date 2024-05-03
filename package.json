@@ -14,7 +14,6 @@
     {
       "name": "askAI",
       "title": "Ask AI",
-      "subtitle": "GPT4Free",
       "description": "Ask GPT a question",
       "mode": "view",
       "icon": "gpt-icon.png",
@@ -30,7 +29,6 @@
     {
       "name": "aiChat",
       "title": "AI Chat",
-      "subtitle": "GPT4Free",
       "description": "Chat with GPT",
       "icon": "chat-icon.png",
       "mode": "view"
@@ -38,7 +36,6 @@
     {
       "name": "askAboutSelectedText",
       "title": "Ask About Selected Text",
-      "subtitle": "GPT4Free",
       "description": "Ask GPT about selected text",
       "mode": "view",
       "icon": "clipboard-icon.png",
@@ -50,6 +47,13 @@
           "required": false
         }
       ]
+    },
+    {
+      "name": "continue",
+      "title": "Continue Text",
+      "description": "Generate completion of text",
+      "icon": "text-icon.png",
+      "mode": "view"
     },
     {
       "name": "summarize",
@@ -101,9 +105,9 @@
       "mode": "view",
       "arguments": [
         {
-          "name": "phrase",
+          "name": "query",
           "type": "text",
-          "placeholder": "word/phrase (or selected text)",
+          "placeholder": "word/phrase",
           "required": false
         }
       ]
@@ -132,7 +136,6 @@
     {
       "name": "genImage",
       "title": "Generate Images",
-      "subtitle": "GPT4Free",
       "icon": "image-icon.png",
       "description": "Generate images from a text prompt",
       "mode": "view"

@@ -31,8 +31,6 @@ import { ReplicateProvider, getReplicateResponse } from "./Providers/replicate";
 // Google Gemini module
 import { GeminiProvider, getGoogleGeminiResponse } from "./Providers/google_gemini";
 
-import fs from "fs";
-
 // Providers
 // [Provider, Model, Stream]
 export const providers = {
@@ -55,7 +53,30 @@ export const is_null_message = (message) => {
   return !message || ((message?.prompt || "").length === 0 && (message?.answer || "").length === 0);
 };
 
-export default (props, { context = undefined, allowPaste = false, useSelected = false, buffer = [] }) => {
+export default (
+  props,
+  { context = undefined, allowPaste = false, useSelected = false, useSelectedAsQuery = true, showFormText = "" }
+) => {
+  // The parameters are documented here:
+  // 1. props: We mostly use this parameter for the query value, which is obtained using props.arguments.query.
+  // For example, the `Ask AI` command shows a "Query" box when the user types the command.
+  // 2. context: A string to be added before the query value. This is usually a default prompt specific to each command.
+  // For example, the `Summary` command has a context of "Summarize the given text."
+  // 3. allowPaste: A boolean to allow pasting the response to the clipboard.
+  // 4. useSelected: A boolean to use the selected text as the query. If we fail to get selected text,
+  // either of the three following scenarios will happen depending on the query value and showFormText parameter:
+  //    a. If query is provided, we will get response based on the query value.
+  //    b. If showFormText string is provided, a Form will be shown with the showFormText parameter as the field title.
+  //    c. If showFormText is not provided, an error will be shown and the command quits.
+  // 5. useSelectedAsQuery: A boolean to use the selected text as the query. Explanation:
+  // By default, the selected text is taken to be the query. For example, the `Continue`, `Fix Code`... commands.
+  // But other commands, like `Ask About Selected Text`, may want to use a query in addition to the selected text.
+  // 6. showFormText: A string to be shown as the field title in the Form. If true, either of the three following
+  // scenarios will happen depending on the query value and useSelected parameter:
+  //    a. If useSelected is true, see useSelected documentation above.
+  //    b. If useSelected is false, and query is provided, we will get response based on the query value.
+  //    c. If useSelected is false, and query is not provided, a Form will be shown with the showFormText parameter as the field title.
+
   const Pages = {
     Form: 0,
     Detail: 1,
@@ -131,32 +152,66 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
 
   useEffect(() => {
     (async () => {
-      if (context || useSelected) {
+      if (useSelected) {
+        // handle the case where we don't need to get selected text: if we already have a query.
+        if (argQuery) {
+          await getResponse(`${context}\n${argQuery}`);
+          return;
+        }
+
+        let selected;
         try {
-          let selected = await getSelectedText();
-          if (useSelected) {
-            if (argQuery === "") {
-              setSelected(selected);
+          selected = await getSelectedText();
+        } catch (e) {
+          selected = null;
+        }
+
+        // if useSelectedAsQuery is true, we use the selected text as the query
+        if (useSelectedAsQuery) {
+          // if we need selected as query but it is not available, we will try to show a Form
+          if (!selected) {
+            if (showFormText) {
               setPage(Pages.Form);
             } else {
-              await getResponse(`${argQuery}\n${selected}`);
+              // if no selected text is available and showing a form is not allowed, we will show an error
+              await popToRoot();
+              await showToast({
+                style: Toast.Style.Failure,
+                title: "Could not get selected text",
+              });
             }
-            return;
-          }
-          await getResponse(`${context}\n${selected}`);
-        } catch (e) {
-          console.error(e);
+          } else await getResponse(`${context}\n${selected}`);
+        }
+
+        // otherwise, we will need to obtain a separate query by showing a form
+        else if (showFormText) {
+          setSelected(selected);
+          setPage(Pages.Form);
+        }
+
+        // if no query is provided and showing a form is not allowed, we will show an error
+        else {
           await popToRoot();
           await showToast({
             style: Toast.Style.Failure,
-            title: "Could not get the selected text",
+            title: "No query provided",
           });
         }
       } else {
-        if (argQuery === "") {
-          setPage(Pages.Form);
-        } else {
+        // !useSelected
+        if (argQuery) {
           await getResponse(argQuery);
+        } else {
+          if (showFormText) {
+            setPage(Pages.Form);
+          } else {
+            // if no query is provided and showing a form is not allowed, we will show an error
+            await popToRoot();
+            await showToast({
+              style: Toast.Style.Failure,
+              title: "No query provided",
+            });
+          }
         }
       }
     })();
@@ -197,7 +252,7 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
             onSubmit={(values) => {
               setMarkdown("");
 
-              if (useSelected) {
+              if (useSelected && selectedState) {
                 getResponse(`${values.query}\n${selectedState}`);
                 return;
               }
@@ -207,7 +262,7 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
         </ActionPanel>
       }
     >
-      <Form.TextArea title="Prompt" id="query" />
+      <Form.TextArea title={showFormText} id="query" />
     </Form>
   );
 };
