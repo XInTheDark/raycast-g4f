@@ -1,4 +1,4 @@
-name: Qodana
+name: Build Extension
 on:
   workflow_dispatch:
   pull_request:
@@ -8,7 +8,7 @@ on:
       - 'releases/*' # The release branches
 
 jobs:
-  qodana:
+  build:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -26,7 +26,5 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
-      - name: 'Qodana Scan'
-        uses: JetBrains/qodana-action@v2024.1
-        env:
-          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+      - name: Build
+        run: npm run build
