@@ -215,10 +215,6 @@ export default function Chat({ launchContext }) {
                 await toast(Toast.Style.Failure, "No Messages to Regenerate");
                 return;
               }
-              if (chat.messages[0].finished === false) {
-                await toast(Toast.Style.Failure, "Please Wait", "Only one message at a time.");
-                return;
-              }
 
               await toast(Toast.Style.Animated, "Regenerating Last Message");
 
