@@ -44,20 +44,27 @@ export default function Chat({ launchContext }) {
       prompt: "",
       answer: "",
       creationDate: new Date().toISOString(),
+      id: new Date().getTime(),
       finished: false,
     };
   };
 
-  let _setChatData = (chatData, setChatData, query = "", response = "") => {
+  let _setChatData = (chatData, setChatData, messageID, query = "", response = "", finished = false) => {
     setChatData((oldData) => {
       let newChatData = structuredClone(oldData);
-      if (query) getChat(chatData.currentChat, newChatData.chats).messages[0].prompt = query;
-      if (response) getChat(chatData.currentChat, newChatData.chats).messages[0].answer = response;
+      let messages = getChat(chatData.currentChat, newChatData.chats).messages;
+      for (let i = 0; i < messages.length; i++) {
+        if (messages[i].id === messageID) {
+          if (query) messages[i].prompt = query;
+          if (response) messages[i].answer = response;
+          if (finished) messages[i].finished = finished;
+        }
+      }
       return newChatData;
     });
   };
 
-  let updateChatResponse = async (chatData, setChatData, query) => {
+  let updateChatResponse = async (chatData, setChatData, messageID, query) => {
     let currentChat = getChat(chatData.currentChat, chatData.chats);
     const [provider, model, stream] = providers[currentChat.provider];
 
@@ -65,22 +72,18 @@ export default function Chat({ launchContext }) {
 
     if (!stream) {
       let response = await getChatResponse(currentChat, query);
-      _setChatData(chatData, setChatData, "", response);
+      _setChatData(chatData, setChatData, messageID, "", response);
     } else {
       let response = "";
       let r = await getChatResponse(currentChat, query);
       for await (const chunk of await processChunks(r, provider)) {
         response += chunk;
         response = formatResponse(response, provider);
-        _setChatData(chatData, setChatData, "", response);
+        _setChatData(chatData, setChatData, messageID, "", response);
       }
     }
 
-    setChatData((oldData) => {
-      let newChatData = structuredClone(oldData);
-      getChat(chatData.currentChat, newChatData.chats).messages[0].finished = true;
-      return newChatData;
-    });
+    _setChatData(chatData, setChatData, messageID, "", "", true);
   };
 
   let CreateChat = () => {
@@ -167,41 +170,36 @@ export default function Chat({ launchContext }) {
 
             const query = searchText;
             setSearchText("");
-            if (
-              getChat(chatData.currentChat).messages.length === 0 ||
-              getChat(chatData.currentChat).messages[0].finished
-            ) {
-              toast(Toast.Style.Animated, "Response Loading", "Please Wait");
-              setChatData((x) => {
-                let newChatData = structuredClone(x);
-                let currentChat = getChat(chatData.currentChat, newChatData.chats);
+            toast(Toast.Style.Animated, "Response Loading", "Please Wait");
 
-                currentChat.messages.unshift({
-                  prompt: query,
-                  answer: "",
-                  creationDate: new Date().toISOString(),
-                  finished: false,
-                });
+            setChatData((x) => {
+              let newChatData = structuredClone(x);
+              let currentChat = getChat(chatData.currentChat, newChatData.chats);
+              let newMessageID = new Date().getTime();
 
-                (async () => {
-                  try {
-                    await updateChatResponse(chatData, setChatData, query);
-
-                    await toast(Toast.Style.Success, "Response Loaded");
-                  } catch {
-                    setChatData((oldData) => {
-                      let newChatData = structuredClone(oldData);
-                      getChat(chatData.currentChat, newChatData.chats).messages.shift();
-                      return newChatData;
-                    });
-                    await toast(Toast.Style.Failure, "GPT cannot process this message.");
-                  }
-                })();
-                return newChatData;
+              currentChat.messages.unshift({
+                prompt: query,
+                answer: "",
+                creationDate: new Date().toISOString(),
+                id: newMessageID,
+                finished: false,
               });
-            } else {
-              toast(Toast.Style.Failure, "Please Wait", "Only one message at a time.");
-            }
+
+              (async () => {
+                try {
+                  await updateChatResponse(chatData, setChatData, newMessageID, query);
+                  await toast(Toast.Style.Success, "Response Loaded");
+                } catch {
+                  setChatData((oldData) => {
+                    let newChatData = structuredClone(oldData);
+                    getChat(chatData.currentChat, newChatData.chats).messages.shift();
+                    return newChatData;
+                  });
+                  await toast(Toast.Style.Failure, "GPT cannot process this message.");
+                }
+              })();
+              return newChatData;
+            });
           }}
         />
         <ActionPanel.Section title="Current Chat">
@@ -224,7 +222,8 @@ export default function Chat({ launchContext }) {
               chat.messages.shift();
               chat.messages.unshift(default_message_data());
 
-              await updateChatResponse(chatData, setChatData, query).then(() => {
+              let messageID = chat.messages[0].id;
+              await updateChatResponse(chatData, setChatData, messageID, query).then(() => {
                 toast(Toast.Style.Success, "Response Loaded");
               });
             }}
@@ -473,6 +472,7 @@ export default function Chat({ launchContext }) {
                 prompt: launchContext.query,
                 answer: launchContext.response,
                 creationDate: new Date().toISOString(),
+                id: new Date().getTime(),
                 finished: true,
               },
             ],
