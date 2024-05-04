@@ -13,6 +13,7 @@ import {
 import { useState, useEffect } from "react";
 import { defaultProvider, getChatResponse, formatResponse, providers, processChunks } from "./api/gpt";
 import { LocalStorage, Clipboard } from "@raycast/api";
+import { formatDate } from "./api/helper";
 
 export default function Chat({ launchContext }) {
   let toast = async (style, title, message) => {
@@ -425,14 +426,6 @@ export default function Chat({ launchContext }) {
         </ActionPanel.Section>
       </ActionPanel>
     );
-  };
-  let formatDate = (dateToCheckISO) => {
-    const dateToCheck = new Date(dateToCheckISO);
-    if (dateToCheck.toDateString() === new Date().toDateString()) {
-      return `${new Date().getHours()}:${String(new Date().getMinutes()).padStart(2, "0")}`;
-    } else {
-      return `${new Date().toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "2-digit" })}`;
-    }
   };
 
   let [chatData, setChatData] = useState(null);
