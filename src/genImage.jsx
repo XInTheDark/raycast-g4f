@@ -397,7 +397,7 @@ export default function genImage() {
                         onAction: () => {
                           // Delete all image chat folders
                           const folderPath = environment.supportPath + "/g4f-image-chats";
-                          fs.rm(folderPath, { recursive: true }, (err) => {
+                          fs.rm(folderPath, { recursive: true }, () => {
                             return null;
                           });
                           setChatData(default_chat_data());
