@@ -279,7 +279,7 @@ export const chatCompletion = async (chat, options) => {
     // Blackbox
     response = await getBlackboxResponse(chat);
   } else if (provider === ReplicateProvider) {
-    // Meta Llama 3
+    // Replicate
     response = await getReplicateResponse(chat);
   } else if (provider === GeminiProvider) {
     // Google Gemini
@@ -349,6 +349,12 @@ export const formatResponse = (response, provider) => {
     response = response.replace(/\[\^.{1,5}>/g, " ");
   }
 
+  if (provider === BlackboxProvider) {
+    // replace only once
+    // example: remove $@$v=v1.13$@$
+    response = response.replace(/\$@\$v=v.{1,6}\$@\$/, "");
+  }
+
   return response;
 };
 
@@ -356,9 +362,7 @@ export const formatResponse = (response, provider) => {
 export const processChunks = (response, provider) => {
   if (provider === g4f.providers.Bing) {
     return G4F.chunkProcessor(response);
-  } else if (provider === ReplicateProvider || provider === DeepInfraProvider || provider === BlackboxProvider) {
-    return response;
   } else {
-    throw new Error("Streaming is not supported for this provider.");
+    return response;
   }
 };

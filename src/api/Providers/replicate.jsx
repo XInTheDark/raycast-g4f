@@ -1,5 +1,6 @@
 export const ReplicateProvider = "ReplicateProvider";
 import fetch from "node-fetch-polyfill";
+import { formatChatToPrompt } from "../helper";
 
 // Implementation ported from gpt4free Replicate provider.
 
@@ -77,14 +78,4 @@ export const getReplicateResponse = async function* (chat, max_retries = 10) {
       throw e;
     }
   }
-};
-
-// Format a series of messages into a single string
-const formatChatToPrompt = (chat) => {
-  let prompt = "";
-  for (let i = 0; i < chat.length; i++) {
-    prompt += chat[i].role + ": " + chat[i].content + "\n";
-  }
-  prompt += "assistant:";
-  return prompt;
 };
