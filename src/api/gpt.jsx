@@ -19,13 +19,13 @@ import { useEffect, useState } from "react";
 import * as G4F from "g4f";
 const g4f = new G4F.G4F();
 
-// DeepInfra Llama 3 module
+// DeepInfra module
 import { DeepInfraProvider, getDeepInfraResponse } from "./Providers/deepinfra";
 
 // Blackbox module
 import { BlackboxProvider, getBlackboxResponse } from "./Providers/blackbox";
 
-// Replicate Llama 3 module
+// Replicate module
 import { ReplicateProvider, getReplicateResponse } from "./Providers/replicate";
 
 // Google Gemini module
@@ -122,7 +122,7 @@ export default (
         setMarkdown(response);
       } else {
         let r = await chatCompletion(messages, options);
-        for await (const chunk of processChunks(r, provider)) {
+        for await (const chunk of await processChunks(r, provider)) {
           response += chunk;
           response = formatResponse(response, provider);
           setMarkdown(response);
@@ -367,7 +367,7 @@ export const processChunks = async function* (response, provider) {
       yield prevChunk;
       prevChunk = chunk;
     }
-  } else if (provider in [DeepInfraProvider, BlackboxProvider, ReplicateProvider]) {
+  } else if ([DeepInfraProvider, BlackboxProvider, ReplicateProvider].includes(provider)) {
     // response must be an async generator
     yield* response;
   } else {

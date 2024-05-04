@@ -69,7 +69,7 @@ export default function Chat({ launchContext }) {
     } else {
       let response = "";
       let r = await getChatResponse(currentChat, query);
-      for await (const chunk of processChunks(r, provider)) {
+      for await (const chunk of await processChunks(r, provider)) {
         response += chunk;
         response = formatResponse(response, provider);
         _setChatData(chatData, setChatData, "", response);
