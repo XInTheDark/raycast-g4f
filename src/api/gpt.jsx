@@ -359,10 +359,19 @@ export const formatResponse = (response, provider) => {
 };
 
 // Returns an async generator that can be used directly.
-export const processChunks = (response, provider) => {
+export const processChunks = async function* (response, provider) {
   if (provider === g4f.providers.Bing) {
-    return G4F.chunkProcessor(response);
+    let prevChunk = "";
+    // For Bing, we must not return the last chunk
+    for await (const chunk of G4F.chunkProcessor(response)) {
+      yield prevChunk;
+      prevChunk = chunk;
+    }
+  } else if (provider in [DeepInfraProvider, BlackboxProvider, ReplicateProvider]) {
+    // response must be an async generator
+    yield* response;
   } else {
-    return response;
+    // nothing here currently.
+    yield* G4F.chunkProcessor(response);
   }
 };
