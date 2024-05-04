@@ -31,3 +31,13 @@ export const formatDate = (dateToCheckISO) => {
 
   return formatted;
 };
+
+// Format a series of messages into a single string
+export const formatChatToPrompt = (chat) => {
+  let prompt = "";
+  for (let i = 0; i < chat.length; i++) {
+    prompt += chat[i].role + ": " + chat[i].content + "\n";
+  }
+  prompt += "assistant:";
+  return prompt;
+};

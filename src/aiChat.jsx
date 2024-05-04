@@ -67,20 +67,11 @@ export default function Chat({ launchContext }) {
       let response = await getChatResponse(currentChat, query);
       _setChatData(chatData, setChatData, "", response);
     } else {
-      let response = "",
-        prevChunk = "";
+      let response = "";
       let r = await getChatResponse(currentChat, query);
-      for await (const chunk of processChunks(r, provider)) {
-        response += prevChunk;
-        response = formatResponse(response);
-        _setChatData(chatData, setChatData, "", response);
-        prevChunk = chunk;
-      }
-
-      // for Bing provider, the last chunk must not be added
-      if (currentChat.provider !== "Bing") {
-        response += prevChunk;
-        response = formatResponse(response);
+      for await (const chunk of await processChunks(r, provider)) {
+        response += chunk;
+        response = formatResponse(response, provider);
         _setChatData(chatData, setChatData, "", response);
       }
     }

@@ -19,13 +19,13 @@ import { useEffect, useState } from "react";
 import * as G4F from "g4f";
 const g4f = new G4F.G4F();
 
-// DeepInfra Llama 3 module
+// DeepInfra module
 import { DeepInfraProvider, getDeepInfraResponse } from "./Providers/deepinfra";
 
 // Blackbox module
 import { BlackboxProvider, getBlackboxResponse } from "./Providers/blackbox";
 
-// Replicate Llama 3 module
+// Replicate module
 import { ReplicateProvider, getReplicateResponse } from "./Providers/replicate";
 
 // Google Gemini module
@@ -122,7 +122,7 @@ export default (
         setMarkdown(response);
       } else {
         let r = await chatCompletion(messages, options);
-        for await (const chunk of processChunks(r, provider)) {
+        for await (const chunk of await processChunks(r, provider)) {
           response += chunk;
           response = formatResponse(response, provider);
           setMarkdown(response);
@@ -279,7 +279,7 @@ export const chatCompletion = async (chat, options) => {
     // Blackbox
     response = await getBlackboxResponse(chat);
   } else if (provider === ReplicateProvider) {
-    // Meta Llama 3
+    // Replicate
     response = await getReplicateResponse(chat);
   } else if (provider === GeminiProvider) {
     // Google Gemini
@@ -349,16 +349,29 @@ export const formatResponse = (response, provider) => {
     response = response.replace(/\[\^.{1,5}>/g, " ");
   }
 
+  if (provider === BlackboxProvider) {
+    // replace only once
+    // example: remove $@$v=v1.13$@$
+    response = response.replace(/\$@\$v=v.{1,6}\$@\$/, "");
+  }
+
   return response;
 };
 
 // Returns an async generator that can be used directly.
-export const processChunks = (response, provider) => {
+export const processChunks = async function* (response, provider) {
   if (provider === g4f.providers.Bing) {
-    return G4F.chunkProcessor(response);
-  } else if (provider === ReplicateProvider || provider === DeepInfraProvider || provider === BlackboxProvider) {
-    return response;
+    let prevChunk = "";
+    // For Bing, we must not return the last chunk
+    for await (const chunk of G4F.chunkProcessor(response)) {
+      yield prevChunk;
+      prevChunk = chunk;
+    }
+  } else if ([DeepInfraProvider, BlackboxProvider, ReplicateProvider].includes(provider)) {
+    // response must be an async generator
+    yield* response;
   } else {
-    throw new Error("Streaming is not supported for this provider.");
+    // nothing here currently.
+    yield* G4F.chunkProcessor(response);
   }
 };
