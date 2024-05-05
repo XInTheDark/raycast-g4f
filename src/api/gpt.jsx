@@ -98,7 +98,7 @@ export default (
 
     await showToast({
       style: Toast.Style.Animated,
-      title: "Waiting for GPT...",
+      title: "Response Loading",
     });
 
     const start = Date.now();
@@ -118,15 +118,31 @@ export default (
 
       // generate response
       let response = "";
+      let elapsed, chars, charPerSec;
+      let start = new Date().getTime();
+
       if (!stream) {
         response = await chatCompletion(messages, options);
         setMarkdown(response);
+
+        elapsed = (new Date().getTime() - start) / 1000;
+        chars = response.length;
+        charPerSec = (chars / elapsed).toFixed(1);
       } else {
         let r = await chatCompletion(messages, options);
         for await (const chunk of await processChunks(r, provider)) {
           response += chunk;
           response = formatResponse(response, provider);
           setMarkdown(response);
+
+          elapsed = (new Date().getTime() - start) / 1000;
+          chars = response.length;
+          charPerSec = (chars / elapsed).toFixed(1);
+          await showToast(
+            Toast.Style.Animated,
+            "Response Loading",
+            `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`
+          );
         }
       }
       setLastResponse(response);
@@ -134,7 +150,7 @@ export default (
       await showToast({
         style: Toast.Style.Success,
         title: "Response Finished",
-        message: `${(Date.now() - start) / 1000} seconds`,
+        message: `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`,
       });
     } catch (e) {
       console.log(e);
@@ -144,7 +160,6 @@ export default (
       await showToast({
         style: Toast.Style.Failure,
         title: "Response Failed",
-        message: `${(Date.now() - start) / 1000} seconds`,
       });
     }
 

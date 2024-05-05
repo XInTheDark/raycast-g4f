@@ -70,9 +70,16 @@ export default function Chat({ launchContext }) {
 
     _setChatData(chatData, setChatData, messageID, query, "");
 
+    let elapsed, chars, charPerSec;
+    let start = new Date().getTime();
+
     if (!stream) {
       let response = await getChatResponse(currentChat, query);
       _setChatData(chatData, setChatData, messageID, "", response);
+
+      elapsed = (new Date().getTime() - start) / 1000;
+      chars = response.length;
+      charPerSec = (chars / elapsed).toFixed(1);
     } else {
       let response = "";
       let r = await getChatResponse(currentChat, query);
@@ -80,10 +87,25 @@ export default function Chat({ launchContext }) {
         response += chunk;
         response = formatResponse(response, provider);
         _setChatData(chatData, setChatData, messageID, "", response);
+
+        elapsed = (new Date().getTime() - start) / 1000;
+        chars = response.length;
+        charPerSec = (chars / elapsed).toFixed(1);
+        await toast(
+          Toast.Style.Animated,
+          "Response Loading",
+          `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`
+        );
       }
     }
 
     _setChatData(chatData, setChatData, messageID, "", "", true);
+
+    await toast(
+      Toast.Style.Success,
+      "Response Finished",
+      `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`
+    );
   };
 
   let CreateChat = () => {
@@ -185,7 +207,7 @@ export default function Chat({ launchContext }) {
                 chat.messages[0].prompt = values.message;
                 let messageID = chat.messages[0].id;
                 updateChatResponse(chatData, setChatData, messageID).then(() => {
-                  toast(Toast.Style.Success, "Response Loaded");
+                  return;
                 });
               }}
             />
@@ -255,7 +277,7 @@ export default function Chat({ launchContext }) {
 
             const query = searchText;
             setSearchText("");
-            toast(Toast.Style.Animated, "Response Loading", "Please Wait");
+            toast(Toast.Style.Animated, "Response Loading");
 
             setChatData((x) => {
               let newChatData = structuredClone(x);
@@ -273,7 +295,6 @@ export default function Chat({ launchContext }) {
               (async () => {
                 try {
                   await updateChatResponse(chatData, setChatData, newMessageID, query);
-                  await toast(Toast.Style.Success, "Response Loaded");
                 } catch {
                   setChatData((oldData) => {
                     let newChatData = structuredClone(oldData);
@@ -308,9 +329,7 @@ export default function Chat({ launchContext }) {
               chat.messages.unshift(default_message_data());
               let messageID = chat.messages[0].id;
 
-              await updateChatResponse(chatData, setChatData, messageID, query).then(() => {
-                toast(Toast.Style.Success, "Response Loaded");
-              });
+              await updateChatResponse(chatData, setChatData, messageID, query);
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "r" }}
           />
