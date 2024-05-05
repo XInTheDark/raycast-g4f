@@ -41,3 +41,30 @@ export const formatChatToPrompt = (chat) => {
   prompt += "assistant:";
   return prompt;
 };
+
+// // Determine if a chat is active or not (updated in the last 24 hours)
+export const isChatActive = (chat) => {
+  const lastUpdated = new Date(chat.messages[0].creationDate);
+  const now = new Date();
+  const diff = now - lastUpdated;
+  const hours = Math.floor(diff / 1000 / 60 / 60);
+  return hours < 24;
+};
+
+// Given a chatData object, filter chats into 2 groups: active ones and inactive ones
+export const filterChats = (chatData) => {
+  const activeChats = [];
+  const inactiveChats = [];
+  const now = new Date();
+  for (const chat of chatData.chats) {
+    const lastUpdated = new Date(chat.messages[0].creationDate);
+    const diff = now - lastUpdated;
+    const hours = Math.floor(diff / 1000 / 60 / 60);
+    if (hours < 24) {
+      activeChats.push(chat);
+    } else {
+      inactiveChats.push(chat);
+    }
+  }
+  return { activeChats, inactiveChats };
+};
