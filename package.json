@@ -182,8 +182,12 @@
           "value": "Blackbox"
         },
         {
+          "title": "Replicate (meta-llama-3-8b)",
+          "value": "ReplicateLlama3_8B"
+        },
+        {
           "title": "Replicate (meta-llama-3-70b)",
-          "value": "ReplicateLlama3"
+          "value": "ReplicateLlama3_70B"
         },
         {
           "title": "Google Gemini (requires API Key)",

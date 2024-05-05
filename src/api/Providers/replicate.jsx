@@ -4,13 +4,13 @@ import { formatChatToPrompt } from "../helper";
 
 // Implementation ported from gpt4free Replicate provider.
 
-const url = "https://replicate.com/api/models/meta/meta-llama-3-70b-instruct/predictions";
+const url = (model) => `https://replicate.com/api/models/${model}/predictions`;
 const headers = {
   accept: "application/json",
   "Content-Type": "application/json",
 };
 
-export const getReplicateResponse = async function* (chat, max_retries = 10) {
+export const getReplicateResponse = async function* (chat, model, max_retries = 10) {
   let data = {
     stream: true,
     input: {
@@ -20,7 +20,7 @@ export const getReplicateResponse = async function* (chat, max_retries = 10) {
 
   try {
     // POST
-    const response = await fetch(url, {
+    const response = await fetch(url(model), {
       method: "POST",
       headers: headers,
       body: JSON.stringify(data),
