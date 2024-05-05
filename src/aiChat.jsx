@@ -169,6 +169,7 @@ export default function Chat({ launchContext }) {
           <Form.Dropdown.Item title="DeepInfra (meta-llama-3-8b)" value="DeepInfraLlama3_8B" />
           <Form.Dropdown.Item title="DeepInfra (meta-llama-3-70b)" value="DeepInfraLlama3_70B" />
           <Form.Dropdown.Item title="DeepInfra (Mixtral-8x22B)" value="DeepInfraMixtral_8x22B" />
+          <Form.Dropdown.Item title="DeepInfra (Dolphin-2.6-8x7B)" value="DeepInfraDolphin26_8x7B" />
           <Form.Dropdown.Item title="Blackbox (custom-model)" value="Blackbox" />
           <Form.Dropdown.Item title="Replicate (meta-llama-3-8b)" value="ReplicateLlama3_8B" />
           <Form.Dropdown.Item title="Replicate (meta-llama-3-70b)" value="ReplicateLlama3_70B" />

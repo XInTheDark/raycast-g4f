@@ -178,6 +178,10 @@
           "value": "DeepInfraMixtral_8x22B"
         },
         {
+          "title": "DeepInfra (Dolphin-2.6-8x7B)",
+          "value": "DeepInfraDolphin26_8x7B"
+        },
+        {
           "title": "Blackbox (custom-model)",
           "value": "Blackbox"
         },

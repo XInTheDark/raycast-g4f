@@ -41,6 +41,7 @@ export const providers = {
   DeepInfraLlama3_8B: [DeepInfraProvider, "meta-llama/Meta-Llama-3-8B-Instruct", true],
   DeepInfraLlama3_70B: [DeepInfraProvider, "meta-llama/Meta-Llama-3-70B-Instruct", true],
   DeepInfraMixtral_8x22B: [DeepInfraProvider, "mistralai/Mixtral-8x22B-Instruct-v0.1", true],
+  DeepInfraDolphin26_8x7B: [DeepInfraProvider, "cognitivecomputations/dolphin-2.6-mixtral-8x7b", true],
   Blackbox: [BlackboxProvider, "", true],
   ReplicateLlama3_8B: [ReplicateProvider, "meta/meta-llama-3-8b-instruct", true],
   ReplicateLlama3_70B: [ReplicateProvider, "meta/meta-llama-3-70b-instruct", true],
