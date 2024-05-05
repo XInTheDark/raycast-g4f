@@ -100,9 +100,9 @@ export default function Chat({ launchContext }) {
               title="Create Chat"
               onSubmit={(values) => {
                 if (values.chatName === "") {
-                  toast(Toast.Style.Failure, "Chat must have a name.");
+                  toast(Toast.Style.Failure, "Chat name cannot be empty");
                 } else if (chatData.chats.map((x) => x.name).includes(values.chatName)) {
-                  toast(Toast.Style.Failure, "Chat with that name already exists.");
+                  toast(Toast.Style.Failure, "Chat with that name already exists");
                 } else {
                   pop();
                   setChatData((oldData) => {
@@ -193,6 +193,40 @@ export default function Chat({ launchContext }) {
         }
       >
         <Form.TextArea id="message" title="Message" defaultValue={lastMessage} />
+      </Form>
+    );
+  };
+
+  let RenameChat = () => {
+    let chat = getChat(chatData.currentChat);
+
+    const { pop } = useNavigation();
+
+    return (
+      <Form
+        actions={
+          <ActionPanel>
+            <Action.SubmitForm
+              title="Rename Chat"
+              onSubmit={(values) => {
+                pop();
+                // check if chat with new name already exists
+                if (chatData.chats.map((x) => x.name).includes(values.chatName)) {
+                  toast(Toast.Style.Failure, "Chat with that name already exists");
+                  return;
+                }
+                setChatData((oldData) => {
+                  let newChatData = structuredClone(oldData);
+                  getChat(chatData.currentChat, newChatData.chats).name = values.chatName;
+                  newChatData.currentChat = values.chatName; // chat must be currentChat
+                  return newChatData;
+                });
+              }}
+            />
+          </ActionPanel>
+        }
+      >
+        <Form.TextField id="chatName" title="Chat Name" defaultValue={chat.name} />
       </Form>
     );
   };
@@ -327,6 +361,7 @@ export default function Chat({ launchContext }) {
             }}
             shortcut={{ modifiers: ["shift"], key: "delete" }}
           />
+          <Action.Push icon={Icon.Pencil} title="Rename Chat" target={<RenameChat />} />
         </ActionPanel.Section>
         <ActionPanel.Section title="Manage Chats">
           <Action.Push
