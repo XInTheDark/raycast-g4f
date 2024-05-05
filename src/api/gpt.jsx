@@ -101,8 +101,6 @@ export default (
       title: "Response Loading",
     });
 
-    const start = Date.now();
-
     try {
       console.log(query);
       const messages = [{ role: "user", content: query }];
