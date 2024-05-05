@@ -4,7 +4,10 @@ import { formatChatToPrompt } from "../helper";
 
 // Implementation ported from gpt4free Replicate provider.
 
-const url = "https://replicate.com/api/models/meta/meta-llama-3-70b-instruct/predictions";
+const url =
+
+
+  "https://replicate.com/api/models/meta/meta-llama-3-70b-instruct/predictions";
 const headers = {
   accept: "application/json",
   "Content-Type": "application/json",
