@@ -100,9 +100,9 @@ export default function genImage() {
               title="Create Image Chat"
               onSubmit={(values) => {
                 if (values.chatName === "") {
-                  toast(Toast.Style.Failure, "Chat must have a name.");
+                  toast(Toast.Style.Failure, "Chat name cannot be empty");
                 } else if (chatData.chats.map((x) => x.name).includes(values.chatName)) {
-                  toast(Toast.Style.Failure, "Chat with that name already exists.");
+                  toast(Toast.Style.Failure, "Chat with that name already exists");
                 } else {
                   pop();
                   setChatData((oldData) => {
@@ -149,6 +149,52 @@ export default function genImage() {
           <Form.Dropdown.Item title="High" value="High" />
           <Form.Dropdown.Item title="Extreme" value="Extreme" />
         </Form.Dropdown>
+      </Form>
+    );
+  };
+
+  let RenameImageChat = () => {
+    let chat = getChat(chatData.currentChat);
+
+    const { pop } = useNavigation();
+
+    return (
+      <Form
+        actions={
+          <ActionPanel>
+            <Action.SubmitForm
+              title="Rename Image Chat"
+              onSubmit={(values) => {
+                pop();
+
+                // check if there is a currently generating message
+                for (let i = 0; i < chat.messages.length; i++) {
+                  if (!chat.messages[i].finished) {
+                    toast(Toast.Style.Failure, "Cannot rename while loading image");
+                    return;
+                  }
+                }
+
+                // check if chat with new name already exists
+                if (chatData.chats.map((x) => x.name).includes(values.chatName)) {
+                  toast(Toast.Style.Failure, "Chat with that name already exists");
+                  return;
+                }
+
+                setChatData((oldData) => {
+                  let newChatData = structuredClone(oldData);
+                  getChat(chatData.currentChat, newChatData.chats).name = values.chatName;
+                  newChatData.currentChat = values.chatName; // chat must be currentChat
+                  return newChatData;
+                });
+
+                //
+              }}
+            />
+          </ActionPanel>
+        }
+      >
+        <Form.TextField id="chatName" title="Chat Name" defaultValue={chat.name} />
       </Form>
     );
   };
@@ -247,29 +293,76 @@ export default function genImage() {
             }
           }}
         />
-        <Action
-          icon={Icon.Folder}
-          title="Show in Finder"
-          onAction={async () => {
-            let found = false;
-            for (const message of getChat(chatData.currentChat).messages) {
-              const path = message.answer;
-              if (path) {
-                try {
-                  await showInFinder(path);
-                  found = true;
-                  break;
-                } catch (e) {
-                  continue;
+        <ActionPanel.Section title="Current Image Chat">
+          <Action
+            icon={Icon.Folder}
+            title="Show in Finder"
+            onAction={async () => {
+              let found = false;
+              for (const message of getChat(chatData.currentChat).messages) {
+                const path = message.answer;
+                if (path) {
+                  try {
+                    await showInFinder(path);
+                    found = true;
+                    break;
+                  } catch (e) {
+                    continue;
+                  }
                 }
               }
-            }
 
-            if (!found) {
-              await toast(Toast.Style.Failure, "Image Chat is empty");
-            }
-          }}
-        />
+              if (!found) {
+                await toast(Toast.Style.Failure, "Image Chat is empty");
+              }
+            }}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "enter" }}
+          />
+          <Action
+            icon={Icon.Trash}
+            title="Delete Last Image"
+            onAction={async () => {
+              await confirmAlert({
+                title: "Are you sure?",
+                message: "You cannot recover deleted images!",
+                icon: Icon.Trash,
+                primaryAction: {
+                  title: "Delete Image",
+                  style: Action.Style.Destructive,
+                  onAction: () => {
+                    let chat = getChat(chatData.currentChat);
+
+                    if (chat.messages.length === 0) {
+                      toast(Toast.Style.Failure, "No Images in Chat");
+                      return;
+                    }
+
+                    // delete image file
+                    // also delete the image file
+                    const imagePath = chat.messages[0].answer;
+                    fs.rmSync(imagePath);
+
+                    // delete index 0
+                    chat.messages.shift();
+                    setChatData((oldData) => {
+                      let newChatData = structuredClone(oldData);
+                      getChat(chatData.currentChat, newChatData.chats).messages = chat.messages;
+                      return newChatData;
+                    });
+                    toast(Toast.Style.Success, "Image Deleted");
+                  },
+                },
+              });
+            }}
+            shortcut={{ modifiers: ["shift"], key: "delete" }}
+          />
+          <Action.Push
+            icon={Icon.Pencil}
+            title="Rename Chat"
+            target={<RenameImageChat />}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "m" }}
+          />
+        </ActionPanel.Section>
         <ActionPanel.Section title="Manage Image Chats">
           <Action.Push
             icon={Icon.PlusCircle}

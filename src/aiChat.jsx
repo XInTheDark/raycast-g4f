@@ -210,11 +210,21 @@ export default function Chat({ launchContext }) {
               title="Rename Chat"
               onSubmit={(values) => {
                 pop();
+
+                // check if there is a currently generating message
+                for (let i = 0; i < chat.messages.length; i++) {
+                  if (!chat.messages[i].finished) {
+                    toast(Toast.Style.Failure, "Cannot rename while loading response");
+                    return;
+                  }
+                }
+
                 // check if chat with new name already exists
                 if (chatData.chats.map((x) => x.name).includes(values.chatName)) {
                   toast(Toast.Style.Failure, "Chat with that name already exists");
                   return;
                 }
+
                 setChatData((oldData) => {
                   let newChatData = structuredClone(oldData);
                   getChat(chatData.currentChat, newChatData.chats).name = values.chatName;
@@ -343,10 +353,12 @@ export default function Chat({ launchContext }) {
                   style: Action.Style.Destructive,
                   onAction: () => {
                     let chat = getChat(chatData.currentChat);
+
                     if (chat.messages.length === 0) {
                       toast(Toast.Style.Failure, "No Messages to Delete");
                       return;
                     }
+
                     // delete index 0
                     chat.messages.shift();
                     setChatData((oldData) => {
@@ -361,7 +373,12 @@ export default function Chat({ launchContext }) {
             }}
             shortcut={{ modifiers: ["shift"], key: "delete" }}
           />
-          <Action.Push icon={Icon.Pencil} title="Rename Chat" target={<RenameChat />} />
+          <Action.Push
+            icon={Icon.Pencil}
+            title="Rename Chat"
+            target={<RenameChat />}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "m" }}
+          />
         </ActionPanel.Section>
         <ActionPanel.Section title="Manage Chats">
           <Action.Push
