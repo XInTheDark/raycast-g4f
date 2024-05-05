@@ -213,84 +213,87 @@ export default function genImage() {
 
             const query = searchText;
             setSearchText("");
-            if (
-              getChat(chatData.currentChat).messages.length === 0 ||
-              getChat(chatData.currentChat).messages[0].finished
-            ) {
-              toast(Toast.Style.Animated, "Response Loading", "Please Wait");
-              setChatData((x) => {
-                let newChatData = structuredClone(x);
-                let currentChat = getChat(chatData.currentChat, newChatData.chats);
 
-                currentChat.messages.unshift({
-                  prompt: query,
-                  answer: "",
-                  creationDate: new Date().toISOString(),
-                  finished: false,
-                });
+            toast(Toast.Style.Animated, "Image Loading", "Please Wait");
+            setChatData((x) => {
+              let newChatData = structuredClone(x);
+              let currentChat = getChat(chatData.currentChat, newChatData.chats);
+              let messageID = new Date().getTime();
 
-                (async () => {
-                  try {
-                    const options = loadImageOptions(currentChat);
-                    const base64Image = await g4f.imageGeneration(query, options);
-
-                    // save image
-                    console.log(environment.supportPath);
-                    let imagePath = "";
-
-                    // Each image chat has its own folder
-                    // Ensure the folder exists
-                    const folderPath =
-                      environment.supportPath + "/g4f-image-chats/" + get_folder_name(chatData.currentChat);
-                    if (!fs.existsSync(folderPath)) {
-                      fs.mkdirSync(folderPath, { recursive: true });
-                    }
-                    const filePath =
-                      folderPath + "/g4f-image_" + new Date().toISOString().replace(/:/g, "-").split(".")[0] + ".png";
-
-                    imagePath = filePath;
-
-                    fs.writeFile(filePath, base64Image, "base64", (err) => {
-                      if (err) {
-                        showToast({
-                          style: Toast.Style.Failure,
-                          title: "Error saving image",
-                        });
-                        console.log("Current path: " + __dirname);
-                        console.error(err);
-                        imagePath = "";
-                      }
-                    });
-
-                    setChatData((oldData) => {
-                      let newChatData = structuredClone(oldData);
-                      getChat(chatData.currentChat, newChatData.chats).messages[0].prompt = query;
-                      console.log("imagePath: " + imagePath);
-                      getChat(chatData.currentChat, newChatData.chats).messages[0].answer = imagePath;
-                      return newChatData;
-                    });
-
-                    setChatData((oldData) => {
-                      let newChatData = structuredClone(oldData);
-                      getChat(chatData.currentChat, newChatData.chats).messages[0].finished = true;
-                      return newChatData;
-                    });
-
-                    await toast(Toast.Style.Success, "Image Generated");
-                  } catch {
-                    setChatData((oldData) => {
-                      let newChatData = structuredClone(oldData);
-                      getChat(chatData.currentChat, newChatData.chats).messages.shift();
-                      return newChatData;
-                    });
-                    await toast(Toast.Style.Failure, "GPT cannot process this prompt.");
-                  }
-                })();
-                return newChatData;
+              currentChat.messages.unshift({
+                prompt: query,
+                answer: "",
+                creationDate: new Date().toISOString(),
+                id: messageID,
+                finished: false,
               });
-            } else {
-              toast(Toast.Style.Failure, "Please Wait", "Only one message at a time.");
-            }
+
+              (async () => {
+                try {
+                  const options = loadImageOptions(currentChat);
+                  const base64Image = await g4f.imageGeneration(query, options);
+
+                  // save image
+                  console.log(environment.supportPath);
+                  let imagePath = "";
+
+                  // Each image chat has its own folder
+                  // Ensure the folder exists
+                  const folderPath =
+                    environment.supportPath + "/g4f-image-chats/" + get_folder_name(chatData.currentChat);
+                  if (!fs.existsSync(folderPath)) {
+                    fs.mkdirSync(folderPath, { recursive: true });
+                  }
+                  const filePath =
+                    folderPath + "/g4f-image_" + new Date().toISOString().replace(/:/g, "-").split(".")[0] + ".png";
+
+                  imagePath = filePath;
+
+                  fs.writeFile(filePath, base64Image, "base64", (err) => {
+                    if (err) {
+                      toast(Toast.Style.Failure, "Error saving image");
+                      console.log("Current path: " + __dirname);
+                      console.error(err);
+                      imagePath = "";
+                    }
+                  });
+
+                  setChatData((oldData) => {
+                    let newChatData = structuredClone(oldData);
+                    let chat = getChat(chatData.currentChat, newChatData.chats);
+                    // get message index
+                    let idx = -1;
+                    for (let i = 0; i < chat.messages.length; i++) {
+                      if (chat.messages[i].id === messageID) {
+                        idx = i;
+                        break;
+                      }
+                    }
+                    if (idx === -1) {
+                      toast(Toast.Style.Failure, "Error saving image");
+                      return newChatData;
+                    }
+
+                    chat.messages[idx].prompt = query;
+                    chat.messages[idx].answer = imagePath;
+                    chat.messages[idx].finished = true;
+
+                    console.log("imagePath: " + imagePath);
+                    return newChatData;
+                  });
+
+                  await toast(Toast.Style.Success, "Image Generated");
+                } catch {
+                  setChatData((oldData) => {
+                    let newChatData = structuredClone(oldData);
+                    getChat(chatData.currentChat, newChatData.chats).messages.shift();
+                    return newChatData;
+                  });
+                  await toast(Toast.Style.Failure, "GPT cannot process this prompt.");
+                }
+              })();
+              return newChatData;
+            });
           }}
         />
         <ActionPanel.Section title="Current Image Chat">
