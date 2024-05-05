@@ -17,7 +17,7 @@ import { formatDate } from "./api/helper";
 
 export default function Chat({ launchContext }) {
   let toast = async (style, title, message) => {
-    await showToast({
+    return await showToast({
       style,
       title,
       message,
@@ -83,6 +83,8 @@ export default function Chat({ launchContext }) {
     } else {
       let response = "";
       let r = await getChatResponse(currentChat, query);
+      let loadingToast = await toast(Toast.Style.Animated, "Response Loading");
+
       for await (const chunk of await processChunks(r, provider)) {
         response += chunk;
         response = formatResponse(response, provider);
@@ -91,11 +93,7 @@ export default function Chat({ launchContext }) {
         elapsed = (new Date().getTime() - start) / 1000;
         chars = response.length;
         charPerSec = (chars / elapsed).toFixed(1);
-        await toast(
-          Toast.Style.Animated,
-          "Response Loading",
-          `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`
-        );
+        loadingToast.message = `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`;
       }
     }
 

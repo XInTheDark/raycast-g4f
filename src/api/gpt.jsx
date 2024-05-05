@@ -130,6 +130,8 @@ export default (
         charPerSec = (chars / elapsed).toFixed(1);
       } else {
         let r = await chatCompletion(messages, options);
+        let loadingToast = await showToast(Toast.Style.Animated, "Response Loading");
+
         for await (const chunk of await processChunks(r, provider)) {
           response += chunk;
           response = formatResponse(response, provider);
@@ -138,11 +140,7 @@ export default (
           elapsed = (new Date().getTime() - start) / 1000;
           chars = response.length;
           charPerSec = (chars / elapsed).toFixed(1);
-          await showToast(
-            Toast.Style.Animated,
-            "Response Loading",
-            `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`
-          );
+          loadingToast.message = `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`;
         }
       }
       setLastResponse(response);
