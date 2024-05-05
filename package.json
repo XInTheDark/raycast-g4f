@@ -80,21 +80,21 @@
       "name": "friendly",
       "title": "Change Tone to Friendly",
       "icon": "text-icon.png",
-      "description": "Change tone of selected text to friendly",
+      "description": "Change tone of text to friendly",
       "mode": "view"
     },
     {
       "name": "professional",
       "title": "Change Tone to Professional",
       "icon": "text-icon.png",
-      "description": "Change tone of selected text to professional",
+      "description": "Change tone of text to professional",
       "mode": "view"
     },
     {
       "name": "paraphrase",
       "title": "Paraphrase",
       "icon": "text-icon.png",
-      "description": "Paraphrase selected text",
+      "description": "Paraphrase text",
       "mode": "view"
     },
     {
@@ -113,24 +113,24 @@
       ]
     },
     {
-      "name": "grammar",
-      "title": "Fix Spelling and Grammar",
+      "name": "improve",
+      "title": "Improve Writing",
       "icon": "grammar-icon.png",
-      "description": "Fix spelling and grammar of selected text",
+      "description": "Improve writing of text",
       "mode": "view"
     },
     {
       "name": "longer",
       "title": "Make Longer",
       "icon": "longer-icon.png",
-      "description": "Make selected text longer",
+      "description": "Make text longer",
       "mode": "view"
     },
     {
       "name": "shorter",
       "title": "Make Shorter",
       "icon": "shorten-icon.png",
-      "description": "Make selected text shorter",
+      "description": "Make text shorter",
       "mode": "view"
     },
     {
