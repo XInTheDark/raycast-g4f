@@ -68,7 +68,7 @@ export default function Chat({ launchContext }) {
     let currentChat = getChat(chatData.currentChat, chatData.chats);
     const [provider, model, stream] = providers[currentChat.provider];
 
-    _setChatData(chatData, setChatData, query, "");
+    _setChatData(chatData, setChatData, messageID, query, "");
 
     if (!stream) {
       let response = await getChatResponse(currentChat, query);
@@ -157,6 +157,46 @@ export default function Chat({ launchContext }) {
     );
   };
 
+  let EditLastMessage = () => {
+    let chat = getChat(chatData.currentChat);
+
+    if (chat.messages.length === 0) {
+      toast(Toast.Style.Failure, "No Messages in Chat");
+      return;
+    }
+
+    const lastMessage = chat.messages[0].prompt;
+    const { pop } = useNavigation();
+
+    return (
+      <Form
+        actions={
+          <ActionPanel>
+            <Action.SubmitForm
+              title="Edit Message"
+              onSubmit={(values) => {
+                pop();
+
+                // Similar to regenerate last message, we remove the last message and insert a new one,
+                // but since prompt is changed, we need to update chat.messages[0].prompt,
+                // so we no longer insert a null message, and hence don't pass query to updateChatResponse.
+                chat.messages.shift();
+                chat.messages.unshift(default_message_data());
+                chat.messages[0].prompt = values.message;
+                let messageID = chat.messages[0].id;
+                updateChatResponse(chatData, setChatData, messageID).then(() => {
+                  toast(Toast.Style.Success, "Response Loaded");
+                });
+              }}
+            />
+          </ActionPanel>
+        }
+      >
+        <Form.TextArea id="message" title="Message" defaultValue={lastMessage} />
+      </Form>
+    );
+  };
+
   let GPTActionPanel = () => {
     return (
       <ActionPanel>
@@ -211,7 +251,7 @@ export default function Chat({ launchContext }) {
               let chat = getChat(chatData.currentChat);
 
               if (chat.messages.length === 0) {
-                await toast(Toast.Style.Failure, "No Messages to Regenerate");
+                await toast(Toast.Style.Failure, "No Messages in Chat");
                 return;
               }
 
@@ -222,8 +262,8 @@ export default function Chat({ launchContext }) {
               let query = chat.messages[0].prompt;
               chat.messages.shift();
               chat.messages.unshift(default_message_data());
-
               let messageID = chat.messages[0].id;
+
               await updateChatResponse(chatData, setChatData, messageID, query).then(() => {
                 toast(Toast.Style.Success, "Response Loaded");
               });
@@ -236,7 +276,7 @@ export default function Chat({ launchContext }) {
             onAction={async () => {
               let chat = getChat(chatData.currentChat);
               if (chat.messages.length === 0) {
-                await toast(Toast.Style.Failure, "No Messages to Copy");
+                await toast(Toast.Style.Failure, "No Messages in Chat");
                 return;
               }
 
@@ -249,6 +289,12 @@ export default function Chat({ launchContext }) {
               await toast(Toast.Style.Success, "Chat Transcript Copied");
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
+          />
+          <Action.Push
+            icon={Icon.Pencil}
+            title="Edit Last Message"
+            target={<EditLastMessage />}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "e" }}
           />
           <Action
             icon={Icon.Trash}

@@ -314,7 +314,7 @@ export const getChatResponse = async (currentChat, query) => {
     chat.push({ role: "user", content: currentChat.messages[i].prompt });
     chat.push({ role: "assistant", content: currentChat.messages[i].answer });
   }
-  if (query.length > 0) chat.push({ role: "user", content: query });
+  if (query?.length > 0) chat.push({ role: "user", content: query });
 
   // load provider and model
   const providerString = currentChat.provider;
