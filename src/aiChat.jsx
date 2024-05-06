@@ -203,6 +203,7 @@ export default function Chat({ launchContext }) {
           <Form.Dropdown.Item title="Blackbox (custom-model)" value="Blackbox" />
           <Form.Dropdown.Item title="Replicate (meta-llama-3-8b)" value="ReplicateLlama3_8B" />
           <Form.Dropdown.Item title="Replicate (meta-llama-3-70b)" value="ReplicateLlama3_70B" />
+          <Form.Dropdown.Item title="Replicate (mixtral-8x7b)" value="ReplicateMixtral_8x7B" />
           <Form.Dropdown.Item title="Google Gemini (requires API Key)" value="GoogleGemini" />
         </Form.Dropdown>
       </Form>

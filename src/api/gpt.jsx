@@ -45,6 +45,7 @@ export const providers = {
   Blackbox: [BlackboxProvider, "", true],
   ReplicateLlama3_8B: [ReplicateProvider, "meta/meta-llama-3-8b-instruct", true],
   ReplicateLlama3_70B: [ReplicateProvider, "meta/meta-llama-3-70b-instruct", true],
+  ReplicateMixtral_8x7B: [ReplicateProvider, "mistralai/mixtral-8x7b-instruct-v0.1", true],
   GoogleGemini: [GeminiProvider, "", false],
 };
 
