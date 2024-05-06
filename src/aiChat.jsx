@@ -1,18 +1,19 @@
 import {
-  List,
-  ActionPanel,
   Action,
-  Toast,
-  Icon,
-  showToast,
-  Form,
-  useNavigation,
+  ActionPanel,
+  Clipboard,
   confirmAlert,
+  Form,
   getPreferenceValues,
+  Icon,
+  List,
+  LocalStorage,
+  showToast,
+  Toast,
+  useNavigation
 } from "@raycast/api";
-import { useState, useEffect } from "react";
-import { defaultProvider, getChatResponse, formatResponse, providers, processChunks } from "./api/gpt";
-import { LocalStorage, Clipboard } from "@raycast/api";
+import { useEffect, useState } from "react";
+import { defaultProvider, formatResponse, getChatResponse, processChunks, providers } from "./api/gpt";
 import { formatDate } from "./api/helper";
 
 export default function Chat({ launchContext }) {
@@ -36,6 +37,7 @@ export default function Chat({ launchContext }) {
           messages: [],
         },
       ],
+      lastPruneTime: new Date().getTime(),
     };
   };
 
@@ -104,7 +106,35 @@ export default function Chat({ launchContext }) {
       "Response Finished",
       `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`
     );
+
+    pruneChats(chatData, setChatData); // this function effectively only runs periodically
   };
+
+  const pruneChatsInterval = 30 * 60 * 1000; // interval to prune inactive chats (in ms)
+
+  let pruneChats = (chatData, setChatData) => {
+    const lastPruneTime = chatData.lastPruneTime || 0;
+    const currentTime = new Date().getTime();
+    if (currentTime - lastPruneTime < pruneChatsInterval) return;
+    console.log(`current time: ${currentTime}, last prune time: ${lastPruneTime}`)
+
+    let pruneChatsLimit = getPreferenceValues()["inactiveDuration"];
+    pruneChatsLimit = Number(pruneChatsLimit) * 24 * 60 * 60 * 1000; // convert days to ms
+    if (pruneChatsLimit === 0) return;
+
+    setChatData((oldData) => {
+      let newChatData = structuredClone(oldData);
+      let chats = newChatData.chats;
+      newChatData.chats = chats.filter((chat) => {
+        if (chat.name === newChatData.currentChat || chat.messages.length === 0) return false;
+        let lastMessageTime = new Date(chat.messages[0].creationDate).getTime();
+        console.log(`chat: ${chat.name}, last message time: ${lastMessageTime}, current time: ${currentTime}`)
+        return currentTime - lastMessageTime < pruneChatsLimit;
+      });
+      newChatData.lastPruneTime = currentTime;
+      return newChatData;
+    });
+  }
 
   let CreateChat = () => {
     const { pop } = useNavigation();
