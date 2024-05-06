@@ -201,24 +201,28 @@
           "value": "0"
         },
         {
+          "title": "6 Hours",
+          "value": "6"
+        },
+        {
           "title": "1 Day",
-          "value": "1"
+          "value": "24"
         },
         {
           "title": "3 Days",
-          "value": "3"
+          "value": "72"
         },
         {
           "title": "1 Week",
-          "value": "7"
+          "value": "168"
         },
         {
           "title": "1 Month",
-          "value": "30"
+          "value": "720"
         },
         {
           "title": "6 Months",
-          "value": "180"
+          "value": "4320"
         }
       ]
     }

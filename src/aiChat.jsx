@@ -116,21 +116,26 @@ export default function Chat({ launchContext }) {
     const lastPruneTime = chatData.lastPruneTime || 0;
     const currentTime = new Date().getTime();
     if (currentTime - lastPruneTime < pruneChatsInterval) return;
-    console.log(`current time: ${currentTime}, last prune time: ${lastPruneTime}`)
 
     let pruneChatsLimit = getPreferenceValues()["inactiveDuration"];
-    pruneChatsLimit = Number(pruneChatsLimit) * 24 * 60 * 60 * 1000; // convert days to ms
+    pruneChatsLimit = Number(pruneChatsLimit) * 60 * 60 * 1000; // convert hours to ms
     if (pruneChatsLimit === 0) return;
 
     setChatData((oldData) => {
       let newChatData = structuredClone(oldData);
       let chats = newChatData.chats;
+      let prunedCnt = 0;
+
       newChatData.chats = chats.filter((chat) => {
-        if (chat.name === newChatData.currentChat || chat.messages.length === 0) return false;
-        let lastMessageTime = new Date(chat.messages[0].creationDate).getTime();
-        console.log(`chat: ${chat.name}, last message time: ${lastMessageTime}, current time: ${currentTime}`)
-        return currentTime - lastMessageTime < pruneChatsLimit;
+        if (chat.name === newChatData.currentChat) return true;
+        let lastMessageTime = chat.messages.length === 0 ? chat.creationDate : chat.messages[0].creationDate;
+        lastMessageTime = new Date(lastMessageTime).getTime();
+        const prune = currentTime - lastMessageTime >= pruneChatsLimit;
+        if (prune) prunedCnt++;
+        return !prune;  // false if pruned
       });
+
+      console.log(`Pruned ${prunedCnt} chats`);
       newChatData.lastPruneTime = currentTime;
       return newChatData;
     });
