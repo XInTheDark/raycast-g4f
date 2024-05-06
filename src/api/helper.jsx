@@ -33,11 +33,33 @@ export const formatDate = (dateToCheckISO) => {
 };
 
 // Format a series of messages into a single string
-export const formatChatToPrompt = (chat) => {
+export const formatChatToPrompt = (chat, model) => {
+  model = model?.toLowerCase() || "";
   let prompt = "";
-  for (let i = 0; i < chat.length; i++) {
-    prompt += chat[i].role + ": " + chat[i].content + "\n";
+
+  if (model.includes("meta-llama-3")) {
+    prompt += "<|begin_of_text|>";
+    for (let i = 0; i < chat.length; i++) {
+      prompt += `<|start_header_id|>${chat[i].role}<|end_header_id|>`;
+      prompt += `\n${chat[i].content}<|eot_id|>`;
+    }
+    prompt += "<|start_header_id|>assistant<|end_header_id|>";
+  } else if (model.includes("mixtral")) {
+    // <s> [INST] Prompt [/INST] answer</s> [INST] Follow-up instruction [/INST]
+    for (let i = 0; i < chat.length; i++) {
+      if (chat[i].role === "user") {
+        prompt += `<s> [INST] ${chat[i].content} [/INST]`;
+      } else if (chat[i].role === "assistant") {
+        prompt += ` ${chat[i].content}</s>`;
+      }
+    }
+    // note how prompt ends with [/INST]
+  } else {
+    for (let i = 0; i < chat.length; i++) {
+      prompt += chat[i].role + ": " + chat[i].content + "\n";
+    }
+    prompt += "assistant:";
   }
-  prompt += "assistant:";
+
   return prompt;
 };
