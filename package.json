@@ -187,6 +187,44 @@
       "required": false,
       "type": "password",
       "default": ""
+    },
+    {
+      "name": "inactiveDuration",
+      "title": "Delete Inactive Chats After...",
+      "description": "Duration of inactivity before chat is deleted.",
+      "required": false,
+      "type": "dropdown",
+      "default": "Disabled",
+      "data": [
+        {
+          "title": "Disabled",
+          "value": "0"
+        },
+        {
+          "title": "6 Hours",
+          "value": "6"
+        },
+        {
+          "title": "1 Day",
+          "value": "24"
+        },
+        {
+          "title": "3 Days",
+          "value": "72"
+        },
+        {
+          "title": "1 Week",
+          "value": "168"
+        },
+        {
+          "title": "1 Month",
+          "value": "720"
+        },
+        {
+          "title": "6 Months",
+          "value": "4320"
+        }
+      ]
     }
   ],
   "dependencies": {
