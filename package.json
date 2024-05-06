@@ -162,26 +162,6 @@
           "value": "Bing"
         },
         {
-          "title": "DeepInfra (WizardLM-2-8x22B)",
-          "value": "DeepInfraWizardLM2_8x22B"
-        },
-        {
-          "title": "DeepInfra (meta-llama-3-8b)",
-          "value": "DeepInfraLlama3_8B"
-        },
-        {
-          "title": "DeepInfra (meta-llama-3-70b)",
-          "value": "DeepInfraLlama3_70B"
-        },
-        {
-          "title": "DeepInfra (Mixtral-8x22B)",
-          "value": "DeepInfraMixtral_8x22B"
-        },
-        {
-          "title": "DeepInfra (Dolphin-2.6-8x7B)",
-          "value": "DeepInfraDolphin26_8x7B"
-        },
-        {
           "title": "Blackbox (custom-model)",
           "value": "Blackbox"
         },
