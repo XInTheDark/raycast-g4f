@@ -10,7 +10,7 @@ import {
   LocalStorage,
   showToast,
   Toast,
-  useNavigation
+  useNavigation,
 } from "@raycast/api";
 import { useEffect, useState } from "react";
 import { defaultProvider, formatResponse, getChatResponse, processChunks, providers } from "./api/gpt";
@@ -132,14 +132,14 @@ export default function Chat({ launchContext }) {
         lastMessageTime = new Date(lastMessageTime).getTime();
         const prune = currentTime - lastMessageTime >= pruneChatsLimit;
         if (prune) prunedCnt++;
-        return !prune;  // false if pruned
+        return !prune; // false if pruned
       });
 
       console.log(`Pruned ${prunedCnt} chats`);
       newChatData.lastPruneTime = currentTime;
       return newChatData;
     });
-  }
+  };
 
   let CreateChat = () => {
     const { pop } = useNavigation();
