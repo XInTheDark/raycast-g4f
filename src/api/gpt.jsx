@@ -58,7 +58,7 @@ export const is_null_message = (message) => {
 
 export default (
   props,
-  { context = undefined, allowPaste = false, useSelected = false, useSelectedAsQuery = true, showFormText = "" }
+  { context = undefined, allowPaste = false, useSelected = false, requireQuery = false, showFormText = "" }
 ) => {
   // The parameters are documented here:
   // 1. props: We mostly use this parameter for the query value, which is obtained using props.arguments.query.
@@ -71,7 +71,7 @@ export default (
   //    a. If query is provided, we will get response based on the query value.
   //    b. If showFormText string is provided, a Form will be shown with the showFormText parameter as the field title.
   //    c. If showFormText is not provided, an error will be shown and the command quits.
-  // 5. useSelectedAsQuery: A boolean to use the selected text as the query. Explanation:
+  // 5. requireQuery: A boolean to require a query, separate from selected text. Explanation:
   // By default, the selected text is taken to be the query. For example, the `Continue`, `Fix Code`... commands.
   // But other commands, like `Ask About Selected Text`, may want to use a query in addition to the selected text.
   // 6. showFormText: A string to be shown as the field title in the Form. If true, either of the three following
@@ -180,8 +180,8 @@ export default (
           selected = null;
         }
 
-        // if useSelectedAsQuery is true, we use the selected text as the query
-        if (useSelectedAsQuery) {
+        // if not requireQuery, we use the selected text as the query
+        if (!requireQuery) {
           // if we need selected as query but it is not available, we will try to show a Form
           if (!selected) {
             if (showFormText) {
@@ -196,7 +196,7 @@ export default (
             }
           } else await getResponse(`${context}\n\n${selected}`);
         } else {
-          // !useSelectedAsQuery
+          // requireQuery - we need a separate query
           // if a query is provided, then we use it as "context", and selected text as "query"
           if (!context && argQuery) {
             await getResponse(`${argQuery}\n\n${selected}`);
