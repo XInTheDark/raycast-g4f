@@ -15,7 +15,8 @@ export const getReplicateResponse = async function* (chat, model, max_retries = 
     stream: true,
     input: {
       prompt: formatChatToPrompt(chat),
-      max_new_tokens: model.includes("meta-llama-3") ? 1028 : 8000,
+      max_tokens: model.includes("meta-llama-3") ? 512 : null, // respected by meta-llama-3
+      max_new_tokens: model.includes("mixtral") ? 1024 : null, // respected by mixtral-8x7b
       temperature: 0.7,
     },
   };
