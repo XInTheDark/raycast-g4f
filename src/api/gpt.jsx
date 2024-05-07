@@ -57,6 +57,9 @@ export const is_null_message = (message) => {
   return !message || ((message?.prompt || "").length === 0 && (message?.answer || "").length === 0);
 };
 
+let generationStatus = { stop: false };
+let get_status = () => generationStatus.stop;
+
 export default (
   props,
   {
@@ -150,8 +153,9 @@ export default (
       } else {
         let r = await chatCompletion(messages, options);
         let loadingToast = await showToast(Toast.Style.Animated, "Response Loading");
+        generationStatus.stop = false;
 
-        for await (const chunk of await processChunks(r, provider)) {
+        for await (const chunk of await processChunks(r, provider, get_status)) {
           response += chunk;
           response = formatResponse(response, provider);
           setMarkdown(response);
@@ -278,26 +282,34 @@ export default (
   return page === Pages.Detail ? (
     <Detail
       actions={
-        !isLoading && (
-          <ActionPanel>
-            {allowPaste && <Action.Paste content={markdown} />}
-            <Action.CopyToClipboard shortcut={Keyboard.Shortcut.Common.Copy} content={markdown} />
-            {lastQuery && lastResponse && (
-              <Action
-                title="Continue in Chat"
-                icon={Icon.Message}
-                shortcut={{ modifiers: ["cmd"], key: "j" }}
-                onAction={async () => {
-                  await launchCommand({
-                    name: "aiChat",
-                    type: LaunchType.UserInitiated,
-                    context: { query: lastQuery, response: lastResponse, creationName: "" },
-                  });
-                }}
-              />
-            )}
-          </ActionPanel>
-        )
+        <ActionPanel>
+          {allowPaste && <Action.Paste content={markdown} />}
+          <Action.CopyToClipboard shortcut={Keyboard.Shortcut.Common.Copy} content={markdown} />
+          {lastQuery && (
+            <Action
+              title="Continue in Chat"
+              icon={Icon.Message}
+              shortcut={{ modifiers: ["cmd"], key: "j" }}
+              onAction={async () => {
+                await launchCommand({
+                  name: "aiChat",
+                  type: LaunchType.UserInitiated,
+                  context: { query: lastQuery, response: lastResponse, creationName: "" },
+                });
+              }}
+            />
+          )}
+          {isLoading && (
+            <Action
+              title="Stop Response"
+              icon={Icon.Pause}
+              onAction={() => {
+                generationStatus.stop = true;
+              }}
+              shortcut={{ modifiers: ["cmd", "shift", "opt"], key: "/" }}
+            />
+          )}
+        </ActionPanel>
       }
       isLoading={isLoading}
       markdown={markdown}
@@ -430,7 +442,7 @@ export const formatResponse = (response, provider) => {
 };
 
 // Returns an async generator that can be used directly.
-export const processChunks = async function* (response, provider) {
+export const processChunksAsync = async function* (response, provider) {
   if (provider === g4f.providers.Bing) {
     let prevChunk = "";
     // For Bing, we must not return the last chunk
@@ -444,5 +456,13 @@ export const processChunks = async function* (response, provider) {
   } else {
     // nothing here currently.
     yield* G4F.chunkProcessor(response);
+  }
+};
+
+export const processChunks = async function* (response, provider, status = null) {
+  // same as processChunksAsync, but stops generating as soon as status() is true
+  for await (const chunk of await processChunksAsync(response, provider)) {
+    if (status && status()) break;
+    yield chunk;
   }
 };
