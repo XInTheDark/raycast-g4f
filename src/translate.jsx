@@ -1,5 +1,5 @@
 import useGPT from "./api/gpt";
-import { Form, getSelectedText, showToast, Toast } from "@raycast/api";
+import { Form, showToast, Toast } from "@raycast/api";
 
 export default function Translate(props) {
   return useGPT(props, {
