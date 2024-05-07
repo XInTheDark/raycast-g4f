@@ -330,6 +330,71 @@ export default function Chat({ launchContext }) {
     );
   };
 
+  let sendToGPT = async (values = null) => {
+    let query = searchText;
+    if (values) {
+      query = values.message;
+    }
+
+    if (query === "") {
+      toast(Toast.Style.Failure, "Please Enter a Query");
+      return;
+    }
+
+    setSearchText("");
+    toast(Toast.Style.Animated, "Response Loading");
+
+    setChatData((x) => {
+      let newChatData = structuredClone(x);
+      let currentChat = getChat(chatData.currentChat, newChatData.chats);
+      let newMessageID = new Date().getTime();
+
+      currentChat.messages.unshift({
+        prompt: query,
+        answer: "",
+        creationDate: new Date().toISOString(),
+        id: newMessageID,
+        finished: false,
+      });
+
+      (async () => {
+        try {
+          await updateChatResponse(chatData, setChatData, newMessageID, query);
+        } catch {
+          setChatData((oldData) => {
+            let newChatData = structuredClone(oldData);
+            getChat(chatData.currentChat, newChatData.chats).messages.shift();
+            return newChatData;
+          });
+          await toast(Toast.Style.Failure, "GPT cannot process this message.");
+        }
+      })();
+      return newChatData;
+    });
+  };
+
+  let ComposeMessage = () => {
+    const { pop } = useNavigation();
+
+    return (
+      <Form
+        actions={
+          <ActionPanel>
+            <Action.SubmitForm
+              title="Send to GPT"
+              onSubmit={async (values) => {
+                pop();
+                await sendToGPT(values);
+              }}
+            />
+          </ActionPanel>
+        }
+      >
+        <Form.TextArea id="message" title="Message" />
+      </Form>
+    );
+  };
+
   let EditLastMessage = () => {
     let chat = getChat(chatData.currentChat);
 
@@ -420,45 +485,11 @@ export default function Chat({ launchContext }) {
         <Action
           icon={Icon.Message}
           title="Send to GPT"
-          onAction={() => {
-            if (searchText === "") {
-              toast(Toast.Style.Failure, "Please Enter a Query");
-              return;
-            }
-
-            const query = searchText;
-            setSearchText("");
-            toast(Toast.Style.Animated, "Response Loading");
-
-            setChatData((x) => {
-              let newChatData = structuredClone(x);
-              let currentChat = getChat(chatData.currentChat, newChatData.chats);
-              let newMessageID = new Date().getTime();
-
-              currentChat.messages.unshift({
-                prompt: query,
-                answer: "",
-                creationDate: new Date().toISOString(),
-                id: newMessageID,
-                finished: false,
-              });
-
-              (async () => {
-                try {
-                  await updateChatResponse(chatData, setChatData, newMessageID, query);
-                } catch {
-                  setChatData((oldData) => {
-                    let newChatData = structuredClone(oldData);
-                    getChat(chatData.currentChat, newChatData.chats).messages.shift();
-                    return newChatData;
-                  });
-                  await toast(Toast.Style.Failure, "GPT cannot process this message.");
-                }
-              })();
-              return newChatData;
-            });
+          onAction={async () => {
+            await sendToGPT();
           }}
         />
+        <Action.Push icon={Icon.BlankDocument} title="Compose Message" target={<ComposeMessage />} />
         <ActionPanel.Section title="Current Chat">
           <Action
             icon={Icon.ArrowClockwise}
@@ -485,7 +516,7 @@ export default function Chat({ launchContext }) {
             shortcut={{ modifiers: ["cmd", "shift"], key: "r" }}
           />
           <Action.Push
-            icon={Icon.Pencil}
+            icon={Icon.TextCursor}
             title="Edit Last Message"
             target={<EditLastMessage />}
             shortcut={{ modifiers: ["cmd", "shift"], key: "e" }}
