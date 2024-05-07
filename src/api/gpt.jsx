@@ -66,7 +66,7 @@ export default (
     requireQuery = false,
     showFormText = "",
     forceShowForm = false,
-    otherReactNode = null,
+    otherReactComponents = [],
     processPrompt = null,
   }
 ) => {
@@ -93,11 +93,11 @@ export default (
   // 7. forceShowForm: Even if selected text is available, still show the form. In this case the default value
   // for the first field in the form will be the selected text. For example, `Translate` command has this set to true
   // because the user needs to select the target language in the form.
-  // 8. otherReactNode: An additional React node to be shown in the Form.
+  // 8. otherReactComponents: An array of additional React components to be shown in the Form.
   // For example, `Translate` command has a dropdown to select the target language.
   // 9. processPrompt: A function to be called when the Form is submitted, to get the final prompt. The usage is
-  // processPrompt(context, query, selected, otherReactNode.values)
-  // Hence, the otherReactNode parameter MUST always be supplied when using processPrompt.
+  // processPrompt(context, query, selected, otherReactComponents.values)
+  // Hence, the otherReactComponents parameter MUST always be supplied when using processPrompt.
 
   const Pages = {
     Form: 0,
@@ -332,7 +332,7 @@ export default (
         id="query"
         defaultValue={argQuery ? argQuery : !requireQuery && selectedState ? selectedState : ""}
       />
-      {otherReactNode}
+      {otherReactComponents}
     </Form>
   );
 };
