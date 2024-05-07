@@ -18,7 +18,7 @@ export default function Translate(props) {
         <Form.Dropdown.Item title="🇯🇵 Japanese" value="Japanese" />
         <Form.Dropdown.Item title="🇷🇺 Russian" value="Russian" />
         <Form.Dropdown.Item title="🇵🇹 Portuguese" value="Portuguese" />
-        <Form.Dropdown.Item title="🇰🇷Korean" value="Korean" />
+        <Form.Dropdown.Item title="🇰🇷 Korean" value="Korean" />
       </Form.Dropdown>
     ),
     processPrompt: (context, query, selected, values) => {
