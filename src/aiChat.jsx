@@ -16,6 +16,26 @@ import { useEffect, useState } from "react";
 import { defaultProvider, formatResponse, getChatResponse, processChunks, providers } from "./api/gpt";
 import { formatDate } from "./api/helper";
 
+const chat_providers = [
+  ["ChatGPT (gpt-4-32k)", "GPT4"],
+  ["ChatGPT (gpt-3.5-turbo)", "GPT35"],
+  ["Bing (gpt-4)", "Bing"],
+  ["DeepInfra (WizardLM-2-8x22B)", "DeepInfraWizardLM2_8x22B"],
+  ["DeepInfra (meta-llama-3-8b)", "DeepInfraLlama3_8B"],
+  ["DeepInfra (meta-llama-3-70b)", "DeepInfraLlama3_70B"],
+  ["DeepInfra (Mixtral-8x22B)", "DeepInfraMixtral_8x22B"],
+  ["DeepInfra (Dolphin-2.6-8x7B)", "DeepInfraDolphin26_8x7B"],
+  ["Blackbox (custom-model)", "Blackbox"],
+  ["Replicate (meta-llama-3-8b)", "ReplicateLlama3_8B"],
+  ["Replicate (meta-llama-3-70b)", "ReplicateLlama3_70B"],
+  ["Replicate (mixtral-8x7b)", "ReplicateMixtral_8x7B"],
+  ["Google Gemini (requires API Key)", "GoogleGemini"],
+];
+
+const ChatProvidersReact = chat_providers.map((x) => {
+  return <Form.Dropdown.Item title={x[0]} value={x[1]} key={x[1]} />;
+});
+
 export default function Chat({ launchContext }) {
   let toast = async (style, title, message) => {
     return await showToast({
@@ -141,6 +161,113 @@ export default function Chat({ launchContext }) {
     });
   };
 
+  let exportChat = (chat) => {
+    let str = "";
+    for (let i = chat.messages.length - 1; i >= 0; i--) {
+      let prompt = chat.messages[i].prompt,
+        answer = chat.messages[i].answer;
+      let time = new Date(chat.messages[i].creationDate).getTime();
+      str += `<|start_message_token|>${time}<|end_message_token|>\n`;
+      if (prompt) {
+        str += `<|start_prompt_token|>\n${prompt}\n<|end_prompt_token|>\n`;
+      }
+      if (answer) {
+        str += `<|start_response_token|>\n${answer}\n<|end_response_token|>\n`;
+      }
+      str += "\n";
+    }
+    return str;
+  };
+
+  let ImportChat = () => {
+    const { pop } = useNavigation();
+
+    return (
+      <Form
+        actions={
+          <ActionPanel>
+            <Action.SubmitForm
+              title="Import Chat"
+              onSubmit={(values) => {
+                pop();
+                let str = values.chatText;
+                processImportChat(str, chatData, setChatData, values.provider);
+              }}
+            />
+          </ActionPanel>
+        }
+      >
+        <Form.TextArea id="chatText" title="Chat Transcript" />
+        <Form.Description title="GPT Model" text="The provider and model used for this chat." />
+        <Form.Dropdown id="provider" defaultValue={defaultProvider()}>
+          {ChatProvidersReact}
+        </Form.Dropdown>
+      </Form>
+    );
+  };
+
+  let processImportChat = (str, chatData, setChatData, provider) => {
+    let lines = str.split("\n");
+    let messages = [];
+    let currentMessage = null;
+    let currentState = null;
+
+    for (let i = 0; i < lines.length; i++) {
+      let line = lines[i];
+      if (line.startsWith("<|start_message_token|>")) {
+        if (currentMessage) {
+          // add to start of array
+          messages.unshift(currentMessage);
+        }
+        let time = Number(line.replace("<|start_message_token|>", "").replace("<|end_message_token|>", ""));
+        currentMessage = {
+          creationDate: new Date(time),
+          prompt: "",
+          answer: "",
+        };
+      } else if (line.startsWith("<|start_prompt_token|>")) {
+        currentState = "prompt";
+      } else if (line.startsWith("<|end_prompt_token|>") || line.startsWith("<|end_response_token|>")) {
+        currentState = null;
+      } else if (line.startsWith("<|start_response_token|>")) {
+        currentState = "response";
+      } else {
+        if (!currentMessage) continue; // this shouldn't happen unless chat transcript is malformed
+        if (!line) line = "\n";
+        if (currentState === "prompt") {
+          currentMessage.prompt += line + "\n";
+        } else if (currentState === "response") {
+          currentMessage.answer += line + "\n";
+        }
+      }
+    }
+
+    if (currentMessage) {
+      messages.unshift(currentMessage);
+    }
+
+    setChatData((oldData) => {
+      let newChatData = structuredClone(oldData);
+      newChatData.chats.push({
+        name: `Imported at ${new Date().toLocaleString("en-US", {
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        })}`,
+        creationDate: new Date(),
+        provider: provider,
+        systemPrompt: "",
+        messages: messages,
+      });
+      newChatData.currentChat = newChatData.chats[newChatData.chats.length - 1].name;
+      return newChatData;
+    });
+
+    toast(Toast.Style.Success, "Chat Imported");
+  };
+
   let CreateChat = () => {
     const { pop } = useNavigation();
 
@@ -197,19 +324,7 @@ export default function Chat({ launchContext }) {
         <Form.TextArea id="systemPrompt" defaultValue="" />
         <Form.Description title="GPT Model" text="The provider and model used for this chat." />
         <Form.Dropdown id="provider" defaultValue={defaultProviderString}>
-          <Form.Dropdown.Item title="ChatGPT (gpt-4-32k)" value="GPT4" />
-          <Form.Dropdown.Item title="ChatGPT (gpt-3.5-turbo)" value="GPT35" />
-          <Form.Dropdown.Item title="Bing (gpt-4)" value="Bing" />
-          <Form.Dropdown.Item title="DeepInfra (WizardLM-2-8x22B)" value="DeepInfraWizardLM2_8x22B" />
-          <Form.Dropdown.Item title="DeepInfra (meta-llama-3-8b)" value="DeepInfraLlama3_8B" />
-          <Form.Dropdown.Item title="DeepInfra (meta-llama-3-70b)" value="DeepInfraLlama3_70B" />
-          <Form.Dropdown.Item title="DeepInfra (Mixtral-8x22B)" value="DeepInfraMixtral_8x22B" />
-          <Form.Dropdown.Item title="DeepInfra (Dolphin-2.6-8x7B)" value="DeepInfraDolphin26_8x7B" />
-          <Form.Dropdown.Item title="Blackbox (custom-model)" value="Blackbox" />
-          <Form.Dropdown.Item title="Replicate (meta-llama-3-8b)" value="ReplicateLlama3_8B" />
-          <Form.Dropdown.Item title="Replicate (meta-llama-3-70b)" value="ReplicateLlama3_70B" />
-          <Form.Dropdown.Item title="Replicate (mixtral-8x7b)" value="ReplicateMixtral_8x7B" />
-          <Form.Dropdown.Item title="Google Gemini (requires API Key)" value="GoogleGemini" />
+          {ChatProvidersReact}
         </Form.Dropdown>
       </Form>
     );
@@ -369,26 +484,6 @@ export default function Chat({ launchContext }) {
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "r" }}
           />
-          <Action
-            icon={Icon.Clipboard}
-            title="Copy Chat Transcript"
-            onAction={async () => {
-              let chat = getChat(chatData.currentChat);
-              if (chat.messages.length === 0) {
-                await toast(Toast.Style.Failure, "No Messages in Chat");
-                return;
-              }
-
-              let transcript = "";
-              for (let i = chat.messages.length - 1; i >= 0; i--) {
-                transcript += `User: ${chat.messages[i].prompt}\n`;
-                transcript += `GPT: ${chat.messages[i].answer}\n\n`;
-              }
-              await Clipboard.copy(transcript);
-              await toast(Toast.Style.Success, "Chat Transcript Copied");
-            }}
-            shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
-          />
           <Action.Push
             icon={Icon.Pencil}
             title="Edit Last Message"
@@ -433,6 +528,21 @@ export default function Chat({ launchContext }) {
             title="Rename Chat"
             target={<RenameChat />}
             shortcut={{ modifiers: ["cmd", "shift"], key: "m" }}
+          />
+          <Action
+            icon={Icon.Download}
+            title="Export Chat"
+            onAction={async () => {
+              let chat = getChat(chatData.currentChat);
+              if (chat.messages.length === 0) {
+                await toast(Toast.Style.Failure, "No Messages in Chat");
+                return;
+              }
+
+              let transcript = exportChat(chat);
+              await Clipboard.copy(transcript);
+              await toast(Toast.Style.Success, "Chat Transcript Copied");
+            }}
           />
         </ActionPanel.Section>
         <ActionPanel.Section title="Manage Chats">
@@ -484,6 +594,7 @@ export default function Chat({ launchContext }) {
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "arrowUp" }}
           />
+          <Action.Push icon={Icon.Upload} title="Import Chat" target={<ImportChat />} />
         </ActionPanel.Section>
         <ActionPanel.Section title="Danger zone">
           <Action
