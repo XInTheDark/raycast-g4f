@@ -372,8 +372,8 @@ export const formatResponse = (response, provider) => {
 
   if (provider === BlackboxProvider) {
     // replace only once
-    // example: remove $@$v=v1.13$@$
-    response = response.replace(/\$@\$v=v.{1,6}\$@\$/, "");
+    // example: remove $@$v=v1.13$@$ or $@$v=undefined%@$
+    response = response.replace(/\$@\$v=.{1,10}\$@\$/, "");
   }
 
   return response;
