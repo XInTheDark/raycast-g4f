@@ -194,6 +194,7 @@ export default (
         } catch (e) {
           selected = null;
         }
+        if (selected && !selected.trim()) selected = null;
         setSelected(selected);
 
         // Before the rest of the code, handle forceShowForm
