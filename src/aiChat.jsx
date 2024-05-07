@@ -264,6 +264,8 @@ export default function Chat({ launchContext }) {
       newChatData.currentChat = newChatData.chats[newChatData.chats.length - 1].name;
       return newChatData;
     });
+
+    toast(Toast.Style.Success, "Chat Imported");
   };
 
   let CreateChat = () => {
