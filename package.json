@@ -113,6 +113,13 @@
       ]
     },
     {
+      "name": "translate",
+      "title": "Translate",
+      "icon": "synonym-icon.png",
+      "description": "Translate text to another language",
+      "mode": "view"
+    },
+    {
       "name": "improve",
       "title": "Improve Writing",
       "icon": "grammar-icon.png",

@@ -59,7 +59,16 @@ export const is_null_message = (message) => {
 
 export default (
   props,
-  { context = undefined, allowPaste = false, useSelected = false, requireQuery = false, showFormText = "" }
+  {
+    context = undefined,
+    allowPaste = false,
+    useSelected = false,
+    requireQuery = false,
+    showFormText = "",
+    forceShowForm = false,
+    otherReactComponents = [],
+    processPrompt = null,
+  }
 ) => {
   // The parameters are documented here:
   // 1. props: We mostly use this parameter for the query value, which is obtained using props.arguments.query.
@@ -80,6 +89,15 @@ export default (
   //    a. If useSelected is true, see useSelected documentation above.
   //    b. If useSelected is false, and query is provided, we will get response based on the query value.
   //    c. If useSelected is false, and query is not provided, a Form will be shown with the showFormText parameter as the field title.
+
+  // 7. forceShowForm: Even if selected text is available, still show the form. In this case the default value
+  // for the first field in the form will be the selected text. For example, `Translate` command has this set to true
+  // because the user needs to select the target language in the form.
+  // 8. otherReactComponents: An array of additional React components to be shown in the Form.
+  // For example, `Translate` command has a dropdown to select the target language.
+  // 9. processPrompt: A function to be called when the Form is submitted, to get the final prompt. The usage is
+  // processPrompt(context, query, selected, otherReactComponents.values)
+  // Hence, the otherReactComponents parameter MUST always be supplied when using processPrompt.
 
   const Pages = {
     Form: 0,
@@ -168,11 +186,7 @@ export default (
   useEffect(() => {
     (async () => {
       if (useSelected) {
-        // handle the case where we don't need to get selected text: if we already have a context and a query.
-        if (context && argQuery) {
-          await getResponse(`${context}\n\n${argQuery}`);
-          return;
-        }
+        let systemPrompt = (context ? `${context}\n\n` : "") + (argQuery ? argQuery : "");
 
         let selected;
         try {
@@ -180,9 +194,23 @@ export default (
         } catch (e) {
           selected = null;
         }
+        setSelected(selected);
+
+        // Before the rest of the code, handle forceShowForm
+        if (forceShowForm) {
+          setPage(Pages.Form);
+          return;
+        }
 
         // if not requireQuery, we use the selected text as the query
         if (!requireQuery) {
+          // handle the case where we don't use selected text: if !requireQuery, and we already have a context & query.
+          // For example: `Find Synonyms` command.
+          if (context && argQuery) {
+            await getResponse(`${systemPrompt}`);
+            return;
+          }
+
           // if we need selected as query but it is not available, we will try to show a Form
           if (!selected) {
             if (showFormText) {
@@ -195,17 +223,18 @@ export default (
                 title: "Could not get selected text",
               });
             }
-          } else await getResponse(`${context}\n\n${selected}`);
+          } else {
+            await getResponse(`${systemPrompt}\n\n${selected}`);
+          }
         } else {
           // requireQuery - we need a separate query
-          // if a query is provided, then we use it as "context", and selected text as "query"
-          if (!context && argQuery) {
-            await getResponse(`${argQuery}\n\n${selected}`);
+          // if a query is provided, then we use it as system prompt, and selected text as "query"
+          if (argQuery) {
+            await getResponse(`${systemPrompt}\n\n${selected}`);
           }
 
           // if no query is provided, we will need to obtain a separate query by showing a form
           else if (showFormText) {
-            setSelected(selected);
             setPage(Pages.Form);
           }
 
@@ -220,6 +249,13 @@ export default (
         }
       } else {
         // !useSelected
+
+        // Before the rest of the code, handle forceShowForm
+        if (forceShowForm) {
+          setPage(Pages.Form);
+          return;
+        }
+
         if (argQuery) {
           await getResponse(argQuery);
         } else {
@@ -273,17 +309,30 @@ export default (
             onSubmit={(values) => {
               setMarkdown("");
 
-              if (useSelected && selectedState) {
-                getResponse(`${values.query}\n\n${selectedState}`);
-                return;
+              let prompt;
+              let systemPrompt = (context ? `${context}\n\n` : "") + (values.query ? values.query : "");
+
+              if (processPrompt) {
+                // custom function
+                prompt = processPrompt(context, values.query, selectedState, values);
+              } else if (useSelected && selectedState) {
+                prompt = `${systemPrompt}\n\n${selectedState}`;
+              } else {
+                prompt = `${systemPrompt}`;
               }
-              getResponse(`${context ? `${context}\n\n` : ""}${values.query}`);
+
+              getResponse(prompt);
             }}
           />
         </ActionPanel>
       }
     >
-      <Form.TextArea title={showFormText} id="query" />
+      <Form.TextArea
+        title={showFormText}
+        id="query"
+        defaultValue={argQuery ? argQuery : !requireQuery && selectedState ? selectedState : ""}
+      />
+      {otherReactComponents}
     </Form>
   );
 };
