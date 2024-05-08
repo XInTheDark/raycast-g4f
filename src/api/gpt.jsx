@@ -28,6 +28,9 @@ import { BlackboxProvider, getBlackboxResponse } from "./Providers/blackbox";
 // Replicate module
 import { ReplicateProvider, getReplicateResponse } from "./Providers/replicate";
 
+// Liaobots module
+import { LiaobotsProvider, getLiaobotsResponse } from "./Providers/liaobots";
+
 // Google Gemini module
 import { GeminiProvider, getGoogleGeminiResponse } from "./Providers/google_gemini";
 
@@ -46,6 +49,9 @@ export const providers = {
   ReplicateLlama3_8B: [ReplicateProvider, "meta/meta-llama-3-8b-instruct", true],
   ReplicateLlama3_70B: [ReplicateProvider, "meta/meta-llama-3-70b-instruct", true],
   ReplicateMixtral_8x7B: [ReplicateProvider, "mistralai/mixtral-8x7b-instruct-v0.1", true],
+  Liaobots_GPT4: [LiaobotsProvider, "gpt-4", true],
+  Liaobots_GPT4Turbo: [LiaobotsProvider, "gpt-4-turbo", true],
+  Liaobots_Claude21: [LiaobotsProvider, "claude-2.1", true],
   GoogleGemini: [GeminiProvider, "", false],
 };
 
@@ -364,6 +370,9 @@ export const chatCompletion = async (chat, options) => {
   } else if (provider === ReplicateProvider) {
     // Replicate
     response = await getReplicateResponse(chat, options.model);
+  } else if (provider === LiaobotsProvider) {
+    // Liaobots
+    response = await getLiaobotsResponse(chat, options.model);
   } else if (provider === GeminiProvider) {
     // Google Gemini
     response = await getGoogleGeminiResponse(chat);
@@ -450,7 +459,7 @@ export const processChunksAsync = async function* (response, provider) {
       yield prevChunk;
       prevChunk = chunk;
     }
-  } else if ([DeepInfraProvider, BlackboxProvider, ReplicateProvider].includes(provider)) {
+  } else if ([DeepInfraProvider, BlackboxProvider, ReplicateProvider, LiaobotsProvider].includes(provider)) {
     // response must be an async generator
     yield* response;
   } else {

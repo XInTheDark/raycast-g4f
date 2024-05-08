@@ -29,6 +29,9 @@ const chat_providers = [
   ["Replicate (meta-llama-3-8b)", "ReplicateLlama3_8B"],
   ["Replicate (meta-llama-3-70b)", "ReplicateLlama3_70B"],
   ["Replicate (mixtral-8x7b)", "ReplicateMixtral_8x7B"],
+  ["Liaobots (gpt-4)", "Liaobots_GPT4"],
+  ["Liaobots (gpt-4-turbo)", "Liaobots_GPT4Turbo"],
+  ["Liaobots (claude-2.1)", "Liaobots_Claude21"],
   ["Google Gemini (requires API Key)", "GoogleGemini"],
 ];
 

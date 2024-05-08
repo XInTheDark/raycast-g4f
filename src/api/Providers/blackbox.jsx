@@ -1,6 +1,6 @@
 export const BlackboxProvider = "BlackboxProvider";
 import fetch from "node-fetch-polyfill";
-import { randomBytes, randomUUID } from "crypto";
+import { token_hex, uuid4 } from "../helper";
 
 // Implementation ported from gpt4free Blackbox provider.
 
@@ -18,16 +18,6 @@ const headers = {
   "Sec-GPC": "1",
   "Alt-Used": "www.blackbox.ai",
   Connection: "keep-alive",
-};
-
-const token_hex = function (nbytes) {
-  // python: binascii.hexlify(token_bytes(nbytes)).decode('ascii')
-  return randomBytes(nbytes).toString("hex");
-};
-
-const uuid4 = function () {
-  // python: str(uuid.uuid4())
-  return randomUUID();
 };
 
 export const getBlackboxResponse = async function* (chat, max_retries = 5) {
