@@ -12,6 +12,7 @@ import {
   popToRoot,
   showToast,
   Toast,
+  BrowserExtension
 } from "@raycast/api";
 import { useEffect, useState } from "react";
 
@@ -71,6 +72,7 @@ export default (
     forceShowForm = false,
     otherReactComponents = [],
     processPrompt = null,
+    useBrowserTab = false,
   }
 ) => {
   // The parameters are documented here:
@@ -102,6 +104,9 @@ export default (
   // processPrompt(context, query, selected, otherReactComponents.values)
   // Hence, the otherReactComponents parameter MUST always be supplied when using processPrompt.
 
+  // 10. useBrowserTab: instead of using selected text, we use the current browser tab content.
+  // Uses the BrowserExtension API. Also asserts that useSelected is false.
+
   const Pages = {
     Form: 0,
     Detail: 1,
@@ -115,6 +120,8 @@ export default (
   const [selectedState, setSelected] = useState("");
   const [lastQuery, setLastQuery] = useState("");
   const [lastResponse, setLastResponse] = useState("");
+
+  useSelected = useSelected || useBrowserTab; // for ease of handling, treat useBrowserTab as useSelected
 
   const getResponse = async (query) => {
     setLastQuery(query);
@@ -193,11 +200,21 @@ export default (
         let systemPrompt = (context ? `${context}\n\n` : "") + (argQuery ? argQuery : "");
 
         let selected;
+        if (!useBrowserTab) {
+          try {
+            selected = await getSelectedText();
+          } catch (e) {
+            selected = null;
+          }
+        }
+      else {
         try {
-          selected = await getSelectedText();
+          selected = await BrowserExtension.getContent({ format: "markdown" });
         } catch (e) {
           selected = null;
         }
+      }
+      console.log(selected);
         if (selected && !selected.trim()) selected = null;
         setSelected(selected);
 

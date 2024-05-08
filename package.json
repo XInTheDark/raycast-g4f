@@ -49,6 +49,21 @@
       ]
     },
     {
+      "name": "askAboutBrowserTab",
+      "title": "Ask About Browser Tab",
+      "description": "Ask GPT about current browser tab",
+      "mode": "view",
+      "icon": "screen-icon.png",
+      "arguments": [
+        {
+          "name": "query",
+          "placeholder": "Query",
+          "type": "text",
+          "required": false
+        }
+      ]
+    },
+    {
       "name": "continue",
       "title": "Continue Text",
       "description": "Generate completion of text",
@@ -259,7 +274,7 @@
     }
   ],
   "dependencies": {
-    "@raycast/api": "^1.62.0",
+    "@raycast/api": "^1.73.0",
     "@raycast/utils": "^1.9.0",
     "g4f": "^1.4.2",
     "gemini-ai": "^1.1.0",
