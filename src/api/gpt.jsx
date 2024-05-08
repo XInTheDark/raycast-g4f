@@ -464,7 +464,7 @@ export const processChunks = async function* (response, provider, status = null)
   // update every few chunks to reduce performance impact
   let i = 0;
   for await (const chunk of await processChunksAsync(response, provider)) {
-    if (i & 15 === 0 && status && status()) break;
+    if ((i & 15) === 0 && status && status()) break;
     yield chunk;
     i++;
   }
