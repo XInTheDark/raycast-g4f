@@ -36,6 +36,9 @@ const ChatProvidersReact = chat_providers.map((x) => {
   return <Form.Dropdown.Item title={x[0]} value={x[1]} key={x[1]} />;
 });
 
+let generationStatus = { stop: false, loading: false };
+let get_status = () => generationStatus.stop;
+
 export default function Chat({ launchContext }) {
   let toast = async (style, title, message) => {
     return await showToast({
@@ -106,8 +109,9 @@ export default function Chat({ launchContext }) {
       let response = "";
       let r = await getChatResponse(currentChat, query);
       let loadingToast = await toast(Toast.Style.Animated, "Response Loading");
+      generationStatus = { stop: false, loading: true };
 
-      for await (const chunk of await processChunks(r, provider)) {
+      for await (const chunk of await processChunks(r, provider, get_status)) {
         response += chunk;
         response = formatResponse(response, provider);
         _setChatData(chatData, setChatData, messageID, "", response);
@@ -127,6 +131,7 @@ export default function Chat({ launchContext }) {
       `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`
     );
 
+    generationStatus.loading = false;
     pruneChats(chatData, setChatData); // this function effectively only runs periodically
   };
 
@@ -491,6 +496,16 @@ export default function Chat({ launchContext }) {
         />
         <Action.Push icon={Icon.BlankDocument} title="Compose Message" target={<ComposeMessage />} />
         <ActionPanel.Section title="Current Chat">
+          {generationStatus.loading && (
+            <Action
+              title="Stop Response"
+              icon={Icon.Pause}
+              onAction={() => {
+                generationStatus = { stop: true, loading: false };
+              }}
+              shortcut={{ modifiers: ["cmd", "shift", "opt"], key: "/" }}
+            />
+          )}
           <Action
             icon={Icon.ArrowClockwise}
             title="Regenerate Last Message"
@@ -500,6 +515,29 @@ export default function Chat({ launchContext }) {
               if (chat.messages.length === 0) {
                 await toast(Toast.Style.Failure, "No Messages in Chat");
                 return;
+              }
+
+              if (chat.messages[0].finished === false) {
+                // We don't prevent the user from regenerating a message that is still loading,
+                // because there are valid use cases, such as when the extension glitches, but we show an alert.
+                let userConfirmed = false;
+                await confirmAlert({
+                  title: "Are you sure?",
+                  message: "Response is still loading. Are you sure you want to regenerate it?",
+                  icon: Icon.ArrowClockwise,
+                  primaryAction: {
+                    title: "Regenerate Message",
+                    onAction: () => {
+                      userConfirmed = true;
+                    },
+                  },
+                  dismissAction: {
+                    title: "Cancel",
+                  },
+                });
+                if (!userConfirmed) {
+                  return;
+                }
               }
 
               await toast(Toast.Style.Animated, "Regenerating Last Message");
