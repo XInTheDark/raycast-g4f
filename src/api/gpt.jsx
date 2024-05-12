@@ -28,6 +28,9 @@ import { BlackboxProvider, getBlackboxResponse } from "./Providers/blackbox";
 // Replicate module
 import { ReplicateProvider, getReplicateResponse } from "./Providers/replicate";
 
+// AwanLLM module
+import { AwanLLMProvider, getAwanLLMResponse } from "./Providers/awanllm";
+
 // Google Gemini module
 import { GeminiProvider, getGoogleGeminiResponse } from "./Providers/google_gemini";
 
@@ -46,6 +49,7 @@ export const providers = {
   ReplicateLlama3_8B: [ReplicateProvider, "meta/meta-llama-3-8b-instruct", true],
   ReplicateLlama3_70B: [ReplicateProvider, "meta/meta-llama-3-70b-instruct", true],
   ReplicateMixtral_8x7B: [ReplicateProvider, "mistralai/mixtral-8x7b-instruct-v0.1", true],
+  AwanLLMLlama3_8B: [AwanLLMProvider, "Meta-Llama-3-8B-Instruct", true],
   GoogleGemini: [GeminiProvider, "", false],
 };
 
