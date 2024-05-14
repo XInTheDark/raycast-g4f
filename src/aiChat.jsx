@@ -19,6 +19,7 @@ import { formatDate } from "./api/helper";
 const chat_providers = [
   ["ChatGPT (gpt-4-32k)", "GPT4"],
   ["ChatGPT (gpt-3.5-turbo)", "GPT35"],
+  ["DuckDuckGo (gpt-3.5-turbo)", "DuckDuckGo"],
   ["Bing (gpt-4)", "Bing"],
   ["DeepInfra (WizardLM-2-8x22B)", "DeepInfraWizardLM2_8x22B"],
   ["DeepInfra (meta-llama-3-8b)", "DeepInfraLlama3_8B"],

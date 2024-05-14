@@ -165,6 +165,10 @@
           "value": "GPT35"
         },
         {
+          "title": "DuckDuckGo (gpt-3.5-turbo)",
+          "value": "DuckDuckGo"
+        },
+        {
           "title": "Bing (gpt-4)",
           "value": "Bing"
         },

@@ -19,6 +19,9 @@ import { useEffect, useState } from "react";
 import * as G4F from "g4f";
 const g4f = new G4F.G4F();
 
+// DuckDuckGo module
+import { DuckDuckGoProvider, getDuckDuckGoResponse } from "./Providers/duckduckgo";
+
 // DeepInfra module
 import { DeepInfraProvider, getDeepInfraResponse } from "./Providers/deepinfra";
 
@@ -36,6 +39,7 @@ import { GeminiProvider, getGoogleGeminiResponse } from "./Providers/google_gemi
 export const providers = {
   GPT4: [g4f.providers.GPT, "gpt-4-32k", false],
   GPT35: [g4f.providers.GPT, "gpt-3.5-turbo", false],
+  DuckDuckGo: [DuckDuckGoProvider, "gpt-3.5-turbo-0125", true],
   Bing: [g4f.providers.Bing, "gpt-4", true],
   DeepInfraWizardLM2_8x22B: [DeepInfraProvider, "microsoft/WizardLM-2-8x22B", true],
   DeepInfraLlama3_8B: [DeepInfraProvider, "meta-llama/Meta-Llama-3-8B-Instruct", true],
@@ -355,7 +359,10 @@ export default (
 export const chatCompletion = async (chat, options) => {
   let response;
   const provider = options.provider;
-  if (provider === DeepInfraProvider) {
+  if (provider === DuckDuckGoProvider) {
+    // DuckDuckGo
+    response = await getDuckDuckGoResponse(chat, options.model);
+  } else if (provider === DeepInfraProvider) {
     // Deep Infra Llama 3
     response = await getDeepInfraResponse(chat, options.model);
   } else if (provider === BlackboxProvider) {
@@ -450,7 +457,7 @@ export const processChunksAsync = async function* (response, provider) {
       yield prevChunk;
       prevChunk = chunk;
     }
-  } else if ([DeepInfraProvider, BlackboxProvider, ReplicateProvider].includes(provider)) {
+  } else if ([DuckDuckGoProvider, DeepInfraProvider, BlackboxProvider, ReplicateProvider].includes(provider)) {
     // response must be an async generator
     yield* response;
   } else {
