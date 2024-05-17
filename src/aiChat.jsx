@@ -15,7 +15,6 @@ import {
 import { useEffect, useState } from "react";
 import { defaultProvider, formatResponse, getChatResponse, processChunks, providers } from "./api/gpt";
 import { formatDate } from "./api/helper";
-import fetch from "node-fetch-polyfill";
 
 // Web search module
 import { getWebResult } from "./api/web";
@@ -138,10 +137,6 @@ export default function Chat({ launchContext }) {
     await _setChatData(chatData, setChatData, messageID, query, ""); // will not overwrite prompt if query is null
 
     let currentChat = getChat(chatData.currentChat, chatData.chats);
-    for (const msg of currentChat.messages) {
-      console.log("prompt: " + msg.prompt);
-      console.log("answer: " + msg.answer);
-    }
     const [provider, model, stream] = providers[currentChat.provider];
     const useWebSearch = getPreferenceValues()["webSearch"];
 

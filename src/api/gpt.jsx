@@ -420,7 +420,6 @@ export const getChatResponse = async (currentChat, query = null) => {
 
   // additional options
   options = { ...options, ...provider_options(provider) };
-  console.log(options);
 
   // generate response
   return await chatCompletion(chat, options);
