@@ -214,7 +214,7 @@
     {
       "name": "webSearch",
       "label": "Enable Web Search (BETA)",
-      "description": "Use web search together with GPT, whenever possible.",
+      "description": "Adds web search capabilities to GPT. Available in AI Chat.",
       "required": false,
       "type": "checkbox",
       "default": false
