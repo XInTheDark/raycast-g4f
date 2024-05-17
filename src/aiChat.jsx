@@ -42,10 +42,14 @@ let webSystemPrompt = "You are given access to make searches on the Internet. Th
   " is: 1. The user sends a message. 2. You will decide whether to make a search. If you choose to make a search, you will " +
   "output a single message, containing the word <|web_search|> (EXACTLY AS IT IS GIVEN TO YOU), followed by ONLY your web search query. " +
   "After outputting your search query, you MUST output the token <|end_web_search|> (EXACTLY AS IT IS GIVEN TO YOU) to denote the end of the search query. " +
-  "Keep your search query concise as there is a 400 characters limit." +
-  " 3. In the next message, the system will provide you with the web search results, which you can then choose to use to answer the user." +
-  " Note that you should choose to search the web ONLY if it is strongly relevant to the user's query. You MUST NOT make up any information.\n\n" +
-  "An example of a conversation: \nUser: What is the capital of France?\n<|web_search|> capital of France\nUser: Paris is the capital of France.\nBot: According to the web, Paris is the capital of France.\n\n";
+  "Keep your search query concise as there is a 400 characters limit.\n" +
+  "The system will then append the web search results at the end of the user message, starting with the token <|web_search_results|>." +
+  " If this token <|web_search_results|> is present in the user's message, then you MUST NOT request another web search.\n" +
+  "You must NEVER output <|web_search_results|>, this token is reserved for the user to send.\n" +
+  "IMPORTANT! You should ONLY choose to search the web if it is STRONGLY relevant to the user's query. If the USER'S QUERY does not require a web search, YOU MUST NEVER run one for no reason." +
+  " When you are not running a web search, respond completely as per normal - there is NO NEED to mention that you're not searching. \n" +
+  "You MUST NOT make up any information.\n";
+let systemResponse = "Understood. I will strictly follow these instructions in this conversation.";
 
 let generationStatus = { stop: false, loading: false };
 let get_status = () => generationStatus.stop;
@@ -96,20 +100,20 @@ export default function Chat({ launchContext }) {
       systemPrompt += "\n\n" + webSystemPrompt;
     }
     if (systemPrompt) {
-      messages.push(message_data({prompt: systemPrompt}));
+      messages.push(message_data({prompt: systemPrompt, answer: systemResponse, visible: false}));
     }
     return messages;
   }
 
-  let _setChatData = (chatData, setChatData, messageID, query = "", response = "", finished = false) => {
+  let _setChatData = async (chatData, setChatData, messageID, query = null, response = null, finished = null) => {
     setChatData((oldData) => {
       let newChatData = structuredClone(oldData);
       let messages = getChat(chatData.currentChat, newChatData.chats).messages;
       for (let i = 0; i < messages.length; i++) {
         if (messages[i].id === messageID) {
-          if (query) messages[i].prompt = query;
-          if (response) messages[i].answer = response;
-          if (finished) messages[i].finished = finished;
+          if (query !== null) messages[i].prompt = query;
+          if (response !== null) messages[i].answer = response;
+          if (finished !== null) messages[i].finished = finished;
         }
       }
       return newChatData;
@@ -145,10 +149,8 @@ export default function Chat({ launchContext }) {
       },
       body: JSON.stringify(data),
     });
-    console.log("RESPONSE!")
 
     const responseJson = await response.json();
-    console.log(responseJson);
     return processWebResults(responseJson["results"]);
   }
 
@@ -161,11 +163,15 @@ export default function Chat({ launchContext }) {
     return answer;
   }
 
-  let updateChatResponse = async (chatData, setChatData, messageID, query = "", previousWebSearch = false) => {
-    let currentChat = getChat(chatData.currentChat, chatData.chats);
-    const [provider, model, stream] = providers[currentChat.provider];
+  let updateChatResponse = async (chatData, setChatData, messageID, query = null, previousWebSearch = false) => {
+    await _setChatData(chatData, setChatData, messageID, query, ""); // will not overwrite prompt if query is null
 
-    _setChatData(chatData, setChatData, messageID, query, "");
+    let currentChat = getChat(chatData.currentChat, chatData.chats);
+      for (const msg of currentChat.messages) {
+      console.log("prompt: " + msg.prompt);
+      console.log("answer: " + msg.answer);
+      }
+    const [provider, model, stream] = providers[currentChat.provider];
 
     let elapsed, chars, charPerSec;
     let start = new Date().getTime();
@@ -173,7 +179,7 @@ export default function Chat({ launchContext }) {
 
     if (!stream) {
       response = await getChatResponse(currentChat, query);
-      _setChatData(chatData, setChatData, messageID, "", response);
+      await _setChatData(chatData, setChatData, messageID, null, response);
 
       elapsed = (new Date().getTime() - start) / 1000;
       chars = response.length;
@@ -186,7 +192,7 @@ export default function Chat({ launchContext }) {
       for await (const chunk of await processChunks(r, provider, get_status)) {
         response += chunk;
         response = formatResponse(response, provider);
-        _setChatData(chatData, setChatData, messageID, "", response);
+        await _setChatData(chatData, setChatData, messageID, null, response);
 
         elapsed = (new Date().getTime() - start) / 1000;
         chars = response.length;
@@ -195,22 +201,31 @@ export default function Chat({ launchContext }) {
       }
     }
 
-    _setChatData(chatData, setChatData, messageID, "", "", true);
+    await _setChatData(chatData, setChatData, messageID, null, null, true);
 
     // Web Search functionality
     if (getPreferenceValues()["webSearch"] && response.includes(webToken) && !previousWebSearch) {
+        await _setChatData(chatData, setChatData, messageID, null, null, false);
         await toast(Toast.Style.Animated, "Searching Web");
         // get everything AFTER webToken and BEFORE webTokenEnd
         let webQuery = response.substring(response.indexOf(webToken) + webToken.length, response.indexOf(webTokenEnd)).trim();
-        console.log("Web Query: " + webQuery);
         let webResponse = await getWebResult(webQuery);
-        webResponse = "Web Search Results:\n\n" + webResponse;
-        console.log(webResponse);
-        currentChat.messages.unshift(message_data({prompt: webQuery, answer: webResponse, finished: true, visible: false}));
-        currentChat.messages.unshift(message_data({prompt: query}));
-        updateCurrentChat(chatData, setChatData, currentChat);
+        webResponse = `\n\n<|web_search_results|> for "${webQuery}":\n\n` + webResponse;
 
-        await updateChatResponse(chatData, setChatData, currentChat.messages[0].id, "", true);
+        // Append web search results to the last user message
+        // special case: If e.g. the message was edited, query is not passed as a parameter, so it is null
+        if (!query) query = currentChat.messages[0].prompt;
+        let newQuery = query + webResponse;
+
+        // remove latest message (similar to edit message)
+        currentChat.messages.shift();
+        currentChat.messages.unshift(message_data({prompt: newQuery}));
+        let newMessageID = currentChat.messages[0].id;
+
+        updateCurrentChat(chatData, setChatData, currentChat);  // important to update the UI!
+
+        await updateChatResponse(chatData, setChatData, newMessageID, null, true);
+        return;
       }
 
 
@@ -426,27 +441,22 @@ export default function Chat({ launchContext }) {
     setSearchText("");
     toast(Toast.Style.Animated, "Response Loading");
 
-    setChatData((x) => {
-      let newChatData = structuredClone(x);
-      let currentChat = getChat(chatData.currentChat, newChatData.chats);
+      let currentChat = getChat(chatData.currentChat, chatData.chats);
       let newMessageID = new Date().getTime();
 
       currentChat.messages.unshift(message_data({prompt: query, id: newMessageID}));
+      updateCurrentChat(chatData, setChatData, currentChat);  // possibly redundant, put here for safety and consistency
 
-      (async () => {
-        try {
-          await updateChatResponse(chatData, setChatData, newMessageID, query);
-        } catch {
-          setChatData((oldData) => {
-            let newChatData = structuredClone(oldData);
-            getChat(chatData.currentChat, newChatData.chats).messages.shift();
-            return newChatData;
-          });
-          await toast(Toast.Style.Failure, "GPT cannot process this message.");
-        }
-      })();
-      return newChatData;
-    });
+      try {
+        await updateChatResponse(chatData, setChatData, newMessageID, query);
+      } catch {
+        setChatData((oldData) => {
+          let newChatData = structuredClone(oldData);
+          getChat(chatData.currentChat, newChatData.chats).messages.shift();
+          return newChatData;
+        });
+        await toast(Toast.Style.Failure, "GPT cannot process this message.");
+      }
   };
 
   let ComposeMessage = () => {
@@ -495,8 +505,8 @@ export default function Chat({ launchContext }) {
                 // but since prompt is changed, we need to update chat.messages[0].prompt,
                 // so we no longer insert a null message, and hence don't pass query to updateChatResponse.
                 chat.messages.shift();
-                chat.messages.unshift(message_data({}));
-                chat.messages[0].prompt = values.message;
+                chat.messages.unshift(message_data({prompt: values.message}));
+                updateCurrentChat(chatData, setChatData, chat);
                 let messageID = chat.messages[0].id;
                 updateChatResponse(chatData, setChatData, messageID).then(() => {
                   return;
@@ -925,7 +935,7 @@ export default function Chat({ launchContext }) {
     >
       {(() => {
         let chat = getChat(chatData.currentChat);
-        if (!chat.messages.length) {
+        if (isChatEmpty(chat)) {
           return (
             <List.EmptyView
               icon={Icon.SpeechBubble}
@@ -935,17 +945,25 @@ export default function Chat({ launchContext }) {
           );
         }
         return chat.messages.map((x, i) => {
-          return (
-            <List.Item
-              title={x.prompt}
-              subtitle={formatDate(x.creationDate)}
-              detail={<List.Item.Detail markdown={x.answer} />}
-              key={x.prompt + x.creationDate}
-              actions={<GPTActionPanel idx={i} />}
-            />
-          );
+          if (x.visible)
+            return (
+              <List.Item
+                title={x.prompt}
+                subtitle={formatDate(x.creationDate)}
+                detail={<List.Item.Detail markdown={x.answer} />}
+                key={x.prompt + x.creationDate}
+                actions={<GPTActionPanel idx={i} />}
+              />
+            );
         });
       })()}
     </List>
   );
+}
+
+const isChatEmpty = (chat) => {
+  for (const message of chat.messages) {
+    if (message.visible) return false;
+  }
+  return true;
 }
