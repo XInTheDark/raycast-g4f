@@ -72,7 +72,7 @@ export default function Chat({ launchContext }) {
       creationDate: creationDate,
       provider: provider,
       systemPrompt: systemPrompt,
-      messages: starting_messages(systemPrompt, provider),
+      messages: messages ? messages : starting_messages(systemPrompt, provider),
     };
   };
 
