@@ -140,7 +140,9 @@ export default function Chat({ launchContext }) {
     const [provider, model, stream] = providers[currentChat.provider];
     const useWebSearch = getPreferenceValues()["webSearch"];
 
-    let elapsed = 0.001, chars, charPerSec;
+    let elapsed = 0.001,
+      chars,
+      charPerSec;
     let start = new Date().getTime();
     let response = "";
 
