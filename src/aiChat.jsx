@@ -238,10 +238,13 @@ export default function Chat({ launchContext }) {
   let exportChat = (chat) => {
     let str = "";
     for (let i = chat.messages.length - 1; i >= 0; i--) {
-      let prompt = chat.messages[i].prompt,
-        answer = chat.messages[i].answer;
-      let time = new Date(chat.messages[i].creationDate).getTime();
-      str += `<|start_message_token|>${time}<|end_message_token|>\n`;
+      let message = chat.messages[i];
+      let prompt = message.prompt,
+        answer = message.answer;
+      let visible = message.visible || true,
+        visibleToken = visible ? "" : "<|invisible_token|>";
+      let time = new Date(message.creationDate).getTime();
+      str += `<|start_message_token|>${visibleToken}${time}<|end_message_token|>\n`;
       if (prompt) {
         str += `<|start_prompt_token|>\n${prompt}\n<|end_prompt_token|>\n`;
       }
@@ -290,11 +293,19 @@ export default function Chat({ launchContext }) {
       let line = lines[i];
       if (line.startsWith("<|start_message_token|>")) {
         if (currentMessage) {
-          // add to start of array
           messages.unshift(currentMessage);
         }
+        currentMessage = message_data({});
+
+        if (line.includes("<|invisible_token|>")) {
+          currentMessage.visible = false;
+          line = line.replace("<|invisible_token|>", "");
+        }
+
         let time = Number(line.replace("<|start_message_token|>", "").replace("<|end_message_token|>", ""));
-        currentMessage = message_data({ creationDate: new Date(time), finished: true });
+        currentMessage.creationDate = new Date(time);
+        currentMessage.id = time;
+        currentMessage.finished = true;
       } else if (line.startsWith("<|start_prompt_token|>")) {
         currentState = "prompt";
       } else if (line.startsWith("<|end_prompt_token|>") || line.startsWith("<|end_response_token|>")) {
