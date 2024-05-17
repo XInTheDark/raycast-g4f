@@ -57,7 +57,7 @@ export const provider_options = (provider) => {
   return {
     temperature: temperature,
   };
-}
+};
 
 export const defaultProvider = () => {
   return getPreferenceValues()["gptProvider"];
@@ -400,7 +400,8 @@ export const getChatResponse = async (currentChat, query = null) => {
 
   // currentChat.messages is stored in the format of [prompt, answer]. We first convert it to
   // { role: "user", content: prompt }, { role: "assistant", content: answer }, etc.
-  for (let i = currentChat.messages.length - 1; i >= 0; i--) { // reverse order, index 0 is latest message
+  for (let i = currentChat.messages.length - 1; i >= 0; i--) {
+    // reverse order, index 0 is latest message
     let message = currentChat.messages[i];
     if (is_null_message(message)) continue;
     chat.push({ role: "user", content: message.prompt });
