@@ -17,6 +17,10 @@ import { defaultProvider, formatResponse, getChatResponse, processChunks, provid
 import { formatDate } from "./api/helper";
 import fetch from "node-fetch-polyfill";
 
+// Web search module
+import { getWebResult } from "./api/web";
+import { webSystemPrompt, systemResponse, webToken, webTokenEnd } from "./api/web";
+
 const chat_providers = [
   ["ChatGPT (gpt-4-32k)", "GPT4"],
   ["ChatGPT (gpt-3.5-turbo)", "GPT35"],
@@ -36,20 +40,6 @@ const chat_providers = [
 const ChatProvidersReact = chat_providers.map((x) => {
   return <Form.Dropdown.Item title={x[0]} value={x[1]} key={x[1]} />;
 });
-
-let webToken = "<|web_search|>", webTokenEnd = "<|end_web_search|>";
-let webSystemPrompt = "You are given access to make searches on the Internet. The format for making a search" +
-  " is: 1. The user sends a message. 2. You will decide whether to make a search. If you choose to make a search, you will " +
-  "output a single message, containing the word <|web_search|> (EXACTLY AS IT IS GIVEN TO YOU), followed by ONLY your web search query. " +
-  "After outputting your search query, you MUST output the token <|end_web_search|> (EXACTLY AS IT IS GIVEN TO YOU) to denote the end of the search query. " +
-  "Keep your search query concise as there is a 400 characters limit.\n" +
-  "The system will then append the web search results at the end of the user message, starting with the token <|web_search_results|>." +
-  " If this token <|web_search_results|> is present in the user's message, then you MUST NOT request another web search.\n" +
-  "You must NEVER output <|web_search_results|>, this token is reserved for the user to send.\n" +
-  "IMPORTANT! You should ONLY choose to search the web if it is STRONGLY relevant to the user's query. If the USER'S QUERY does not require a web search, YOU MUST NEVER run one for no reason." +
-  " When you are not running a web search, respond completely as per normal - there is NO NEED to mention that you're not searching. \n" +
-  "You MUST NOT make up any information.\n";
-let systemResponse = "Understood. I will strictly follow these instructions in this conversation.";
 
 let generationStatus = { stop: false, loading: false };
 let get_status = () => generationStatus.stop;
@@ -133,36 +123,6 @@ export default function Chat({ launchContext }) {
     });
   }
 
-  let getWebResult = async (query) => {
-    const APIKey = getPreferenceValues()["TavilyAPIKey"];
-    const api_url = "https://api.tavily.com/search";
-    let data = {
-      "api_key": APIKey,
-      "query": query,
-      "max_results": 5,
-    };
-    // POST
-    const response = await fetch(api_url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-
-    const responseJson = await response.json();
-    return processWebResults(responseJson["results"]);
-  }
-
-  let processWebResults = (results) => {
-    let answer = "";
-    for (let i = 0; i < results.length; i++) {
-      let x = results[i];
-      answer += x["title"] + "\n" + x["url"] + "\n" + x["content"] + "\n\n";
-    }
-    return answer;
-  }
-
   let updateChatResponse = async (chatData, setChatData, messageID, query = null, previousWebSearch = false) => {
     await _setChatData(chatData, setChatData, messageID, query, ""); // will not overwrite prompt if query is null
 
@@ -172,6 +132,7 @@ export default function Chat({ launchContext }) {
       console.log("answer: " + msg.answer);
       }
     const [provider, model, stream] = providers[currentChat.provider];
+    const useWebSearch = getPreferenceValues()["webSearch"];
 
     let elapsed, chars, charPerSec;
     let start = new Date().getTime();
@@ -188,11 +149,21 @@ export default function Chat({ launchContext }) {
       let r = await getChatResponse(currentChat, query);
       let loadingToast = await toast(Toast.Style.Animated, "Response Loading");
       generationStatus = { stop: false, loading: true };
+      let i = 0;
 
       for await (const chunk of await processChunks(r, provider, get_status)) {
+        i++;
         response += chunk;
         response = formatResponse(response, provider);
         await _setChatData(chatData, setChatData, messageID, null, response);
+
+        // Web Search functionality
+        // We check the response every few chunks so we can possibly exit early
+        if ((i & 15) === 0 && useWebSearch && response.includes(webToken) && response.includes(webTokenEnd) && !previousWebSearch) {
+            generationStatus.stop = true; // stop generating the current response
+            await processWebSearchResponse(chatData, setChatData, currentChat, messageID, response, query);
+            return;
+        }
 
         elapsed = (new Date().getTime() - start) / 1000;
         chars = response.length;
@@ -201,33 +172,15 @@ export default function Chat({ launchContext }) {
       }
     }
 
-    await _setChatData(chatData, setChatData, messageID, null, null, true);
-
     // Web Search functionality
-    if (getPreferenceValues()["webSearch"] && response.includes(webToken) && !previousWebSearch) {
-        await _setChatData(chatData, setChatData, messageID, null, null, false);
-        await toast(Toast.Style.Animated, "Searching Web");
-        // get everything AFTER webToken and BEFORE webTokenEnd
-        let webQuery = response.substring(response.indexOf(webToken) + webToken.length, response.indexOf(webTokenEnd)).trim();
-        let webResponse = await getWebResult(webQuery);
-        webResponse = `\n\n<|web_search_results|> for "${webQuery}":\n\n` + webResponse;
-
-        // Append web search results to the last user message
-        // special case: If e.g. the message was edited, query is not passed as a parameter, so it is null
-        if (!query) query = currentChat.messages[0].prompt;
-        let newQuery = query + webResponse;
-
-        // remove latest message (similar to edit message)
-        currentChat.messages.shift();
-        currentChat.messages.unshift(message_data({prompt: newQuery}));
-        let newMessageID = currentChat.messages[0].id;
-
-        updateCurrentChat(chatData, setChatData, currentChat);  // important to update the UI!
-
-        await updateChatResponse(chatData, setChatData, newMessageID, null, true);
+    // Process web search response again in case streaming is false, or if it was not processed during streaming
+    if (useWebSearch && response.includes(webToken) && !previousWebSearch) {
+        generationStatus.stop = true;
+        await processWebSearchResponse(chatData, setChatData, currentChat, messageID, response, query);
         return;
-      }
+    }
 
+    await _setChatData(chatData, setChatData, messageID, null, null, true);
 
     await toast(
       Toast.Style.Success,
@@ -564,6 +517,32 @@ export default function Chat({ launchContext }) {
       </Form>
     );
   };
+
+  // Web Search functionality
+  const processWebSearchResponse = async (chatData, setChatData, currentChat, messageID, response, query) => {
+  await _setChatData(chatData, setChatData, messageID, null, null, false);
+  await showToast(Toast.Style.Animated, "Searching Web");
+  // get everything AFTER webToken and BEFORE webTokenEnd
+  let webQuery = response.includes(webTokenEnd) ? response.substring(response.indexOf(webToken) + webToken.length, response.indexOf(webTokenEnd)).trim()
+    : response.substring(response.indexOf(webToken) + webToken.length).trim();
+  let webResponse = await getWebResult(webQuery);
+  webResponse = `\n\n<|web_search_results|> for "${webQuery}":\n\n` + webResponse;
+
+  // Append web search results to the last user message
+  // special case: If e.g. the message was edited, query is not passed as a parameter, so it is null
+  if (!query) query = currentChat.messages[0].prompt;
+  let newQuery = query + webResponse;
+
+  // remove latest message (similar to edit message)
+  currentChat.messages.shift();
+  currentChat.messages.unshift(message_data({prompt: newQuery}));
+  let newMessageID = currentChat.messages[0].id;
+
+  updateCurrentChat(chatData, setChatData, currentChat);  // important to update the UI!
+
+  await updateChatResponse(chatData, setChatData, newMessageID, null, true);
+  return;
+  }
 
   let GPTActionPanel = () => {
     return (

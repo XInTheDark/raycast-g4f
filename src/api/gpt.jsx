@@ -52,7 +52,7 @@ export const providers = {
 // Additional options
 export const provider_options = (provider) => {
   let useWebSearch = getPreferenceValues()["webSearch"];
-  let temperature = useWebSearch ? 0 : 0.7;
+  let temperature = useWebSearch ? 0.3 : 0.7;
 
   return {
     temperature: temperature,
