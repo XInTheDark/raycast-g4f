@@ -394,9 +394,10 @@ export const chatCompletion = async (chat, options) => {
 // generate response using a chat context and a query (optional)
 export const getChatResponse = async (currentChat, query = null) => {
   let chat = [];
-  if (currentChat.systemPrompt.length > 0)
-    // The system prompt is not acknowledged by most providers, so we use it as first user prompt instead
-    chat.push({ role: "user", content: currentChat.systemPrompt });
+  // if (currentChat.systemPrompt.length > 0)
+  //   // The system prompt is not acknowledged by most providers, so we use it as first user prompt instead
+  //   chat.push({ role: "user", content: currentChat.systemPrompt });
+  // The above section is deprecated because we currently already push system prompt to start of chat
 
   // currentChat.messages is stored in the format of [prompt, answer]. We first convert it to
   // { role: "user", content: prompt }, { role: "assistant", content: answer }, etc.

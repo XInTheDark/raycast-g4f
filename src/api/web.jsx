@@ -39,6 +39,11 @@ export const getWebResult = async (query) => {
 };
 
 export const processWebResults = (results) => {
+  // Handle undefined results
+  if (!results) {
+    return "No results found.";
+  }
+
   let answer = "";
   for (let i = 0; i < results.length; i++) {
     let x = results[i];

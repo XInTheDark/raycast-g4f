@@ -78,7 +78,7 @@ export const getReplicateResponse = async function* (chat, options, max_retries 
   } catch (e) {
     if (max_retries > 0) {
       console.log(e, "Retrying...");
-      yield* getReplicateResponse(chat, model, max_retries - 1);
+      yield* getReplicateResponse(chat, options, max_retries - 1);
     } else {
       throw e;
     }

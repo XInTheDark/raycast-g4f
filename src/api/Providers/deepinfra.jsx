@@ -76,7 +76,7 @@ export const getDeepInfraResponse = async function* (chat, options, max_retries 
   } catch (e) {
     if (max_retries > 0) {
       console.log(e, "Retrying...");
-      yield* getDeepInfraResponse(chat, model, max_retries - 1);
+      yield* getDeepInfraResponse(chat, options, max_retries - 1);
     } else {
       throw e;
     }

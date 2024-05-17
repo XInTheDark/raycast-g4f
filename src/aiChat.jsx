@@ -134,13 +134,13 @@ export default function Chat({ launchContext }) {
   };
 
   let updateChatResponse = async (chatData, setChatData, messageID, query = null, previousWebSearch = false) => {
-    await _setChatData(chatData, setChatData, messageID, query, ""); // will not overwrite prompt if query is null
+    await _setChatData(chatData, setChatData, messageID, null, ""); // set response to empty string
 
     let currentChat = getChat(chatData.currentChat, chatData.chats);
     const [provider, model, stream] = providers[currentChat.provider];
     const useWebSearch = getPreferenceValues()["webSearch"];
 
-    let elapsed, chars, charPerSec;
+    let elapsed = 0.001, chars, charPerSec;
     let start = new Date().getTime();
     let response = "";
 
@@ -428,7 +428,8 @@ export default function Chat({ launchContext }) {
     updateCurrentChat(chatData, setChatData, currentChat); // possibly redundant, put here for safety and consistency
 
     try {
-      await updateChatResponse(chatData, setChatData, newMessageID, query);
+      // Note how we don't pass query here because it is already in the chat
+      await updateChatResponse(chatData, setChatData, newMessageID);
     } catch {
       setChatData((oldData) => {
         let newChatData = structuredClone(oldData);
@@ -481,16 +482,16 @@ export default function Chat({ launchContext }) {
               onSubmit={(values) => {
                 pop();
 
-                // Similar to regenerate last message, we remove the last message and insert a new one,
-                // but since prompt is changed, we need to update chat.messages[0].prompt,
-                // so we no longer insert a null message, and hence don't pass query to updateChatResponse.
+                // We remove the last message and insert the new one
                 chat.messages.shift();
                 chat.messages.unshift(message_data({ prompt: values.message }));
-                updateCurrentChat(chatData, setChatData, chat);
+
+                updateCurrentChat(chatData, setChatData, chat); // important to update the UI!
+
                 let messageID = chat.messages[0].id;
                 updateChatResponse(chatData, setChatData, messageID).then(() => {
                   return;
-                });
+                }); // Note how we don't pass query here because it is already in the chat
               }}
             />
           </ActionPanel>
@@ -561,13 +562,14 @@ export default function Chat({ launchContext }) {
     if (!query) query = currentChat.messages[0].prompt;
     let newQuery = query + webResponse;
 
-    // remove latest message (similar to edit message)
+    // remove latest message and insert new one (similar to EditLastMessage)
     currentChat.messages.shift();
     currentChat.messages.unshift(message_data({ prompt: newQuery }));
     let newMessageID = currentChat.messages[0].id;
 
     updateCurrentChat(chatData, setChatData, currentChat); // important to update the UI!
 
+    // Note how we don't pass query here because it is already in the chat
     await updateChatResponse(chatData, setChatData, newMessageID, null, true);
     return;
   };
@@ -630,14 +632,13 @@ export default function Chat({ launchContext }) {
 
               await toast(Toast.Style.Animated, "Regenerating Last Message");
 
-              // We first remove the last message, then insert a null (default) message.
-              // This null message is not sent to the API (see getChatResponse() in api/gpt.jsx)
-              let query = chat.messages[0].prompt;
-              chat.messages.shift();
-              chat.messages.unshift(message_data({}));
-              let messageID = chat.messages[0].id;
+              chat.messages[0].answer = "";
+              chat.messages[0].finished = false;
+              updateCurrentChat(chatData, setChatData, chat);
 
-              await updateChatResponse(chatData, setChatData, messageID, query);
+              let messageID = chat.messages[0].id;
+              // Note how we don't pass the prompt here because it is already in the chat
+              await updateChatResponse(chatData, setChatData, messageID);
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "r" }}
           />
