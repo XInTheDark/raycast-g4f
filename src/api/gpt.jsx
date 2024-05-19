@@ -49,6 +49,16 @@ export const providers = {
   GoogleGemini: [GeminiProvider, "", false],
 };
 
+// Additional options
+export const provider_options = (provider) => {
+  let useWebSearch = getPreferenceValues()["webSearch"];
+  let temperature = useWebSearch ? 0.5 : 0.7;
+
+  return {
+    temperature: temperature,
+  };
+};
+
 export const defaultProvider = () => {
   return getPreferenceValues()["gptProvider"];
 };
@@ -357,13 +367,13 @@ export const chatCompletion = async (chat, options) => {
   const provider = options.provider;
   if (provider === DeepInfraProvider) {
     // Deep Infra Llama 3
-    response = await getDeepInfraResponse(chat, options.model);
+    response = await getDeepInfraResponse(chat, options);
   } else if (provider === BlackboxProvider) {
     // Blackbox
     response = await getBlackboxResponse(chat);
   } else if (provider === ReplicateProvider) {
     // Replicate
-    response = await getReplicateResponse(chat, options.model);
+    response = await getReplicateResponse(chat, options);
   } else if (provider === GeminiProvider) {
     // Google Gemini
     response = await getGoogleGeminiResponse(chat);
@@ -382,30 +392,35 @@ export const chatCompletion = async (chat, options) => {
 };
 
 // generate response using a chat context and a query (optional)
-export const getChatResponse = async (currentChat, query) => {
+export const getChatResponse = async (currentChat, query = null) => {
   let chat = [];
-  if (currentChat.systemPrompt.length > 0)
-    // The system prompt is not acknowledged by most providers, so we use it as first user prompt instead
-    chat.push({ role: "user", content: currentChat.systemPrompt });
+  // if (currentChat.systemPrompt.length > 0)
+  //   // The system prompt is not acknowledged by most providers, so we use it as first user prompt instead
+  //   chat.push({ role: "user", content: currentChat.systemPrompt });
+  // The above section is deprecated because we currently already push system prompt to start of chat
 
   // currentChat.messages is stored in the format of [prompt, answer]. We first convert it to
   // { role: "user", content: prompt }, { role: "assistant", content: answer }, etc.
   for (let i = currentChat.messages.length - 1; i >= 0; i--) {
-    if (is_null_message(currentChat.messages[i])) continue;
     // reverse order, index 0 is latest message
-    chat.push({ role: "user", content: currentChat.messages[i].prompt });
-    chat.push({ role: "assistant", content: currentChat.messages[i].answer });
+    let message = currentChat.messages[i];
+    if (is_null_message(message)) continue;
+    chat.push({ role: "user", content: message.prompt });
+    if (message.answer) chat.push({ role: "assistant", content: message.answer });
   }
-  if (query?.length > 0) chat.push({ role: "user", content: query });
+  if (query) chat.push({ role: "user", content: query });
 
   // load provider and model
   const providerString = currentChat.provider;
   const [provider, model, stream] = providers[providerString];
-  const options = {
+  let options = {
     provider: provider,
     model: model,
     stream: stream,
   };
+
+  // additional options
+  options = { ...options, ...provider_options(provider) };
 
   // generate response
   return await chatCompletion(chat, options);

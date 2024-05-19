@@ -212,6 +212,22 @@
       "default": "GPT4"
     },
     {
+      "name": "webSearch",
+      "label": "Enable Web Search (BETA)",
+      "description": "Adds web search capabilities to GPT. Available in AI Chat.",
+      "required": false,
+      "type": "checkbox",
+      "default": false
+    },
+    {
+      "name": "TavilyAPIKey",
+      "title": "Tavily API Key",
+      "description": "Optional. Only used if Web Search is enabled.",
+      "required": false,
+      "type": "password",
+      "default": ""
+    },
+    {
       "name": "GeminiAPIKey",
       "title": "Google Gemini API Key",
       "description": "Optional. Only used if Gemini model is selected.",

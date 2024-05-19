@@ -23,11 +23,12 @@ const headers = {
   "sec-ch-ua-platform": '"macOS"',
 };
 
-export const getDeepInfraResponse = async function* (chat, model, max_retries = 5) {
+export const getDeepInfraResponse = async function* (chat, options, max_retries = 5) {
+  const model = options.model;
   let data = {
     model: model,
     messages: chat,
-    temperature: 0.7,
+    temperature: options.temperature || 0.7,
     max_tokens: model.includes("Meta-Llama-3") ? 1028 : null,
     stream: true,
     headers: headers,
@@ -75,7 +76,7 @@ export const getDeepInfraResponse = async function* (chat, model, max_retries = 
   } catch (e) {
     if (max_retries > 0) {
       console.log(e, "Retrying...");
-      yield* getDeepInfraResponse(chat, model, max_retries - 1);
+      yield* getDeepInfraResponse(chat, options, max_retries - 1);
     } else {
       throw e;
     }
