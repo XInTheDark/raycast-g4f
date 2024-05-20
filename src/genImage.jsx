@@ -547,7 +547,7 @@ export default function genImage() {
 
   return chatData === null ? (
     <Grid columns={3} searchText={searchText} onSearchTextChange={setSearchText}>
-      <Grid.EmptyView icon={Icon.Stars} title="Send a Prompt to GPT to get started." />
+      <Grid.EmptyView icon={Icon.Stars} title="Imagine Anything..." />
     </Grid>
   ) : (
     <Grid
@@ -575,13 +575,7 @@ export default function genImage() {
       {(() => {
         let chat = getChat(chatData.currentChat);
         if (!chat.messages.length) {
-          return (
-            <Grid.EmptyView
-              icon={Icon.Stars}
-              title="Send a Prompt to GPT to get started."
-              actions={<ImageActionPanel />}
-            />
-          );
+          return <Grid.EmptyView icon={Icon.Stars} title="Imagine Anything..." actions={<ImageActionPanel />} />;
         }
         return chat.messages.map((x, i) => {
           return (

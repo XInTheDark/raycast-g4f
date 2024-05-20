@@ -918,7 +918,7 @@ export default function Chat({ launchContext }) {
 
   return chatData === null ? (
     <List searchText={searchText} onSearchTextChange={setSearchText}>
-      <List.EmptyView icon={Icon.SpeechBubble} title="Send a Message to GPT to get started." />
+      <List.EmptyView icon={Icon.SpeechBubble} title="Ask GPT Anything..." />
     </List>
   ) : (
     <List
@@ -946,13 +946,7 @@ export default function Chat({ launchContext }) {
       {(() => {
         let chat = getChat(chatData.currentChat);
         if (isChatEmpty(chat)) {
-          return (
-            <List.EmptyView
-              icon={Icon.SpeechBubble}
-              title="Send a Message to GPT to get started."
-              actions={<GPTActionPanel />}
-            />
-          );
+          return <List.EmptyView icon={Icon.SpeechBubble} title="Ask GPT Anything..." actions={<GPTActionPanel />} />;
         }
         return chat.messages.map((x, i) => {
           if (x.visible)
