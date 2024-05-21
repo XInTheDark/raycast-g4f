@@ -53,9 +53,11 @@ export default function Chat({ launchContext }) {
   };
 
   let default_all_chats_data = () => {
+    let newChat = chat_data({});
+    console.log("newChat"+newChat.id)
     return {
-      currentChat: "New Chat",
-      chats: [chat_data({})],
+      currentChat: newChat.id,
+      chats: [newChat],
       lastPruneTime: new Date().getTime(),
     };
   };
@@ -63,6 +65,7 @@ export default function Chat({ launchContext }) {
   let chat_data = ({
     name = "New Chat",
     creationDate = new Date(),
+    id = new Date().getTime().toString(), // toString() is important because Raycast expects a string for value
     provider = defaultProvider(),
     systemPrompt = "",
     messages = [],
@@ -70,6 +73,7 @@ export default function Chat({ launchContext }) {
     return {
       name: name,
       creationDate: creationDate,
+      id: id,
       provider: provider,
       systemPrompt: systemPrompt,
       messages: messages?.length ? messages : starting_messages(systemPrompt, provider),
@@ -223,7 +227,7 @@ export default function Chat({ launchContext }) {
       let prunedCnt = 0;
 
       newChatData.chats = chats.filter((chat) => {
-        if (chat.name === newChatData.currentChat) return true;
+        if (chat.id === newChatData.currentChat) return true;
         let lastMessageTime = chat.messages.length === 0 ? chat.creationDate : chat.messages[0].creationDate;
         lastMessageTime = new Date(lastMessageTime).getTime();
         const prune = currentTime - lastMessageTime >= pruneChatsLimit;
@@ -344,7 +348,7 @@ export default function Chat({ launchContext }) {
           messages: messages,
         })
       );
-      newChatData.currentChat = newChatData.chats[newChatData.chats.length - 1].name;
+      newChatData.currentChat = newChatData.chats[newChatData.chats.length - 1].id;
       return newChatData;
     });
 
@@ -372,10 +376,9 @@ export default function Chat({ launchContext }) {
                   pop();
                   setChatData((oldData) => {
                     let newChatData = structuredClone(oldData);
-                    newChatData.chats.push(
-                      chat_data({ name: values.chatName, provider: values.provider, systemPrompt: values.systemPrompt })
-                    );
-                    newChatData.currentChat = values.chatName;
+                    let newChat = chat_data({ name: values.chatName, provider: values.provider, systemPrompt: values.systemPrompt });
+                    newChatData.chats.push(newChat);
+                    newChatData.currentChat = newChat.id;
 
                     return newChatData;
                   });
@@ -518,13 +521,14 @@ export default function Chat({ launchContext }) {
               onSubmit={(values) => {
                 pop();
 
-                // check if there is a currently generating message
-                for (let i = 0; i < chat.messages.length; i++) {
-                  if (!chat.messages[i].finished) {
-                    toast(Toast.Style.Failure, "Cannot rename while loading response");
-                    return;
-                  }
-                }
+                // // check if there is a currently generating message
+                // // this is now legacy because we use chat ID instead of name for identification
+                // for (let i = 0; i < chat.messages.length; i++) {
+                //   if (!chat.messages[i].finished) {
+                //     toast(Toast.Style.Failure, "Cannot rename while loading response");
+                //     return;
+                //   }
+                // }
 
                 // check if chat with new name already exists
                 if (chatData.chats.map((x) => x.name).includes(values.chatName)) {
@@ -535,7 +539,6 @@ export default function Chat({ launchContext }) {
                 setChatData((oldData) => {
                   let newChatData = structuredClone(oldData);
                   getChat(chatData.currentChat, newChatData.chats).name = values.chatName;
-                  newChatData.currentChat = values.chatName; // chat must be currentChat
                   return newChatData;
                 });
               }}
@@ -718,7 +721,7 @@ export default function Chat({ launchContext }) {
             onAction={() => {
               let chatIdx = 0;
               for (let i = 0; i < chatData.chats.length; i++) {
-                if (chatData.chats[i].name === chatData.currentChat) {
+                if (chatData.chats[i].id === chatData.currentChat) {
                   chatIdx = i;
                   break;
                 }
@@ -727,7 +730,7 @@ export default function Chat({ launchContext }) {
               else {
                 setChatData((oldData) => ({
                   ...oldData,
-                  currentChat: chatData.chats[chatIdx + 1].name,
+                  currentChat: chatData.chats[chatIdx + 1].id,
                 }));
               }
             }}
@@ -739,7 +742,7 @@ export default function Chat({ launchContext }) {
             onAction={() => {
               let chatIdx = 0;
               for (let i = 0; i < chatData.chats.length; i++) {
-                if (chatData.chats[i].name === chatData.currentChat) {
+                if (chatData.chats[i].id === chatData.currentChat) {
                   chatIdx = i;
                   break;
                 }
@@ -748,7 +751,7 @@ export default function Chat({ launchContext }) {
               else {
                 setChatData((oldData) => ({
                   ...oldData,
-                  currentChat: chatData.chats[chatIdx - 1].name,
+                  currentChat: chatData.chats[chatIdx - 1].id,
                 }));
               }
             }}
@@ -771,7 +774,7 @@ export default function Chat({ launchContext }) {
                   onAction: () => {
                     let chatIdx = 0;
                     for (let i = 0; i < chatData.chats.length; i++) {
-                      if (chatData.chats[i].name === chatData.currentChat) {
+                      if (chatData.chats[i].id === chatData.currentChat) {
                         chatIdx = i;
                         break;
                       }
@@ -786,14 +789,14 @@ export default function Chat({ launchContext }) {
                       setChatData((oldData) => {
                         let newChatData = structuredClone(oldData);
                         newChatData.chats.splice(chatIdx);
-                        newChatData.currentChat = newChatData.chats[chatIdx - 1].name;
+                        newChatData.currentChat = newChatData.chats[chatIdx - 1].id;
                         return newChatData;
                       });
                     } else {
                       setChatData((oldData) => {
                         let newChatData = structuredClone(oldData);
                         newChatData.chats.splice(chatIdx, 1);
-                        newChatData.currentChat = newChatData.chats[chatIdx].name;
+                        newChatData.currentChat = newChatData.chats[chatIdx].id;
                         return newChatData;
                       });
                     }
@@ -887,13 +890,14 @@ export default function Chat({ launchContext }) {
             minute: "2-digit",
             second: "2-digit",
           })}`;
-          newChatData.chats.push(
-            chat_data({
+          let newChat = chat_data({
               name: newChatName,
               messages: [message_data({ prompt: launchContext.query, answer: launchContext.response, finished: true })],
-            })
+            });
+          newChatData.chats.push(
+            newChat
           );
-          newChatData.currentChat = newChatName;
+          newChatData.currentChat = newChat.id;
           return newChatData;
         });
       }
@@ -912,7 +916,7 @@ export default function Chat({ launchContext }) {
 
   let getChat = (target, customChat = chatData.chats) => {
     for (const chat of customChat) {
-      if (chat.name === target) return chat;
+      if (chat.id === target) return chat;
     }
   };
 
@@ -924,21 +928,21 @@ export default function Chat({ launchContext }) {
     <List
       searchText={searchText}
       onSearchTextChange={setSearchText}
-      isShowingDetail={getChat(chatData.currentChat).messages.length > 0}
+      isShowingDetail={!isChatEmpty(getChat(chatData.currentChat))}
       searchBarPlaceholder="Ask GPT..."
       searchBarAccessory={
         <List.Dropdown
           tooltip="Your Chats"
-          onChange={(newValue) => {
+          onChange={(newChatID) => {
             setChatData((oldData) => ({
               ...oldData,
-              currentChat: newValue,
+              currentChat: newChatID,
             }));
           }}
           value={chatData.currentChat}
         >
           {chatData.chats.map((x) => {
-            return <List.Dropdown.Item title={x.name} value={x.name} key={x.name} />;
+            return <List.Dropdown.Item title={x.name} value={x.id} key={x.id} />;
           })}
         </List.Dropdown>
       }
