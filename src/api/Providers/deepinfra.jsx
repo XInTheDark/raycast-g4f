@@ -45,11 +45,12 @@ export const getDeepInfraResponse = async function* (chat, options, max_retries 
     // Implementation taken from gpt4free: g4f/Provider/needs_auth/Openai.py at async def create_async_generator()
     let first = true;
     let reader = response.body.getReader();
+    let decoder = new TextDecoder();
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
 
-      let str = new TextDecoder().decode(value);
+      let str = decoder.decode(value);
       let lines = str.split("\n");
       for (let i = 0; i < lines.length; i++) {
         let line = lines[i];

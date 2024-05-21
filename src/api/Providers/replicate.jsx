@@ -46,13 +46,14 @@ export const getReplicateResponse = async function* (chat, options, max_retries 
     });
 
     const reader = streamResponse.body.getReader();
+    let decoder = new TextDecoder();
     // eslint-disable-next-line no-constant-condition
     let curr_event = "";
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
 
-      let str = new TextDecoder().decode(value);
+      let str = decoder.decode(value);
 
       // iterate through each line
       // implementation ported from gpt4free.

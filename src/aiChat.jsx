@@ -442,9 +442,10 @@ export default function Chat({ launchContext }) {
     toast(Toast.Style.Animated, "Response Loading");
 
     let currentChat = getChat(chatData.currentChat, chatData.chats);
-    let newMessageID = new Date().getTime();
+    let newMessage = message_data({ prompt: query })
+    let newMessageID = newMessage.id;
 
-    currentChat.messages.unshift(message_data({ prompt: query, id: newMessageID }));
+    currentChat.messages.unshift(newMessage);
     updateCurrentChat(chatData, setChatData, currentChat); // possibly redundant, put here for safety and consistency
 
     try {

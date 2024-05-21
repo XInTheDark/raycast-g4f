@@ -58,11 +58,12 @@ export const getBlackboxResponse = async function* (chat, max_retries = 5) {
     });
 
     let reader = response.body.getReader();
+    let decoder = new TextDecoder();
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
 
-      let chunk = new TextDecoder().decode(value);
+      let chunk = decoder.decode(value);
       if (chunk) {
         yield chunk;
       }

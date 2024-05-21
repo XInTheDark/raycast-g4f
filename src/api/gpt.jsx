@@ -16,9 +16,13 @@ import {
 import { useEffect, useState } from "react";
 
 import { formatChatToGPT } from "./helper";
+
 // G4F module
 import * as G4F from "g4f";
 const g4f = new G4F.G4F();
+
+// Nexra module
+import { NexraProvider, getNexraResponse } from "./Providers/nexra";
 
 // DeepInfra module
 import { DeepInfraProvider, getDeepInfraResponse } from "./Providers/deepinfra";
@@ -36,7 +40,7 @@ import { GeminiProvider, getGoogleGeminiResponse } from "./Providers/google_gemi
 // [Provider, Model, Stream]
 export const providers = {
   GPT4: [g4f.providers.GPT, "gpt-4-32k", false],
-  GPT35: [g4f.providers.GPT, "gpt-3.5-turbo", false],
+  GPT35: [NexraProvider, "chatgpt", true],
   Bing: [g4f.providers.Bing, "gpt-4", true],
   DeepInfraWizardLM2_8x22B: [DeepInfraProvider, "microsoft/WizardLM-2-8x22B", true],
   DeepInfraLlama3_8B: [DeepInfraProvider, "meta-llama/Meta-Llama-3-8B-Instruct", true],
@@ -362,8 +366,11 @@ export default (
 export const chatCompletion = async (chat, options) => {
   let response;
   const provider = options.provider;
-  if (provider === DeepInfraProvider) {
-    // Deep Infra Llama 3
+  if (provider === NexraProvider) {
+    // Nexra
+    response = await getNexraResponse(chat, options);
+  } else if (provider === DeepInfraProvider) {
+    // DeepInfra
     response = await getDeepInfraResponse(chat, options);
   } else if (provider === BlackboxProvider) {
     // Blackbox
@@ -461,12 +468,12 @@ export const processChunksAsync = async function* (response, provider) {
       yield prevChunk;
       prevChunk = chunk;
     }
-  } else if ([DeepInfraProvider, BlackboxProvider, ReplicateProvider].includes(provider)) {
-    // response must be an async generator
-    yield* response;
-  } else {
+  } else if ([].includes(provider)) {
     // nothing here currently.
     yield* G4F.chunkProcessor(response);
+  } else {
+    // default case. response must be an async generator.
+    yield* response;
   }
 };
 
