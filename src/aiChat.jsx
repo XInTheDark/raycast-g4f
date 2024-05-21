@@ -218,28 +218,7 @@ export default function Chat({ launchContext }) {
 
     // Smart Chat Naming functionality
     if (getPreferenceValues()["smartChatNaming"] && currentChat.messages.length <= 2) {
-      // Special handling: don't include first message (system prompt)
-      let newChat = structuredClone(currentChat);
-      if (!newChat.messages[newChat.messages.length - 1].visible) {
-        newChat.messages.pop();
-      }
-
-      // Format chat using default wrapper
-      let formatted_chat = formatChatToPrompt(formatChatToGPT(newChat), null);
-      let newQuery =
-        "Below is a conversation between the user and the assistant. Give a concise name for this chat. " +
-        "Output ONLY the name of the chat (without quotes) and NOTHING else.\n\n" +
-        formatted_chat;
-
-      let newChatName = await getChatResponseSync({ messages: [{ prompt: newQuery }], provider: currentChat.provider });
-      newChatName = newChatName.trim();
-
-      // Rename chat
-      setChatData((oldData) => {
-        let newChatData = structuredClone(oldData);
-        getChat(chatData.currentChat, newChatData.chats).name = newChatName;
-        return newChatData;
-      });
+      await processSmartChatNaming(chatData, setChatData, currentChat);
     }
   };
 
@@ -615,6 +594,32 @@ export default function Chat({ launchContext }) {
     // Note how we don't pass query here because it is already in the chat
     await updateChatResponse(chatData, setChatData, newMessageID, null, true);
     return;
+  };
+
+  // Smart Chat Naming functionality
+  const processSmartChatNaming = async (chatData, setChatData, currentChat) => {
+    // Special handling: don't include first message (system prompt)
+    let newChat = structuredClone(currentChat);
+    if (!newChat.messages[newChat.messages.length - 1].visible) {
+      newChat.messages.pop();
+    }
+
+    // Format chat using default wrapper
+    let formatted_chat = formatChatToPrompt(formatChatToGPT(newChat), null);
+    let newQuery =
+      "Below is a conversation between the user and the assistant. Give a concise name for this chat. " +
+      "Output ONLY the name of the chat (without quotes) and NOTHING else.\n\n" +
+      formatted_chat;
+
+    let newChatName = await getChatResponseSync({ messages: [{ prompt: newQuery }], provider: currentChat.provider });
+    newChatName = newChatName.trim();
+
+    // Rename chat
+    setChatData((oldData) => {
+      let newChatData = structuredClone(oldData);
+      getChat(chatData.currentChat, newChatData.chats).name = newChatName;
+      return newChatData;
+    });
   };
 
   let GPTActionPanel = () => {
