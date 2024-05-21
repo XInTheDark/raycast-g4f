@@ -433,12 +433,16 @@ export const getChatResponseSync = async (currentChat, query = null) => {
 export const formatResponse = (response, provider = null) => {
   const is_code = response.includes("```");
 
-  if (provider === g4f.providers.Bing || !is_code) {
-    // replace \n with a real newline, \t with a real tab, etc.
-    // unless code blocks are detected and provider is not Bing
+  if (provider === g4f.providers.Bing || provider === NexraProvider || !is_code) {
+    // replace escape characters: \n with a real newline, \t with a real tab, etc.
     response = response.replace(/\\n/g, "\n");
     response = response.replace(/\\t/g, "\t");
     response = response.replace(/\\r/g, "\r");
+
+    // the following escape characters are still displayed correctly even without the replacement,
+    // but we currently have features that depend on stuff being in the response, for example
+    // web search that requires the <|web_search|> token to be present.
+    response = response.replace(/\\_/g, "_");
 
     // remove <sup>, </sup> tags (not supported apparently)
     response = response.replace(/<sup>/g, "");
