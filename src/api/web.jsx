@@ -9,9 +9,8 @@ export const webSystemPrompt =
   "output a single message, containing the word <|web_search|> (EXACTLY AS IT IS GIVEN TO YOU), followed by ONLY your web search query. " +
   "After outputting your search query, you MUST output the token <|end_web_search|> (EXACTLY AS IT IS GIVEN TO YOU) to denote the end of the search query. " +
   "Keep your search query concise as there is a 400 characters limit.\n" +
-  "The system will then append the web search results at the end of the user message, starting with the token <|web_search_results|>." +
-  " If this token <|web_search_results|> is present in the user's message, then you MUST NOT request another web search.\n" +
-  "You must NEVER output <|web_search_results|>, this token is reserved for the user to send.\n" +
+  "The system will then append the web search results at the end of the user message, starting with the token <|web_search_results|>. You can use these search results in your response." +
+  " If the token <|web_search_results|> is present in the user's message, then you MUST NOT request another web search.\n" +
   "IMPORTANT! You should ONLY choose to search the web if it is STRONGLY relevant to the user's query. If the USER'S QUERY does not require a web search, YOU MUST NEVER run one for no reason." +
   " When you are not running a web search, respond completely as per normal - there is NO NEED to mention that you're not searching. \n" +
   "You MUST NOT make up any information.\n";

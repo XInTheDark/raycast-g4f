@@ -134,7 +134,7 @@ export default function Chat({ launchContext }) {
     setChatData((oldData) => {
       let newChatData = structuredClone(oldData);
       for (let i = 0; i < newChatData.chats.length; i++) {
-        if (newChatData.chats[i].name === chat.name) {
+        if (newChatData.chats[i].id === chat.id) {
           newChatData.chats[i] = chat;
           break;
         }
@@ -381,8 +381,6 @@ export default function Chat({ launchContext }) {
               onSubmit={(values) => {
                 if (values.chatName === "") {
                   toast(Toast.Style.Failure, "Chat name cannot be empty");
-                } else if (chatData.chats.map((x) => x.name).includes(values.chatName)) {
-                  toast(Toast.Style.Failure, "Chat with that name already exists");
                 } else {
                   pop();
                   setChatData((oldData) => {
