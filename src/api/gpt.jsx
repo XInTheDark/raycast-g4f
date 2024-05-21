@@ -15,6 +15,7 @@ import {
 } from "@raycast/api";
 import { useEffect, useState } from "react";
 
+import { formatChatToGPT } from "./helper";
 // G4F module
 import * as G4F from "g4f";
 const g4f = new G4F.G4F();
@@ -61,10 +62,6 @@ export const provider_options = (provider) => {
 
 export const defaultProvider = () => {
   return getPreferenceValues()["gptProvider"];
-};
-
-export const is_null_message = (message) => {
-  return !message || ((message?.prompt || "").length === 0 && (message?.answer || "").length === 0);
 };
 
 let generationStatus = { stop: false };
@@ -393,25 +390,10 @@ export const chatCompletion = async (chat, options) => {
 
 // generate response using a chat context and a query (optional)
 export const getChatResponse = async (currentChat, query = null) => {
-  let chat = [];
-  // if (currentChat.systemPrompt.length > 0)
-  //   // The system prompt is not acknowledged by most providers, so we use it as first user prompt instead
-  //   chat.push({ role: "user", content: currentChat.systemPrompt });
-  // The above section is deprecated because we currently already push system prompt to start of chat
-
-  // currentChat.messages is stored in the format of [prompt, answer]. We first convert it to
-  // { role: "user", content: prompt }, { role: "assistant", content: answer }, etc.
-  for (let i = currentChat.messages.length - 1; i >= 0; i--) {
-    // reverse order, index 0 is latest message
-    let message = currentChat.messages[i];
-    if (is_null_message(message)) continue;
-    chat.push({ role: "user", content: message.prompt });
-    if (message.answer) chat.push({ role: "assistant", content: message.answer });
-  }
-  if (query) chat.push({ role: "user", content: query });
+  let chat = formatChatToGPT(currentChat, query);
 
   // load provider and model
-  const providerString = currentChat.provider;
+  const providerString = currentChat?.provider || defaultProvider();
   const [provider, model, stream] = providers[providerString];
   let options = {
     provider: provider,
@@ -426,8 +408,22 @@ export const getChatResponse = async (currentChat, query = null) => {
   return await chatCompletion(chat, options);
 };
 
+// generate response using a chat context and a query, while forcing stream = false
+export const getChatResponseSync = async (currentChat, query = null) => {
+  let r = await getChatResponse(currentChat, query);
+  if (typeof r === "string") {
+    return r;
+  }
+  let response = "";
+  for await (const chunk of r) {
+    response += chunk;
+  }
+  response = formatResponse(response, currentChat?.provider);
+  return response;
+};
+
 // format response using some heuristics
-export const formatResponse = (response, provider) => {
+export const formatResponse = (response, provider = null) => {
   const is_code = response.includes("```");
 
   if (provider === g4f.providers.Bing || !is_code) {

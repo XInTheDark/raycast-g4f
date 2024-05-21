@@ -13,8 +13,15 @@ import {
   useNavigation,
 } from "@raycast/api";
 import { useEffect, useState } from "react";
-import { defaultProvider, formatResponse, getChatResponse, processChunks, providers } from "./api/gpt";
-import { formatDate } from "./api/helper";
+import {
+  defaultProvider,
+  formatResponse,
+  getChatResponse,
+  getChatResponseSync,
+  processChunks,
+  providers,
+} from "./api/gpt";
+import { formatDate, formatChatToPrompt, formatChatToGPT } from "./api/helper";
 
 // Web search module
 import { getWebResult } from "./api/web";
@@ -54,7 +61,7 @@ export default function Chat({ launchContext }) {
 
   let default_all_chats_data = () => {
     let newChat = chat_data({});
-    console.log("newChat"+newChat.id)
+    console.log("newChat" + newChat.id);
     return {
       currentChat: newChat.id,
       chats: [newChat],
@@ -208,6 +215,32 @@ export default function Chat({ launchContext }) {
 
     generationStatus.loading = false;
     pruneChats(chatData, setChatData); // this function effectively only runs periodically
+
+    // Smart Chat Naming functionality
+    if (getPreferenceValues()["smartChatNaming"] && currentChat.messages.length <= 2) {
+      // Special handling: don't include first message (system prompt)
+      let newChat = structuredClone(currentChat);
+      if (!newChat.messages[newChat.messages.length - 1].visible) {
+        newChat.messages.pop();
+      }
+
+      // Format chat using default wrapper
+      let formatted_chat = formatChatToPrompt(formatChatToGPT(newChat), null);
+      let newQuery =
+        "Below is a conversation between the user and the assistant. Give a concise name for this chat. " +
+        "Output ONLY the name of the chat (without quotes) and NOTHING else.\n\n" +
+        formatted_chat;
+
+      let newChatName = await getChatResponseSync({ messages: [{ prompt: newQuery }], provider: currentChat.provider });
+      newChatName = newChatName.trim();
+
+      // Rename chat
+      setChatData((oldData) => {
+        let newChatData = structuredClone(oldData);
+        getChat(chatData.currentChat, newChatData.chats).name = newChatName;
+        return newChatData;
+      });
+    }
   };
 
   const pruneChatsInterval = 30 * 60 * 1000; // interval to prune inactive chats (in ms)
@@ -262,7 +295,7 @@ export default function Chat({ launchContext }) {
     return str;
   };
 
-  let ImportChat = () => {
+  let ImportChatComponent = () => {
     const { pop } = useNavigation();
 
     return (
@@ -355,7 +388,7 @@ export default function Chat({ launchContext }) {
     toast(Toast.Style.Success, "Chat Imported");
   };
 
-  let CreateChat = () => {
+  let CreateChatComponent = () => {
     const { pop } = useNavigation();
 
     const preferences = getPreferenceValues();
@@ -376,7 +409,11 @@ export default function Chat({ launchContext }) {
                   pop();
                   setChatData((oldData) => {
                     let newChatData = structuredClone(oldData);
-                    let newChat = chat_data({ name: values.chatName, provider: values.provider, systemPrompt: values.systemPrompt });
+                    let newChat = chat_data({
+                      name: values.chatName,
+                      provider: values.provider,
+                      systemPrompt: values.systemPrompt,
+                    });
                     newChatData.chats.push(newChat);
                     newChatData.currentChat = newChat.id;
 
@@ -445,7 +482,7 @@ export default function Chat({ launchContext }) {
     }
   };
 
-  let ComposeMessage = () => {
+  let ComposeMessageComponent = () => {
     const { pop } = useNavigation();
 
     return (
@@ -467,7 +504,7 @@ export default function Chat({ launchContext }) {
     );
   };
 
-  let EditLastMessage = () => {
+  let EditLastMessageComponent = () => {
     let chat = getChat(chatData.currentChat);
 
     if (chat.messages.length === 0) {
@@ -507,7 +544,7 @@ export default function Chat({ launchContext }) {
     );
   };
 
-  let RenameChat = () => {
+  let RenameChatComponent = () => {
     let chat = getChat(chatData.currentChat);
 
     const { pop } = useNavigation();
@@ -529,12 +566,13 @@ export default function Chat({ launchContext }) {
                 //     return;
                 //   }
                 // }
-
-                // check if chat with new name already exists
-                if (chatData.chats.map((x) => x.name).includes(values.chatName)) {
-                  toast(Toast.Style.Failure, "Chat with that name already exists");
-                  return;
-                }
+                //
+                // // check if chat with new name already exists
+                // // similarly this is now legacy
+                // if (chatData.chats.map((x) => x.name).includes(values.chatName)) {
+                //   toast(Toast.Style.Failure, "Chat with that name already exists");
+                //   return;
+                // }
 
                 setChatData((oldData) => {
                   let newChatData = structuredClone(oldData);
@@ -589,7 +627,7 @@ export default function Chat({ launchContext }) {
             await sendToGPT();
           }}
         />
-        <Action.Push icon={Icon.BlankDocument} title="Compose Message" target={<ComposeMessage />} />
+        <Action.Push icon={Icon.BlankDocument} title="Compose Message" target={<ComposeMessageComponent />} />
         <ActionPanel.Section title="Current Chat">
           {generationStatus.loading && (
             <Action
@@ -650,7 +688,7 @@ export default function Chat({ launchContext }) {
           <Action.Push
             icon={Icon.TextCursor}
             title="Edit Last Message"
-            target={<EditLastMessage />}
+            target={<EditLastMessageComponent />}
             shortcut={{ modifiers: ["cmd", "shift"], key: "e" }}
           />
           <Action
@@ -689,7 +727,7 @@ export default function Chat({ launchContext }) {
           <Action.Push
             icon={Icon.Pencil}
             title="Rename Chat"
-            target={<RenameChat />}
+            target={<RenameChatComponent />}
             shortcut={{ modifiers: ["cmd", "shift"], key: "m" }}
           />
           <Action
@@ -712,7 +750,7 @@ export default function Chat({ launchContext }) {
           <Action.Push
             icon={Icon.PlusCircle}
             title="Create Chat"
-            target={<CreateChat />}
+            target={<CreateChatComponent />}
             shortcut={{ modifiers: ["cmd"], key: "n" }}
           />
           <Action
@@ -757,7 +795,7 @@ export default function Chat({ launchContext }) {
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "arrowUp" }}
           />
-          <Action.Push icon={Icon.Upload} title="Import Chat" target={<ImportChat />} />
+          <Action.Push icon={Icon.Upload} title="Import Chat" target={<ImportChatComponent />} />
         </ActionPanel.Section>
         <ActionPanel.Section title="Danger zone">
           <Action
@@ -891,12 +929,10 @@ export default function Chat({ launchContext }) {
             second: "2-digit",
           })}`;
           let newChat = chat_data({
-              name: newChatName,
-              messages: [message_data({ prompt: launchContext.query, answer: launchContext.response, finished: true })],
-            });
-          newChatData.chats.push(
-            newChat
-          );
+            name: newChatName,
+            messages: [message_data({ prompt: launchContext.query, answer: launchContext.response, finished: true })],
+          });
+          newChatData.chats.push(newChat);
           newChatData.currentChat = newChat.id;
           return newChatData;
         });
