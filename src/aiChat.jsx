@@ -61,7 +61,6 @@ export default function Chat({ launchContext }) {
 
   let default_all_chats_data = () => {
     let newChat = chat_data({});
-    console.log("newChat" + newChat.id);
     return {
       currentChat: newChat.id,
       chats: [newChat],
