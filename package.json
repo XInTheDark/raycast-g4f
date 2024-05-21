@@ -213,8 +213,17 @@
     },
     {
       "name": "webSearch",
+      "title": "Experimental Features",
       "label": "Enable Web Search (BETA)",
       "description": "Adds web search capabilities to GPT. Available in AI Chat.",
+      "required": false,
+      "type": "checkbox",
+      "default": false
+    },
+    {
+      "name": "smartChatNaming",
+      "label": "Enable Smart Chat Naming (BETA)",
+      "description": "Automatically renames chat sessions based on the messages you send.",
       "required": false,
       "type": "checkbox",
       "default": false

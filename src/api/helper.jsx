@@ -32,8 +32,33 @@ export const formatDate = (dateToCheckISO) => {
   return formatted;
 };
 
+// Format a series of messages into a GPT chat format
+// Takes a chat object (that we use in AI Chat) and a query, and returns a GPT chat format
+export const formatChatToGPT = (currentChat, query = null) => {
+  // if (currentChat.systemPrompt.length > 0)
+  //   // The system prompt is not acknowledged by most providers, so we use it as first user prompt instead
+  //   chat.push({ role: "user", content: currentChat.systemPrompt });
+  // The above section is deprecated because we currently already push system prompt to start of chat
+
+  let chat = [];
+
+  // currentChat.messages is stored in the format of [prompt, answer]. We first convert it to
+  // { role: "user", content: prompt }, { role: "assistant", content: answer }, etc.
+  for (let i = currentChat.messages.length - 1; i >= 0; i--) {
+    // reverse order, index 0 is latest message
+    let message = currentChat.messages[i];
+    if (is_null_message(message)) continue;
+    if (message.prompt) chat.push({ role: "user", content: message.prompt });
+    else continue;
+    if (message.answer) chat.push({ role: "assistant", content: message.answer });
+  }
+  if (query) chat.push({ role: "user", content: query });
+  return chat;
+};
+
 // Format a series of messages into a single string
-export const formatChatToPrompt = (chat, model) => {
+// Takes a GPT format chat (i.e. [{role: ..., content: ...}]) and returns a string
+export const formatChatToPrompt = (chat, model = null) => {
   model = model?.toLowerCase() || "";
   let prompt = "";
 
@@ -62,4 +87,8 @@ export const formatChatToPrompt = (chat, model) => {
   }
 
   return prompt;
+};
+
+export const is_null_message = (message) => {
+  return !message || ((message?.prompt || "").length === 0 && (message?.answer || "").length === 0);
 };
