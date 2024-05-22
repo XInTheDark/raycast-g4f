@@ -45,6 +45,7 @@ export const getWebResult = async (query) => {
   return processWebResults(responseJson["results"]);
 };
 
+// Wrapper for returning web results in a readable format
 export const processWebResults = (results) => {
   // Handle undefined results
   if (!results) {
@@ -54,7 +55,7 @@ export const processWebResults = (results) => {
   let answer = "";
   for (let i = 0; i < results.length; i++) {
     let x = results[i];
-    let rst = `Title: ${x["title"]}\nURL: ${x["url"]}\n${x["content"]}\n\n`;
+    let rst = `${i + 1}.\nURL: ${x["url"]}\nTitle: ${x["title"]}\nContent: ${x["content"]}\n\n`;
     answer += rst;
   }
   return answer;
