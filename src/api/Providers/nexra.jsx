@@ -40,7 +40,6 @@ export const getNexraResponse = async function* (chat, options, max_retries = 5)
       let arr = chunkStr.split(String.fromCharCode(30));
 
       for (const _chunk of arr) {
-        console.log(_chunk);
         let chunkJson;
         try {
           chunkJson = JSON.parse(_chunk);

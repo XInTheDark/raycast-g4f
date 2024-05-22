@@ -400,7 +400,8 @@ export const getChatResponse = async (currentChat, query = null) => {
   let chat = formatChatToGPT(currentChat, query);
 
   // load provider and model
-  const providerString = currentChat?.provider || defaultProvider();
+  if (!currentChat.provider) currentChat.provider = defaultProvider();
+  const providerString = currentChat.provider;
   const [provider, model, stream] = providers[providerString];
   let options = {
     provider: provider,
@@ -421,11 +422,13 @@ export const getChatResponseSync = async (currentChat, query = null) => {
   if (typeof r === "string") {
     return r;
   }
+
+  const [provider, model, stream] = providers[currentChat.provider];
   let response = "";
-  for await (const chunk of r) {
-    response += chunk;
+  for await (const chunk of processChunks(r, provider)) {
+    response = chunk;
   }
-  response = formatResponse(response, currentChat?.provider);
+  response = formatResponse(response, currentChat.provider);
   return response;
 };
 
