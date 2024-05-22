@@ -12,10 +12,11 @@ export const webSystemPrompt =
   "The system will then append the web search results at the end of the user message, starting with the token <|web_search_results|>. " +
   "Take note that the user CANNOT ACCESS the content under <|web_search_results|> - YOU should incorporate these results into your response. " +
   "Additionally, If the token <|web_search_results|> is present in the user's message, then you MUST NOT request another web search.\n\n" +
-  "IMPORTANT! You should ONLY choose to search the web if it is STRONGLY relevant to the user's query, i.e. in the following circumstances: " +
+  "IMPORTANT! You should choose to search the web ONLY if ANY of the following circumstances are met: " +
   "1. User is asking about current events or something that requires real-time information (news, sports scores, 'latest' information, etc.)\n" +
   "2. User is asking about some term you are unfamiliar with - you don't have a good idea of what it is, or if it's a little-known term.\n" +
-  "3. User explicitly asks you to browse or provide links to references.\n" +
+  "3. User is asking about anything that involves numerical facts (e.g. distances between places, population count, sizes, date and time, etc.)\n" +
+  "4. User explicitly asks you to search or provide links to references.\n" +
   "If the user's query does NOT require a web search, YOU MUST NEVER run one for no reason.\n\n" +
   "When using web search results, you are encouraged to cite references where appropriate, using inline links in standard markdown format.\n" +
   "You are also allowed to make use of web search results from previous messages, if they are STRONGLY RELEVANT to the current message.\n\n" +
