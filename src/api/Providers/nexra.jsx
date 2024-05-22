@@ -27,7 +27,6 @@ export const getNexraResponse = async function* (chat, options, max_retries = 5)
 
     const reader = response.body.getReader();
     let decoder = new TextDecoder();
-    let prevMsg = "";
 
     while (true) {
       const { done, value } = await reader.read();
@@ -53,15 +52,8 @@ export const getNexraResponse = async function* (chat, options, max_retries = 5)
         if (chunkJson["finish"]) break;
         // if (chunkJson["error"]) throw new Error();
 
-        let chunk = chunkJson["message"],
-          msg = chunk;
-        // remove prevMsg from chunk
-        chunk = removePrefix(chunk, prevMsg);
-
-        // Update prevMsg
-        prevMsg = msg;
-
-        yield chunk;
+        let chunk = chunkJson["message"];
+        yield chunk; // note that this is the full response, not just incremental updates!
       }
     }
   } catch (e) {

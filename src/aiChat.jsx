@@ -171,7 +171,7 @@ export default function Chat({ launchContext }) {
 
       for await (const chunk of await processChunks(r, provider, get_status)) {
         i++;
-        response += chunk;
+        response = chunk;
         response = formatResponse(response, provider);
         await _setChatData(chatData, setChatData, messageID, null, response);
 

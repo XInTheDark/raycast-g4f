@@ -167,7 +167,7 @@ export default (
         generationStatus.stop = false;
 
         for await (const chunk of await processChunks(r, provider, get_status)) {
-          response += chunk;
+          response = chunk;
           response = formatResponse(response, provider);
           setMarkdown(response);
 
@@ -463,8 +463,8 @@ export const formatResponse = (response, provider = null) => {
   return response;
 };
 
-// Returns an async generator that can be used directly.
-export const processChunksAsync = async function* (response, provider) {
+// yield chunks incrementally from a response.
+export const processChunksIncrementalAsync = async function* (response, provider) {
   if (provider === g4f.providers.Bing) {
     let prevChunk = "";
     // For Bing, we must not return the last chunk
@@ -481,13 +481,28 @@ export const processChunksAsync = async function* (response, provider) {
   }
 };
 
-export const processChunks = async function* (response, provider, status = null) {
-  // same as processChunksAsync, but stops generating as soon as status() is true
+export const processChunksIncremental = async function* (response, provider, status = null) {
+  // same as processChunksIncrementalAsync, but stops generating as soon as status() is true
   // update every few chunks to reduce performance impact
   let i = 0;
-  for await (const chunk of await processChunksAsync(response, provider)) {
+  for await (const chunk of await processChunksIncrementalAsync(response, provider)) {
     if ((i & 15) === 0 && status && status()) break;
     yield chunk;
     i++;
+  }
+};
+
+// instead of yielding incrementally, this function yields the entire response each time.
+// hence, when using the function, we will do `response = chunk` instead of `response += chunk`
+export const processChunks = async function* (response, provider, status = null) {
+  let r = "";
+  for await (const chunk of await processChunksIncremental(response, provider, status)) {
+    // normally we add the chunk to r, but for certain providers, the chunk is already yielded fully
+    if ([NexraProvider].includes(provider)) {
+      r = chunk;
+    } else {
+      r += chunk;
+    }
+    yield r;
   }
 };
