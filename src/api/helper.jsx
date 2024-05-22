@@ -92,3 +92,33 @@ export const formatChatToPrompt = (chat, model = null) => {
 export const is_null_message = (message) => {
   return !message || ((message?.prompt || "").length === 0 && (message?.answer || "").length === 0);
 };
+
+export const removeFirstOccurrence = (str, substr) => {
+  let idx = str.indexOf(substr);
+  if (idx !== -1) {
+    return str.substring(idx + substr.length);
+  }
+  return str;
+};
+
+export const removeLastOccurrence = (str, substr) => {
+  let idx = str.lastIndexOf(substr);
+  if (idx !== -1) {
+    return str.substring(0, idx);
+  }
+  return str;
+};
+
+export const removePrefix = (str, prefix) => {
+  if (str.startsWith(prefix)) {
+    return str.substring(prefix.length);
+  }
+  return str;
+};
+
+export const removeSuffix = (str, suffix) => {
+  if (str.endsWith(suffix)) {
+    return str.substring(0, str.length - suffix.length);
+  }
+  return str;
+};

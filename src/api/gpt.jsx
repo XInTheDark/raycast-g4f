@@ -16,9 +16,13 @@ import {
 import { useEffect, useState } from "react";
 
 import { formatChatToGPT } from "./helper";
+
 // G4F module
 import * as G4F from "g4f";
 const g4f = new G4F.G4F();
+
+// Nexra module
+import { NexraProvider, getNexraResponse } from "./Providers/nexra";
 
 // DeepInfra module
 import { DeepInfraProvider, getDeepInfraResponse } from "./Providers/deepinfra";
@@ -36,7 +40,7 @@ import { GeminiProvider, getGoogleGeminiResponse } from "./Providers/google_gemi
 // [Provider, Model, Stream]
 export const providers = {
   GPT4: [g4f.providers.GPT, "gpt-4-32k", false],
-  GPT35: [g4f.providers.GPT, "gpt-3.5-turbo", false],
+  GPT35: [NexraProvider, "chatgpt", true],
   Bing: [g4f.providers.Bing, "gpt-4", true],
   DeepInfraWizardLM2_8x22B: [DeepInfraProvider, "microsoft/WizardLM-2-8x22B", true],
   DeepInfraLlama3_8B: [DeepInfraProvider, "meta-llama/Meta-Llama-3-8B-Instruct", true],
@@ -163,7 +167,7 @@ export default (
         generationStatus.stop = false;
 
         for await (const chunk of await processChunks(r, provider, get_status)) {
-          response += chunk;
+          response = chunk;
           response = formatResponse(response, provider);
           setMarkdown(response);
 
@@ -362,8 +366,11 @@ export default (
 export const chatCompletion = async (chat, options) => {
   let response;
   const provider = options.provider;
-  if (provider === DeepInfraProvider) {
-    // Deep Infra Llama 3
+  if (provider === NexraProvider) {
+    // Nexra
+    response = await getNexraResponse(chat, options);
+  } else if (provider === DeepInfraProvider) {
+    // DeepInfra
     response = await getDeepInfraResponse(chat, options);
   } else if (provider === BlackboxProvider) {
     // Blackbox
@@ -393,7 +400,8 @@ export const getChatResponse = async (currentChat, query = null) => {
   let chat = formatChatToGPT(currentChat, query);
 
   // load provider and model
-  const providerString = currentChat?.provider || defaultProvider();
+  if (!currentChat.provider) currentChat.provider = defaultProvider();
+  const providerString = currentChat.provider;
   const [provider, model, stream] = providers[providerString];
   let options = {
     provider: provider,
@@ -414,11 +422,13 @@ export const getChatResponseSync = async (currentChat, query = null) => {
   if (typeof r === "string") {
     return r;
   }
+
+  const [provider, model, stream] = providers[currentChat.provider];
   let response = "";
-  for await (const chunk of r) {
-    response += chunk;
+  for await (const chunk of processChunks(r, provider)) {
+    response = chunk;
   }
-  response = formatResponse(response, currentChat?.provider);
+  response = formatResponse(response, currentChat.provider);
   return response;
 };
 
@@ -426,12 +436,16 @@ export const getChatResponseSync = async (currentChat, query = null) => {
 export const formatResponse = (response, provider = null) => {
   const is_code = response.includes("```");
 
-  if (provider === g4f.providers.Bing || !is_code) {
-    // replace \n with a real newline, \t with a real tab, etc.
-    // unless code blocks are detected and provider is not Bing
+  if (provider === g4f.providers.Bing || provider === NexraProvider || !is_code) {
+    // replace escape characters: \n with a real newline, \t with a real tab, etc.
     response = response.replace(/\\n/g, "\n");
     response = response.replace(/\\t/g, "\t");
     response = response.replace(/\\r/g, "\r");
+
+    // the following escape characters are still displayed correctly even without the replacement,
+    // but we currently have features that depend on stuff being in the response, for example
+    // web search that requires the <|web_search|> token to be present.
+    response = response.replace(/\\_/g, "_");
 
     // remove <sup>, </sup> tags (not supported apparently)
     response = response.replace(/<sup>/g, "");
@@ -452,8 +466,8 @@ export const formatResponse = (response, provider = null) => {
   return response;
 };
 
-// Returns an async generator that can be used directly.
-export const processChunksAsync = async function* (response, provider) {
+// yield chunks incrementally from a response.
+export const processChunksIncrementalAsync = async function* (response, provider) {
   if (provider === g4f.providers.Bing) {
     let prevChunk = "";
     // For Bing, we must not return the last chunk
@@ -461,22 +475,37 @@ export const processChunksAsync = async function* (response, provider) {
       yield prevChunk;
       prevChunk = chunk;
     }
-  } else if ([DeepInfraProvider, BlackboxProvider, ReplicateProvider].includes(provider)) {
-    // response must be an async generator
-    yield* response;
-  } else {
+  } else if ([].includes(provider)) {
     // nothing here currently.
     yield* G4F.chunkProcessor(response);
+  } else {
+    // default case. response must be an async generator.
+    yield* response;
   }
 };
 
-export const processChunks = async function* (response, provider, status = null) {
-  // same as processChunksAsync, but stops generating as soon as status() is true
+export const processChunksIncremental = async function* (response, provider, status = null) {
+  // same as processChunksIncrementalAsync, but stops generating as soon as status() is true
   // update every few chunks to reduce performance impact
   let i = 0;
-  for await (const chunk of await processChunksAsync(response, provider)) {
+  for await (const chunk of await processChunksIncrementalAsync(response, provider)) {
     if ((i & 15) === 0 && status && status()) break;
     yield chunk;
     i++;
+  }
+};
+
+// instead of yielding incrementally, this function yields the entire response each time.
+// hence, when using the function, we will do `response = chunk` instead of `response += chunk`
+export const processChunks = async function* (response, provider, status = null) {
+  let r = "";
+  for await (const chunk of await processChunksIncremental(response, provider, status)) {
+    // normally we add the chunk to r, but for certain providers, the chunk is already yielded fully
+    if ([NexraProvider].includes(provider)) {
+      r = chunk;
+    } else {
+      r += chunk;
+    }
+    yield r;
   }
 };

@@ -28,8 +28,8 @@ import { getWebResult } from "./api/web";
 import { webSystemPrompt, systemResponse, webToken, webTokenEnd } from "./api/web";
 
 const chat_providers = [
-  ["ChatGPT (gpt-4-32k)", "GPT4"],
   ["ChatGPT (gpt-3.5-turbo)", "GPT35"],
+  ["ChatGPT (gpt-4-32k)", "GPT4"],
   ["Bing (gpt-4)", "Bing"],
   ["DeepInfra (WizardLM-2-8x22B)", "DeepInfraWizardLM2_8x22B"],
   ["DeepInfra (meta-llama-3-8b)", "DeepInfraLlama3_8B"],
@@ -115,7 +115,7 @@ export default function Chat({ launchContext }) {
     return messages;
   };
 
-  let _setChatData = async (chatData, setChatData, messageID, query = null, response = null, finished = null) => {
+  let setCurrentChatData = async (chatData, setChatData, messageID, query = null, response = null, finished = null) => {
     setChatData((oldData) => {
       let newChatData = structuredClone(oldData);
       let messages = getChat(chatData.currentChat, newChatData.chats).messages;
@@ -134,7 +134,7 @@ export default function Chat({ launchContext }) {
     setChatData((oldData) => {
       let newChatData = structuredClone(oldData);
       for (let i = 0; i < newChatData.chats.length; i++) {
-        if (newChatData.chats[i].name === chat.name) {
+        if (newChatData.chats[i].id === chat.id) {
           newChatData.chats[i] = chat;
           break;
         }
@@ -144,7 +144,7 @@ export default function Chat({ launchContext }) {
   };
 
   let updateChatResponse = async (chatData, setChatData, messageID, query = null, previousWebSearch = false) => {
-    await _setChatData(chatData, setChatData, messageID, null, ""); // set response to empty string
+    await setCurrentChatData(chatData, setChatData, messageID, null, ""); // set response to empty string
 
     let currentChat = getChat(chatData.currentChat, chatData.chats);
     const [provider, model, stream] = providers[currentChat.provider];
@@ -158,7 +158,7 @@ export default function Chat({ launchContext }) {
 
     if (!stream) {
       response = await getChatResponse(currentChat, query);
-      await _setChatData(chatData, setChatData, messageID, null, response);
+      await setCurrentChatData(chatData, setChatData, messageID, null, response);
 
       elapsed = (new Date().getTime() - start) / 1000;
       chars = response.length;
@@ -171,9 +171,9 @@ export default function Chat({ launchContext }) {
 
       for await (const chunk of await processChunks(r, provider, get_status)) {
         i++;
-        response += chunk;
+        response = chunk;
         response = formatResponse(response, provider);
-        await _setChatData(chatData, setChatData, messageID, null, response);
+        await setCurrentChatData(chatData, setChatData, messageID, null, response);
 
         // Web Search functionality
         // We check the response every few chunks so we can possibly exit early
@@ -204,7 +204,7 @@ export default function Chat({ launchContext }) {
       return;
     }
 
-    await _setChatData(chatData, setChatData, messageID, null, null, true);
+    await setCurrentChatData(chatData, setChatData, messageID, null, null, true);
 
     await toast(
       Toast.Style.Success,
@@ -381,8 +381,6 @@ export default function Chat({ launchContext }) {
               onSubmit={(values) => {
                 if (values.chatName === "") {
                   toast(Toast.Style.Failure, "Chat name cannot be empty");
-                } else if (chatData.chats.map((x) => x.name).includes(values.chatName)) {
-                  toast(Toast.Style.Failure, "Chat with that name already exists");
                 } else {
                   pop();
                   setChatData((oldData) => {
@@ -442,9 +440,10 @@ export default function Chat({ launchContext }) {
     toast(Toast.Style.Animated, "Response Loading");
 
     let currentChat = getChat(chatData.currentChat, chatData.chats);
-    let newMessageID = new Date().getTime();
+    let newMessage = message_data({ prompt: query });
+    let newMessageID = newMessage.id;
 
-    currentChat.messages.unshift(message_data({ prompt: query, id: newMessageID }));
+    currentChat.messages.unshift(newMessage);
     updateCurrentChat(chatData, setChatData, currentChat); // possibly redundant, put here for safety and consistency
 
     try {
@@ -569,7 +568,7 @@ export default function Chat({ launchContext }) {
 
   // Web Search functionality
   const processWebSearchResponse = async (chatData, setChatData, currentChat, messageID, response, query) => {
-    await _setChatData(chatData, setChatData, messageID, null, null, false);
+    await setCurrentChatData(chatData, setChatData, messageID, null, null, false);
     await showToast(Toast.Style.Animated, "Searching Web");
     // get everything AFTER webToken and BEFORE webTokenEnd
     let webQuery = response.includes(webTokenEnd)
@@ -592,7 +591,6 @@ export default function Chat({ launchContext }) {
 
     // Note how we don't pass query here because it is already in the chat
     await updateChatResponse(chatData, setChatData, newMessageID, null, true);
-    return;
   };
 
   // Smart Chat Naming functionality

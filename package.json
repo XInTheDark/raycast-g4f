@@ -157,12 +157,12 @@
       "type": "dropdown",
       "data": [
         {
-          "title": "ChatGPT (gpt-4-32k)",
-          "value": "GPT4"
-        },
-        {
           "title": "ChatGPT (gpt-3.5-turbo)",
           "value": "GPT35"
+        },
+        {
+          "title": "ChatGPT (gpt-4-32k)",
+          "value": "GPT4"
         },
         {
           "title": "Bing (gpt-4)",
@@ -209,7 +209,7 @@
           "value": "GoogleGemini"
         }
       ],
-      "default": "GPT4"
+      "default": "GPT35"
     },
     {
       "name": "webSearch",
