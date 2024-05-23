@@ -1,4 +1,4 @@
-import { getPreferenceValues } from "@raycast/api";
+import { getPreferenceValues, Toast, showToast } from "@raycast/api";
 import fetch from "node-fetch-polyfill";
 
 export const webToken = "<|web_search|>",
@@ -25,24 +25,42 @@ export const webSystemPrompt =
 export const systemResponse = "Understood. I will strictly follow these instructions in this conversation.";
 
 export const getWebResult = async (query) => {
-  const APIKey = getPreferenceValues()["TavilyAPIKey"];
-  const api_url = "https://api.tavily.com/search";
-  let data = {
-    api_key: APIKey,
-    query: query,
-    max_results: 5,
-  };
-  // POST
-  const response = await fetch(api_url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+  let APIKeysStr = getPreferenceValues()["TavilyAPIKeys"];
+  let APIKeys = APIKeysStr.split(",").map((x) => x.trim());
 
-  const responseJson = await response.json();
-  return processWebResults(responseJson["results"]);
+  for (const APIKey of APIKeys) {
+    const api_url = "https://api.tavily.com/search";
+    let data = {
+      api_key: APIKey,
+      query: query,
+      max_results: 5,
+      search_depth: "advanced",
+    };
+
+    let responseJson;
+    try {
+      // POST
+      const response = await fetch(api_url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      responseJson = await response.json();
+    } catch (e) {
+      continue;
+    }
+
+    if (!responseJson || !responseJson["results"]) continue;
+
+    return processWebResults(responseJson["results"]);
+  }
+
+  // no valid API key
+  await showToast(Toast.Style.Failure, "No valid Tavily API key found");
+  return "No results found.";
 };
 
 // Wrapper for returning web results in a readable format

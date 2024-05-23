@@ -229,9 +229,9 @@
       "default": false
     },
     {
-      "name": "TavilyAPIKey",
-      "title": "Tavily API Key",
-      "description": "Optional. Only used if Web Search is enabled.",
+      "name": "TavilyAPIKeys",
+      "title": "Tavily API Keys",
+      "description": "Optional. Only used if Web Search is enabled. Multiple keys are supported - separate them with commas.",
       "required": false,
       "type": "password",
       "default": ""
