@@ -1,4 +1,4 @@
-import { getPreferenceValues } from "@raycast/api";
+import { getPreferenceValues, Toast, showToast } from "@raycast/api";
 import fetch from "node-fetch-polyfill";
 
 export const webToken = "<|web_search|>",
@@ -12,10 +12,11 @@ export const webSystemPrompt =
   "The system will then append the web search results at the end of the user message, starting with the token <|web_search_results|>. " +
   "Take note that the user CANNOT ACCESS the content under <|web_search_results|> - YOU should incorporate these results into your response. " +
   "Additionally, If the token <|web_search_results|> is present in the user's message, then you MUST NOT request another web search.\n\n" +
-  "IMPORTANT! You should ONLY choose to search the web if it is STRONGLY relevant to the user's query, i.e. in the following circumstances: " +
+  "IMPORTANT! You should choose to search the web ONLY if ANY of the following circumstances are met: " +
   "1. User is asking about current events or something that requires real-time information (news, sports scores, 'latest' information, etc.)\n" +
-  "2. User is asking about some term you are unfamiliar with - you don't have a good idea of what it is, or if it's a little-known term.\n" +
-  "3. User explicitly asks you to browse or provide links to references.\n" +
+  "2. User is asking about some term you are unfamiliar with (e.g. if it's a little-known term, if it's a person you don't know well, etc.)\n" +
+  "3. User is asking about anything that involves numerical facts (e.g. distances between places, population count, sizes, date and time, etc.)\n" +
+  "4. User explicitly asks you to search or provide links to references.\n" +
   "If the user's query does NOT require a web search, YOU MUST NEVER run one for no reason.\n\n" +
   "When using web search results, you are encouraged to cite references where appropriate, using inline links in standard markdown format.\n" +
   "You are also allowed to make use of web search results from previous messages, if they are STRONGLY RELEVANT to the current message.\n\n" +
@@ -24,26 +25,45 @@ export const webSystemPrompt =
 export const systemResponse = "Understood. I will strictly follow these instructions in this conversation.";
 
 export const getWebResult = async (query) => {
-  const APIKey = getPreferenceValues()["TavilyAPIKey"];
-  const api_url = "https://api.tavily.com/search";
-  let data = {
-    api_key: APIKey,
-    query: query,
-    max_results: 5,
-  };
-  // POST
-  const response = await fetch(api_url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+  let APIKeysStr = getPreferenceValues()["TavilyAPIKeys"];
+  let APIKeys = APIKeysStr.split(",").map((x) => x.trim());
 
-  const responseJson = await response.json();
-  return processWebResults(responseJson["results"]);
+  for (const APIKey of APIKeys) {
+    const api_url = "https://api.tavily.com/search";
+    let data = {
+      api_key: APIKey,
+      query: query,
+      max_results: 5,
+      search_depth: "advanced",
+    };
+
+    let responseJson;
+    try {
+      // POST
+      const response = await fetch(api_url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      responseJson = await response.json();
+    } catch (e) {
+      continue;
+    }
+
+    if (!responseJson || !responseJson["results"]) continue;
+
+    return processWebResults(responseJson["results"]);
+  }
+
+  // no valid API key
+  await showToast(Toast.Style.Failure, "No valid Tavily API key found");
+  return "No results found.";
 };
 
+// Wrapper for returning web results in a readable format
 export const processWebResults = (results) => {
   // Handle undefined results
   if (!results) {
@@ -53,7 +73,7 @@ export const processWebResults = (results) => {
   let answer = "";
   for (let i = 0; i < results.length; i++) {
     let x = results[i];
-    let rst = `Title: ${x["title"]}\nURL: ${x["url"]}\n${x["content"]}\n\n`;
+    let rst = `${i + 1}.\nURL: ${x["url"]}\nTitle: ${x["title"]}\nContent: ${x["content"]}\n\n`;
     answer += rst;
   }
   return answer;

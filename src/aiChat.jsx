@@ -605,7 +605,7 @@ export default function Chat({ launchContext }) {
     let formatted_chat = formatChatToPrompt(formatChatToGPT(newChat), null);
     let newQuery =
       "Below is a conversation between the user and the assistant. Give a concise name for this chat. " +
-      "Output ONLY the name of the chat (without quotes) and NOTHING else.\n\n" +
+      "Output ONLY the name of the chat (WITHOUT quotes) and NOTHING else.\n\n" +
       formatted_chat;
 
     let newChatName = await getChatResponseSync({ messages: [{ prompt: newQuery }], provider: currentChat.provider });
