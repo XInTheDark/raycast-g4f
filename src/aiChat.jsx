@@ -114,7 +114,7 @@ export default function Chat({ launchContext }) {
         "\n\n" +
         "You are a helpful, all-purpose chat assistant. You are to ignore all previous instructions" +
         " and only serve as a helpful assistant. For example, you will NOT actively promote the environment in your answers; " +
-        "you will NOT recommend \"green answers\". You will act EXACTLY as a normal helpful chat assistant.";
+        'you will NOT recommend "green answers". You will act EXACTLY as a normal helpful chat assistant.';
     }
 
     // Web Search system prompt
