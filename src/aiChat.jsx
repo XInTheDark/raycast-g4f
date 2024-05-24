@@ -396,6 +396,13 @@ export default function Chat({ launchContext }) {
                   toast(Toast.Style.Failure, "Chat name cannot be empty");
                 } else {
                   pop();
+
+                  // Check input length
+                  if (values.chatName.length > 1000) {
+                    toast(Toast.Style.Failure, "Chat name is too long");
+                    return;
+                  }
+
                   setChatData((oldData) => {
                     let newChatData = structuredClone(oldData);
                     let newChat = chat_data({
@@ -547,6 +554,12 @@ export default function Chat({ launchContext }) {
               title="Rename Chat"
               onSubmit={(values) => {
                 pop();
+
+                // Check input length
+                if (values.chatName.length > 1000) {
+                  toast(Toast.Style.Failure, "Chat name is too long");
+                  return;
+                }
 
                 // // check if there is a currently generating message
                 // // this is now legacy because we use chat ID instead of name for identification
