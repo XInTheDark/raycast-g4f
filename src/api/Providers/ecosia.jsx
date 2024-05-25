@@ -27,6 +27,12 @@ export const getEcosiaResponse = async function* (chat, options, max_retries = 5
       headers: headers,
       body: JSON.stringify(data),
     });
+
+    // Check for error codes
+    if (response.status !== 200) {
+      throw new Error(`${response.status}`);
+    }
+
     let reader = response.body.getReader();
     let decoder = new TextDecoder();
 

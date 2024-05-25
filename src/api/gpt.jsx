@@ -365,38 +365,42 @@ export default (
   );
 };
 
-// generate response using a chat context and options
-// returned response is ready for use directly
-export const chatCompletion = async (chat, options) => {
-  let response;
+// relatively low level function to get response from the specified provider
+const getProviderResponse = async (chat, options) => {
   const provider = options.provider;
   if (provider === NexraProvider) {
-    // Nexra
-    response = await getNexraResponse(chat, options);
-  } else if (provider === EcosiaProvider) {
-    // Ecosia
-    response = await getEcosiaResponse(chat, options);
-  } else if (provider === DeepInfraProvider) {
-    // DeepInfra
-    response = await getDeepInfraResponse(chat, options);
-  } else if (provider === BlackboxProvider) {
-    // Blackbox
-    response = await getBlackboxResponse(chat);
-  } else if (provider === ReplicateProvider) {
-    // Replicate
-    response = await getReplicateResponse(chat, options);
-  } else if (provider === GeminiProvider) {
-    // Google Gemini
-    response = await getGoogleGeminiResponse(chat);
-  } else {
-    // GPT
-    response = await g4f.chatCompletion(chat, options);
-  }
+      // Nexra
+      return getNexraResponse(chat, options);
+    } else if (provider === EcosiaProvider) {
+      // Ecosia
+      return getEcosiaResponse(chat, options);
+    } else if (provider === DeepInfraProvider) {
+      // DeepInfra
+      return getDeepInfraResponse(chat, options);
+    } else if (provider === BlackboxProvider) {
+      // Blackbox
+      return getBlackboxResponse(chat);
+    } else if (provider === ReplicateProvider) {
+      // Replicate
+      return getReplicateResponse(chat, options);
+    } else if (provider === GeminiProvider) {
+      // Google Gemini
+      return getGoogleGeminiResponse(chat);
+    } else {
+      // GPT
+      return g4f.chatCompletion(chat, options);
+    }
+}
+
+// generate response using a chat context and options
+// returned response is either a string or an async generator
+export const chatCompletion = async (chat, options) => {
+  let response = await getProviderResponse(chat, options);
 
   // format response
   if (typeof response === "string") {
     // will not be a string if stream is enabled
-    response = formatResponse(response, provider);
+    response = formatResponse(response, options.provider);
   }
 
   return response;
@@ -516,3 +520,25 @@ export const processChunks = async function* (response, provider, status = null)
     yield r;
   }
 };
+
+// error handler
+export const errorHandler = async (e, chat, options) => {
+  let response;
+  console.log(e);
+  // Try some fixes based on error
+  if (e.message.includes("413")) {
+    // Input too long, switch to model with the longest context (DeepInfraWizardLM2_8x22B)
+    options.provider = DeepInfraProvider;
+    options.model = "microsoft/WizardLM-2-8x22B";
+    options.stream = true;
+    response = await chatCompletion(chat, options);
+  }
+  else {
+    // Switch to most reliable model (gpt-4-32k)
+    options.provider = g4f.providers.GPT;
+    options.model = "gpt-4-32k";
+    options.stream = false;
+    response = await chatCompletion(chat, options);
+  }
+  return response;
+}
