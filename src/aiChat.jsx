@@ -41,7 +41,6 @@ const chat_providers = [
   ["Replicate (meta-llama-3-8b)", "ReplicateLlama3_8B"],
   ["Replicate (meta-llama-3-70b)", "ReplicateLlama3_70B"],
   ["Replicate (mixtral-8x7b)", "ReplicateMixtral_8x7B"],
-  ["Google Gemini (requires API Key)", "GoogleGemini"],
 ];
 
 const ChatProvidersReact = chat_providers.map((x) => {
