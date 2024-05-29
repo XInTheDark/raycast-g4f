@@ -207,10 +207,6 @@
         {
           "title": "Replicate (mixtral-8x7b)",
           "value": "ReplicateMixtral_8x7B"
-        },
-        {
-          "title": "Google Gemini (requires API Key)",
-          "value": "GoogleGemini"
         }
       ],
       "default": "GPT35"
@@ -236,14 +232,6 @@
       "name": "TavilyAPIKeys",
       "title": "Tavily API Keys",
       "description": "Optional. Only used if Web Search is enabled. Multiple keys are supported - separate them with commas.",
-      "required": false,
-      "type": "password",
-      "default": ""
-    },
-    {
-      "name": "GeminiAPIKey",
-      "title": "Google Gemini API Key",
-      "description": "Optional. Only used if Gemini model is selected.",
       "required": false,
       "type": "password",
       "default": ""
@@ -291,7 +279,6 @@
     "@raycast/api": "^1.62.0",
     "@raycast/utils": "^1.9.0",
     "g4f": "^1.4.2",
-    "gemini-ai": "^1.1.0",
     "node-fetch-polyfill": "^2.0.6"
   },
   "devDependencies": {
