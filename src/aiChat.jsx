@@ -160,7 +160,7 @@ export default function Chat({ launchContext }) {
     await setCurrentChatData(chatData, setChatData, messageID, null, ""); // set response to empty string
 
     let currentChat = getChat(chatData.currentChat, chatData.chats);
-    const [provider, model, stream] = providers[currentChat.provider];
+    const providerInfo = providers[currentChat.provider];
     const useWebSearch = getPreferenceValues()["webSearch"];
 
     let elapsed = 0.001,
@@ -169,7 +169,7 @@ export default function Chat({ launchContext }) {
     let start = new Date().getTime();
     let response = "";
 
-    if (!stream) {
+    if (!providerInfo.stream) {
       response = await getChatResponse(currentChat, query);
       await setCurrentChatData(chatData, setChatData, messageID, null, response);
 
@@ -182,10 +182,10 @@ export default function Chat({ launchContext }) {
       generationStatus = { stop: false, loading: true };
       let i = 0;
 
-      for await (const chunk of await processChunks(r, provider, get_status)) {
+      for await (const chunk of await processChunks(r, providerInfo.provider, get_status)) {
         i++;
         response = chunk;
-        response = formatResponse(response, provider);
+        response = formatResponse(response, providerInfo.provider);
         await setCurrentChatData(chatData, setChatData, messageID, null, response);
 
         // Web Search functionality

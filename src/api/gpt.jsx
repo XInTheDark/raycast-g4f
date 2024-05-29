@@ -15,7 +15,7 @@ import {
 } from "@raycast/api";
 import { useEffect, useState } from "react";
 
-import { formatChatToGPT } from "./helper";
+import { formatChatToGPT, truncateChat } from "./helper";
 
 // G4F module
 import * as G4F from "g4f";
@@ -40,23 +40,23 @@ import { ReplicateProvider, getReplicateResponse } from "./Providers/replicate";
 import { GeminiProvider, getGoogleGeminiResponse } from "./Providers/google_gemini";
 
 // Providers
-// [Provider, Model, Stream]
+// {Provider, Model, Stream, Context window in tokens (for some providers only)}
 export const providers = {
-  GPT4: [g4f.providers.GPT, "gpt-4-32k", false],
-  GPT35: [NexraProvider, "chatgpt", true],
-  Bing: [g4f.providers.Bing, "gpt-4", true],
-  Ecosia: [EcosiaProvider, "gpt-3.5-turbo-0125", true],
-  DeepInfraWizardLM2_8x22B: [DeepInfraProvider, "microsoft/WizardLM-2-8x22B", true],
-  DeepInfraLlama3_8B: [DeepInfraProvider, "meta-llama/Meta-Llama-3-8B-Instruct", true],
-  DeepInfraLlama3_70B: [DeepInfraProvider, "meta-llama/Meta-Llama-3-70B-Instruct", true],
-  DeepInfraMixtral_8x22B: [DeepInfraProvider, "mistralai/Mixtral-8x22B-Instruct-v0.1", true],
-  DeepInfraDolphin26_8x7B: [DeepInfraProvider, "cognitivecomputations/dolphin-2.6-mixtral-8x7b", true],
-  Blackbox: [BlackboxProvider, "", true],
-  ReplicateLlama3_8B: [ReplicateProvider, "meta/meta-llama-3-8b-instruct", true],
-  ReplicateLlama3_70B: [ReplicateProvider, "meta/meta-llama-3-70b-instruct", true],
-  ReplicateMixtral_8x7B: [ReplicateProvider, "mistralai/mixtral-8x7b-instruct-v0.1", true],
-  GoogleGemini: [GeminiProvider, "", false],
-};
+  GPT4: {provider: g4f.providers.GPT, model: "gpt-4-32k", stream: false},
+  Nexra: {provider: NexraProvider, model: "chatgpt", stream: true},
+  Bing: {provider: g4f.providers.Bing, model: "gpt-4", stream: true},
+  Ecosia: {provider: EcosiaProvider, model: "gpt-3.5-turbo-0125", stream: true, context_chars: 14500},
+  DeepInfraWizardLM2_8x22B: {provider: DeepInfraProvider, model: "microsoft/WizardLM-2-8x22B", stream: true},
+  DeepInfraLlama3_8B: {provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3-8B-Instruct", stream: true},
+  DeepInfraLlama3_70B: {provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3-70B-Instruct", stream: true},
+  DeepInfraMixtral_8x22B: {provider: DeepInfraProvider, model: "mistralai/Mixtral-8x22B-Instruct-v0.1", stream: true},
+  DeepInfraDolphin26_8x7B: {provider: DeepInfraProvider, model: "cognitivecomputations/dolphin-2.6-mixtral-8x7b", stream: true},
+  Blackbox: {provider: BlackboxProvider, model: "", stream: true},
+  ReplicateLlama3_8B: {provider: ReplicateProvider, model: "meta/meta-llama-3-8b-instruct", stream: true},
+  ReplicateLlama3_70B: {provider: ReplicateProvider, model: "meta/meta-llama-3-70b-instruct", stream: true},
+  ReplicateMixtral_8x7B: {provider: ReplicateProvider, model: "mistralai/mixtral-8x7b-instruct-v0.1", stream: true},
+  GoogleGemini: {provider: GeminiProvider, model: "", stream: false},
+}
 
 // Additional options
 export const provider_options = (provider) => {
@@ -146,11 +146,11 @@ export default (
       // load provider and model from preferences
       const preferences = getPreferenceValues();
       const providerString = preferences["gptProvider"];
-      const [provider, model, stream] = providers[providerString];
+      const providerInfo = providers[providerString];
       const options = {
-        provider: provider,
-        model: model,
-        stream: stream,
+        provider: providerInfo.provider,
+        model: providerInfo.model,
+        stream: providerInfo.stream,
       };
 
       // generate response
@@ -158,7 +158,7 @@ export default (
       let elapsed, chars, charPerSec;
       let start = new Date().getTime();
 
-      if (!stream) {
+      if (!providerInfo.stream) {
         response = await chatCompletion(messages, options);
         setMarkdown(response);
 
@@ -170,9 +170,9 @@ export default (
         let loadingToast = await showToast(Toast.Style.Animated, "Response Loading");
         generationStatus.stop = false;
 
-        for await (const chunk of await processChunks(r, provider, get_status)) {
+        for await (const chunk of await processChunks(r, providerInfo.provider, get_status)) {
           response = chunk;
-          response = formatResponse(response, provider);
+          response = formatResponse(response, providerInfo.provider);
           setMarkdown(response);
 
           elapsed = (new Date().getTime() - start) / 1000;
@@ -404,20 +404,22 @@ export const chatCompletion = async (chat, options) => {
 
 // generate response using a chat context and a query (optional)
 export const getChatResponse = async (currentChat, query = null) => {
-  let chat = formatChatToGPT(currentChat, query);
-
   // load provider and model
   if (!currentChat.provider) currentChat.provider = defaultProvider();
   const providerString = currentChat.provider;
-  const [provider, model, stream] = providers[providerString];
+  const providerInfo = providers[providerString];
   let options = {
-    provider: provider,
-    model: model,
-    stream: stream,
+    provider: providerInfo.provider,
+    model: providerInfo.model,
+    stream: providerInfo.stream,
   };
 
   // additional options
-  options = { ...options, ...provider_options(provider) };
+  options = { ...options, ...provider_options(providerInfo.provider) };
+
+  // format chat
+  let chat = formatChatToGPT(currentChat, query);
+  chat = truncateChat(chat, providerInfo);
 
   // generate response
   return await chatCompletion(chat, options);
@@ -430,12 +432,12 @@ export const getChatResponseSync = async (currentChat, query = null) => {
     return r;
   }
 
-  const [provider, model, stream] = providers[currentChat.provider];
+  const providerInfo = providers[currentChat.provider];
   let response = "";
-  for await (const chunk of processChunks(r, provider)) {
+  for await (const chunk of processChunks(r, providerInfo.provider)) {
     response = chunk;
   }
-  response = formatResponse(response, currentChat.provider);
+  response = formatResponse(response, providerInfo.provider);
   return response;
 };
 

@@ -122,3 +122,48 @@ export const removeSuffix = (str, suffix) => {
   }
   return str;
 };
+
+// Estimate number of tokens in a string
+export const tokens_estimate = (str) => {
+  if (!str) return 0;
+  let chars = str.length;
+  let words = str.split(" ").length;
+  return Math.max(words * 4 / 3, chars / 4);
+}
+
+// Given a GPT-style chat array and a provider info, return the
+// longest chat array that fits within the context length
+export const truncateChat = (chat, providerInfo) => {
+  let contextChars = providerInfo?.context_chars || null, contextTokens = providerInfo?.context_tokens || null;
+  console.log("contextChars: " + contextChars + ", contextTokens: " + contextTokens);
+  if (!contextChars && !contextTokens) return chat; // undefined context length
+  let newChat = [];
+  let totalChars = 0, totalTokens = 0;
+  // start from end of chat to get most recent messages
+  for (let i = chat.length - 1; i >= 0; i--) {
+    let message = chat[i];
+    let chars = message.content.length, tokens = tokens_estimate(message.content);
+    if (contextChars && totalChars + chars > contextChars)
+    {console.log("truncated."); break;}
+    if (contextTokens && totalTokens + tokens > contextTokens)
+      break;
+
+    newChat.unshift(message); // add to start of array
+    totalChars += chars;
+    totalTokens += tokens;
+  }
+  for (const msg of newChat) {
+    // log role
+    console.log(msg.role);
+    // log 1st 50 characters of content
+    console.log(msg.content.substring(0, 50));
+  }
+  console.log("---")
+  for (const msg of chat) {
+    // log role
+    console.log(msg.role);
+    // log 1st 50 characters of content
+    console.log(msg.content.substring(0, 50));
+  }
+  return newChat;
+};
