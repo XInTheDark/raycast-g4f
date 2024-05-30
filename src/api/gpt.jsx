@@ -33,6 +33,9 @@ import { DeepInfraProvider, getDeepInfraResponse } from "./Providers/deepinfra";
 // Blackbox module
 import { BlackboxProvider, getBlackboxResponse } from "./Providers/blackbox";
 
+// You module
+import { YouProvider, getYouResponse } from "./Providers/you";
+
 // Replicate module
 import { ReplicateProvider, getReplicateResponse } from "./Providers/replicate";
 
@@ -49,6 +52,7 @@ export const providers = {
   DeepInfraMixtral_8x22B: [DeepInfraProvider, "mistralai/Mixtral-8x22B-Instruct-v0.1", true],
   DeepInfraDolphin26_8x7B: [DeepInfraProvider, "cognitivecomputations/dolphin-2.6-mixtral-8x7b", true],
   Blackbox: [BlackboxProvider, "", true],
+  You: [YouProvider, "gpt-3.5-turbo", true],
   ReplicateLlama3_8B: [ReplicateProvider, "meta/meta-llama-3-8b-instruct", true],
   ReplicateLlama3_70B: [ReplicateProvider, "meta/meta-llama-3-70b-instruct", true],
   ReplicateMixtral_8x7B: [ReplicateProvider, "mistralai/mixtral-8x7b-instruct-v0.1", true],
@@ -378,6 +382,9 @@ export const chatCompletion = async (chat, options) => {
   } else if (provider === BlackboxProvider) {
     // Blackbox
     response = await getBlackboxResponse(chat);
+  } else if (provider === YouProvider) {
+    // You
+    response = await getYouResponse(chat, options);
   } else if (provider === ReplicateProvider) {
     // Replicate
     response = await getReplicateResponse(chat, options);

@@ -38,6 +38,7 @@ const chat_providers = [
   ["DeepInfra (Mixtral-8x22B)", "DeepInfraMixtral_8x22B"],
   ["DeepInfra (Dolphin-2.6-8x7B)", "DeepInfraDolphin26_8x7B"],
   ["Blackbox (custom-model)", "Blackbox"],
+  ["You (gpt-3.5-turbo)", "You"],
   ["Replicate (meta-llama-3-8b)", "ReplicateLlama3_8B"],
   ["Replicate (meta-llama-3-70b)", "ReplicateLlama3_70B"],
   ["Replicate (mixtral-8x7b)", "ReplicateMixtral_8x7B"],

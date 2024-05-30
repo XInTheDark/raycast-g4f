@@ -197,6 +197,10 @@
           "value": "Blackbox"
         },
         {
+          "title": "You (gpt-3.5-turbo)",
+          "value": "You"
+        },
+        {
           "title": "Replicate (meta-llama-3-8b)",
           "value": "ReplicateLlama3_8B"
         },
