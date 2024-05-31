@@ -28,22 +28,22 @@ The extension, and its full set of commands, should then show up in your Raycast
 - 💪 Support for many providers & models (more info below!)
 
 ## Providers & Models
-| Provider      | Model                   | Streaming | Active | Speed     | Rating and remarks by extension author                                                        |
-|---------------|-------------------------|-----------|--------|-----------|-----------------------------------------------------------------------------------------------|
-| GPT           | gpt-3.5-turbo (default) |     ✅     |    ✅   | Fast      | 8/10, the most reliable and decently performing model but there are some stronger models.     |
-| GPT           | gpt-4                   |     ❌     |    ✅   | Medium    | 6/10, no streaming support but otherwise a great model.                                       |
-| Bing          | gpt-4                   |     ✅     |    ✅   | Slow      | 6/10, generation speed is likely quite slow but comes with built-in web search ability.       |
-| Ecosia        | gpt-3.5-turbo           |     ✅     |    ❓   | Very fast | ?/10                                                                                          |
-| DeepInfra     | WizardLM-2-8x22B        |     ✅     |    ✅   | Medium    | 8/10, very capable model for all purposes.                                                    |
-| DeepInfra     | meta-llama-3-8b         |     ✅     |    ✅   | Fast      | 6.5/10                                                                                        |
-| DeepInfra     | meta-llama-3-70b        |     ✅     |    ✅   | Medium    | 7.5/10                                                                                        |
-| DeepInfra     | Mixtral-8x22B           |     ✅     |    ✅   | Medium    | 7/10, slightly worse version than WizardLM-2                                                  |
-| DeepInfra     | Dolphin-2.6-8x7B        |     ✅     |    ✅   | Fast      | 5/10                                                                                          |
-| Blackbox      | custom model            |     ✅     |    ✅   | Very fast | 5/10, very fast generation but is only suitable for code related stuff                        |
-| Replicate     | meta-llama-3-8b         |     ✅     |    ❓   | Medium    | ?/10                                                                                          |
-| Replicate     | meta-llama-3-70b        |     ✅     |    ❓   | Medium    | ?/10                                                                                          |
-| Replicate     | mixtral-8x7b            |     ✅     |    ❓   | Medium    | ?/10                                                                                          |
-| Google Gemini | gemini-1.5-flash-latest |     ✅     |    ✅   | Very fast | 8.5/10, very good overall model but requires an API Key. (It's *free*, see the section below) |
+| Provider      | Model                   | Streaming | Status                                                     | Speed     | Rating and remarks by extension author                                                        |
+|---------------|-------------------------|-----------|------------------------------------------------------------|-----------|-----------------------------------------------------------------------------------------------|
+| GPT           | gpt-3.5-turbo (default) | ✅         | ![Active](https://img.shields.io/badge/Active-brightgreen) | Fast      | 8/10, the most reliable and decently performing model but there are some stronger models.     |
+| GPT           | gpt-4                   | ❌         | ![Active](https://img.shields.io/badge/Active-brightgreen) | Medium    | 6/10, no streaming support but otherwise a great model.                                       |
+| Bing          | gpt-4                   | ✅         | ![Active](https://img.shields.io/badge/Active-brightgreen) | Slow      | 6/10, generation speed is likely quite slow but comes with built-in web search ability.       |
+| Ecosia        | gpt-3.5-turbo           | ✅         | ![Unknown](https://img.shields.io/badge/Unknown-grey)      | Very fast | ?/10                                                                                          |
+| DeepInfra     | WizardLM-2-8x22B        | ✅         | ![Active](https://img.shields.io/badge/Active-brightgreen) | Medium    | 8/10, very capable model for all purposes.                                                    |
+| DeepInfra     | meta-llama-3-8b         | ✅         | ![Active](https://img.shields.io/badge/Active-brightgreen) | Fast      | 6.5/10                                                                                        |
+| DeepInfra     | meta-llama-3-70b        | ✅         | ![Active](https://img.shields.io/badge/Active-brightgreen) | Medium    | 7.5/10                                                                                        |
+| DeepInfra     | Mixtral-8x22B           | ✅         | ![Active](https://img.shields.io/badge/Active-brightgreen) | Medium    | 7/10, slightly worse version than WizardLM-2                                                  |
+| DeepInfra     | Dolphin-2.6-8x7B        | ✅         | ![Active](https://img.shields.io/badge/Active-brightgreen) | Fast      | 5/10                                                                                          |
+| Blackbox      | custom model            | ✅         | ![Active](https://img.shields.io/badge/Active-brightgreen) | Very fast | 5/10, very fast generation but is only suitable for code related stuff                        |
+| Replicate     | meta-llama-3-8b         | ✅         | ![Unknown](https://img.shields.io/badge/Unknown-grey)      | Medium    | ?/10                                                                                          |
+| Replicate     | meta-llama-3-70b        | ✅         | ![Unknown](https://img.shields.io/badge/Unknown-grey)      | Medium    | ?/10                                                                                          |
+| Replicate     | mixtral-8x7b            | ✅         | ![Unknown](https://img.shields.io/badge/Unknown-grey)      | Medium    | ?/10                                                                                          |
+| Google Gemini | gemini-1.5-flash-latest | ✅         | ![Active](https://img.shields.io/badge/Active-brightgreen) | Very fast | 8.5/10, very good overall model but requires an API Key. (It's *free*, see the section below) |
 
 ### Provider-specific notes
 - **Google Gemini**: An API Key is required to use this model. You can get one *completely for free*:
