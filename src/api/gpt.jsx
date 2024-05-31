@@ -36,6 +36,9 @@ import { BlackboxProvider, getBlackboxResponse } from "./Providers/blackbox";
 // Replicate module
 import { ReplicateProvider, getReplicateResponse } from "./Providers/replicate";
 
+// Google Gemini module
+import { GeminiProvider, getGoogleGeminiResponse } from "./Providers/google_gemini";
+
 // Providers
 // [Provider, Model, Stream]
 export const providers = {
@@ -52,6 +55,7 @@ export const providers = {
   ReplicateLlama3_8B: [ReplicateProvider, "meta/meta-llama-3-8b-instruct", true],
   ReplicateLlama3_70B: [ReplicateProvider, "meta/meta-llama-3-70b-instruct", true],
   ReplicateMixtral_8x7B: [ReplicateProvider, "mistralai/mixtral-8x7b-instruct-v0.1", true],
+  GoogleGemini: [GeminiProvider, "", false],
 };
 
 // Additional options
@@ -381,6 +385,9 @@ export const chatCompletion = async (chat, options) => {
   } else if (provider === ReplicateProvider) {
     // Replicate
     response = await getReplicateResponse(chat, options);
+  } else if (provider === GeminiProvider) {
+    // Google Gemini
+    response = await getGoogleGeminiResponse(chat);
   } else {
     // GPT
     response = await g4f.chatCompletion(chat, options);
