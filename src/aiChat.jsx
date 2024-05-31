@@ -18,7 +18,6 @@ import {
   formatResponse,
   getChatResponse,
   getChatResponseSync,
-  processChunks,
   providers,
 } from "./api/gpt";
 import { formatDate, formatChatToPrompt, formatChatToGPT } from "./api/helper";
