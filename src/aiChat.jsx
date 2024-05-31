@@ -13,14 +13,7 @@ import {
   useNavigation,
 } from "@raycast/api";
 import { useEffect, useState } from "react";
-import {
-  defaultProvider,
-  formatResponse,
-  getChatResponse,
-  getChatResponseSync,
-  processChunks,
-  providers,
-} from "./api/gpt";
+import { default_provider_string, formatResponse, getChatResponse, getChatResponseSync, providers } from "./api/gpt";
 import { formatDate, formatChatToPrompt, formatChatToGPT } from "./api/helper";
 
 // Web search module
@@ -41,6 +34,7 @@ const chat_providers = [
   ["Replicate (meta-llama-3-8b)", "ReplicateLlama3_8B"],
   ["Replicate (meta-llama-3-70b)", "ReplicateLlama3_70B"],
   ["Replicate (mixtral-8x7b)", "ReplicateMixtral_8x7B"],
+  ["Google Gemini (requires API Key)", "GoogleGemini"],
 ];
 
 const ChatProvidersReact = chat_providers.map((x) => {
@@ -72,7 +66,7 @@ export default function Chat({ launchContext }) {
     name = "New Chat",
     creationDate = new Date(),
     id = new Date().getTime().toString(), // toString() is important because Raycast expects a string for value
-    provider = defaultProvider(),
+    provider = default_provider_string(),
     systemPrompt = "",
     messages = [],
   }) => {
@@ -176,14 +170,13 @@ export default function Chat({ launchContext }) {
       chars = response.length;
       charPerSec = (chars / elapsed).toFixed(1);
     } else {
-      let r = await getChatResponse(currentChat, query);
       let loadingToast = await toast(Toast.Style.Animated, "Response Loading");
       generationStatus = { stop: false, loading: true };
       let i = 0;
 
-      for await (const chunk of await processChunks(r, provider, get_status)) {
+      const handler = async (new_message) => {
         i++;
-        response = chunk;
+        response = new_message;
         response = formatResponse(response, provider);
         await setCurrentChatData(chatData, setChatData, messageID, null, response);
 
@@ -205,7 +198,9 @@ export default function Chat({ launchContext }) {
         chars = response.length;
         charPerSec = (chars / elapsed).toFixed(1);
         loadingToast.message = `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`;
-      }
+      };
+
+      await getChatResponse(currentChat, query, handler, get_status);
     }
 
     // Web Search functionality
@@ -305,7 +300,7 @@ export default function Chat({ launchContext }) {
       >
         <Form.TextArea id="chatText" title="Chat Transcript" />
         <Form.Description title="GPT Model" text="The provider and model used for this chat." />
-        <Form.Dropdown id="provider" defaultValue={defaultProvider()}>
+        <Form.Dropdown id="provider" defaultValue={default_provider_string()}>
           {ChatProvidersReact}
         </Form.Dropdown>
       </Form>

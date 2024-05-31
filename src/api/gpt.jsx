@@ -36,6 +36,9 @@ import { BlackboxProvider, getBlackboxResponse } from "./Providers/blackbox";
 // Replicate module
 import { ReplicateProvider, getReplicateResponse } from "./Providers/replicate";
 
+// Google Gemini module
+import { GeminiProvider, getGoogleGeminiResponse } from "./Providers/google_gemini";
+
 // Providers
 // [Provider, Model, Stream]
 export const providers = {
@@ -52,6 +55,7 @@ export const providers = {
   ReplicateLlama3_8B: [ReplicateProvider, "meta/meta-llama-3-8b-instruct", true],
   ReplicateLlama3_70B: [ReplicateProvider, "meta/meta-llama-3-70b-instruct", true],
   ReplicateMixtral_8x7B: [ReplicateProvider, "mistralai/mixtral-8x7b-instruct-v0.1", true],
+  GoogleGemini: [GeminiProvider, "gemini-1.5-flash-latest", true],
 };
 
 // Additional options
@@ -64,7 +68,11 @@ export const provider_options = (provider) => {
   };
 };
 
-export const defaultProvider = () => {
+// Additional properties
+// providers that handle the stream update in a custom way (see chatCompletion function)
+const custom_stream_handled_providers = [GeminiProvider];
+
+export const default_provider_string = () => {
   return getPreferenceValues()["gptProvider"];
 };
 
@@ -162,12 +170,11 @@ export default (
         chars = response.length;
         charPerSec = (chars / elapsed).toFixed(1);
       } else {
-        let r = await chatCompletion(messages, options);
         let loadingToast = await showToast(Toast.Style.Animated, "Response Loading");
         generationStatus.stop = false;
 
-        for await (const chunk of await processChunks(r, provider, get_status)) {
-          response = chunk;
+        const handler = (new_message) => {
+          response = new_message;
           response = formatResponse(response, provider);
           setMarkdown(response);
 
@@ -175,7 +182,9 @@ export default (
           chars = response.length;
           charPerSec = (chars / elapsed).toFixed(1);
           loadingToast.message = `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`;
-        }
+        };
+
+        await chatCompletion(messages, options, handler, get_status);
       }
       setLastResponse(response);
 
@@ -362,10 +371,15 @@ export default (
 };
 
 // generate response using a chat context and options
-// returned response is ready for use directly
-export const chatCompletion = async (chat, options) => {
-  let response;
+// if stream_update is passed, we will call it with stream_update(new_message) every time a chunk is received
+// otherwise, this function returns an async generator (if stream = true) or a string (if stream = false)
+// if status is passed, we will stop generating when status() is true
+export const chatCompletion = async (chat, options, stream_update = null, status = null) => {
   const provider = options.provider;
+  // additional options
+  options = { ...options, ...provider_options(provider) };
+
+  let response;
   if (provider === NexraProvider) {
     // Nexra
     response = await getNexraResponse(chat, options);
@@ -381,26 +395,37 @@ export const chatCompletion = async (chat, options) => {
   } else if (provider === ReplicateProvider) {
     // Replicate
     response = await getReplicateResponse(chat, options);
+  } else if (provider === GeminiProvider) {
+    // Google Gemini
+    response = await getGoogleGeminiResponse(chat, options, stream_update);
   } else {
     // GPT
     response = await g4f.chatCompletion(chat, options);
   }
 
-  // format response
+  // stream = false
   if (typeof response === "string") {
     // will not be a string if stream is enabled
     response = formatResponse(response, provider);
+    return response;
   }
 
+  // streaming related handling
+  if (custom_stream_handled_providers.includes(provider)) return; // handled in the provider
+  if (stream_update) {
+    await processStream(response, provider, stream_update, status);
+    return;
+  }
   return response;
 };
 
 // generate response using a chat context and a query (optional)
-export const getChatResponse = async (currentChat, query = null) => {
+// see the documentation of chatCompletion for details on the other parameters
+export const getChatResponse = async (currentChat, query = null, stream_update = null, status = null) => {
   let chat = formatChatToGPT(currentChat, query);
 
   // load provider and model
-  if (!currentChat.provider) currentChat.provider = defaultProvider();
+  if (!currentChat.provider) currentChat.provider = default_provider_string();
   const providerString = currentChat.provider;
   const [provider, model, stream] = providers[providerString];
   let options = {
@@ -408,12 +433,11 @@ export const getChatResponse = async (currentChat, query = null) => {
     model: model,
     stream: stream,
   };
-
   // additional options
   options = { ...options, ...provider_options(provider) };
 
   // generate response
-  return await chatCompletion(chat, options);
+  return await chatCompletion(chat, options, stream_update, status);
 };
 
 // generate response using a chat context and a query, while forcing stream = false
@@ -507,5 +531,12 @@ export const processChunks = async function* (response, provider, status = null)
       r += chunk;
     }
     yield r;
+  }
+};
+
+// a simple stream handler. upon each chunk received, we call stream_update(new_message)
+export const processStream = async function (asyncGenerator, provider, stream_update = null, status = null) {
+  for await (const new_message of processChunks(asyncGenerator, provider, status)) {
+    stream_update(new_message);
   }
 };
