@@ -28,7 +28,7 @@ export const getDeepInfraResponse = async function* (chat, options, max_retries 
   let data = {
     model: model,
     messages: chat,
-    temperature: options.temperature || 0.7,
+    temperature: options.temperature ?? 0.7,
     max_tokens: model.includes("Meta-Llama-3") ? 1028 : null,
     stream: true,
     headers: headers,

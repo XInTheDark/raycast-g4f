@@ -69,6 +69,7 @@ export default function Chat({ launchContext }) {
     provider = default_provider_string(),
     systemPrompt = "",
     messages = [],
+    options = {},
   }) => {
     return {
       name: name,
@@ -77,6 +78,7 @@ export default function Chat({ launchContext }) {
       provider: provider,
       systemPrompt: systemPrompt,
       messages: messages?.length ? messages : starting_messages(systemPrompt, provider),
+      options: options,
     };
   };
 
@@ -403,6 +405,7 @@ export default function Chat({ launchContext }) {
                       name: values.chatName,
                       provider: values.provider,
                       systemPrompt: values.systemPrompt,
+                      options: { creativity: values.creativity },
                     });
                     newChatData.chats.push(newChat);
                     newChatData.currentChat = newChat.id;
@@ -429,12 +432,25 @@ export default function Chat({ launchContext }) {
             second: "2-digit",
           })}`}
         />
-        <Form.Description title="System Prompt" text="This prompt will be sent to GPT to start the conversation." />
-        <Form.TextArea id="systemPrompt" defaultValue="" />
         <Form.Description title="GPT Model" text="The provider and model used for this chat." />
         <Form.Dropdown id="provider" defaultValue={defaultProviderString}>
           {ChatProvidersReact}
         </Form.Dropdown>
+
+        <Form.Description
+          title="Creativity"
+          text="Technical tasks like coding require less creativity, while open-ended ones require more."
+        />
+        <Form.Dropdown id="creativity" defaultValue="0.7">
+          <Form.Dropdown.Item title="None" value="0.0" />
+          <Form.Dropdown.Item title="Low" value="0.3" />
+          <Form.Dropdown.Item title="Medium" value="0.5" />
+          <Form.Dropdown.Item title="High" value="0.7" />
+          <Form.Dropdown.Item title="Very High" value="1.0" />
+        </Form.Dropdown>
+
+        <Form.Description title="System Prompt" text="This prompt will be sent to GPT to start the conversation." />
+        <Form.TextArea id="systemPrompt" defaultValue="" />
       </Form>
     );
   };
@@ -615,28 +631,32 @@ export default function Chat({ launchContext }) {
 
   // Smart Chat Naming functionality
   const processSmartChatNaming = async (chatData, setChatData, currentChat) => {
-    // Special handling: don't include first message (system prompt)
-    let newChat = structuredClone(currentChat);
-    if (!newChat.messages[newChat.messages.length - 1].visible) {
-      newChat.messages.pop();
+    try {
+      // Special handling: don't include first message (system prompt)
+      let newChat = structuredClone(currentChat);
+      if (!newChat.messages[newChat.messages.length - 1].visible) {
+        newChat.messages.pop();
+      }
+
+      // Format chat using default wrapper
+      let formatted_chat = formatChatToPrompt(formatChatToGPT(newChat), null);
+      let newQuery =
+        "Below is a conversation between the user and the assistant. Give a concise name for this chat. " +
+        "Output ONLY the name of the chat (WITHOUT quotes) and NOTHING else.\n\n" +
+        formatted_chat;
+
+      let newChatName = await getChatResponseSync({ messages: [{ prompt: newQuery }], provider: currentChat.provider });
+      newChatName = newChatName.trim();
+
+      // Rename chat
+      setChatData((oldData) => {
+        let newChatData = structuredClone(oldData);
+        getChat(chatData.currentChat, newChatData.chats).name = newChatName;
+        return newChatData;
+      });
+    } catch (e) {
+      console.log("Smart Chat Naming failed: ", e);
     }
-
-    // Format chat using default wrapper
-    let formatted_chat = formatChatToPrompt(formatChatToGPT(newChat), null);
-    let newQuery =
-      "Below is a conversation between the user and the assistant. Give a concise name for this chat. " +
-      "Output ONLY the name of the chat (WITHOUT quotes) and NOTHING else.\n\n" +
-      formatted_chat;
-
-    let newChatName = await getChatResponseSync({ messages: [{ prompt: newQuery }], provider: currentChat.provider });
-    newChatName = newChatName.trim();
-
-    // Rename chat
-    setChatData((oldData) => {
-      let newChatData = structuredClone(oldData);
-      getChat(chatData.currentChat, newChatData.chats).name = newChatName;
-      return newChatData;
-    });
   };
 
   let GPTActionPanel = () => {
