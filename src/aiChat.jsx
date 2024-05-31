@@ -177,14 +177,13 @@ export default function Chat({ launchContext }) {
       chars = response.length;
       charPerSec = (chars / elapsed).toFixed(1);
     } else {
-      let r = await getChatResponse(currentChat, query);
       let loadingToast = await toast(Toast.Style.Animated, "Response Loading");
       generationStatus = { stop: false, loading: true };
       let i = 0;
 
-      for await (const chunk of await processChunks(r, provider, get_status)) {
+      const handler = async (new_message) => {
         i++;
-        response = chunk;
+        response = new_message;
         response = formatResponse(response, provider);
         await setCurrentChatData(chatData, setChatData, messageID, null, response);
 
@@ -206,7 +205,9 @@ export default function Chat({ launchContext }) {
         chars = response.length;
         charPerSec = (chars / elapsed).toFixed(1);
         loadingToast.message = `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`;
-      }
+      };
+
+      await getChatResponse(currentChat, query, handler, get_status);
     }
 
     // Web Search functionality
