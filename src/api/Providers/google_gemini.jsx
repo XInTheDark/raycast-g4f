@@ -4,34 +4,44 @@ import fetch from "node-fetch-polyfill";
 
 export const GeminiProvider = "GeminiProvider";
 
-export const getGoogleGeminiResponse = async (chat, options, stream_update, max_retries = 5) => {
-  const APIKey = getPreferenceValues()["GeminiAPIKey"];
-  const googleGemini = new Gemini(APIKey, { fetch: fetch });
+export const getGoogleGeminiResponse = async (chat, options, stream_update, max_retries = 2) => {
+  let APIKeysStr = getPreferenceValues()["GeminiAPIKeys"];
+  let APIKeys = APIKeysStr.split(",").map((x) => x.trim());
   let formattedChat = GeminiFormatChat(chat);
 
-  // Create chat
-  let query = chat[chat.length - 1].content;
-  const geminiChat = googleGemini.createChat({
-    model: options.model,
-    messages: formattedChat,
-    maxOutputTokens: 8192, // accurate as of 2024-05-31, for gemini-1.5-flash-latest
-    temperature: options.temperature || 0.7,
-  });
-
-  // Send message
   try {
-    let response = "";
-    if (stream_update) {
-      const handler = (chunk) => {
-        response += chunk;
-        stream_update(response);
-      };
-      await geminiChat.ask(query, { stream: handler });
-    } else {
-      response = await geminiChat.ask(query);
-      return response;
+    for (const APIKey of APIKeys) {
+      const googleGemini = new Gemini(APIKey, { fetch: fetch });
+
+      // Create chat
+      let query = chat[chat.length - 1].content;
+      const geminiChat = googleGemini.createChat({
+        model: options.model,
+        messages: formattedChat,
+        maxOutputTokens: 8192, // accurate as of 2024-05-31, for gemini-1.5-flash-latest
+        temperature: options.temperature || 0.7,
+      });
+
+      // Send message
+      try {
+        let response = "";
+        if (stream_update) {
+          const handler = (chunk) => {
+            response += chunk;
+            stream_update(response);
+          };
+          await geminiChat.ask(query, { stream: handler });
+          return;
+        } else {
+          response = await geminiChat.ask(query);
+          return response;
+        }
+      } catch (e) {
+        continue;
+      }
     }
   } catch (e) {
+    // if all API keys fail, we allow a few retries
     if (max_retries > 0) {
       console.log(e, "Retrying...");
       return await getGoogleGeminiResponse(chat, options, stream_update, max_retries - 1);

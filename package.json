@@ -241,9 +241,9 @@
       "default": ""
     },
     {
-      "name": "GeminiAPIKey",
-      "title": "Google Gemini API Key",
-      "description": "Optional. Only used if Gemini provider is selected.",
+      "name": "GeminiAPIKeys",
+      "title": "Google Gemini API Keys",
+      "description": "Optional. Only used if Gemini provider is selected. Multiple keys are supported - separate them with commas.",
       "required": false,
       "type": "password",
       "default": ""
