@@ -13,7 +13,7 @@ import {
   useNavigation,
 } from "@raycast/api";
 import { useEffect, useState } from "react";
-import { defaultProvider, formatResponse, getChatResponse, getChatResponseSync, providers } from "./api/gpt";
+import { default_provider_string, formatResponse, getChatResponse, getChatResponseSync, providers } from "./api/gpt";
 import { formatDate, formatChatToPrompt, formatChatToGPT } from "./api/helper";
 
 // Web search module
@@ -66,7 +66,7 @@ export default function Chat({ launchContext }) {
     name = "New Chat",
     creationDate = new Date(),
     id = new Date().getTime().toString(), // toString() is important because Raycast expects a string for value
-    provider = defaultProvider(),
+    provider = default_provider_string(),
     systemPrompt = "",
     messages = [],
   }) => {
@@ -300,7 +300,7 @@ export default function Chat({ launchContext }) {
       >
         <Form.TextArea id="chatText" title="Chat Transcript" />
         <Form.Description title="GPT Model" text="The provider and model used for this chat." />
-        <Form.Dropdown id="provider" defaultValue={defaultProvider()}>
+        <Form.Dropdown id="provider" defaultValue={default_provider_string()}>
           {ChatProvidersReact}
         </Form.Dropdown>
       </Form>

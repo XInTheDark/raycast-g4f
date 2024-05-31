@@ -72,7 +72,7 @@ export const provider_options = (provider) => {
 // providers that handle the stream update in a custom way (see chatCompletion function)
 const custom_stream_handled_providers = [GeminiProvider];
 
-export const defaultProvider = () => {
+export const default_provider_string = () => {
   return getPreferenceValues()["gptProvider"];
 };
 
@@ -375,8 +375,11 @@ export default (
 // otherwise, this function returns an async generator (if stream = true) or a string (if stream = false)
 // if status is passed, we will stop generating when status() is true
 export const chatCompletion = async (chat, options, stream_update = null, status = null) => {
-  let response;
   const provider = options.provider;
+  // additional options
+  options = { ...options, ...provider_options(provider) };
+
+  let response;
   if (provider === NexraProvider) {
     // Nexra
     response = await getNexraResponse(chat, options);
@@ -422,7 +425,7 @@ export const getChatResponse = async (currentChat, query = null, stream_update =
   let chat = formatChatToGPT(currentChat, query);
 
   // load provider and model
-  if (!currentChat.provider) currentChat.provider = defaultProvider();
+  if (!currentChat.provider) currentChat.provider = default_provider_string();
   const providerString = currentChat.provider;
   const [provider, model, stream] = providers[providerString];
   let options = {
@@ -430,7 +433,6 @@ export const getChatResponse = async (currentChat, query = null, stream_update =
     model: model,
     stream: stream,
   };
-
   // additional options
   options = { ...options, ...provider_options(provider) };
 
