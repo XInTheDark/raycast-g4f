@@ -30,7 +30,7 @@ The extension, and its full set of commands, should then show up in your Raycast
 ## Providers & Models
 | Provider      | Model                   | Streaming | Status                                                     | Speed     | Rating and remarks by extension author                                                        |
 |---------------|-------------------------|-----------|------------------------------------------------------------|-----------|-----------------------------------------------------------------------------------------------|
-| GPT           | gpt-3.5-turbo (default) | ✅         | ![Active](https://img.shields.io/badge/Active-brightgreen) | Fast      | 8/10, the most reliable and decently performing model but there are some stronger models.     |
+| GPT           | gpt-3.5-turbo (default) | ✅         | ![Active](https://img.shields.io/badge/Active-brightgreen) | Fast      | 7.5/10, the most reliable and decently performing model but there are some stronger models.   |
 | GPT           | gpt-4                   | ❌         | ![Active](https://img.shields.io/badge/Active-brightgreen) | Medium    | 6/10, no streaming support but otherwise a great model.                                       |
 | Bing          | gpt-4                   | ✅         | ![Active](https://img.shields.io/badge/Active-brightgreen) | Slow      | 6/10, generation speed is likely quite slow but comes with built-in web search ability.       |
 | Ecosia        | gpt-3.5-turbo           | ✅         | ![Unknown](https://img.shields.io/badge/Unknown-grey)      | Very fast | ?/10                                                                                          |
