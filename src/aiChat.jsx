@@ -13,13 +13,7 @@ import {
   useNavigation,
 } from "@raycast/api";
 import { useEffect, useState } from "react";
-import {
-  defaultProvider,
-  formatResponse,
-  getChatResponse,
-  getChatResponseSync,
-  providers,
-} from "./api/gpt";
+import { defaultProvider, formatResponse, getChatResponse, getChatResponseSync, providers } from "./api/gpt";
 import { formatDate, formatChatToPrompt, formatChatToGPT } from "./api/helper";
 
 // Web search module
