@@ -243,7 +243,7 @@
     {
       "name": "GeminiAPIKey",
       "title": "Google Gemini API Key",
-      "description": "Optional. Only used if Gemini model is selected.",
+      "description": "Optional. Only used if Gemini provider is selected.",
       "required": false,
       "type": "password",
       "default": ""

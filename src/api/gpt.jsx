@@ -55,7 +55,7 @@ export const providers = {
   ReplicateLlama3_8B: [ReplicateProvider, "meta/meta-llama-3-8b-instruct", true],
   ReplicateLlama3_70B: [ReplicateProvider, "meta/meta-llama-3-70b-instruct", true],
   ReplicateMixtral_8x7B: [ReplicateProvider, "mistralai/mixtral-8x7b-instruct-v0.1", true],
-  GoogleGemini: [GeminiProvider, "gemini-1.5-flash-latest", false],
+  GoogleGemini: [GeminiProvider, "gemini-1.5-flash-latest", true],
 };
 
 // Additional options
@@ -67,6 +67,10 @@ export const provider_options = (provider) => {
     temperature: temperature,
   };
 };
+
+// Additional properties
+// providers that handle the stream update in a custom way (see chatCompletion function)
+const custom_stream_handled_providers = [GeminiProvider];
 
 export const defaultProvider = () => {
   return getPreferenceValues()["gptProvider"];
@@ -390,23 +394,25 @@ export const chatCompletion = async (chat, options, stream_update = null, status
     response = await getReplicateResponse(chat, options);
   } else if (provider === GeminiProvider) {
     // Google Gemini
-    response = await getGoogleGeminiResponse(chat, options);
+    response = await getGoogleGeminiResponse(chat, options, stream_update);
   } else {
     // GPT
     response = await g4f.chatCompletion(chat, options);
   }
 
+  // stream = false
+  if (typeof response === "string") {
+    // will not be a string if stream is enabled
+    response = formatResponse(response, provider);
+    return response;
+  }
+
+  // streaming related handling
+  if (custom_stream_handled_providers.includes(provider)) return; // handled in the provider
   if (stream_update) {
     await processStream(response, provider, stream_update, status);
     return;
   }
-
-  // format response
-  if (typeof response === "string") {
-    // will not be a string if stream is enabled
-    response = formatResponse(response, provider);
-  }
-
   return response;
 };
 
