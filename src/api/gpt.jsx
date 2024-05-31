@@ -55,7 +55,7 @@ export const providers = {
   ReplicateLlama3_8B: [ReplicateProvider, "meta/meta-llama-3-8b-instruct", true],
   ReplicateLlama3_70B: [ReplicateProvider, "meta/meta-llama-3-70b-instruct", true],
   ReplicateMixtral_8x7B: [ReplicateProvider, "mistralai/mixtral-8x7b-instruct-v0.1", true],
-  GoogleGemini: [GeminiProvider, "", false],
+  GoogleGemini: [GeminiProvider, "gemini-1.5-flash-latest", false],
 };
 
 // Additional options
@@ -387,7 +387,7 @@ export const chatCompletion = async (chat, options) => {
     response = await getReplicateResponse(chat, options);
   } else if (provider === GeminiProvider) {
     // Google Gemini
-    response = await getGoogleGeminiResponse(chat);
+    response = await getGoogleGeminiResponse(chat, options);
   } else {
     // GPT
     response = await g4f.chatCompletion(chat, options);

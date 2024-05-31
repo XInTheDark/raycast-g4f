@@ -4,7 +4,7 @@ import fetch from "node-fetch-polyfill";
 
 export const GeminiProvider = "GeminiProvider";
 
-export const getGoogleGeminiResponse = async (chat) => {
+export const getGoogleGeminiResponse = async (chat, options) => {
   const APIKey = getPreferenceValues()["GeminiAPIKey"];
   const googleGemini = new Gemini(APIKey, { fetch: fetch });
   let formattedChat = GeminiFormatChat(chat);
@@ -12,8 +12,9 @@ export const getGoogleGeminiResponse = async (chat) => {
   // Send message
   let query = chat[chat.length - 1].content;
   const geminiChat = googleGemini.createChat({
-    model: "gemini-pro",
+    model: options.model,
     messages: formattedChat,
+    maxOutputTokens: 8192, // accurate as of 2024-05-31, for gemini-1.5-flash-latest
   });
   let response = await geminiChat.ask(query);
   return response;
