@@ -1,5 +1,5 @@
 export const NexraProvider = "NexraProvider";
-import fetch from "node-fetch-polyfill";
+import fetch from "node-fetch";
 
 import { removePrefix } from "../helper";
 
@@ -25,14 +25,10 @@ export const getNexraResponse = async function* (chat, options, max_retries = 5)
       body: JSON.stringify(data),
     });
 
-    const reader = response.body.getReader();
-    let decoder = new TextDecoder();
+    const reader = response.body;
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      let chunkStr = decoder.decode(value);
+    for await (let chunk of reader) {
+      let chunkStr = chunk.toString();
       if (!chunkStr) continue;
 
       // special fix because "\^^" is somehow added at the end of the chunk

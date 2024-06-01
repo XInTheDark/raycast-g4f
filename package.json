@@ -292,8 +292,7 @@
     "@raycast/utils": "^1.9.0",
     "g4f": "^1.4.2",
     "gemini-ai": "^2.1.0",
-    "node-fetch": "^3.3.2",
-    "node-fetch-polyfill": "^2.0.6"
+    "node-fetch": "^3.3.2"
   },
   "devDependencies": {
     "@raycast/eslint-config": "1.0.5",

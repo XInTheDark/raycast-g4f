@@ -1,5 +1,5 @@
 export const BlackboxProvider = "BlackboxProvider";
-import fetch from "node-fetch-polyfill";
+import fetch from "node-fetch";
 import { randomBytes, randomUUID } from "crypto";
 
 // Implementation ported from gpt4free Blackbox provider.
@@ -57,13 +57,10 @@ export const getBlackboxResponse = async function* (chat, max_retries = 5) {
       body: JSON.stringify(data),
     });
 
-    let reader = response.body.getReader();
-    let decoder = new TextDecoder();
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
+    const reader = response.body;
+    for await (let chunk of reader) {
+      chunk = chunk.toString();
 
-      let chunk = decoder.decode(value);
       if (chunk) {
         yield chunk;
       }
