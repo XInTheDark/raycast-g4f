@@ -1,5 +1,5 @@
 export const ReplicateProvider = "ReplicateProvider";
-import fetch from "node-fetch-polyfill";
+import fetch from "node-fetch";
 import { formatChatToPrompt } from "../helper";
 
 // Implementation ported from gpt4free Replicate provider.
@@ -45,15 +45,11 @@ export const getReplicateResponse = async function* (chat, options, max_retries 
       headers: new_headers,
     });
 
-    const reader = streamResponse.body.getReader();
-    let decoder = new TextDecoder();
+    const reader = streamResponse.body;
     // eslint-disable-next-line no-constant-condition
     let curr_event = "";
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      let str = decoder.decode(value);
+    for await (let chunk of reader) {
+      let str = chunk.toString();
 
       // iterate through each line
       // implementation ported from gpt4free.

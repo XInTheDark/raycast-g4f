@@ -1,6 +1,6 @@
 import Gemini from "gemini-ai";
 import { getPreferenceValues } from "@raycast/api";
-import fetch from "node-fetch-polyfill";
+import fetch from "node-fetch";
 
 export const GeminiProvider = "GeminiProvider";
 

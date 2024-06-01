@@ -1,5 +1,5 @@
 import { getPreferenceValues, Toast, showToast } from "@raycast/api";
-import fetch from "node-fetch-polyfill";
+import fetch from "node-fetch";
 
 export const webToken = "<|web_search|>",
   webTokenEnd = "<|end_web_search|>";
