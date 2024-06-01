@@ -1,5 +1,5 @@
 export const EcosiaProvider = "EcosiaProvider";
-import fetch from "node-fetch-polyfill";
+import fetch from "node-fetch";
 
 const api_url = "https://api.ecosia.org/v2/chat/?sp=productivity";
 const headers = {
@@ -27,14 +27,10 @@ export const getEcosiaResponse = async function* (chat, options, max_retries = 5
       headers: headers,
       body: JSON.stringify(data),
     });
-    let reader = response.body.getReader();
-    let decoder = new TextDecoder();
+    const reader = response.body;
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      let chunk = decoder.decode(value);
+    for await (let chunk of reader) {
+      chunk = chunk.toString();
       if (chunk) yield chunk;
     }
   } catch (e) {
