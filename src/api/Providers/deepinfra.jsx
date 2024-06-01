@@ -48,7 +48,6 @@ export const getDeepInfraResponse = async function* (chat, options, max_retries 
     for await (let chunk of reader) {
       const str = chunk.toString();
 
-      // let str = decoder.decode(value);
       let lines = str.split("\n");
       for (let i = 0; i < lines.length; i++) {
         let line = lines[i];
