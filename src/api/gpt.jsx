@@ -59,13 +59,20 @@ export const providers = {
 };
 
 // Additional options
-export const provider_options = (provider) => {
-  let useWebSearch = getPreferenceValues()["webSearch"];
-  let temperature = useWebSearch ? 0.5 : 0.7;
+export const provider_options = (provider, chatOptions = null) => {
+  let options = {};
+  if (chatOptions?.creativity) {
+    let temperature = parseFloat(chatOptions.creativity);
+    if (temperature >= 0.6 && getPreferenceValues()["webSearch"]) {
+      temperature -= 0.2; // reduce temperature if web search is enabled
 
-  return {
-    temperature: temperature,
-  };
+      // note that in the future when we implement web search in more places, all this logic needs to be replaced
+      // with a more reliable detection mechanism as to whether we are actually using web search.
+    }
+    temperature = Math.max(0.0, temperature).toFixed(1);
+    options.temperature = temperature;
+  }
+  return options;
 };
 
 // Additional properties
@@ -151,11 +158,13 @@ export default (
       const preferences = getPreferenceValues();
       const providerString = preferences["gptProvider"];
       const [provider, model, stream] = providers[providerString];
-      const options = {
+      let options = {
         provider: provider,
         model: model,
         stream: stream,
       };
+      // additional options
+      options = { ...options, ...provider_options(provider) };
 
       // generate response
       let response = "";
@@ -434,7 +443,7 @@ export const getChatResponse = async (currentChat, query = null, stream_update =
     stream: stream,
   };
   // additional options
-  options = { ...options, ...provider_options(provider) };
+  options = { ...options, ...provider_options(provider, currentChat.options) };
 
   // generate response
   return await chatCompletion(chat, options, stream_update, status);
