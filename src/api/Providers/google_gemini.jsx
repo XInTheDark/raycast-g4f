@@ -4,6 +4,14 @@ import fetch from "node-fetch";
 
 export const GeminiProvider = "GeminiProvider";
 
+// By default, we set the most lenient safety settings
+const safetySettings = {
+  hate: Gemini.SafetyThreshold.BLOCK_NONE,
+  sexual: Gemini.SafetyThreshold.BLOCK_NONE,
+  harassment: Gemini.SafetyThreshold.BLOCK_NONE,
+  dangerous: Gemini.SafetyThreshold.BLOCK_NONE,
+};
+
 export const getGoogleGeminiResponse = async (chat, options, stream_update, max_retries = 3) => {
   let APIKeysStr = getPreferenceValues()["GeminiAPIKeys"];
   let APIKeys = APIKeysStr.split(",").map((x) => x.trim());
@@ -30,10 +38,10 @@ export const getGoogleGeminiResponse = async (chat, options, stream_update, max_
             response += chunk;
             stream_update(response);
           };
-          await geminiChat.ask(query, { stream: handler });
+          await geminiChat.ask(query, { stream: handler, safetySettings: safetySettings });
           return;
         } else {
-          response = await geminiChat.ask(query);
+          response = await geminiChat.ask(query, { safetySettings: safetySettings });
           return response;
         }
       } catch (e) {
