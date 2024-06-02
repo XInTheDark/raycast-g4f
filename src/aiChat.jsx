@@ -499,6 +499,7 @@ export default function Chat({ launchContext }) {
             <Action.SubmitForm
               title="Send to GPT"
               onSubmit={async (values) => {
+                setSearchText("");
                 pop();
                 await sendToGPT(values);
               }}
@@ -506,7 +507,7 @@ export default function Chat({ launchContext }) {
           </ActionPanel>
         }
       >
-        <Form.TextArea id="message" title="Message" />
+        <Form.TextArea id="message" title="Message" defaultValue={searchText} />
       </Form>
     );
   };
