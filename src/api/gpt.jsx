@@ -494,6 +494,10 @@ export const formatResponse = (response, provider = null) => {
     // replace only once
     // example: remove $@$v=v1.13$@$ or $@$v=undefined%@$
     response = response.replace(/\$@\$v=.{1,10}\$@\$/, "");
+
+    // remove sources
+    // remove the chunk of text starting with $~~~$[ and ending with ]$~~~$
+    response = response.replace(/\$~~~\$\[.*]\$~~~\$/, "");
   }
 
   return response;
