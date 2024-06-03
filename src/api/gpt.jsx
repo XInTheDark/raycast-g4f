@@ -24,9 +24,6 @@ const g4f = new G4F.G4F();
 // Nexra module
 import { NexraProvider, getNexraResponse } from "./Providers/nexra";
 
-// Ecosia module
-import { EcosiaProvider, getEcosiaResponse } from "./Providers/ecosia";
-
 // DeepInfra module
 import { DeepInfraProvider, getDeepInfraResponse } from "./Providers/deepinfra";
 
@@ -45,7 +42,6 @@ export const providers = {
   GPT4: [g4f.providers.GPT, "gpt-4-32k", false],
   GPT35: [NexraProvider, "chatgpt", true],
   Bing: [g4f.providers.Bing, "gpt-4", true],
-  Ecosia: [EcosiaProvider, "gpt-3.5-turbo-0125", true],
   DeepInfraWizardLM2_8x22B: [DeepInfraProvider, "microsoft/WizardLM-2-8x22B", true],
   DeepInfraLlama3_8B: [DeepInfraProvider, "meta-llama/Meta-Llama-3-8B-Instruct", true],
   DeepInfraLlama3_70B: [DeepInfraProvider, "meta-llama/Meta-Llama-3-70B-Instruct", true],
@@ -392,9 +388,6 @@ export const chatCompletion = async (chat, options, stream_update = null, status
   if (provider === NexraProvider) {
     // Nexra
     response = await getNexraResponse(chat, options);
-  } else if (provider === EcosiaProvider) {
-    // Ecosia
-    response = await getEcosiaResponse(chat, options);
   } else if (provider === DeepInfraProvider) {
     // DeepInfra
     response = await getDeepInfraResponse(chat, options);
