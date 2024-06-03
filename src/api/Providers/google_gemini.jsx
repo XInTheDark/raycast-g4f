@@ -1,4 +1,4 @@
-import Gemini from "gemini-ai";
+import Gemini from "@jmuzhen/gemini-g4f-beta";
 import { getPreferenceValues } from "@raycast/api";
 import fetch from "node-fetch";
 
@@ -30,15 +30,22 @@ export const getGoogleGeminiResponse = async (chat, options, stream_update, max_
         temperature: options.temperature ?? 0.7,
       });
 
-      // Send message
       try {
         let response = "";
         if (stream_update) {
+          // Set timeout - if the API does not respond in time, we throw an error
+          // note that this only applies to the FIRST stream chunk, the rest of the stream is not affected
+          const abortController = new AbortController();
+          const timeout = setTimeout(() => {
+            abortController.abort();
+          }, 3000);
+
           const handler = (chunk) => {
             response += chunk;
             stream_update(response);
+            clearTimeout(timeout);
           };
-          await geminiChat.ask(query, { stream: handler, safetySettings: safetySettings });
+          await geminiChat.ask(query, { stream: handler, safetySettings: safetySettings }, abortController.signal);
           return;
         } else {
           response = await geminiChat.ask(query, { safetySettings: safetySettings });
