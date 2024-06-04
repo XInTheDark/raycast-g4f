@@ -18,8 +18,8 @@ import { useEffect, useState } from "react";
 import { formatChatToGPT } from "./helper";
 
 // G4F module
-import * as G4F from "g4f";
-const g4f = new G4F.G4F();
+import { G4F } from "g4f";
+const g4f = new G4F();
 
 // Nexra module
 import { NexraProvider, getNexraResponse } from "./Providers/nexra";
