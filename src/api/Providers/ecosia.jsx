@@ -9,7 +9,7 @@ const headers = {
   origin: "https://www.ecosia.org",
   referer: "https://www.ecosia.org/",
   "user-agent":
-    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36",
+    "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0.3 Mobile/15E148 Safari/604.1 RDDocuments/8.7.2.978",
 };
 
 export const getEcosiaResponse = async function* (chat, options, max_retries = 5) {

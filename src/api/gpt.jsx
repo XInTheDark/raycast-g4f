@@ -24,14 +24,14 @@ const g4f = new G4F.G4F();
 // Nexra module
 import { NexraProvider, getNexraResponse } from "./Providers/nexra";
 
-// Ecosia module
-import { EcosiaProvider, getEcosiaResponse } from "./Providers/ecosia";
-
 // DeepInfra module
 import { DeepInfraProvider, getDeepInfraResponse } from "./Providers/deepinfra";
 
 // Blackbox module
 import { BlackboxProvider, getBlackboxResponse } from "./Providers/blackbox";
+
+// Ecosia module
+import { EcosiaProvider, getEcosiaResponse } from "./Providers/ecosia";
 
 // Replicate module
 import { ReplicateProvider, getReplicateResponse } from "./Providers/replicate";
@@ -45,13 +45,13 @@ export const providers = {
   GPT4: [g4f.providers.GPT, "gpt-4-32k", false],
   GPT35: [NexraProvider, "chatgpt", true],
   Bing: [g4f.providers.Bing, "gpt-4", true],
-  Ecosia: [EcosiaProvider, "gpt-3.5-turbo-0125", true],
   DeepInfraWizardLM2_8x22B: [DeepInfraProvider, "microsoft/WizardLM-2-8x22B", true],
   DeepInfraLlama3_8B: [DeepInfraProvider, "meta-llama/Meta-Llama-3-8B-Instruct", true],
   DeepInfraLlama3_70B: [DeepInfraProvider, "meta-llama/Meta-Llama-3-70B-Instruct", true],
   DeepInfraMixtral_8x22B: [DeepInfraProvider, "mistralai/Mixtral-8x22B-Instruct-v0.1", true],
   DeepInfraDolphin26_8x7B: [DeepInfraProvider, "cognitivecomputations/dolphin-2.6-mixtral-8x7b", true],
   Blackbox: [BlackboxProvider, "", true],
+  Ecosia: [EcosiaProvider, "gpt-3.5-turbo-0125", true],
   ReplicateLlama3_8B: [ReplicateProvider, "meta/meta-llama-3-8b-instruct", true],
   ReplicateLlama3_70B: [ReplicateProvider, "meta/meta-llama-3-70b-instruct", true],
   ReplicateMixtral_8x7B: [ReplicateProvider, "mistralai/mixtral-8x7b-instruct-v0.1", true],
@@ -392,15 +392,15 @@ export const chatCompletion = async (chat, options, stream_update = null, status
   if (provider === NexraProvider) {
     // Nexra
     response = await getNexraResponse(chat, options);
-  } else if (provider === EcosiaProvider) {
-    // Ecosia
-    response = await getEcosiaResponse(chat, options);
   } else if (provider === DeepInfraProvider) {
     // DeepInfra
     response = await getDeepInfraResponse(chat, options);
   } else if (provider === BlackboxProvider) {
     // Blackbox
     response = await getBlackboxResponse(chat);
+  } else if (provider === EcosiaProvider) {
+    // Ecosia
+    response = await getEcosiaResponse(chat, options);
   } else if (provider === ReplicateProvider) {
     // Replicate
     response = await getReplicateResponse(chat, options);
