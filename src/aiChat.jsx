@@ -13,7 +13,13 @@ import {
   useNavigation,
 } from "@raycast/api";
 import { useEffect, useState } from "react";
-import { default_provider_string, formatResponse, getChatResponse, getChatResponseSync, providers } from "./api/gpt";
+import {
+  default_provider_string,
+  formatResponse,
+  getChatResponse,
+  getChatResponseSync,
+  providers_info,
+} from "./api/gpt";
 import { formatDate, formatChatToPrompt, formatChatToGPT } from "./api/helper";
 
 // Web search module
@@ -145,7 +151,7 @@ export default function Chat({ launchContext }) {
     await setCurrentChatData(chatData, setChatData, messageID, null, ""); // set response to empty string
 
     let currentChat = getChat(chatData.currentChat, chatData.chats);
-    const [provider, model, stream] = providers[currentChat.provider];
+    const info = providers_info[currentChat.provider];
     const useWebSearch = getPreferenceValues()["webSearch"];
 
     let elapsed = 0.001,
@@ -154,7 +160,7 @@ export default function Chat({ launchContext }) {
     let start = new Date().getTime();
     let response = "";
 
-    if (!stream) {
+    if (!info.stream) {
       response = await getChatResponse(currentChat, query);
       await setCurrentChatData(chatData, setChatData, messageID, null, response);
 
@@ -169,7 +175,7 @@ export default function Chat({ launchContext }) {
       const handler = async (new_message) => {
         i++;
         response = new_message;
-        response = formatResponse(response, provider);
+        response = formatResponse(response, info.provider);
         await setCurrentChatData(chatData, setChatData, messageID, null, response);
 
         // Web Search functionality

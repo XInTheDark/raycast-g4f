@@ -18,8 +18,8 @@ import { useEffect, useState } from "react";
 import { formatChatToGPT } from "./helper";
 
 // G4F module
-import * as G4F from "g4f";
-const g4f = new G4F.G4F();
+import { G4F } from "g4f";
+const g4f = new G4F();
 
 // Nexra module
 import { NexraProvider, getNexraResponse } from "./Providers/nexra";
@@ -36,22 +36,23 @@ import { ReplicateProvider, getReplicateResponse } from "./Providers/replicate";
 // Google Gemini module
 import { GeminiProvider, getGoogleGeminiResponse } from "./Providers/google_gemini";
 
-// Providers
-// [Provider, Model, Stream]
-export const providers = {
-  GPT4: [g4f.providers.GPT, "gpt-4-32k", false],
-  GPT35: [NexraProvider, "chatgpt", true],
-  Bing: [g4f.providers.Bing, "gpt-4", true],
-  DeepInfraWizardLM2_8x22B: [DeepInfraProvider, "microsoft/WizardLM-2-8x22B", true],
-  DeepInfraLlama3_8B: [DeepInfraProvider, "meta-llama/Meta-Llama-3-8B-Instruct", true],
-  DeepInfraLlama3_70B: [DeepInfraProvider, "meta-llama/Meta-Llama-3-70B-Instruct", true],
-  DeepInfraMixtral_8x22B: [DeepInfraProvider, "mistralai/Mixtral-8x22B-Instruct-v0.1", true],
-  DeepInfraDolphin26_8x7B: [DeepInfraProvider, "cognitivecomputations/dolphin-2.6-mixtral-8x7b", true],
-  Blackbox: [BlackboxProvider, "", true],
-  ReplicateLlama3_8B: [ReplicateProvider, "meta/meta-llama-3-8b-instruct", true],
-  ReplicateLlama3_70B: [ReplicateProvider, "meta/meta-llama-3-70b-instruct", true],
-  ReplicateMixtral_8x7B: [ReplicateProvider, "mistralai/mixtral-8x7b-instruct-v0.1", true],
-  GoogleGemini: [GeminiProvider, "gemini-1.5-flash-latest", true],
+// All providers info
+// {Provider, Model, Stream}
+// prettier-ignore
+export const providers_info = {
+  GPT35: { provider: NexraProvider, model: "chatgpt", stream: true },
+  GPT4: { provider: g4f.providers.GPT, model: "gpt-4-32k", stream: false },
+  Bing: { provider: g4f.providers.Bing, model: "gpt-4", stream: true },
+  DeepInfraWizardLM2_8x22B: { provider: DeepInfraProvider, model: "microsoft/WizardLM-2-8x22B", stream: true },
+  DeepInfraLlama3_8B: { provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3-8B-Instruct", stream: true },
+  DeepInfraLlama3_70B: { provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3-70B-Instruct", stream: true },
+  DeepInfraMixtral_8x22B: { provider: DeepInfraProvider, model: "mistralai/Mixtral-8x22B-Instruct-v0.1", stream: true },
+  DeepInfraDolphin26_8x7B: { provider: DeepInfraProvider, model: "cognitivecomputations/dolphin-2.6-mixtral-8x7b", stream: true, },
+  Blackbox: { provider: BlackboxProvider, model: "", stream: true },
+  ReplicateLlama3_8B: { provider: ReplicateProvider, model: "meta/meta-llama-3-8b-instruct", stream: true },
+  ReplicateLlama3_70B: { provider: ReplicateProvider, model: "meta/meta-llama-3-70b-instruct", stream: true },
+  ReplicateMixtral_8x7B: { provider: ReplicateProvider, model: "mistralai/mixtral-8x7b-instruct-v0.1", stream: true },
+  GoogleGemini: { provider: GeminiProvider, model: "gemini-1.5-flash-latest", stream: true },
 };
 
 // Additional options
@@ -77,6 +78,11 @@ const custom_stream_handled_providers = [GeminiProvider];
 
 export const default_provider_string = () => {
   return getPreferenceValues()["gptProvider"];
+};
+
+export const get_provider_string = (provider) => {
+  if (provider) return provider;
+  return default_provider_string();
 };
 
 let generationStatus = { stop: false };
@@ -151,23 +157,16 @@ export default (
       console.log(query);
       const messages = [{ role: "user", content: query }];
       // load provider and model from preferences
-      const preferences = getPreferenceValues();
-      const providerString = preferences["gptProvider"];
-      const [provider, model, stream] = providers[providerString];
-      let options = {
-        provider: provider,
-        model: model,
-        stream: stream,
-      };
+      const info = providers_info[default_provider_string()];
       // additional options
-      options = { ...options, ...provider_options(provider) };
+      let options = { ...info, ...provider_options(info.provider) };
 
       // generate response
       let response = "";
       let elapsed, chars, charPerSec;
       let start = new Date().getTime();
 
-      if (!stream) {
+      if (!info.stream) {
         response = await chatCompletion(messages, options);
         setMarkdown(response);
 
@@ -180,7 +179,7 @@ export default (
 
         const handler = (new_message) => {
           response = new_message;
-          response = formatResponse(response, provider);
+          response = formatResponse(response, info.provider);
           setMarkdown(response);
 
           elapsed = (new Date().getTime() - start) / 1000;
@@ -427,16 +426,9 @@ export const getChatResponse = async (currentChat, query = null, stream_update =
   let chat = formatChatToGPT(currentChat, query);
 
   // load provider and model
-  if (!currentChat.provider) currentChat.provider = default_provider_string();
-  const providerString = currentChat.provider;
-  const [provider, model, stream] = providers[providerString];
-  let options = {
-    provider: provider,
-    model: model,
-    stream: stream,
-  };
+  const info = providers_info[get_provider_string(currentChat.provider)];
   // additional options
-  options = { ...options, ...provider_options(provider, currentChat.options) };
+  let options = { ...info, ...provider_options(info.provider, currentChat.options) };
 
   // generate response
   return await chatCompletion(chat, options, stream_update, status);
@@ -449,12 +441,12 @@ export const getChatResponseSync = async (currentChat, query = null) => {
     return r;
   }
 
-  const [provider, model, stream] = providers[currentChat.provider];
+  const info = providers_info[get_provider_string(currentChat.provider)];
   let response = "";
-  for await (const chunk of processChunks(r, provider)) {
+  for await (const chunk of processChunks(r, info.provider)) {
     response = chunk;
   }
-  response = formatResponse(response, currentChat.provider);
+  response = formatResponse(response, info.provider);
   return response;
 };
 
@@ -541,7 +533,7 @@ export const processChunks = async function* (response, provider, status = null)
 };
 
 // a simple stream handler. upon each chunk received, we call stream_update(new_message)
-export const processStream = async function (asyncGenerator, provider, stream_update = null, status = null) {
+export const processStream = async function (asyncGenerator, provider, stream_update, status = null) {
   for await (const new_message of processChunks(asyncGenerator, provider, status)) {
     stream_update(new_message);
   }
