@@ -169,10 +169,6 @@
           "value": "Bing"
         },
         {
-          "title": "Ecosia (gpt-3.5-turbo)",
-          "value": "Ecosia"
-        },
-        {
           "title": "DeepInfra (WizardLM-2-8x22B)",
           "value": "DeepInfraWizardLM2_8x22B"
         },
@@ -195,6 +191,10 @@
         {
           "title": "Blackbox (custom-model)",
           "value": "Blackbox"
+        },
+        {
+          "title": "Ecosia (gpt-3.5-turbo)",
+          "value": "Ecosia"
         },
         {
           "title": "Replicate (meta-llama-3-8b)",
