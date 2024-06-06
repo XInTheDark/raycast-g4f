@@ -193,6 +193,10 @@
           "value": "Blackbox"
         },
         {
+          "title": "Ecosia (gpt-3.5-turbo)",
+          "value": "Ecosia"
+        },
+        {
           "title": "Replicate (meta-llama-3-8b)",
           "value": "ReplicateLlama3_8B"
         },

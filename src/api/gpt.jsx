@@ -30,6 +30,9 @@ import { DeepInfraProvider, getDeepInfraResponse } from "./Providers/deepinfra";
 // Blackbox module
 import { BlackboxProvider, getBlackboxResponse } from "./Providers/blackbox";
 
+// Ecosia module
+import { EcosiaProvider, getEcosiaResponse } from "./Providers/ecosia";
+
 // Replicate module
 import { ReplicateProvider, getReplicateResponse } from "./Providers/replicate";
 
@@ -49,6 +52,7 @@ export const providers_info = {
   DeepInfraMixtral_8x22B: { provider: DeepInfraProvider, model: "mistralai/Mixtral-8x22B-Instruct-v0.1", stream: true },
   DeepInfraDolphin26_8x7B: { provider: DeepInfraProvider, model: "cognitivecomputations/dolphin-2.6-mixtral-8x7b", stream: true, },
   Blackbox: { provider: BlackboxProvider, model: "", stream: true },
+  Ecosia: { provider: EcosiaProvider, model: "gpt-3.5-turbo-0125", stream: true },
   ReplicateLlama3_8B: { provider: ReplicateProvider, model: "meta/meta-llama-3-8b-instruct", stream: true },
   ReplicateLlama3_70B: { provider: ReplicateProvider, model: "meta/meta-llama-3-70b-instruct", stream: true },
   ReplicateMixtral_8x7B: { provider: ReplicateProvider, model: "mistralai/mixtral-8x7b-instruct-v0.1", stream: true },
@@ -393,6 +397,9 @@ export const chatCompletion = async (chat, options, stream_update = null, status
   } else if (provider === BlackboxProvider) {
     // Blackbox
     response = await getBlackboxResponse(chat);
+  } else if (provider === EcosiaProvider) {
+    // Ecosia
+    response = await getEcosiaResponse(chat, options);
   } else if (provider === ReplicateProvider) {
     // Replicate
     response = await getReplicateResponse(chat, options);
