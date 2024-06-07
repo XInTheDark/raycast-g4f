@@ -50,6 +50,8 @@ const ChatProvidersReact = chat_providers.map((x) => {
 let generationStatus = { stop: false, loading: false };
 let get_status = () => generationStatus.stop;
 
+let lastLocalStorageUpdate = 0;
+
 export default function Chat({ launchContext }) {
   let toast = async (style, title, message) => {
     return await showToast({
@@ -991,9 +993,13 @@ export default function Chat({ launchContext }) {
 
   useEffect(() => {
     if (chatData) {
-      (async () => {
-        await LocalStorage.setItem("chatData", JSON.stringify(chatData));
-      })();
+      const time = new Date().getTime();
+      if (time - lastLocalStorageUpdate > 500) {
+        lastLocalStorageUpdate = time;
+        (async () => {
+          await LocalStorage.setItem("chatData", JSON.stringify(chatData));
+        })();
+      }
     }
   }, [chatData]);
 
