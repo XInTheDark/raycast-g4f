@@ -19,11 +19,6 @@ import { formatDate } from "./api/helper";
 
 const g4f = new G4F.G4F();
 
-export const _NegativePrompt =
-  "low quality, normal quality, bad quality, disfigured, bad, ugly, poorly drawn face," +
-  " extra limb, missing limb, floating limbs, disconnected limbs, malformed limbs, oversaturated, duplicate," +
-  " low-res, blurry, out of focus, out of frame, extra, missing";
-
 // Image Providers
 export const image_providers = {
   Prodia: [
@@ -31,19 +26,17 @@ export const image_providers = {
     {
       // list of available models: https://rentry.co/b6i53fnm
       model: "neverendingDream_v122.safetensors [f964ceeb]",
-      cfgScale: 10,
-      negativePrompt: _NegativePrompt,
-      samplingMethod: "Heun",
+      cfgScale: 20,
+      samplingMethod: "DPM++ 2M Karras",
     },
   ],
   ProdiaStableDiffusion: [
     g4f.providers.ProdiaStableDiffusion,
     {
       // list of available models: https://rentry.co/pfwmx6y5
-      model: "ICantBelieveItsNotPhotography_seco.safetensors [4e7a3dfd]",
-      cfgScale: 10,
-      negativePrompt: _NegativePrompt,
-      samplingMethod: "Heun",
+      model: "neverendingDream_v122.safetensors [f964ceeb]",
+      cfgScale: 7,
+      samplingMethod: "DPM++ 2M Karras",
     },
   ],
   ProdiaStableDiffusionXL: [
@@ -53,9 +46,8 @@ export const image_providers = {
       model: "dreamshaperXL10_alpha2.safetensors [c8afe2ef]",
       height: 1024,
       width: 1024,
-      cfgScale: 10,
-      negativePrompt: _NegativePrompt,
-      samplingMethod: "Heun",
+      cfgScale: 7,
+      samplingMethod: "DPM++ 2M Karras",
     },
   ],
   Dalle: [g4f.providers.Dalle, {}],
@@ -112,6 +104,7 @@ export default function genImage() {
                       creationDate: new Date(),
                       provider: values.provider,
                       imageQuality: values.imageQuality,
+                      negativePrompt: values.negativePrompt,
                       messages: [],
                     });
                     newChatData.currentChat = values.chatName;
@@ -149,6 +142,9 @@ export default function genImage() {
           <Form.Dropdown.Item title="High" value="High" />
           <Form.Dropdown.Item title="Extreme" value="Extreme" />
         </Form.Dropdown>
+
+        <Form.Description title="Negative Prompt" text="Words that you don't want to show up in your images." />
+        <Form.TextArea id="negativePrompt" defaultValue="" />
       </Form>
     );
   };
@@ -596,7 +592,8 @@ export default function genImage() {
 export const loadImageOptions = (currentChat) => {
   // load provider and options
   const providerString = currentChat.provider,
-    imageQuality = currentChat.imageQuality;
+    imageQuality = currentChat.imageQuality,
+    negativePrompt = currentChat.negativePrompt;
   const [provider, providerOptions] = image_providers[providerString];
 
   // image quality and creativity settings are handled separately
@@ -606,6 +603,8 @@ export const loadImageOptions = (currentChat) => {
   } else if (provider === g4f.providers.ProdiaStableDiffusion || provider === g4f.providers.ProdiaStableDiffusionXL) {
     providerOptions.samplingSteps = imageQuality === "Medium" ? 20 : imageQuality === "High" ? 25 : 30;
   }
+
+  if (negativePrompt) providerOptions.negativePrompt = negativePrompt;
 
   if (providerOptions)
     return {
