@@ -668,7 +668,9 @@ export default function Chat({ launchContext }) {
     }
   };
 
-  let GPTActionPanel = () => {
+  let GPTActionPanel = (props) => {
+    const idx = props.idx || 0;
+
     return (
       <ActionPanel>
         <Action
@@ -690,6 +692,23 @@ export default function Chat({ launchContext }) {
               shortcut={{ modifiers: ["cmd", "shift", "opt"], key: "/" }}
             />
           )}
+          <Action
+            icon={Icon.Clipboard}
+            title="Copy Response"
+            onAction={async () => {
+              let chat = getChat(chatData.currentChat);
+
+              if (chat.messages.length === 0) {
+                await toast(Toast.Style.Failure, "No Messages in Chat");
+                return;
+              }
+
+              let response = chat.messages[idx].answer;
+              await Clipboard.copy(response);
+              await toast(Toast.Style.Success, "Response Copied");
+            }}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
+          />
           <Action
             icon={Icon.ArrowClockwise}
             title="Regenerate Last Message"
@@ -744,7 +763,7 @@ export default function Chat({ launchContext }) {
           />
           <Action
             icon={Icon.Trash}
-            title="Delete Last Message"
+            title="Delete Message"
             onAction={async () => {
               await confirmAlert({
                 title: "Are you sure?",
@@ -761,8 +780,8 @@ export default function Chat({ launchContext }) {
                       return;
                     }
 
-                    // delete index 0
-                    chat.messages.shift();
+                    // delete index idx
+                    chat.messages.splice(idx, 1);
                     setChatData((oldData) => {
                       let newChatData = structuredClone(oldData);
                       getChat(chatData.currentChat, newChatData.chats).messages = chat.messages;
