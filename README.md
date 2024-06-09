@@ -75,6 +75,19 @@ Let GPT automatically come up with a name for the current chat session after you
 
 ---
 
+## FAQs
+
+### Why is this extension not on the official Raycast store?
+- I submitted it when the extension was in its early stages, but since Raycast is quite conservative about adding AI extensions, it was rejected because of concerns over the use of third-party APIs. I think this is a valid concern, and I'd like to be very transparent about where your data is going to, so I'll be writing all the details in the project homepage really soon. But do rest assured that I use safe APIs from legitimate websites; I also update the extension very frequently so all the providers I use will be up-to-date.
+- Thus, the extension will have to be installed from source. Regarding this, I apologize as it's indeed more complicated than downloading it from the store. I have tried my best to make the installation process quick and streamlined - please do provide feedback on whether it was simple enough!
+
+### How does this extension compare to the paid Raycast AI? 
+- The biggest difference is probably the chat GUI. Because the developer API that Raycast provides is limited, it's not possible to replicate the Raycast AI interface exactly. The GUI used in my extension is really intuitive however, and it's also used by a lot of AI extensions on raycast.
+- Regarding the models available, and the AI quality: Raycast AI definitely has more model options - after all, money talks ;) But please rest assured that the quality of AI responses in my extension is by no means subpar! Some models available are gpt-3.5-turbo, gpt-4 (authentic!), Google Gemini, as well as large & capable open-source models like Llama3-70B and Mixtral-8x22B. If you still doubt it, I'd encourage you to the extension a try! :-) 
+
+
+---
+
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=XInTheDark/raycast-g4f&type=Date)](https://star-history.com/#XInTheDark/raycast-g4f&Date)
