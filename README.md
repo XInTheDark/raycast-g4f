@@ -73,6 +73,12 @@ This should be enough for most users, but similarly you can also create multiple
 Let GPT automatically come up with a name for the current chat session after you send the first message. For example, this is similar to what the ChatGPT web UI does.
 - **How to enable**: Go to the extension preferences and check the "Enable Smart Chat Naming" box.
 
+---
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=XInTheDark/raycast-g4f&type=Date)](https://star-history.com/#XInTheDark/raycast-g4f&Date)
+
 ## License & Acknowledgements
 License: GPLv3. Full license is found in LICENSE.txt.
 
