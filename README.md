@@ -32,7 +32,7 @@ The extension, and its full set of commands, should then show up in your Raycast
 |---------------|-------------------------|-----------|------------------------------------------------------------|-----------|-----------------------------------------------------------------------------------------------|
 | GPT           | gpt-3.5-turbo (default) | ✅         | ![Active](https://img.shields.io/badge/Active-brightgreen) | Fast      | 7.5/10, the most reliable and decently performing model but there are some stronger models.   |
 | GPT           | gpt-4                   | ❌         | ![Active](https://img.shields.io/badge/Active-brightgreen) | Medium    | 6/10, no streaming support but otherwise a great model.                                       |
-| Bing          | gpt-4                   | ✅         | ![Active](https://img.shields.io/badge/Active-brightgreen) | Slow      | 6/10, generation speed is likely quite slow but comes with built-in web search ability.       |
+| Bing          | gpt-4                   | ✅         | ![Unknown](https://img.shields.io/badge/Unknown-grey)      | Slow      | 6/10, generation speed is likely quite slow but comes with built-in web search ability.       |
 | DeepInfra     | WizardLM-2-8x22B        | ✅         | ![Active](https://img.shields.io/badge/Active-brightgreen) | Fast      | 8/10, very capable model for all purposes.                                                    |
 | DeepInfra     | meta-llama-3-8b         | ✅         | ![Active](https://img.shields.io/badge/Active-brightgreen) | Very fast | 7/10                                                                                          |
 | DeepInfra     | meta-llama-3-70b        | ✅         | ![Active](https://img.shields.io/badge/Active-brightgreen) | Medium    | 7.5/10                                                                                        |
@@ -40,9 +40,9 @@ The extension, and its full set of commands, should then show up in your Raycast
 | DeepInfra     | Dolphin-2.6-8x7B        | ✅         | ![Active](https://img.shields.io/badge/Active-brightgreen) | Fast      | 5/10                                                                                          |
 | Blackbox      | custom model            | ✅         | ![Active](https://img.shields.io/badge/Active-brightgreen) | Very fast | 6.5/10, very fast generation with built-in web search ability, but is optimized for coding.   |
 | Ecosia        | gpt-3.5-turbo           | ✅         | ![Active](https://img.shields.io/badge/Active-brightgreen) | Very fast | 7.5/10, near instant responses with a recent model.                                           |
-| Replicate     | meta-llama-3-8b         | ✅         | ![Unknown](https://img.shields.io/badge/Unknown-grey)      | Fast      | ?/10                                                                                          |
+| Replicate     | meta-llama-3-8b         | ✅         | ![Active](https://img.shields.io/badge/Active-brightgreen) | Fast      | ?/10                                                                                          |
 | Replicate     | meta-llama-3-70b        | ✅         | ![Unknown](https://img.shields.io/badge/Unknown-grey)      | Medium    | ?/10                                                                                          |
-| Replicate     | mixtral-8x7b            | ✅         | ![Unknown](https://img.shields.io/badge/Unknown-grey)      | Medium    | ?/10                                                                                          |
+| Replicate     | mixtral-8x7b            | ✅         | ![Active](https://img.shields.io/badge/Active-brightgreen) | Medium    | ?/10                                                                                          |
 | Google Gemini | gemini-1.5-flash-latest | ✅         | ![Active](https://img.shields.io/badge/Active-brightgreen) | Very fast | 8.5/10, very good overall model but requires an API Key. (It's *free*, see the section below) |
 
 ### Provider-specific notes
