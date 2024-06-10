@@ -17,6 +17,7 @@ import {
 import { useEffect, useState } from "react";
 
 import { formatChatToGPT } from "./helper";
+import { help_action } from "./helpPage";
 
 // G4F module
 import { G4F } from "g4f";
@@ -371,6 +372,7 @@ export default (
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "r" }}
           />
+          {help_action()}
         </ActionPanel>
       }
       isLoading={isLoading}
