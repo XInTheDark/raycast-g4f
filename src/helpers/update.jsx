@@ -1,6 +1,8 @@
 import { version } from "../../package.json";
 import fetch from "node-fetch";
 import { exec } from "node:child_process";
+import { environment } from "@raycast/api";
+import fs from "fs";
 
 // Some notes:
 // 1. The update function asserts that each release is versioned in the form "vX.Y" or "vX.Y.Z",
@@ -15,7 +17,6 @@ export const get_version = () => {
 export const fetch_github_latest_version = async function () {
   const response = await fetch(LATEST_VER_URL, { method: "GET" });
   const data = await response.json();
-  console.log(data);
   const tag_name = data.tag_name;
   // we also return the data so we don't have to fetch it again when installing
   return parse_version_from_github(tag_name)
@@ -32,7 +33,9 @@ export const is_up_to_date = (current, latest) => {
 export const download_and_install_update = async (setMarkdown) => {
   // execute the update script
   let has_error = false;
-  exec("sh ../scripts/update.sh", (error, stdout, stderr) => {
+  let dirPath = environment.supportPath;
+  read_update_sh(dirPath);
+  exec("sh update.sh",  {cwd: dirPath}, (error, stdout, stderr) => {
     if (error) {
       setMarkdown((prev) => `${prev}\n\n# Update failed: ${error}`);
       has_error = true;
@@ -48,4 +51,13 @@ export const download_and_install_update = async (setMarkdown) => {
   if (has_error) {
     throw new Error("Update failed");
   }
+}
+
+
+const read_update_sh = (dir) => {
+  // read the update script and place a copy of it in the support directory
+  // so that it can be executed
+  const path = "../scripts/update.sh";
+  const update_sh = fs.readFileSync(path, "utf8");
+  fs.writeFileSync(`${dir}/update.sh`, update_sh);
 }
