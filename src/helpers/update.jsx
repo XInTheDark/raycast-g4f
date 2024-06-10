@@ -38,14 +38,14 @@ export const download_and_install_update = async (setMarkdown) => {
   read_update_sh(dirPath);
   exec("sh update.sh",  {cwd: dirPath}, (error, stdout, stderr) => {
     if (error) {
-      setMarkdown((prev) => `${prev}\n\n# Update failed: ${error}`);
+      setMarkdown((prev) => `${prev}\n\n# Update failed!\nError: ${error}`);
       has_error = true;
     }
     if (stderr) {
-      setMarkdown((prev) => `${prev}\n\n## Error: ${stderr}`);
+      setMarkdown((prev) => `${prev}\n\n## Error log: \n${stderr}`);
     }
     if (stdout) {
-      setMarkdown((prev) => `${prev}\n\nLog: ${stdout}`);
+      setMarkdown((prev) => `${prev}\n\n## Log:\n${stdout}`);
     }
   });
 

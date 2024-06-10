@@ -19,7 +19,7 @@ export default function CheckForUpdates(props) {
   let version = get_version();
   let default_markdown = `## Current raycast-g4f version: ${version}`;
   let [markdown, setMarkdown] = useState(default_markdown);
-  showToast(Toast.Style.Loading, "Checking for updates...");
+  showToast(Toast.Style.Animated, "Checking for updates...");
 
   // get latest version from github
 
