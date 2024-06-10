@@ -25,14 +25,13 @@ export default function CheckForUpdates(props) {
 
   useEffect(() => {
     (async () => {
-      const response = await fetch_github_latest_version();
-      const latest_version = response.version;
+      const latest_version = await fetch_github_latest_version().version;
       setMarkdown((prev) => `${prev}\n\n## Latest raycast-g4f version: ${latest_version}`);
 
       if (is_up_to_date(version, latest_version)) {
-        setMarkdown((prev) => `${prev}\n\nraycast-g4f is up to date!`);
+        setMarkdown((prev) => `${prev}\n\n# raycast-g4f is up to date!`);
       } else {
-        setMarkdown((prev) => `${prev}\n\nUpdate available!`);
+        setMarkdown((prev) => `${prev}\n\n## Update available!`);
         await confirmAlert({
           title: `Update available: version ${latest_version}`,
           message: "Would you like to update now?",
@@ -42,7 +41,8 @@ export default function CheckForUpdates(props) {
             onAction: async () => {
               showToast(Toast.Style.Loading, "Downloading update...");
               try {
-                await download_and_install_update(response.data);
+                await download_and_install_update(setMarkdown);
+                setMarkdown((prev) => `${prev}\n\n# Update successful!`);
               } catch (e) {
                 setMarkdown(
                   (prev) =>
@@ -52,7 +52,6 @@ export default function CheckForUpdates(props) {
                 return;
               }
 
-              setMarkdown((prev) => `${prev}\n\n# Update successful!`);
               showToast(Toast.Style.Success, "Update successful!");
             },
           },
