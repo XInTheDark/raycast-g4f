@@ -2,6 +2,7 @@ import {
   Action,
   ActionPanel,
   confirmAlert,
+  Clipboard,
   environment,
   Form,
   Grid,
@@ -195,12 +196,14 @@ export default function genImage() {
     );
   };
 
-  let ImageActionPanel = () => {
+  let ImageActionPanel = (props) => {
+    const idx = props.idx || 0;
+
     return (
       <ActionPanel>
         <Action
           icon={Icon.Message}
-          title="Send to GPT"
+          title="Generate Image"
           onAction={() => {
             if (searchText === "") {
               toast(Toast.Style.Failure, "Please Enter a Prompt");
@@ -297,29 +300,32 @@ export default function genImage() {
             icon={Icon.Folder}
             title="Show in Finder"
             onAction={async () => {
-              let found = false;
-              for (const message of getChat(chatData.currentChat).messages) {
-                const path = message.answer;
-                if (path) {
-                  try {
-                    await showInFinder(path);
-                    found = true;
-                    break;
-                  } catch (e) {
-                    continue;
-                  }
-                }
-              }
-
-              if (!found) {
-                await toast(Toast.Style.Failure, "Image Chat is empty");
+              const messages = getChat(chatData.currentChat).messages;
+              const message = messages[idx];
+              const path = message.answer;
+              try {
+                await showInFinder(path);
+              } catch (e) {
+                await toast(Toast.Style.Failure, "Image Not Found");
               }
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "enter" }}
           />
           <Action
+            icon={Icon.Clipboard}
+            title="Copy Image Path"
+            onAction={async () => {
+              const messages = getChat(chatData.currentChat).messages;
+              const message = messages[idx];
+              const path = message.answer;
+              await Clipboard.copy(path);
+              await toast(Toast.Style.Success, "Image Path Copied");
+            }}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
+          />
+          <Action
             icon={Icon.Trash}
-            title="Delete Last Image"
+            title="Delete Image"
             onAction={async () => {
               await confirmAlert({
                 title: "Are you sure?",
@@ -337,12 +343,11 @@ export default function genImage() {
                     }
 
                     // delete image file
-                    // also delete the image file
-                    const imagePath = chat.messages[0].answer;
+                    const imagePath = chat.messages[idx].answer;
                     fs.rmSync(imagePath);
 
-                    // delete index 0
-                    chat.messages.shift();
+                    // delete index idx
+                    chat.messages.splice(idx, 1);
                     setChatData((oldData) => {
                       let newChatData = structuredClone(oldData);
                       getChat(chatData.currentChat, newChatData.chats).messages = chat.messages;
@@ -489,7 +494,7 @@ export default function genImage() {
                         onAction: () => {
                           // Delete all image chat folders
                           const folderPath = environment.supportPath + "/g4f-image-chats";
-                          fs.rm(folderPath, { recursive: true }, (err) => {
+                          fs.rm(folderPath, { recursive: true }, () => {
                             return null;
                           });
                           setChatData(default_chat_data());
