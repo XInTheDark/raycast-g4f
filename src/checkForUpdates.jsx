@@ -25,7 +25,7 @@ export default function CheckForUpdates(props) {
 
   useEffect(() => {
     (async () => {
-      const latest_version = await fetch_github_latest_version().version;
+      const latest_version = await fetch_github_latest_version();
       setMarkdown((prev) => `${prev}\n\n## Latest raycast-g4f version: ${latest_version}`);
 
       if (is_up_to_date(version, latest_version)) {
