@@ -146,6 +146,13 @@
       "icon": "image-icon.png",
       "description": "Generate images from a text prompt",
       "mode": "view"
+    },
+    {
+      "name": "customAICommands",
+      "title": "Custom AI Commands",
+      "icon": "screen-icon.png",
+      "description": "Run and manage custom AI commands",
+      "mode": "view"
     }
   ],
   "preferences": [
