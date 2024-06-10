@@ -5,10 +5,7 @@ then
     exit
 fi
 
-#/usr/local/bin/npm -v
-
-echo "env:"
-env
+export PATH="/usr/local/bin:$PATH"  # important to use npm executable
 
 # Check that npm is installed, else warn using stderr and exit
 NPM="npm"
@@ -34,11 +31,10 @@ fi
 
 REPO_PATH=https://github.com/XInTheDark/raycast-g4f
 
-# cd to root of project
-cd "$(dirname "$0")/../.." || exit 1
-
-# remove source_code folder if already exists
+# cd to source_code folder, replacing it if already exists
 rm -rf ./source_code
+mkdir ./source_code
+cd ./source_code || exit 1
 
 echo "Downloading from GitHub..."
 
