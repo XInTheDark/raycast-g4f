@@ -34,6 +34,7 @@ export const download_and_install_update = async (setMarkdown) => {
   // execute the update script
   let has_error = false;
   let dirPath = environment.supportPath;
+  console.log("support path: " + dirPath);
   read_update_sh(dirPath);
   exec("sh update.sh",  {cwd: dirPath}, (error, stdout, stderr) => {
     if (error) {
@@ -55,9 +56,11 @@ export const download_and_install_update = async (setMarkdown) => {
 
 
 const read_update_sh = (dir) => {
-  // read the update script and place a copy of it in the support directory
-  // so that it can be executed
-  const path = "../scripts/update.sh";
+  if (!dir) {
+    throw new Error("Directory not found");
+  }
+  // place a copy of the update script in the support directory so that it can be executed
+  const path = environment.assetsPath + "/scripts/update.sh";
   const update_sh = fs.readFileSync(path, "utf8");
   fs.writeFileSync(`${dir}/update.sh`, update_sh);
 }
