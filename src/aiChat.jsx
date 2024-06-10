@@ -743,8 +743,6 @@ export default function Chat({ launchContext }) {
                 }
               }
 
-              await toast(Toast.Style.Animated, "Regenerating Last Message");
-
               chat.messages[0].answer = "";
               chat.messages[0].finished = false;
               updateCurrentChat(chatData, setChatData, chat);
