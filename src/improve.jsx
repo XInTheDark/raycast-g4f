@@ -7,6 +7,7 @@ export default function Improve(props) {
 Strictly follow these rules:
 - Correct spelling, grammar, and punctuation errors in the given text
 - Enhance clarity and conciseness without altering the original meaning
+- Use the same language as the original text
 - Divide lengthy sentences into shorter, more readable ones
 - Eliminate unnecessary repetition while preserving important points
 - Prioritize active voice over passive voice for a more engaging tone
