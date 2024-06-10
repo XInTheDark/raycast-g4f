@@ -14,7 +14,6 @@ export default function CustomAICommands({ launchContext }) {
 
   useEffect(() => {
     (async () => {
-      console.log("Setting custom commands", commands);
       await setCustomCommands(commands);
     })();
   }, [commands]);
