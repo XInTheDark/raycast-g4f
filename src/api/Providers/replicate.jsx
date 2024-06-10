@@ -1,6 +1,6 @@
 export const ReplicateProvider = "ReplicateProvider";
 import fetch from "node-fetch";
-import { formatChatToPrompt } from "../helper";
+import { formatChatToPrompt } from "../../helpers/helper";
 
 // Implementation ported from gpt4free Replicate provider.
 

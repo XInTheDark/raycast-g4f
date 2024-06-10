@@ -20,8 +20,8 @@ import {
   getChatResponseSync,
   providers_info,
 } from "./api/gpt";
-import { formatDate, formatChatToPrompt, formatChatToGPT } from "./api/helper";
-import { help_action, help_action_panel } from "./api/helpPage";
+import { formatDate, formatChatToPrompt, formatChatToGPT } from "./helpers/helper";
+import { help_action, help_action_panel } from "./helpers/helpPage";
 
 // Web search module
 import { getWebResult } from "./api/web";

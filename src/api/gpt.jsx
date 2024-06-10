@@ -16,8 +16,8 @@ import {
 } from "@raycast/api";
 import { useEffect, useState } from "react";
 
-import { formatChatToGPT } from "./helper";
-import { help_action } from "./helpPage";
+import { formatChatToGPT } from "../helpers/helper";
+import { help_action } from "../helpers/helpPage";
 
 // G4F module
 import { G4F } from "g4f";

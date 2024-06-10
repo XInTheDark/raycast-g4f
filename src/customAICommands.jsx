@@ -2,7 +2,7 @@ import { CustomCommand, getCustomCommands, setCustomCommands } from "./api/custo
 import { useEffect, useState } from "react";
 import { Form, List, Action, ActionPanel, Icon, useNavigation, confirmAlert } from "@raycast/api";
 import useGPT from "./api/gpt";
-import { help_action } from "./api/helpPage";
+import { help_action } from "./helpers/helpPage";
 
 export default function CustomAICommands() {
   let [commands, setCommands] = useState(null);
