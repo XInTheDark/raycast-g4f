@@ -104,7 +104,7 @@ export default (
     forceShowForm = false,
     otherReactComponents = [],
     processPrompt = null,
-  }
+  } = {}
 ) => {
   // The parameters are documented here:
   // 1. props: We mostly use this parameter for the query value, which is obtained using props.arguments.query.
@@ -131,15 +131,14 @@ export default (
   // because the user needs to select the target language in the form.
   // 8. otherReactComponents: An array of additional React components to be shown in the Form.
   // For example, `Translate` command has a dropdown to select the target language.
-  // 9. processPrompt: A function to be called when the Form is submitted, to get the final prompt. The usage is
-  // processPrompt(context, query, selected, otherReactComponents.values)
-  // Hence, the otherReactComponents parameter MUST always be supplied when using processPrompt.
+  // 9. processPrompt: A function to be called to get the final prompt. The usage is
+  // processPrompt(context, query, selected, otherReactComponents.values - if any).
 
   const Pages = {
     Form: 0,
     Detail: 1,
   };
-  let { query: argQuery } = props.arguments;
+  let { query: argQuery } = props.arguments ?? {};
   if (!argQuery) argQuery = props.fallbackText ?? "";
 
   const [page, setPage] = useState(Pages.Detail);
@@ -149,7 +148,12 @@ export default (
   const [lastQuery, setLastQuery] = useState("");
   const [lastResponse, setLastResponse] = useState("");
 
-  const getResponse = async (query) => {
+  const getResponse = async (query, { regenerate = false } = {}) => {
+    // handle processPrompt
+    if (!regenerate && processPrompt) {
+      query = processPrompt(context, query, selectedState);
+    }
+
     setLastQuery(query);
     setPage(Pages.Detail);
 
@@ -363,7 +367,7 @@ export default (
                 }
               }
 
-              await getResponse(lastQuery);
+              await getResponse(lastQuery, { regenerate: true });
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "r" }}
           />
@@ -386,6 +390,7 @@ export default (
               if (processPrompt) {
                 // custom function
                 prompt = processPrompt(context, values.query, selectedState, values);
+                processPrompt = null; // only call once
               } else if (useSelected && selectedState) {
                 prompt = `${systemPrompt}\n\n${selectedState}`;
               } else {
