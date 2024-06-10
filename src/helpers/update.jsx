@@ -1,6 +1,6 @@
 import { version } from "../../package.json";
 import fetch from "node-fetch";
-import { exec } from "node:child_process";
+import { exec } from "child_process";
 import { environment } from "@raycast/api";
 import fs from "fs";
 
@@ -35,6 +35,7 @@ export const download_and_install_update = async (setMarkdown) => {
   let has_error = false;
   let dirPath = environment.supportPath;
   console.log("support path: " + dirPath);
+  console.log("env: " + process.env);
   read_update_sh(dirPath);
   exec("sh update.sh",  {cwd: dirPath}, (error, stdout, stderr) => {
     if (error) {

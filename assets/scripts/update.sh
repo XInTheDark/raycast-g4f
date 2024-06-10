@@ -5,6 +5,11 @@ then
     exit
 fi
 
+#/usr/local/bin/npm -v
+
+echo "env:"
+env
+
 # Check that npm is installed, else warn using stderr and exit
 NPM="npm"
 
