@@ -21,6 +21,7 @@ import {
   providers_info,
 } from "./api/gpt";
 import { formatDate, formatChatToPrompt, formatChatToGPT } from "./api/helper";
+import { help_action, help_action_panel } from "./api/helpPage";
 
 // Web search module
 import { getWebResult } from "./api/web";
@@ -944,6 +945,7 @@ export default function Chat({ launchContext }) {
             style={Action.Style.Destructive}
           />
         </ActionPanel.Section>
+        {help_action("aiChat")}
       </ActionPanel>
     );
   };
@@ -1030,7 +1032,7 @@ export default function Chat({ launchContext }) {
 
   return chatData === null ? (
     <List searchText={searchText} onSearchTextChange={setSearchText}>
-      <List.EmptyView icon={Icon.SpeechBubble} title="Ask GPT Anything..." />
+      <List.EmptyView icon={Icon.SpeechBubble} title="Ask GPT Anything..." actions={help_action_panel("aiChat")} />
     </List>
   ) : (
     <List

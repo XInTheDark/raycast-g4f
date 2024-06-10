@@ -2,6 +2,7 @@ import { CustomCommand, getCustomCommands, setCustomCommands } from "./api/custo
 import { useEffect, useState } from "react";
 import { Form, List, Action, ActionPanel, Icon, useNavigation, confirmAlert } from "@raycast/api";
 import useGPT from "./api/gpt";
+import { help_action } from "./api/helpPage";
 
 export default function CustomAICommands() {
   let [commands, setCommands] = useState(null);
@@ -91,6 +92,7 @@ export default function CustomAICommands() {
           shortcut={{ modifiers: ["cmd", "shift"], key: "delete" }}
           style={Action.Style.Destructive}
         />
+        {help_action("customAICommands")}
       </ActionPanel>
     );
   };
@@ -120,6 +122,7 @@ export default function CustomAICommands() {
                 icon={Icon.PlusCircle}
                 target={<EditCommandForm newCommand={true} />}
               />
+              {help_action("customAICommands")}
             </ActionPanel>
           }
         />
