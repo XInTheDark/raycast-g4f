@@ -25,16 +25,16 @@ echo "Download success! Installing..."
 # -------- Installation --------
 
 # move all files from temp to root, forcefully replacing existing files
-mv -f temp/* .
+mv -f temp/* . || exit 1
 
 # remove temp folder
-rm -rf temp
+rm -rf temp || exit 1
 
 # install dependencies
-npm ci
+npm ci || exit 1
 
 # build
-npm run build
+npm run build || exit 1
 
 echo "Installation success!"
 exit 0
