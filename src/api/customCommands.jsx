@@ -1,11 +1,10 @@
 import { LocalStorage } from "@raycast/api";
 
 export class CustomCommand {
-  constructor({ name = "", prompt = "", id = new Date().getTime().toString(), shortcut = "", options = {} }) {
+  constructor({ name = "", prompt = "", id = new Date().getTime().toString(), options = {} }) {
     this.name = name;
     this.prompt = prompt;
     this.id = id;
-    this.shortcut = shortcut;
     this.options = options; // unused for now
   }
 

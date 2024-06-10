@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Form, List, Action, ActionPanel, Icon, useNavigation, confirmAlert } from "@raycast/api";
 import useGPT from "./api/gpt";
 
-export default function CustomAICommands({ launchContext }) {
+export default function CustomAICommands() {
   let [commands, setCommands] = useState(null);
   useEffect(() => {
     (async () => {
@@ -36,7 +36,6 @@ export default function CustomAICommands({ launchContext }) {
               onSubmit={async (values) => {
                 command.name = values.name;
                 command.prompt = values.prompt;
-                command.shortcut = values.shortcut;
 
                 if (newCommand) {
                   setCommands([...commands, command]);
@@ -56,7 +55,6 @@ export default function CustomAICommands({ launchContext }) {
           title="Variables"
           text="In the prompt, you can use {input} or {selection} as a dynamic placeholder for the selected text or input text."
         />
-        <Form.TextField id="shortcut" title="Shortcut" defaultValue={command.shortcut} />
       </Form>
     );
   };
