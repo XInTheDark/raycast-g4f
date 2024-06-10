@@ -338,37 +338,35 @@ export default (
               shortcut={{ modifiers: ["cmd", "shift", "opt"], key: "/" }}
             />
           )}
-          {
-            <Action
-              title="Regenerate Response"
-              icon={Icon.ArrowClockwise}
-              onAction={async () => {
-                if (isLoading) {
-                  let userConfirmed = false;
-                  await confirmAlert({
-                    title: "Are you sure?",
-                    message: "Response is still loading. Are you sure you want to regenerate it?",
-                    icon: Icon.ArrowClockwise,
-                    primaryAction: {
-                      title: "Regenerate Response",
-                      onAction: () => {
-                        userConfirmed = true;
-                      },
+          <Action
+            title="Regenerate Response"
+            icon={Icon.ArrowClockwise}
+            onAction={async () => {
+              if (isLoading) {
+                let userConfirmed = false;
+                await confirmAlert({
+                  title: "Are you sure?",
+                  message: "Response is still loading. Are you sure you want to regenerate it?",
+                  icon: Icon.ArrowClockwise,
+                  primaryAction: {
+                    title: "Regenerate Response",
+                    onAction: () => {
+                      userConfirmed = true;
                     },
-                    dismissAction: {
-                      title: "Cancel",
-                    },
-                  });
-                  if (!userConfirmed) {
-                    return;
-                  }
+                  },
+                  dismissAction: {
+                    title: "Cancel",
+                  },
+                });
+                if (!userConfirmed) {
+                  return;
                 }
+              }
 
-                await getResponse(lastQuery);
-              }}
-              shortcut={{ modifiers: ["cmd", "shift"], key: "r" }}
-            />
-          }
+              await getResponse(lastQuery);
+            }}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "r" }}
+          />
         </ActionPanel>
       }
       isLoading={isLoading}
