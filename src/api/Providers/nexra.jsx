@@ -1,7 +1,7 @@
 export const NexraProvider = "NexraProvider";
 import fetch from "node-fetch";
 
-import { removePrefix } from "../helper";
+import { removePrefix } from "../../helpers/helper";
 
 // Reference: https://nexra.aryahcr.cc/documentation/chatgpt/en (under ChatGPT v2)
 const api_url = "https://nexra.aryahcr.cc/api/chat/complements";

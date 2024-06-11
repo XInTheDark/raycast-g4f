@@ -2,7 +2,7 @@ import { CustomCommand, getCustomCommands, setCustomCommands } from "./api/custo
 import { useEffect, useState } from "react";
 import { Form, List, Action, ActionPanel, Icon, useNavigation, confirmAlert } from "@raycast/api";
 import useGPT from "./api/gpt";
-import { help_action } from "./api/helpPage";
+import { help_action } from "./helpers/helpPage";
 
 export default function CustomAICommands() {
   let [commands, setCommands] = useState(null);
@@ -47,14 +47,15 @@ export default function CustomAICommands() {
                 pop();
               }}
             />
+            {help_action("customAICommands")}
           </ActionPanel>
         }
       >
         <Form.TextField id="name" title="Name" defaultValue={command.name} />
         <Form.TextArea id="prompt" title="Prompt" defaultValue={command.prompt} />
         <Form.Description
-          title="Variables"
-          text="In the prompt, you can use {input} or {selection} as a dynamic placeholder for the selected text or input text."
+          title=""
+          text="In the prompt, you can use {input} or {selection} as a dynamic placeholder for the selected text or input text. Learn more by selecting the Help action."
         />
       </Form>
     );
@@ -113,7 +114,7 @@ export default function CustomAICommands() {
     return (
       <List>
         <List.EmptyView
-          icon={Icon.LightBulb}
+          icon={Icon.Layers}
           title="Start by creating a custom command..."
           actions={
             <ActionPanel>
