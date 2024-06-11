@@ -18,6 +18,7 @@ import { useEffect, useState } from "react";
 
 import { formatChatToGPT } from "../helpers/helper";
 import { help_action } from "../helpers/helpPage";
+import { autoCheckForUpdates } from "../helpers/update";
 
 // G4F module
 import { G4F } from "g4f";
@@ -207,6 +208,9 @@ export default (
         title: "Response Finished",
         message: `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`,
       });
+
+      // functions that run periodically
+      await autoCheckForUpdates();
     } catch (e) {
       console.log(e);
       setMarkdown(
