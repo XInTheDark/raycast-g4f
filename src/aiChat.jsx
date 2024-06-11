@@ -22,6 +22,7 @@ import {
 } from "./api/gpt";
 import { formatDate, formatChatToPrompt, formatChatToGPT } from "./helpers/helper";
 import { help_action, help_action_panel } from "./helpers/helpPage";
+import { autoCheckForUpdates } from "./helpers/update";
 
 // Web search module
 import { getWebResult } from "./api/web";
@@ -229,14 +230,16 @@ export default function Chat({ launchContext }) {
       "Response Finished",
       `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`
     );
-
     generationStatus.loading = false;
-    pruneChats(chatData, setChatData); // this function effectively only runs periodically
 
     // Smart Chat Naming functionality
     if (getPreferenceValues()["smartChatNaming"] && currentChat.messages.length <= 2) {
       await processSmartChatNaming(chatData, setChatData, currentChat);
     }
+
+    // functions that run periodically
+    pruneChats(chatData, setChatData);
+    await autoCheckForUpdates();
   };
 
   const pruneChatsInterval = 30 * 60 * 1000; // interval to prune inactive chats (in ms)
