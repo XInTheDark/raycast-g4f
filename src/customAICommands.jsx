@@ -47,14 +47,15 @@ export default function CustomAICommands() {
                 pop();
               }}
             />
+            {help_action("customAICommands")}
           </ActionPanel>
         }
       >
         <Form.TextField id="name" title="Name" defaultValue={command.name} />
         <Form.TextArea id="prompt" title="Prompt" defaultValue={command.prompt} />
         <Form.Description
-          title="Variables"
-          text="In the prompt, you can use {input} or {selection} as a dynamic placeholder for the selected text or input text."
+          title=""
+          text="In the prompt, you can use {input} or {selection} as a dynamic placeholder for the selected text or input text. Learn more by selecting the Help action."
         />
       </Form>
     );
