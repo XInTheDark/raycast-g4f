@@ -37,12 +37,15 @@ export const is_up_to_date = (current, latest) => {
 };
 
 export const download_and_install_update = async (setMarkdown) => {
-  await showToast(Toast.Style.Animated, "Downloading update...");
-  // execute the update script
+  await showToast(Toast.Style.Animated, "Downloading update...", "This may take a while");
   let has_error = false;
   let dirPath = environment.supportPath;
-  console.log("Current path: " + dirPath);
+  console.log("Running update in support path: " + dirPath);
+
+  // read and initialise the update script
   read_update_sh(dirPath);
+
+  // execute the update script
   exec("sh update.sh", { cwd: dirPath }, (error, stdout, stderr) => {
     if (error) {
       setMarkdown((prev) => `${prev}\n\n#@ Update failed!\nError: ${error}`);
