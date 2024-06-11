@@ -10,7 +10,7 @@ This extension is currently not available on the Raycast Extension store, but
 installation from source is extremely simple.
 
 1. Clone the repository / download source code from GitHub.
-2. Navigate to the directory.
+2. Navigate to the directory, and open a Terminal window at the downloaded folder.
 3. Run `npm ci` to install required dependencies.
 4. Run `npm run build` to build the extension.
 
@@ -20,12 +20,27 @@ The extension, and its full set of commands, should then show up in your Raycast
 - If `npm run build` doesn't cause the extension to be added to your Raycast app, please try running `npm run dev` instead.
 - Also feel free to open an issue if unexpected problems occur.
 
-### Key features
+### Updating
+
+#### Automatically
+There is built-in support for updating within the extension itself! Simply run the "Check for Updates" command in the extension,
+and it will take care of the update process for you. Furthermore, you can also enable the "Automatically Check for Updates" experimental feature in the preferences.
+
+#### Manually
+In the command line, run `git pull`, `npm ci` and `npm run build` (in that order). 
+
+You might want to update manually if the automatic update doesn't work (please also open a GitHub issue if this is the case); 
+updating manually also allows you to fetch and view the latest changes to the source code.
+
+## Key features
 
 - ⛓️ Streaming support - see messages load in real-time, providing a seamless experience.
-- ⚡ Ask anything from anywhere - with 14 commands available, there's something for you no matter what you need.
-- 💬 Chat command - interact with the AI in a conversation, and your chat history will be stored in the extension.
+- ⚡ Ask anything from anywhere - with 18 commands available, there's something for you no matter what you need.
 - 💪 Support for many providers & models (more info below!)
+- 💬 Chat command - interact with the AI in a conversation, and your chat history will be stored in the extension.
+- 🌐 Web search - let GPT search the web for the latest information (experimental feature).
+- 🎨 Image generation capabilities - imagine anything, and make it reality with state-of-the-art models.
+- ✏️ Custom AI Commands - create your own commands with custom prompts!
 
 ## Providers & Models
 | Provider      | Model                   | Streaming | Status                                                     | Speed     | Rating and remarks by extension author                                                        |
@@ -72,6 +87,10 @@ This should be enough for most users, but similarly you can also create multiple
 ### Smart Chat Naming
 Let GPT automatically come up with a name for the current chat session after you send the first message. For example, this is similar to what the ChatGPT web UI does.
 - **How to enable**: Go to the extension preferences and check the "Enable Smart Chat Naming" box.
+
+### Automatically Check for Updates (Beta)
+Let the extension automatically check for updates every day. If a new version is available, you will be notified,
+along with the option to update the extension with a single click.
 
 ---
 
