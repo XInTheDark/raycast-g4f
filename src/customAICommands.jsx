@@ -113,7 +113,7 @@ export default function CustomAICommands() {
     return (
       <List>
         <List.EmptyView
-          icon={Icon.LightBulb}
+          icon={Icon.Layers}
           title="Start by creating a custom command..."
           actions={
             <ActionPanel>
