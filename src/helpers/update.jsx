@@ -112,7 +112,7 @@ export const autoCheckForUpdates = async () => {
   await LocalStorage.setItem("lastCheckForUpdates", now);
 
   const version = get_version();
-  const latest_version = fetch_github_latest_version();
+  const latest_version = await fetch_github_latest_version();
 
   if (is_up_to_date(version, latest_version)) {
     return;
