@@ -1,18 +1,11 @@
 // This module defines the following classes:
 // - Message
 // - MessagePair
-// - Properties
-// - File
 //
 // It also defines the following utilities:
-// - to_user_message
-// - to_assistant_message
-// - is_message
 // - pairs_to_messages
 // - format_chat_to_prompt
 // - messages_to_json
-// - chat_to_json
-// - json_to_chat
 //
 // Note how we currently don't have a Chat class, and instead we just use an array of messages.
 
@@ -26,8 +19,8 @@ export class Message {
 }
 
 export class MessagePair {
-  // This class is different from Message, not only in that it contains two messages, but also because
-  // it is stored in JSON format in localStorage. Therefore, special care needs to be taken so that all the data
+  // This class is different from Message in that it contains two messages, user and assistant.
+  // It is stored in JSON format in localStorage. Therefore, special care needs to be taken so that all the data
   // is stored correctly. To make this easier and more reliable, the class is completely JSON-compatible,
   // so we don't even need to serialize/deserialize it. In particular, we can use a non-Messages object as if it were
   // a MessagePair object, as long as it has the same properties.
