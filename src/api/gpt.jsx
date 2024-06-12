@@ -19,7 +19,7 @@ import { useEffect, useState } from "react";
 import { help_action } from "../helpers/helpPage";
 import { autoCheckForUpdates } from "../helpers/update";
 
-import { MessagePair, Message, pairs_to_messages } from "../classes/message";
+import { Message, pairs_to_messages } from "../classes/message";
 
 // G4F module
 import { G4FProvider, getG4FResponse } from "./Providers/g4f";
