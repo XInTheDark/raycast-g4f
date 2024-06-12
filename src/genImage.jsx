@@ -217,7 +217,7 @@ export default function genImage() {
             setChatData((x) => {
               let newChatData = structuredClone(x);
               let currentChat = getChat(chatData.currentChat, newChatData.chats);
-              let messageID = new Date().getTime();
+              let messageID = Date.now();
 
               currentChat.messages.unshift({
                 prompt: query,

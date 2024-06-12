@@ -1,7 +1,7 @@
-import { LocalStorage } from "@raycast/api";
+import { Storage } from "./storage";
 
 export class CustomCommand {
-  constructor({ name = "", prompt = "", id = new Date().getTime().toString(), options = {} }) {
+  constructor({ name = "", prompt = "", id = Date.now().toString(), options = {} }) {
     this.name = name;
     this.prompt = prompt;
     this.id = id;
@@ -22,15 +22,10 @@ export class CustomCommand {
 }
 
 export const getCustomCommands = async () => {
-  const retrieved = await LocalStorage.getItem("customCommands");
-  if (!retrieved) {
-    await LocalStorage.setItem("customCommands", JSON.stringify([]));
-    return [];
-  } else {
-    return JSON.parse(retrieved).map((x) => new CustomCommand(x));
-  }
+  const retrieved = await Storage.read("customCommands", "[]");
+  return JSON.parse(retrieved).map((x) => new CustomCommand(x));
 };
 
 export const setCustomCommands = async (commands) => {
-  await LocalStorage.setItem("customCommands", JSON.stringify(commands));
+  if (commands) await Storage.write("customCommands", JSON.stringify(commands));
 };
