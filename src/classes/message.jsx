@@ -10,11 +10,9 @@
 // Note how we currently don't have a Chat class, and instead we just use an array of messages.
 
 export class Message {
-  constructor({ role = "", content = "", creationDate = new Date(), id = new Date().getTime() } = {}) {
+  constructor({ role = "", content = "" } = {}) {
     this.role = role;
     this.content = content;
-    this.creationDate = creationDate;
-    this.id = id;
   }
 }
 
