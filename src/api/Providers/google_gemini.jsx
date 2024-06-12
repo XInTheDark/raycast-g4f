@@ -1,6 +1,7 @@
 import Gemini from "gemini-ai";
 import { getPreferenceValues } from "@raycast/api";
 import fetch from "node-fetch";
+import { messages_to_json } from "../../classes/message";
 
 export const GeminiProvider = "GeminiProvider";
 
@@ -15,6 +16,7 @@ const safetySettings = {
 export const getGoogleGeminiResponse = async (chat, options, stream_update, max_retries = 3) => {
   let APIKeysStr = getPreferenceValues()["GeminiAPIKeys"];
   let APIKeys = APIKeysStr.split(",").map((x) => x.trim());
+  chat = messages_to_json(chat);
   let formattedChat = GeminiFormatChat(chat);
 
   try {
@@ -62,11 +64,6 @@ export const getGoogleGeminiResponse = async (chat, options, stream_update, max_
 // Reformat chat to be in google gemini format
 export const GeminiFormatChat = (chat) => {
   let formattedChat = [];
-
-  // Discard system prompt as it is not supported by the API
-  if (chat.length >= 2 && chat[0].role === "user" && chat[1].role === "user") {
-    chat.shift(); // remove first user message (system prompt)
-  }
 
   let currentPair = [];
   for (let i = 0; i < chat.length; i++) {

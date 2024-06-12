@@ -1,6 +1,6 @@
 export const ReplicateProvider = "ReplicateProvider";
 import fetch from "node-fetch";
-import { formatChatToPrompt } from "../../helpers/helper";
+import { format_chat_to_prompt, messages_to_json } from "../../classes/message";
 
 // Implementation ported from gpt4free Replicate provider.
 
@@ -12,11 +12,12 @@ const headers = {
 
 export const getReplicateResponse = async function* (chat, options, max_retries = 10) {
   const model = options.model;
+  chat = messages_to_json(chat);
 
   let data = {
     stream: true,
     input: {
-      prompt: formatChatToPrompt(chat, model),
+      prompt: format_chat_to_prompt(chat, model),
       max_tokens: model.includes("meta-llama-3") ? 512 : null, // respected by meta-llama-3
       max_new_tokens: model.includes("mixtral") ? 1024 : null, // respected by mixtral-8x7b
       temperature: options.temperature ?? 0.7,

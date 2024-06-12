@@ -1,7 +1,6 @@
 export const NexraProvider = "NexraProvider";
 import fetch from "node-fetch";
-
-import { removePrefix } from "../../helpers/helper";
+import { messages_to_json } from "../../classes/message";
 
 // Reference: https://nexra.aryahcr.cc/documentation/chatgpt/en (under ChatGPT v2)
 const api_url = "https://nexra.aryahcr.cc/api/chat/complements";
@@ -10,6 +9,7 @@ const headers = {
 };
 
 export const getNexraResponse = async function* (chat, options, max_retries = 5) {
+  chat = messages_to_json(chat);
   let data = {
     messages: chat,
     stream: true,
