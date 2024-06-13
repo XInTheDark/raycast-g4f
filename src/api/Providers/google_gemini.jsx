@@ -72,9 +72,10 @@ export const GeminiFormatChat = async (chat, googleGemini) => {
     // We now convert to a Message type as used in gemini-ai. It essentially just consists of role and parts.
     // (see gemini-g4f, types.ts)
     //
-    // to do the conversion, we just call on gemini-ai's pre-existing messageToParts function. (see gemini-g4f, index.ts)
+    // to do the conversion, we just call on gemini-ai's pre-existing messageToParts function.
+    // (see https://github.com/XInTheDark/gemini-ai/blob/546064f5f6665793eb76765e82ad9fd8952ce29d/src/index.ts#L104)
     // messageToParts takes in an array of [String | ArrayBuffer | FileUpload] and returns an array that can be passed to parts param.
-    // where FileUpload is just { filePath: string, buffer: Buffer }.
+    // We use FileUpload, which is just { filePath: string, buffer: Buffer }.
     let geminiMessageParts;
     if (message.files && message.files.length > 0) {
       let arr = [message.content];
