@@ -22,5 +22,6 @@ Text to improve:`,
     useSelected: true,
     showFormText: "Text",
     allowPaste: true,
+    allowUploadFiles: true,
   });
 }

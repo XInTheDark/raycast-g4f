@@ -8,5 +8,6 @@ export default function FixCode(props) {
     useSelected: true,
     showFormText: "Code",
     allowPaste: true,
+    allowUploadFiles: true,
   });
 }

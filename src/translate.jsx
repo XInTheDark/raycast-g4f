@@ -24,6 +24,7 @@ export default function Translate(props) {
     showFormText: "Text to translate",
     allowPaste: true,
     forceShowForm: true,
+    allowUploadFiles: true,
     otherReactComponents: [
       <Form.Dropdown id="language" defaultValue="English" key="languageDropdown">
         {languagesReact}

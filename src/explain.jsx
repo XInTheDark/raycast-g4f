@@ -5,5 +5,6 @@ export default function Explain(props) {
     context: "Explain the following text as best as you can.",
     showFormText: "Text",
     useSelected: true,
+    allowUploadFiles: true,
   });
 }
