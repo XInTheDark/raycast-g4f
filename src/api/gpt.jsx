@@ -81,7 +81,7 @@ export default (
   const [markdown, setMarkdown] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [selectedState, setSelected] = useState("");
-  const [lastQuery, setLastQuery] = useState({text: "", files: []});
+  const [lastQuery, setLastQuery] = useState({ text: "", files: [] });
   const [lastResponse, setLastResponse] = useState("");
 
   // Input parameters: query - string, files - array of strings (file paths).
@@ -91,7 +91,7 @@ export default (
       query = processPrompt(context, query, selectedState);
     }
 
-    setLastQuery({text: query, files: files});
+    setLastQuery({ text: query, files: files });
     setPage(Pages.Detail);
 
     await showToast({

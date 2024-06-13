@@ -58,7 +58,7 @@ export const pairs_to_messages = (pairs, query = null) => {
   for (let i = pairs.length - 1; i >= 0; i--) {
     // reverse order, index 0 is latest message
     let messagePair = pairs[i];
-    if (!messagePair.prompt) continue;
+    if (!messagePair.prompt && !messagePair.files) continue;
     chat.push(
       messagePair.files
         ? new Message({ role: "user", content: messagePair.prompt, files: messagePair.files })
