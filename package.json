@@ -1,6 +1,7 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "raycast-g4f",
+  "version": "1.1.1",
   "title": "GPT4Free",
   "description": "Use GPT-4 for FREE, on Raycast - no API Key required.",
   "icon": "gpt-icon.png",
@@ -146,6 +147,20 @@
       "icon": "image-icon.png",
       "description": "Generate images from a text prompt",
       "mode": "view"
+    },
+    {
+      "name": "customAICommands",
+      "title": "Custom AI Commands",
+      "icon": "screen-icon.png",
+      "description": "Run and manage custom AI commands",
+      "mode": "view"
+    },
+    {
+      "name": "checkForUpdates",
+      "title": "Check for Updates",
+      "icon": "update-icon.png",
+      "description": "Check for extension updates from the official GitHub source",
+      "mode": "view"
     }
   ],
   "preferences": [
@@ -218,7 +233,7 @@
     {
       "name": "webSearch",
       "title": "Experimental Features",
-      "label": "Enable Web Search (BETA)",
+      "label": "Enable Web Search",
       "description": "Adds web search capabilities to GPT. Available in AI Chat.",
       "required": false,
       "type": "checkbox",
@@ -226,8 +241,16 @@
     },
     {
       "name": "smartChatNaming",
-      "label": "Enable Smart Chat Naming (BETA)",
+      "label": "Enable Smart Chat Naming",
       "description": "Automatically renames chat sessions based on the messages you send.",
+      "required": false,
+      "type": "checkbox",
+      "default": false
+    },
+    {
+      "name": "autoCheckForUpdates",
+      "label": "Automatically Check for Updates (BETA)",
+      "description": "Automatically check for updates from the official GitHub source.",
       "required": false,
       "type": "checkbox",
       "default": false

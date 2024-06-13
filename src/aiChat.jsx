@@ -7,12 +7,12 @@ import {
   getPreferenceValues,
   Icon,
   List,
-  LocalStorage,
   showToast,
   Toast,
   useNavigation,
 } from "@raycast/api";
 import { useEffect, useState } from "react";
+import { Storage } from "./api/storage";
 import {
   default_provider_string,
   formatResponse,
@@ -20,7 +20,10 @@ import {
   getChatResponseSync,
   providers_info,
 } from "./api/gpt";
-import { formatDate, formatChatToPrompt, formatChatToGPT } from "./api/helper";
+import { formatDate } from "./helpers/helper";
+import { help_action, help_action_panel } from "./helpers/helpPage";
+import { autoCheckForUpdates } from "./helpers/update";
+import { MessagePair, format_chat_to_prompt, pairs_to_messages } from "./classes/message";
 
 // Web search module
 import { getWebResult } from "./api/web";
@@ -51,7 +54,7 @@ let generationStatus = { stop: false, loading: false };
 let get_status = () => generationStatus.stop;
 
 export default function Chat({ launchContext }) {
-  let toast = async (style, title, message) => {
+  const toast = async (style, title, message) => {
     return await showToast({
       style,
       title,
@@ -59,19 +62,19 @@ export default function Chat({ launchContext }) {
     });
   };
 
-  let default_all_chats_data = () => {
+  const default_all_chats_data = () => {
     let newChat = chat_data({});
     return {
       currentChat: newChat.id,
       chats: [newChat],
-      lastPruneTime: new Date().getTime(),
+      lastPruneTime: Date.now(),
     };
   };
 
-  let chat_data = ({
+  const chat_data = ({
     name = "New Chat",
     creationDate = new Date(),
-    id = new Date().getTime().toString(), // toString() is important because Raycast expects a string for value
+    id = Date.now().toString(), // toString() is important because Raycast expects a string for value
     provider = default_provider_string(),
     systemPrompt = "",
     messages = [],
@@ -88,25 +91,7 @@ export default function Chat({ launchContext }) {
     };
   };
 
-  let message_data = ({
-    prompt = "",
-    answer = "",
-    creationDate = new Date(),
-    id = new Date().getTime(),
-    finished = false,
-    visible = true,
-  }) => {
-    return {
-      prompt: prompt,
-      answer: answer,
-      creationDate: creationDate,
-      id: id,
-      finished: finished,
-      visible: visible,
-    };
-  };
-
-  let starting_messages = (systemPrompt = "", provider = null) => {
+  const starting_messages = (systemPrompt = "", provider = null) => {
     let messages = [];
 
     // Provider based starting messages
@@ -124,12 +109,25 @@ export default function Chat({ launchContext }) {
     }
 
     if (systemPrompt) {
-      messages.push(message_data({ prompt: systemPrompt, answer: systemResponse, visible: false }));
+      messages.push(
+        new MessagePair({
+          prompt: systemPrompt,
+          answer: systemResponse,
+          visible: false,
+        })
+      );
     }
     return messages;
   };
 
-  let setCurrentChatData = async (chatData, setChatData, messageID, query = null, response = null, finished = null) => {
+  const setCurrentChatData = async (
+    chatData,
+    setChatData,
+    messageID,
+    query = null,
+    response = null,
+    finished = null
+  ) => {
     setChatData((oldData) => {
       let newChatData = structuredClone(oldData);
       let messages = getChat(chatData.currentChat, newChatData.chats).messages;
@@ -144,7 +142,7 @@ export default function Chat({ launchContext }) {
     });
   };
 
-  let updateCurrentChat = (chatData, setChatData, chat) => {
+  const updateCurrentChat = (chatData, setChatData, chat) => {
     setChatData((oldData) => {
       let newChatData = structuredClone(oldData);
       for (let i = 0; i < newChatData.chats.length; i++) {
@@ -157,7 +155,7 @@ export default function Chat({ launchContext }) {
     });
   };
 
-  let updateChatResponse = async (chatData, setChatData, messageID, query = null, previousWebSearch = false) => {
+  const updateChatResponse = async (chatData, setChatData, messageID, query = null, previousWebSearch = false) => {
     await setCurrentChatData(chatData, setChatData, messageID, null, ""); // set response to empty string
 
     let currentChat = getChat(chatData.currentChat, chatData.chats);
@@ -167,14 +165,14 @@ export default function Chat({ launchContext }) {
     let elapsed = 0.001,
       chars,
       charPerSec;
-    let start = new Date().getTime();
+    let start = Date.now();
     let response = "";
 
     if (!info.stream) {
       response = await getChatResponse(currentChat, query);
       await setCurrentChatData(chatData, setChatData, messageID, null, response);
 
-      elapsed = (new Date().getTime() - start) / 1000;
+      elapsed = (Date.now() - start) / 1000;
       chars = response.length;
       charPerSec = (chars / elapsed).toFixed(1);
     } else {
@@ -202,7 +200,7 @@ export default function Chat({ launchContext }) {
           return;
         }
 
-        elapsed = (new Date().getTime() - start) / 1000;
+        elapsed = (Date.now() - start) / 1000;
         chars = response.length;
         charPerSec = (chars / elapsed).toFixed(1);
         loadingToast.message = `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`;
@@ -226,21 +224,23 @@ export default function Chat({ launchContext }) {
       "Response Finished",
       `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`
     );
-
     generationStatus.loading = false;
-    pruneChats(chatData, setChatData); // this function effectively only runs periodically
 
     // Smart Chat Naming functionality
     if (getPreferenceValues()["smartChatNaming"] && currentChat.messages.length <= 2) {
       await processSmartChatNaming(chatData, setChatData, currentChat);
     }
+
+    // functions that run periodically
+    pruneChats(chatData, setChatData);
+    await autoCheckForUpdates();
   };
 
   const pruneChatsInterval = 30 * 60 * 1000; // interval to prune inactive chats (in ms)
 
-  let pruneChats = (chatData, setChatData) => {
+  const pruneChats = (chatData, setChatData) => {
     const lastPruneTime = chatData.lastPruneTime || 0;
-    const currentTime = new Date().getTime();
+    const currentTime = Date.now();
     if (currentTime - lastPruneTime < pruneChatsInterval) return;
 
     let pruneChatsLimit = getPreferenceValues()["inactiveDuration"];
@@ -267,7 +267,7 @@ export default function Chat({ launchContext }) {
     });
   };
 
-  let exportChat = (chat) => {
+  const exportChat = (chat) => {
     let str = "";
     for (let i = chat.messages.length - 1; i >= 0; i--) {
       let message = chat.messages[i];
@@ -315,7 +315,7 @@ export default function Chat({ launchContext }) {
     );
   };
 
-  let processImportChat = (str, chatData, setChatData, provider) => {
+  const processImportChat = (str, chatData, setChatData, provider) => {
     let lines = str.split("\n");
     let messages = [];
     let currentMessage = null;
@@ -327,7 +327,7 @@ export default function Chat({ launchContext }) {
         if (currentMessage) {
           messages.unshift(currentMessage);
         }
-        currentMessage = message_data({});
+        currentMessage = new MessagePair();
 
         if (line.includes("<|invisible_token|>")) {
           currentMessage.visible = false;
@@ -461,7 +461,7 @@ export default function Chat({ launchContext }) {
     );
   };
 
-  let sendToGPT = async (values = null) => {
+  const sendToGPT = async (values = null) => {
     let query = searchText;
     if (values) {
       query = values.message;
@@ -476,10 +476,10 @@ export default function Chat({ launchContext }) {
     toast(Toast.Style.Animated, "Response Loading");
 
     let currentChat = getChat(chatData.currentChat, chatData.chats);
-    let newMessage = message_data({ prompt: query });
-    let newMessageID = newMessage.id;
+    let newMessagePair = new MessagePair({ prompt: query });
+    let newMessageID = newMessagePair.id;
 
-    currentChat.messages.unshift(newMessage);
+    currentChat.messages.unshift(newMessagePair);
     updateCurrentChat(chatData, setChatData, currentChat); // possibly redundant, put here for safety and consistency
 
     try {
@@ -540,7 +540,7 @@ export default function Chat({ launchContext }) {
 
                 // We remove the last message and insert the new one
                 chat.messages.shift();
-                chat.messages.unshift(message_data({ prompt: values.message }));
+                chat.messages.unshift(new MessagePair({ prompt: values.message }));
 
                 updateCurrentChat(chatData, setChatData, chat); // important to update the UI!
 
@@ -627,7 +627,7 @@ export default function Chat({ launchContext }) {
 
     // remove latest message and insert new one (similar to EditLastMessage)
     currentChat.messages.shift();
-    currentChat.messages.unshift(message_data({ prompt: newQuery }));
+    currentChat.messages.unshift(new MessagePair({ prompt: newQuery }));
     let newMessageID = currentChat.messages[0].id;
 
     updateCurrentChat(chatData, setChatData, currentChat); // important to update the UI!
@@ -646,13 +646,16 @@ export default function Chat({ launchContext }) {
       }
 
       // Format chat using default wrapper
-      let formatted_chat = formatChatToPrompt(formatChatToGPT(newChat), null);
+      let formatted_chat = format_chat_to_prompt(pairs_to_messages(newChat.messages), null);
       let newQuery =
         "Below is a conversation between the user and the assistant. Give a concise name for this chat. " +
         "Output ONLY the name of the chat (WITHOUT quotes) and NOTHING else.\n\n" +
         formatted_chat;
 
-      let newChatName = await getChatResponseSync({ messages: [{ prompt: newQuery }], provider: currentChat.provider });
+      let newChatName = await getChatResponseSync({
+        messages: [new MessagePair({ prompt: newQuery })],
+        provider: currentChat.provider,
+      });
       newChatName = newChatName.trim();
 
       // Rename chat
@@ -666,7 +669,9 @@ export default function Chat({ launchContext }) {
     }
   };
 
-  let GPTActionPanel = () => {
+  let GPTActionPanel = (props) => {
+    const idx = props.idx || 0;
+
     return (
       <ActionPanel>
         <Action
@@ -688,6 +693,23 @@ export default function Chat({ launchContext }) {
               shortcut={{ modifiers: ["cmd", "shift", "opt"], key: "/" }}
             />
           )}
+          <Action
+            icon={Icon.Clipboard}
+            title="Copy Response"
+            onAction={async () => {
+              let chat = getChat(chatData.currentChat);
+
+              if (chat.messages.length === 0) {
+                await toast(Toast.Style.Failure, "No Messages in Chat");
+                return;
+              }
+
+              let response = chat.messages[idx].answer;
+              await Clipboard.copy(response);
+              await toast(Toast.Style.Success, "Response Copied");
+            }}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
+          />
           <Action
             icon={Icon.ArrowClockwise}
             title="Regenerate Last Message"
@@ -722,8 +744,6 @@ export default function Chat({ launchContext }) {
                 }
               }
 
-              await toast(Toast.Style.Animated, "Regenerating Last Message");
-
               chat.messages[0].answer = "";
               chat.messages[0].finished = false;
               updateCurrentChat(chatData, setChatData, chat);
@@ -742,7 +762,7 @@ export default function Chat({ launchContext }) {
           />
           <Action
             icon={Icon.Trash}
-            title="Delete Last Message"
+            title="Delete Message"
             onAction={async () => {
               await confirmAlert({
                 title: "Are you sure?",
@@ -759,8 +779,8 @@ export default function Chat({ launchContext }) {
                       return;
                     }
 
-                    // delete index 0
-                    chat.messages.shift();
+                    // delete index idx
+                    chat.messages.splice(idx, 1);
                     setChatData((oldData) => {
                       let newChatData = structuredClone(oldData);
                       getChat(chatData.currentChat, newChatData.chats).messages = chat.messages;
@@ -925,6 +945,7 @@ export default function Chat({ launchContext }) {
             style={Action.Style.Destructive}
           />
         </ActionPanel.Section>
+        {help_action("aiChat")}
       </ActionPanel>
     );
   };
@@ -933,37 +954,13 @@ export default function Chat({ launchContext }) {
 
   useEffect(() => {
     (async () => {
-      const storedChatData = await LocalStorage.getItem("chatData");
+      const storedChatData = await Storage.read("chatData");
       if (storedChatData) {
         let newData = JSON.parse(storedChatData);
-
-        // Legacy feature to regenerate last message, from raycast-gemini.
-        // This feature no longer works because of how we handle streaming.
-        //
-        // if (getChat(newData.currentChat, newData.chats).messages[0]?.finished === false) {
-        //   let currentChat = getChat(newData.currentChat, newData.chats);
-        //   currentChat.messages[0].answer = "";
-        //
-        //   toast(Toast.Style.Animated, "Regenerating Last Message");
-        //   await (async () => {
-        //     try {
-        //       await updateChatResponse(newData, setChatData, "");
-        //       toast(Toast.Style.Success, "Response Loaded");
-        //     } catch {
-        //       setChatData((oldData) => {
-        //         let newChatData = structuredClone(oldData);
-        //         getChat(newData.currentChat, newChatData.chats).messages.shift();
-        //         return newChatData;
-        //       });
-        //       toast(Toast.Style.Failure, "GPT cannot process this message.");
-        //     }
-        //   })();
-        // }
-
         setChatData(structuredClone(newData));
       } else {
         const newChatData = default_all_chats_data();
-        await LocalStorage.setItem("chatData", JSON.stringify(newChatData));
+        await Storage.write("chatData", JSON.stringify(newChatData));
         setChatData(newChatData);
       }
 
@@ -979,7 +976,13 @@ export default function Chat({ launchContext }) {
           })}`;
           let newChat = chat_data({
             name: newChatName,
-            messages: [message_data({ prompt: launchContext.query, answer: launchContext.response, finished: true })],
+            messages: [
+              new MessagePair({
+                prompt: launchContext.query,
+                answer: launchContext.response,
+                finished: true,
+              }),
+            ],
           });
           newChatData.chats.push(newChat);
           newChatData.currentChat = newChat.id;
@@ -992,14 +995,14 @@ export default function Chat({ launchContext }) {
   useEffect(() => {
     if (chatData) {
       (async () => {
-        await LocalStorage.setItem("chatData", JSON.stringify(chatData));
+        await Storage.write("chatData", JSON.stringify(chatData));
       })();
     }
   }, [chatData]);
 
   const [searchText, setSearchText] = useState("");
 
-  let getChat = (target, customChat = chatData.chats) => {
+  const getChat = (target, customChat = chatData.chats) => {
     for (const chat of customChat) {
       if (chat.id === target) return chat;
     }
@@ -1007,7 +1010,7 @@ export default function Chat({ launchContext }) {
 
   return chatData === null ? (
     <List searchText={searchText} onSearchTextChange={setSearchText}>
-      <List.EmptyView icon={Icon.SpeechBubble} title="Ask GPT Anything..." />
+      <List.EmptyView icon={Icon.SpeechBubble} title="Ask GPT Anything..." actions={help_action_panel("aiChat")} />
     </List>
   ) : (
     <List
@@ -1044,7 +1047,7 @@ export default function Chat({ launchContext }) {
                 title={x.prompt}
                 subtitle={formatDate(x.creationDate)}
                 detail={<List.Item.Detail markdown={x.answer} />}
-                key={x.prompt + x.creationDate}
+                key={x.id}
                 actions={<GPTActionPanel idx={i} />}
               />
             );

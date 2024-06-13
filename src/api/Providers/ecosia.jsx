@@ -1,5 +1,6 @@
 export const EcosiaProvider = "EcosiaProvider";
 import fetch from "node-fetch";
+import { messages_to_json } from "../../classes/message";
 
 const api_url = "https://api.ecosia.org/v2/chat/?sp=productivity";
 const headers = {
@@ -14,6 +15,7 @@ const headers = {
 
 export const getEcosiaResponse = async function* (chat, options, max_retries = 5) {
   // python: "messages": base64.b64encode(json.dumps(chat).encode()).decode()
+  chat = messages_to_json(chat);
   let chatJson = JSON.stringify(chat);
   let encodedChat = Buffer.from(chatJson).toString("base64").toString();
   let data = {

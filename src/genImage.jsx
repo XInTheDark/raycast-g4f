@@ -2,6 +2,7 @@ import {
   Action,
   ActionPanel,
   confirmAlert,
+  Clipboard,
   environment,
   Form,
   Grid,
@@ -15,14 +16,9 @@ import {
 import { useEffect, useState } from "react";
 import * as G4F from "g4f";
 import fs from "fs";
-import { formatDate } from "./api/helper";
+import { formatDate } from "./helpers/helper";
 
 const g4f = new G4F.G4F();
-
-export const _NegativePrompt =
-  "low quality, normal quality, bad quality, disfigured, bad, ugly, poorly drawn face," +
-  " extra limb, missing limb, floating limbs, disconnected limbs, malformed limbs, oversaturated, duplicate," +
-  " low-res, blurry, out of focus, out of frame, extra, missing";
 
 // Image Providers
 export const image_providers = {
@@ -31,19 +27,17 @@ export const image_providers = {
     {
       // list of available models: https://rentry.co/b6i53fnm
       model: "neverendingDream_v122.safetensors [f964ceeb]",
-      cfgScale: 10,
-      negativePrompt: _NegativePrompt,
-      samplingMethod: "Heun",
+      cfgScale: 20,
+      samplingMethod: "DPM++ 2M Karras",
     },
   ],
   ProdiaStableDiffusion: [
     g4f.providers.ProdiaStableDiffusion,
     {
       // list of available models: https://rentry.co/pfwmx6y5
-      model: "ICantBelieveItsNotPhotography_seco.safetensors [4e7a3dfd]",
-      cfgScale: 10,
-      negativePrompt: _NegativePrompt,
-      samplingMethod: "Heun",
+      model: "neverendingDream_v122.safetensors [f964ceeb]",
+      cfgScale: 7,
+      samplingMethod: "DPM++ 2M Karras",
     },
   ],
   ProdiaStableDiffusionXL: [
@@ -53,9 +47,8 @@ export const image_providers = {
       model: "dreamshaperXL10_alpha2.safetensors [c8afe2ef]",
       height: 1024,
       width: 1024,
-      cfgScale: 10,
-      negativePrompt: _NegativePrompt,
-      samplingMethod: "Heun",
+      cfgScale: 7,
+      samplingMethod: "DPM++ 2M Karras",
     },
   ],
   Dalle: [g4f.providers.Dalle, {}],
@@ -112,6 +105,7 @@ export default function genImage() {
                       creationDate: new Date(),
                       provider: values.provider,
                       imageQuality: values.imageQuality,
+                      negativePrompt: values.negativePrompt,
                       messages: [],
                     });
                     newChatData.currentChat = values.chatName;
@@ -149,6 +143,9 @@ export default function genImage() {
           <Form.Dropdown.Item title="High" value="High" />
           <Form.Dropdown.Item title="Extreme" value="Extreme" />
         </Form.Dropdown>
+
+        <Form.Description title="Negative Prompt" text="Words that you don't want to show up in your images." />
+        <Form.TextArea id="negativePrompt" defaultValue="" />
       </Form>
     );
   };
@@ -199,12 +196,14 @@ export default function genImage() {
     );
   };
 
-  let ImageActionPanel = () => {
+  let ImageActionPanel = (props) => {
+    const idx = props.idx || 0;
+
     return (
       <ActionPanel>
         <Action
           icon={Icon.Message}
-          title="Send to GPT"
+          title="Generate Image"
           onAction={() => {
             if (searchText === "") {
               toast(Toast.Style.Failure, "Please Enter a Prompt");
@@ -218,7 +217,7 @@ export default function genImage() {
             setChatData((x) => {
               let newChatData = structuredClone(x);
               let currentChat = getChat(chatData.currentChat, newChatData.chats);
-              let messageID = new Date().getTime();
+              let messageID = Date.now();
 
               currentChat.messages.unshift({
                 prompt: query,
@@ -301,29 +300,32 @@ export default function genImage() {
             icon={Icon.Folder}
             title="Show in Finder"
             onAction={async () => {
-              let found = false;
-              for (const message of getChat(chatData.currentChat).messages) {
-                const path = message.answer;
-                if (path) {
-                  try {
-                    await showInFinder(path);
-                    found = true;
-                    break;
-                  } catch (e) {
-                    continue;
-                  }
-                }
-              }
-
-              if (!found) {
-                await toast(Toast.Style.Failure, "Image Chat is empty");
+              const messages = getChat(chatData.currentChat).messages;
+              const message = messages[idx];
+              const path = message.answer;
+              try {
+                await showInFinder(path);
+              } catch (e) {
+                await toast(Toast.Style.Failure, "Image Not Found");
               }
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "enter" }}
           />
           <Action
+            icon={Icon.Clipboard}
+            title="Copy Image Path"
+            onAction={async () => {
+              const messages = getChat(chatData.currentChat).messages;
+              const message = messages[idx];
+              const path = message.answer;
+              await Clipboard.copy(path);
+              await toast(Toast.Style.Success, "Image Path Copied");
+            }}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
+          />
+          <Action
             icon={Icon.Trash}
-            title="Delete Last Image"
+            title="Delete Image"
             onAction={async () => {
               await confirmAlert({
                 title: "Are you sure?",
@@ -341,12 +343,11 @@ export default function genImage() {
                     }
 
                     // delete image file
-                    // also delete the image file
-                    const imagePath = chat.messages[0].answer;
+                    const imagePath = chat.messages[idx].answer;
                     fs.rmSync(imagePath);
 
-                    // delete index 0
-                    chat.messages.shift();
+                    // delete index idx
+                    chat.messages.splice(idx, 1);
                     setChatData((oldData) => {
                       let newChatData = structuredClone(oldData);
                       getChat(chatData.currentChat, newChatData.chats).messages = chat.messages;
@@ -493,7 +494,7 @@ export default function genImage() {
                         onAction: () => {
                           // Delete all image chat folders
                           const folderPath = environment.supportPath + "/g4f-image-chats";
-                          fs.rm(folderPath, { recursive: true }, (err) => {
+                          fs.rm(folderPath, { recursive: true }, () => {
                             return null;
                           });
                           setChatData(default_chat_data());
@@ -596,7 +597,8 @@ export default function genImage() {
 export const loadImageOptions = (currentChat) => {
   // load provider and options
   const providerString = currentChat.provider,
-    imageQuality = currentChat.imageQuality;
+    imageQuality = currentChat.imageQuality,
+    negativePrompt = currentChat.negativePrompt;
   const [provider, providerOptions] = image_providers[providerString];
 
   // image quality and creativity settings are handled separately
@@ -606,6 +608,8 @@ export const loadImageOptions = (currentChat) => {
   } else if (provider === g4f.providers.ProdiaStableDiffusion || provider === g4f.providers.ProdiaStableDiffusionXL) {
     providerOptions.samplingSteps = imageQuality === "Medium" ? 20 : imageQuality === "High" ? 25 : 30;
   }
+
+  if (negativePrompt) providerOptions.negativePrompt = negativePrompt;
 
   if (providerOptions)
     return {

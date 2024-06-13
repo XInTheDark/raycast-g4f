@@ -1,6 +1,7 @@
 import {
   Action,
   ActionPanel,
+  confirmAlert,
   Detail,
   Form,
   getPreferenceValues,
@@ -15,11 +16,14 @@ import {
 } from "@raycast/api";
 import { useEffect, useState } from "react";
 
-import { formatChatToGPT } from "./helper";
+import { help_action } from "../helpers/helpPage";
+import { autoCheckForUpdates } from "../helpers/update";
+
+import { Message, pairs_to_messages } from "../classes/message";
 
 // G4F module
+import { G4FProvider, getG4FResponse } from "./Providers/g4f";
 import { G4F } from "g4f";
-const g4f = new G4F();
 
 // Nexra module
 import { NexraProvider, getNexraResponse } from "./Providers/nexra";
@@ -40,12 +44,12 @@ import { ReplicateProvider, getReplicateResponse } from "./Providers/replicate";
 import { GeminiProvider, getGoogleGeminiResponse } from "./Providers/google_gemini";
 
 // All providers info
-// {Provider, Model, Stream}
+// {provider, model, stream, extra options}
 // prettier-ignore
 export const providers_info = {
   GPT35: { provider: NexraProvider, model: "chatgpt", stream: true },
-  GPT4: { provider: g4f.providers.GPT, model: "gpt-4-32k", stream: false },
-  Bing: { provider: g4f.providers.Bing, model: "gpt-4", stream: true },
+  GPT4: { provider: G4FProvider, model: "gpt-4-32k", stream: false, g4f_provider: G4FProvider.GPT },
+  Bing: { provider: G4FProvider, model: "gpt-4", stream: true, g4f_provider: G4FProvider.Bing },
   DeepInfraWizardLM2_8x22B: { provider: DeepInfraProvider, model: "microsoft/WizardLM-2-8x22B", stream: true },
   DeepInfraLlama3_8B: { provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3-8B-Instruct", stream: true },
   DeepInfraLlama3_70B: { provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3-70B-Instruct", stream: true },
@@ -103,7 +107,7 @@ export default (
     forceShowForm = false,
     otherReactComponents = [],
     processPrompt = null,
-  }
+  } = {}
 ) => {
   // The parameters are documented here:
   // 1. props: We mostly use this parameter for the query value, which is obtained using props.arguments.query.
@@ -130,15 +134,14 @@ export default (
   // because the user needs to select the target language in the form.
   // 8. otherReactComponents: An array of additional React components to be shown in the Form.
   // For example, `Translate` command has a dropdown to select the target language.
-  // 9. processPrompt: A function to be called when the Form is submitted, to get the final prompt. The usage is
-  // processPrompt(context, query, selected, otherReactComponents.values)
-  // Hence, the otherReactComponents parameter MUST always be supplied when using processPrompt.
+  // 9. processPrompt: A function to be called to get the final prompt. The usage is
+  // processPrompt(context, query, selected, otherReactComponents.values - if any).
 
   const Pages = {
     Form: 0,
     Detail: 1,
   };
-  let { query: argQuery } = props.arguments;
+  let { query: argQuery } = props.arguments ?? {};
   if (!argQuery) argQuery = props.fallbackText ?? "";
 
   const [page, setPage] = useState(Pages.Detail);
@@ -148,7 +151,12 @@ export default (
   const [lastQuery, setLastQuery] = useState("");
   const [lastResponse, setLastResponse] = useState("");
 
-  const getResponse = async (query) => {
+  const getResponse = async (query, { regenerate = false } = {}) => {
+    // handle processPrompt
+    if (!regenerate && processPrompt) {
+      query = processPrompt(context, query, selectedState);
+    }
+
     setLastQuery(query);
     setPage(Pages.Detail);
 
@@ -159,7 +167,7 @@ export default (
 
     try {
       console.log(query);
-      const messages = [{ role: "user", content: query }];
+      const messages = [new Message({ role: "user", content: query })];
       // load provider and model from preferences
       const info = providers_info[default_provider_string()];
       // additional options
@@ -170,13 +178,13 @@ export default (
       let elapsed = 0.001,
         chars,
         charPerSec;
-      let start = new Date().getTime();
+      let start = Date.now();
 
       if (!info.stream) {
         response = await chatCompletion(messages, options);
         setMarkdown(response);
 
-        elapsed = (new Date().getTime() - start) / 1000;
+        elapsed = (Date.now() - start) / 1000;
         chars = response.length;
         charPerSec = (chars / elapsed).toFixed(1);
       } else {
@@ -188,7 +196,7 @@ export default (
           response = formatResponse(response, info.provider);
           setMarkdown(response);
 
-          elapsed = (new Date().getTime() - start) / 1000;
+          elapsed = (Date.now() - start) / 1000;
           chars = response.length;
           charPerSec = (chars / elapsed).toFixed(1);
           loadingToast.message = `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`;
@@ -203,6 +211,9 @@ export default (
         title: "Response Finished",
         message: `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`,
       });
+
+      // functions that run periodically
+      await autoCheckForUpdates();
     } catch (e) {
       console.log(e);
       setMarkdown(
@@ -339,6 +350,36 @@ export default (
               shortcut={{ modifiers: ["cmd", "shift", "opt"], key: "/" }}
             />
           )}
+          <Action
+            title="Regenerate Response"
+            icon={Icon.ArrowClockwise}
+            onAction={async () => {
+              if (isLoading) {
+                let userConfirmed = false;
+                await confirmAlert({
+                  title: "Are you sure?",
+                  message: "Response is still loading. Are you sure you want to regenerate it?",
+                  icon: Icon.ArrowClockwise,
+                  primaryAction: {
+                    title: "Regenerate Response",
+                    onAction: () => {
+                      userConfirmed = true;
+                    },
+                  },
+                  dismissAction: {
+                    title: "Cancel",
+                  },
+                });
+                if (!userConfirmed) {
+                  return;
+                }
+              }
+
+              await getResponse(lastQuery, { regenerate: true });
+            }}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "r" }}
+          />
+          {help_action()}
         </ActionPanel>
       }
       isLoading={isLoading}
@@ -349,7 +390,7 @@ export default (
       actions={
         <ActionPanel>
           <Action.SubmitForm
-            onSubmit={(values) => {
+            onSubmit={async (values) => {
               setMarkdown("");
 
               let prompt;
@@ -358,13 +399,14 @@ export default (
               if (processPrompt) {
                 // custom function
                 prompt = processPrompt(context, values.query, selectedState, values);
+                processPrompt = null; // only call once
               } else if (useSelected && selectedState) {
                 prompt = `${systemPrompt}\n\n${selectedState}`;
               } else {
                 prompt = `${systemPrompt}`;
               }
 
-              getResponse(prompt);
+              await getResponse(prompt);
             }}
           />
         </ActionPanel>
@@ -380,10 +422,14 @@ export default (
   );
 };
 
-// generate response using a chat context and options
+// Generate response using a chat context and options. This is the core function of the extension.
+
 // if stream_update is passed, we will call it with stream_update(new_message) every time a chunk is received
 // otherwise, this function returns an async generator (if stream = true) or a string (if stream = false)
 // if status is passed, we will stop generating when status() is true
+//
+// also note that the chat parameter is an array of Message objects, and how it is handled is up to the provider modules.
+// for most providers it is first converted into JSON format before being used.
 export const chatCompletion = async (chat, options, stream_update = null, status = null) => {
   const provider = options.provider;
   // additional options
@@ -408,9 +454,9 @@ export const chatCompletion = async (chat, options, stream_update = null, status
   } else if (provider === GeminiProvider) {
     // Google Gemini
     response = await getGoogleGeminiResponse(chat, options, stream_update);
-  } else {
-    // GPT
-    response = await g4f.chatCompletion(chat, options);
+  } else if (provider === G4FProvider) {
+    // G4F
+    response = await getG4FResponse(chat, options);
   }
 
   // stream = false
@@ -429,11 +475,10 @@ export const chatCompletion = async (chat, options, stream_update = null, status
   return response;
 };
 
-// generate response using a chat context and a query (optional)
+// generate response. input: currentChat is a chat object from AI Chat; query (string) is optional
 // see the documentation of chatCompletion for details on the other parameters
 export const getChatResponse = async (currentChat, query = null, stream_update = null, status = null) => {
-  let chat = formatChatToGPT(currentChat, query);
-
+  let chat = pairs_to_messages(currentChat.messages, query);
   // load provider and model
   const info = providers_info[get_provider_string(currentChat.provider)];
   // additional options
@@ -463,7 +508,12 @@ export const getChatResponseSync = async (currentChat, query = null) => {
 export const formatResponse = (response, provider = null) => {
   const is_code = response.includes("```");
 
-  if (provider === g4f.providers.Bing || provider === NexraProvider || !is_code) {
+  if (provider === G4FProvider || provider === NexraProvider || !is_code) {
+    // note: since the class rewrite, the first condition is actually flawed,
+    // because we include both G4FProvider.GPT and G4FProvider.Bing, even though
+    // only Bing is supposed to be included. However, this is not a problem because
+    // the response is never poorly formatted for GPT anyway.
+
     // replace escape characters: \n with a real newline, \t with a real tab, etc.
     response = response.replace(/\\n/g, "\n");
     response = response.replace(/\\t/g, "\t");
@@ -480,14 +530,14 @@ export const formatResponse = (response, provider = null) => {
   }
 
   // Bing: replace [^x> with a space where x is any string from 1 to 5 characters
-  if (provider === g4f.providers.Bing) {
+  if (provider === G4FProvider) {
     response = response.replace(/\[\^.{1,5}>/g, " ");
   }
 
   if (provider === BlackboxProvider) {
     // replace only once
     // example: remove $@$v=v1.13$@$ or $@$v=undefined%@$
-    response = response.replace(/\$@\$v=.{1,10}\$@\$/, "");
+    response = response.replace(/\$@\$v=.{1,30}\$@\$/, "");
 
     // remove sources
     // remove the chunk of text starting with $~~~$[ and ending with ]$~~~$
@@ -499,7 +549,7 @@ export const formatResponse = (response, provider = null) => {
 
 // yield chunks incrementally from a response.
 export const processChunksIncrementalAsync = async function* (response, provider) {
-  if (provider === g4f.providers.Bing) {
+  if (provider === G4FProvider) {
     let prevChunk = "";
     // For Bing, we must not return the last chunk
     for await (const chunk of G4F.chunkProcessor(response)) {
