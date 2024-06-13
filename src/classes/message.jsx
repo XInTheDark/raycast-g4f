@@ -10,9 +10,12 @@
 // Note how we currently don't have a Chat class, and instead we just use an array of messages.
 
 export class Message {
-  constructor({ role = "", content = "" } = {}) {
+  constructor({ role = "", content = "", files = [] } = {}) {
     this.role = role;
     this.content = content;
+    if (files && files.length > 0) {
+      this.files = files;
+    }
   }
 }
 
@@ -32,6 +35,7 @@ export class MessagePair {
     id = new Date().getTime(),
     finished = false,
     visible = true,
+    files = [],
   } = {}) {
     this.prompt = prompt;
     this.answer = answer;
@@ -39,6 +43,9 @@ export class MessagePair {
     this.id = id;
     this.finished = finished;
     this.visible = visible;
+    if (files && files.length > 0) {
+      this.files = files;
+    }
   }
 }
 
@@ -51,8 +58,12 @@ export const pairs_to_messages = (pairs, query = null) => {
   for (let i = pairs.length - 1; i >= 0; i--) {
     // reverse order, index 0 is latest message
     let messagePair = pairs[i];
-    if (messagePair.prompt) chat.push(new Message({ role: "user", content: messagePair.prompt }));
-    else continue;
+    if (!messagePair.prompt) continue;
+    chat.push(
+      messagePair.files
+        ? new Message({ role: "user", content: messagePair.prompt, files: messagePair.files })
+        : new Message({ role: "user", content: messagePair.prompt })
+    );
     if (messagePair.answer) chat.push(new Message({ role: "assistant", content: messagePair.answer }));
   }
   if (query) chat.push(new Message({ role: "user", content: query }));

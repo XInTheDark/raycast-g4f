@@ -4,7 +4,6 @@ import {
   confirmAlert,
   Detail,
   Form,
-  getPreferenceValues,
   getSelectedText,
   Icon,
   Keyboard,
@@ -20,78 +19,10 @@ import { help_action } from "../helpers/helpPage";
 import { autoCheckForUpdates } from "../helpers/update";
 
 import { Message, pairs_to_messages } from "../classes/message";
+import { FileHandler } from "../classes/fileHandler";
 
-// G4F module
-import { G4FProvider, getG4FResponse } from "./Providers/g4f";
+import * as providers from "./providers";
 import { G4F } from "g4f";
-
-// Nexra module
-import { NexraProvider, getNexraResponse } from "./Providers/nexra";
-
-// DeepInfra module
-import { DeepInfraProvider, getDeepInfraResponse } from "./Providers/deepinfra";
-
-// Blackbox module
-import { BlackboxProvider, getBlackboxResponse } from "./Providers/blackbox";
-
-// Ecosia module
-import { EcosiaProvider, getEcosiaResponse } from "./Providers/ecosia";
-
-// Replicate module
-import { ReplicateProvider, getReplicateResponse } from "./Providers/replicate";
-
-// Google Gemini module
-import { GeminiProvider, getGoogleGeminiResponse } from "./Providers/google_gemini";
-
-// All providers info
-// {provider, model, stream, extra options}
-// prettier-ignore
-export const providers_info = {
-  GPT35: { provider: NexraProvider, model: "chatgpt", stream: true },
-  GPT4: { provider: G4FProvider, model: "gpt-4-32k", stream: false, g4f_provider: G4FProvider.GPT },
-  Bing: { provider: G4FProvider, model: "gpt-4", stream: true, g4f_provider: G4FProvider.Bing },
-  DeepInfraWizardLM2_8x22B: { provider: DeepInfraProvider, model: "microsoft/WizardLM-2-8x22B", stream: true },
-  DeepInfraLlama3_8B: { provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3-8B-Instruct", stream: true },
-  DeepInfraLlama3_70B: { provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3-70B-Instruct", stream: true },
-  DeepInfraMixtral_8x22B: { provider: DeepInfraProvider, model: "mistralai/Mixtral-8x22B-Instruct-v0.1", stream: true },
-  DeepInfraDolphin26_8x7B: { provider: DeepInfraProvider, model: "cognitivecomputations/dolphin-2.6-mixtral-8x7b", stream: true, },
-  Blackbox: { provider: BlackboxProvider, model: "", stream: true },
-  Ecosia: { provider: EcosiaProvider, model: "gpt-3.5-turbo-0125", stream: true },
-  ReplicateLlama3_8B: { provider: ReplicateProvider, model: "meta/meta-llama-3-8b-instruct", stream: true },
-  ReplicateLlama3_70B: { provider: ReplicateProvider, model: "meta/meta-llama-3-70b-instruct", stream: true },
-  ReplicateMixtral_8x7B: { provider: ReplicateProvider, model: "mistralai/mixtral-8x7b-instruct-v0.1", stream: true },
-  GoogleGemini: { provider: GeminiProvider, model: "gemini-1.5-flash-latest", stream: true },
-};
-
-// Additional options
-export const provider_options = (provider, chatOptions = null) => {
-  let options = {};
-  if (chatOptions?.creativity) {
-    let temperature = parseFloat(chatOptions.creativity);
-    if (temperature >= 0.6 && getPreferenceValues()["webSearch"]) {
-      temperature -= 0.2; // reduce temperature if web search is enabled
-
-      // note that in the future when we implement web search in more places, all this logic needs to be replaced
-      // with a more reliable detection mechanism as to whether we are actually using web search.
-    }
-    temperature = Math.max(0.0, temperature).toFixed(1);
-    options.temperature = temperature;
-  }
-  return options;
-};
-
-// Additional properties
-// providers that handle the stream update in a custom way (see chatCompletion function)
-const custom_stream_handled_providers = [GeminiProvider];
-
-export const default_provider_string = () => {
-  return getPreferenceValues()["gptProvider"];
-};
-
-export const get_provider_string = (provider) => {
-  if (provider) return provider;
-  return default_provider_string();
-};
 
 let generationStatus = { stop: false };
 let get_status = () => generationStatus.stop;
@@ -169,9 +100,9 @@ export default (
       console.log(query);
       const messages = [new Message({ role: "user", content: query })];
       // load provider and model from preferences
-      const info = providers_info[default_provider_string()];
+      const info = providers.get_provider_info();
       // additional options
-      let options = { ...info, ...provider_options(info.provider) };
+      let options = { ...info, ...providers.provider_options(info.provider) };
 
       // generate response
       let response = "";
@@ -431,30 +362,30 @@ export default (
 export const chatCompletion = async (chat, options, stream_update = null, status = null) => {
   const provider = options.provider;
   // additional options
-  options = { ...options, ...provider_options(provider) };
+  options = { ...options, ...providers.provider_options(provider) };
 
   let response;
-  if (provider === NexraProvider) {
+  if (provider === providers.NexraProvider) {
     // Nexra
-    response = await getNexraResponse(chat, options);
-  } else if (provider === DeepInfraProvider) {
+    response = await providers.getNexraResponse(chat, options);
+  } else if (provider === providers.DeepInfraProvider) {
     // DeepInfra
-    response = await getDeepInfraResponse(chat, options);
-  } else if (provider === BlackboxProvider) {
+    response = await providers.getDeepInfraResponse(chat, options);
+  } else if (provider === providers.BlackboxProvider) {
     // Blackbox
-    response = await getBlackboxResponse(chat);
-  } else if (provider === EcosiaProvider) {
+    response = await providers.getBlackboxResponse(chat);
+  } else if (provider === providers.EcosiaProvider) {
     // Ecosia
-    response = await getEcosiaResponse(chat, options);
-  } else if (provider === ReplicateProvider) {
+    response = await providers.getEcosiaResponse(chat, options);
+  } else if (provider === providers.ReplicateProvider) {
     // Replicate
-    response = await getReplicateResponse(chat, options);
-  } else if (provider === GeminiProvider) {
+    response = await providers.getReplicateResponse(chat, options);
+  } else if (provider === providers.GeminiProvider) {
     // Google Gemini
-    response = await getGoogleGeminiResponse(chat, options, stream_update);
-  } else if (provider === G4FProvider) {
+    response = await providers.getGoogleGeminiResponse(chat, options, stream_update);
+  } else if (provider === providers.G4FProvider) {
     // G4F
-    response = await getG4FResponse(chat, options);
+    response = await providers.getG4FResponse(chat, options);
   }
 
   // stream = false
@@ -465,7 +396,7 @@ export const chatCompletion = async (chat, options, stream_update = null, status
   }
 
   // streaming related handling
-  if (custom_stream_handled_providers.includes(provider)) return; // handled in the provider
+  if (providers.custom_stream_handled_providers.includes(provider)) return; // handled in the provider
   if (stream_update) {
     await processStream(response, provider, stream_update, status);
     return;
@@ -478,9 +409,9 @@ export const chatCompletion = async (chat, options, stream_update = null, status
 export const getChatResponse = async (currentChat, query = null, stream_update = null, status = null) => {
   let chat = pairs_to_messages(currentChat.messages, query);
   // load provider and model
-  const info = providers_info[get_provider_string(currentChat.provider)];
+  const info = providers.get_provider_info(currentChat.provider);
   // additional options
-  let options = { ...info, ...provider_options(info.provider, currentChat.options) };
+  let options = { ...info, ...providers.provider_options(info.provider, currentChat.options) };
 
   // generate response
   return await chatCompletion(chat, options, stream_update, status);
@@ -493,7 +424,7 @@ export const getChatResponseSync = async (currentChat, query = null) => {
     return r;
   }
 
-  const info = providers_info[get_provider_string(currentChat.provider)];
+  const info = providers.get_provider_info(currentChat.provider);
   let response = "";
   for await (const chunk of processChunks(r, info.provider)) {
     response = chunk;
@@ -506,7 +437,7 @@ export const getChatResponseSync = async (currentChat, query = null) => {
 export const formatResponse = (response, provider = null) => {
   const is_code = response.includes("```");
 
-  if (provider === G4FProvider || provider === NexraProvider || !is_code) {
+  if (provider === providers.G4FProvider || provider === providers.NexraProvider || !is_code) {
     // note: since the class rewrite, the first condition is actually flawed,
     // because we include both G4FProvider.GPT and G4FProvider.Bing, even though
     // only Bing is supposed to be included. However, this is not a problem because
@@ -528,11 +459,11 @@ export const formatResponse = (response, provider = null) => {
   }
 
   // Bing: replace [^x> with a space where x is any string from 1 to 5 characters
-  if (provider === G4FProvider) {
+  if (provider === providers.G4FProvider) {
     response = response.replace(/\[\^.{1,5}>/g, " ");
   }
 
-  if (provider === BlackboxProvider) {
+  if (provider === providers.BlackboxProvider) {
     // replace only once
     // example: remove $@$v=v1.13$@$ or $@$v=undefined%@$
     response = response.replace(/\$@\$v=.{1,30}\$@\$/, "");
@@ -547,7 +478,7 @@ export const formatResponse = (response, provider = null) => {
 
 // yield chunks incrementally from a response.
 export const processChunksIncrementalAsync = async function* (response, provider) {
-  if (provider === G4FProvider) {
+  if (provider === providers.G4FProvider) {
     let prevChunk = "";
     // For Bing, we must not return the last chunk
     for await (const chunk of G4F.chunkProcessor(response)) {
@@ -580,7 +511,7 @@ export const processChunks = async function* (response, provider, status = null)
   let r = "";
   for await (const chunk of await processChunksIncremental(response, provider, status)) {
     // normally we add the chunk to r, but for certain providers, the chunk is already yielded fully
-    if ([NexraProvider].includes(provider)) {
+    if ([providers.NexraProvider].includes(provider)) {
       r = chunk;
     } else {
       r += chunk;
