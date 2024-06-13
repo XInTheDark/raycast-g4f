@@ -50,7 +50,7 @@ export const is_up_to_date = (current = null, latest = null) => {
 export const download_and_install_update = async (setMarkdown = null) => {
   if (!setMarkdown) setMarkdown = () => {}; // eslint-disable-line
 
-  await showToast(Toast.Style.Animated, "Downloading update...", "This may take a while");
+  await showToast(Toast.Style.Animated, "Downloading update...", "This may take a short while");
   let has_error = false;
   let dirPath = environment.supportPath;
   console.log("Running update in support path: " + dirPath);
