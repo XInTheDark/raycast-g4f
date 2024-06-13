@@ -1,16 +1,8 @@
 import { version } from "../../package.json";
 import fetch from "node-fetch";
 import { exec } from "child_process";
-import {
-  environment,
-  LocalStorage,
-  popToRoot,
-  showToast,
-  Toast,
-  confirmAlert,
-  Icon,
-  getPreferenceValues,
-} from "@raycast/api";
+import { environment, popToRoot, showToast, Toast, confirmAlert, Icon, getPreferenceValues } from "@raycast/api";
+import { Storage } from "../api/storage";
 import fs from "fs";
 
 // Some notes:
@@ -102,21 +94,14 @@ const read_update_sh = (dir) => {
 export const autoCheckForUpdates = async () => {
   if (!getPreferenceValues()["autoCheckForUpdates"]) return;
 
-  const last = await LocalStorage.getItem("lastCheckForUpdates");
-  const now = new Date().getTime();
-  if (!last) {
-    await LocalStorage.setItem("lastCheckForUpdates", now);
-  } else if (now - last < autoCheckUpdateInterval) {
-    return;
-  }
-  await LocalStorage.setItem("lastCheckForUpdates", now);
+  const now = Date.now();
+  const last = await Storage.localStorage_read("lastCheckForUpdates", now);
+  if (now - last < autoCheckUpdateInterval) return;
+  await Storage.localStorage_write("lastCheckForUpdates", now);
 
   const version = get_version();
   const latest_version = await fetch_github_latest_version();
-
-  if (is_up_to_date(version, latest_version)) {
-    return;
-  }
+  if (is_up_to_date(version, latest_version)) return;
 
   await confirmAlert({
     title: `Update available: version ${latest_version}`,

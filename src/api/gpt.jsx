@@ -176,13 +176,13 @@ export default (
       // generate response
       let response = "";
       let elapsed, chars, charPerSec;
-      let start = new Date().getTime();
+      let start = Date.now();
 
       if (!info.stream) {
         response = await chatCompletion(messages, options);
         setMarkdown(response);
 
-        elapsed = (new Date().getTime() - start) / 1000;
+        elapsed = (Date.now() - start) / 1000;
         chars = response.length;
         charPerSec = (chars / elapsed).toFixed(1);
       } else {
@@ -194,7 +194,7 @@ export default (
           response = formatResponse(response, info.provider);
           setMarkdown(response);
 
-          elapsed = (new Date().getTime() - start) / 1000;
+          elapsed = (Date.now() - start) / 1000;
           chars = response.length;
           charPerSec = (chars / elapsed).toFixed(1);
           loadingToast.message = `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`;

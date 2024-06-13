@@ -7,12 +7,12 @@ import {
   getPreferenceValues,
   Icon,
   List,
-  LocalStorage,
   showToast,
   Toast,
   useNavigation,
 } from "@raycast/api";
 import { useEffect, useState } from "react";
+import { Storage } from "./api/storage";
 import {
   default_provider_string,
   formatResponse,
@@ -67,14 +67,14 @@ export default function Chat({ launchContext }) {
     return {
       currentChat: newChat.id,
       chats: [newChat],
-      lastPruneTime: new Date().getTime(),
+      lastPruneTime: Date.now(),
     };
   };
 
   const chat_data = ({
     name = "New Chat",
     creationDate = new Date(),
-    id = new Date().getTime().toString(), // toString() is important because Raycast expects a string for value
+    id = Date.now().toString(), // toString() is important because Raycast expects a string for value
     provider = default_provider_string(),
     systemPrompt = "",
     messages = [],
@@ -165,14 +165,14 @@ export default function Chat({ launchContext }) {
     let elapsed = 0.001,
       chars,
       charPerSec;
-    let start = new Date().getTime();
+    let start = Date.now();
     let response = "";
 
     if (!info.stream) {
       response = await getChatResponse(currentChat, query);
       await setCurrentChatData(chatData, setChatData, messageID, null, response);
 
-      elapsed = (new Date().getTime() - start) / 1000;
+      elapsed = (Date.now() - start) / 1000;
       chars = response.length;
       charPerSec = (chars / elapsed).toFixed(1);
     } else {
@@ -200,7 +200,7 @@ export default function Chat({ launchContext }) {
           return;
         }
 
-        elapsed = (new Date().getTime() - start) / 1000;
+        elapsed = (Date.now() - start) / 1000;
         chars = response.length;
         charPerSec = (chars / elapsed).toFixed(1);
         loadingToast.message = `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`;
@@ -240,7 +240,7 @@ export default function Chat({ launchContext }) {
 
   const pruneChats = (chatData, setChatData) => {
     const lastPruneTime = chatData.lastPruneTime || 0;
-    const currentTime = new Date().getTime();
+    const currentTime = Date.now();
     if (currentTime - lastPruneTime < pruneChatsInterval) return;
 
     let pruneChatsLimit = getPreferenceValues()["inactiveDuration"];
@@ -954,13 +954,13 @@ export default function Chat({ launchContext }) {
 
   useEffect(() => {
     (async () => {
-      const storedChatData = await LocalStorage.getItem("chatData");
+      const storedChatData = await Storage.read("chatData");
       if (storedChatData) {
         let newData = JSON.parse(storedChatData);
         setChatData(structuredClone(newData));
       } else {
         const newChatData = default_all_chats_data();
-        await LocalStorage.setItem("chatData", JSON.stringify(newChatData));
+        await Storage.write("chatData", JSON.stringify(newChatData));
         setChatData(newChatData);
       }
 
@@ -995,7 +995,7 @@ export default function Chat({ launchContext }) {
   useEffect(() => {
     if (chatData) {
       (async () => {
-        await LocalStorage.setItem("chatData", JSON.stringify(chatData));
+        await Storage.write("chatData", JSON.stringify(chatData));
       })();
     }
   }, [chatData]);
