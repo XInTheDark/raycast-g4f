@@ -444,6 +444,7 @@ export default function Chat({ launchContext }) {
     if (values) {
       query = values.message;
     }
+    let files = values?.files || [];
 
     if (query === "") {
       toast(Toast.Style.Failure, "Please Enter a Query");
@@ -454,7 +455,7 @@ export default function Chat({ launchContext }) {
     toast(Toast.Style.Animated, "Response Loading");
 
     let currentChat = getChat(chatData.currentChat, chatData.chats);
-    let newMessagePair = new MessagePair({ prompt: query });
+    let newMessagePair = new MessagePair({ prompt: query, files: files });
     let newMessageID = newMessagePair.id;
 
     currentChat.messages.unshift(newMessagePair);
@@ -492,6 +493,7 @@ export default function Chat({ launchContext }) {
         }
       >
         <Form.TextArea id="message" title="Message" defaultValue={searchText} />
+        <Form.FilePicker title="Upload Files" id="files" />
       </Form>
     );
   };
