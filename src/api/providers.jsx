@@ -31,7 +31,6 @@ export { ReplicateProvider, getReplicateResponse };
 
 // Google Gemini module
 import { GeminiProvider, getGoogleGeminiResponse } from "./Providers/google_gemini";
-import Gemini from "gemini-g4f";
 export { GeminiProvider, getGoogleGeminiResponse };
 
 /// All providers info
