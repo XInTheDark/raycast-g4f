@@ -19,7 +19,6 @@ import { help_action } from "../helpers/helpPage";
 import { autoCheckForUpdates } from "../helpers/update";
 
 import { Message, pairs_to_messages } from "../classes/message";
-import { FileHandler } from "../classes/fileHandler";
 
 import * as providers from "./providers";
 import { G4F } from "g4f";

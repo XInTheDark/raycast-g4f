@@ -19,7 +19,6 @@ import { help_action, help_action_panel } from "./helpers/helpPage";
 import { autoCheckForUpdates } from "./helpers/update";
 
 import { MessagePair, format_chat_to_prompt, pairs_to_messages } from "./classes/message";
-import { FileHandler } from "./classes/fileHandler";
 
 import { formatResponse, getChatResponse, getChatResponseSync } from "./api/gpt";
 import * as providers from "./api/providers";
