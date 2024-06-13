@@ -39,6 +39,7 @@ updating manually also allows you to fetch and view the latest changes to the so
 - 💪 Support for many providers & models (more info below!)
 - 💬 Chat command - interact with the AI in a conversation, and your chat history will be stored in the extension.
 - 🌐 Web search - let GPT search the web for the latest information (experimental feature).
+- 📄 File upload - you can upload image, video, audio and text files to the AI. (only available for Google Gemini, more to come!)
 - 🎨 Image generation capabilities - imagine anything, and make it reality with state-of-the-art models.
 - ✏️ Custom AI Commands - create your own commands with custom prompts!
 
@@ -69,6 +70,9 @@ updating manually also allows you to fetch and view the latest changes to the so
 
 The rate limit for Google Gemini is 1500 requests per day (as of the time of writing). This should be much more than enough for any normal usage. 
 If your use case needs an increased rate limit, you can even create multiple API Keys with different Google accounts; separate them with commas in the preferences.
+
+- **Google Gemini**: This provider supports **File upload** functionality, as well as the **Ask About Screen Content** command!
+To upload a file in AI Chat, press Command-Enter or select "Compose Message" from the actions. Then, simply click on the upload button to get started.
 
 ## Experimental features
 

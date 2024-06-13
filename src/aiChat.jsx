@@ -12,43 +12,20 @@ import {
   useNavigation,
 } from "@raycast/api";
 import { useEffect, useState } from "react";
+
 import { Storage } from "./api/storage";
-import {
-  default_provider_string,
-  formatResponse,
-  getChatResponse,
-  getChatResponseSync,
-  providers_info,
-} from "./api/gpt";
 import { formatDate } from "./helpers/helper";
 import { help_action, help_action_panel } from "./helpers/helpPage";
 import { autoCheckForUpdates } from "./helpers/update";
+
 import { MessagePair, format_chat_to_prompt, pairs_to_messages } from "./classes/message";
+
+import { formatResponse, getChatResponse, getChatResponseSync } from "./api/gpt";
+import * as providers from "./api/providers";
 
 // Web search module
 import { getWebResult } from "./api/web";
 import { webSystemPrompt, systemResponse, webToken, webTokenEnd } from "./api/web";
-
-const chat_providers = [
-  ["ChatGPT (gpt-3.5-turbo)", "GPT35"],
-  ["ChatGPT (gpt-4-32k)", "GPT4"],
-  ["Bing (gpt-4)", "Bing"],
-  ["DeepInfra (WizardLM-2-8x22B)", "DeepInfraWizardLM2_8x22B"],
-  ["DeepInfra (meta-llama-3-8b)", "DeepInfraLlama3_8B"],
-  ["DeepInfra (meta-llama-3-70b)", "DeepInfraLlama3_70B"],
-  ["DeepInfra (Mixtral-8x22B)", "DeepInfraMixtral_8x22B"],
-  ["DeepInfra (Dolphin-2.6-8x7B)", "DeepInfraDolphin26_8x7B"],
-  ["Blackbox (custom-model)", "Blackbox"],
-  ["Ecosia (gpt-3.5-turbo)", "Ecosia"],
-  ["Replicate (meta-llama-3-8b)", "ReplicateLlama3_8B"],
-  ["Replicate (meta-llama-3-70b)", "ReplicateLlama3_70B"],
-  ["Replicate (mixtral-8x7b)", "ReplicateMixtral_8x7B"],
-  ["Google Gemini (requires API Key)", "GoogleGemini"],
-];
-
-const ChatProvidersReact = chat_providers.map((x) => {
-  return <Form.Dropdown.Item title={x[0]} value={x[1]} key={x[1]} />;
-});
 
 let generationStatus = { stop: false, loading: false };
 let get_status = () => generationStatus.stop;
@@ -75,7 +52,7 @@ export default function Chat({ launchContext }) {
     name = "New Chat",
     creationDate = new Date(),
     id = Date.now().toString(), // toString() is important because Raycast expects a string for value
-    provider = default_provider_string(),
+    provider = providers.default_provider_string(),
     systemPrompt = "",
     messages = [],
     options = {},
@@ -159,7 +136,7 @@ export default function Chat({ launchContext }) {
     await setCurrentChatData(chatData, setChatData, messageID, null, ""); // set response to empty string
 
     let currentChat = getChat(chatData.currentChat, chatData.chats);
-    const info = providers_info[currentChat.provider];
+    const info = providers.get_provider_info(currentChat.provider);
     const useWebSearch = getPreferenceValues()["webSearch"];
 
     let elapsed = 0.001,
@@ -308,8 +285,8 @@ export default function Chat({ launchContext }) {
       >
         <Form.TextArea id="chatText" title="Chat Transcript" />
         <Form.Description title="GPT Model" text="The provider and model used for this chat." />
-        <Form.Dropdown id="provider" defaultValue={default_provider_string()}>
-          {ChatProvidersReact}
+        <Form.Dropdown id="provider" defaultValue={providers.default_provider_string()}>
+          {providers.ChatProvidersReact}
         </Form.Dropdown>
       </Form>
     );
@@ -440,7 +417,7 @@ export default function Chat({ launchContext }) {
         />
         <Form.Description title="GPT Model" text="The provider and model used for this chat." />
         <Form.Dropdown id="provider" defaultValue={defaultProviderString}>
-          {ChatProvidersReact}
+          {providers.ChatProvidersReact}
         </Form.Dropdown>
 
         <Form.Description
@@ -466,6 +443,7 @@ export default function Chat({ launchContext }) {
     if (values) {
       query = values.message;
     }
+    let files = values?.files || [];
 
     if (query === "") {
       toast(Toast.Style.Failure, "Please Enter a Query");
@@ -476,7 +454,7 @@ export default function Chat({ launchContext }) {
     toast(Toast.Style.Animated, "Response Loading");
 
     let currentChat = getChat(chatData.currentChat, chatData.chats);
-    let newMessagePair = new MessagePair({ prompt: query });
+    let newMessagePair = new MessagePair({ prompt: query, files: files });
     let newMessageID = newMessagePair.id;
 
     currentChat.messages.unshift(newMessagePair);
@@ -514,6 +492,7 @@ export default function Chat({ launchContext }) {
         }
       >
         <Form.TextArea id="message" title="Message" defaultValue={searchText} />
+        <Form.FilePicker title="Upload Files" id="files" />
       </Form>
     );
   };
@@ -538,9 +517,9 @@ export default function Chat({ launchContext }) {
               onSubmit={(values) => {
                 pop();
 
-                // We remove the last message and insert the new one
-                chat.messages.shift();
-                chat.messages.unshift(new MessagePair({ prompt: values.message }));
+                chat.messages[0].prompt = values.message;
+                chat.messages[0].answer = "";
+                chat.messages[0].finished = false;
 
                 updateCurrentChat(chatData, setChatData, chat); // important to update the UI!
 
@@ -965,6 +944,8 @@ export default function Chat({ launchContext }) {
       }
 
       if (launchContext?.query) {
+        // query is an object consisting of text and files.
+
         setChatData((oldData) => {
           let newChatData = structuredClone(oldData);
           let newChatName = `From Quick AI at ${new Date().toLocaleString("en-US", {
@@ -978,9 +959,10 @@ export default function Chat({ launchContext }) {
             name: newChatName,
             messages: [
               new MessagePair({
-                prompt: launchContext.query,
+                prompt: launchContext.query.text,
                 answer: launchContext.response,
                 finished: true,
+                files: launchContext.query.files,
               }),
             ],
           });
@@ -1046,7 +1028,22 @@ export default function Chat({ launchContext }) {
               <List.Item
                 title={x.prompt}
                 subtitle={formatDate(x.creationDate)}
-                detail={<List.Item.Detail markdown={x.answer} />}
+                detail={
+                  <List.Item.Detail
+                    markdown={x.answer}
+                    // show metadata if files were uploaded
+                    metadata={
+                      x.files && x.files.length > 0 ? (
+                        <List.Item.Detail.Metadata>
+                          <List.Item.Detail.Metadata.Label title="Files" />
+                          {x.files.map((file, i) => (
+                            <List.Item.Detail.Metadata.Label title="" text={file} key={i} />
+                          ))}
+                        </List.Item.Detail.Metadata>
+                      ) : null
+                    }
+                  />
+                }
                 key={x.id}
                 actions={<GPTActionPanel idx={i} />}
               />
