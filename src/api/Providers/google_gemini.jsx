@@ -1,4 +1,4 @@
-import Gemini, { messageToParts } from "gemini-ai";
+import Gemini, { messageToParts } from "gemini-g4f";
 import { getPreferenceValues } from "@raycast/api";
 import fetch from "node-fetch";
 import fs from "fs";
