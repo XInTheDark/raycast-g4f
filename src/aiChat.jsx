@@ -1028,7 +1028,22 @@ export default function Chat({ launchContext }) {
               <List.Item
                 title={x.prompt}
                 subtitle={formatDate(x.creationDate)}
-                detail={<List.Item.Detail markdown={x.answer} />}
+                detail={
+                  <List.Item.Detail
+                    markdown={x.answer}
+                    // show metadata if files were uploaded
+                    metadata={
+                      x.files && x.files.length > 0 ? (
+                        <List.Item.Detail.Metadata>
+                          <List.Item.Detail.Metadata.Label title="Files" />
+                          {x.files.map((file, i) => (
+                            <List.Item.Detail.Metadata.Label title="" text={file} key={i} />
+                          ))}
+                        </List.Item.Detail.Metadata>
+                      ) : null
+                    }
+                  />
+                }
                 key={x.id}
                 actions={<GPTActionPanel idx={i} />}
               />
