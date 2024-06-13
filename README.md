@@ -4,6 +4,8 @@ Use the powerful GPT-4, Llama-3 and more AI models on Raycast, for FREE - no API
 
 ## Getting Started
 
+"If you like the extension, please consider giving it a ✨star✨ tysm!" - the developer, probably
+
 ### Installation
 
 This extension is currently not available on the Raycast Extension store, but

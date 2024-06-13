@@ -16,8 +16,8 @@
       "name": "askAI",
       "title": "Ask AI",
       "description": "Ask GPT a question",
-      "mode": "view",
       "icon": "gpt-icon.png",
+      "mode": "view",
       "arguments": [
         {
           "name": "query",
@@ -38,8 +38,23 @@
       "name": "askAboutSelectedText",
       "title": "Ask About Selected Text",
       "description": "Ask GPT about selected text",
-      "mode": "view",
       "icon": "clipboard-icon.png",
+      "mode": "view",
+      "arguments": [
+        {
+          "name": "query",
+          "placeholder": "Query",
+          "type": "text",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "askAboutScreenContent",
+      "title": "Ask About Screen Content",
+      "description": "Ask GPT about screen content",
+      "icon": "screen-icon.png",
+      "mode": "no-view",
       "arguments": [
         {
           "name": "query",
@@ -80,29 +95,29 @@
     {
       "name": "friendly",
       "title": "Change Tone to Friendly",
-      "icon": "text-icon.png",
       "description": "Change tone of text to friendly",
+      "icon": "text-icon.png",
       "mode": "view"
     },
     {
       "name": "professional",
       "title": "Change Tone to Professional",
-      "icon": "text-icon.png",
       "description": "Change tone of text to professional",
+      "icon": "text-icon.png",
       "mode": "view"
     },
     {
       "name": "paraphrase",
       "title": "Paraphrase",
-      "icon": "text-icon.png",
       "description": "Paraphrase text",
+      "icon": "text-icon.png",
       "mode": "view"
     },
     {
       "name": "synonyms",
       "title": "Find Synonyms",
-      "icon": "synonym-icon.png",
       "description": "Find synonyms of word/phrase",
+      "icon": "synonym-icon.png",
       "mode": "view",
       "arguments": [
         {
@@ -116,50 +131,50 @@
     {
       "name": "translate",
       "title": "Translate",
-      "icon": "synonym-icon.png",
       "description": "Translate text to another language",
+      "icon": "synonym-icon.png",
       "mode": "view"
     },
     {
       "name": "improve",
       "title": "Improve Writing",
-      "icon": "grammar-icon.png",
       "description": "Improve writing of text",
+      "icon": "grammar-icon.png",
       "mode": "view"
     },
     {
       "name": "longer",
       "title": "Make Longer",
-      "icon": "longer-icon.png",
       "description": "Make text longer",
+      "icon": "longer-icon.png",
       "mode": "view"
     },
     {
       "name": "shorter",
       "title": "Make Shorter",
-      "icon": "shorten-icon.png",
       "description": "Make text shorter",
+      "icon": "shorten-icon.png",
       "mode": "view"
     },
     {
       "name": "genImage",
       "title": "Generate Images",
-      "icon": "image-icon.png",
       "description": "Generate images from a text prompt",
+      "icon": "image-icon.png",
       "mode": "view"
     },
     {
       "name": "customAICommands",
       "title": "Custom AI Commands",
-      "icon": "command-icon.png",
       "description": "Run and manage custom AI commands",
+      "icon": "command-icon.png",
       "mode": "view"
     },
     {
       "name": "checkForUpdates",
       "title": "Check for Updates",
-      "icon": "update-icon.png",
       "description": "Check for extension updates from the official GitHub source",
+      "icon": "update-icon.png",
       "mode": "view"
     }
   ],

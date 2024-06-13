@@ -38,6 +38,7 @@ export default (
     otherReactComponents = [],
     processPrompt = null,
     allowUploadFiles = false,
+    defaultFiles = [],
   } = {}
 ) => {
   // The parameters are documented here:
@@ -68,6 +69,7 @@ export default (
   // 9. processPrompt: A function to be called to get the final prompt. The usage is
   // processPrompt(context, query, selected, otherReactComponents.values - if any).
   // 10. allowUploadFiles: A boolean to allow uploading files in the Form. If true, a file upload field will be shown.
+  // 11. defaultFiles: Files to always include in the prompt. This is an array of file paths.
 
   const Pages = {
     Form: 0,
@@ -89,6 +91,10 @@ export default (
     if (!regenerate && processPrompt) {
       query = processPrompt(context, query, selectedState);
     }
+
+    // handle files: we combine files (files that the user uploads)
+    // with defaultFiles (files that are passed as a parameter and are always included)
+    files = [...defaultFiles, ...files];
 
     setLastQuery({ text: query, files: files });
     setPage(Pages.Detail);
