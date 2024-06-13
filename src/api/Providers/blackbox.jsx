@@ -1,5 +1,6 @@
 export const BlackboxProvider = "BlackboxProvider";
 import fetch from "node-fetch";
+import { messages_to_json } from "../../classes/message";
 import { randomBytes, randomUUID } from "crypto";
 
 // Implementation ported from gpt4free Blackbox provider.
@@ -33,6 +34,7 @@ const uuid4 = function () {
 export const getBlackboxResponse = async function* (chat, max_retries = 5) {
   let random_id = token_hex(16);
   let random_user_id = uuid4();
+  chat = messages_to_json(chat);
 
   let data = {
     messages: chat,

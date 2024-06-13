@@ -1,5 +1,6 @@
 export const DeepInfraProvider = "DeepInfraProvider";
 import fetch from "node-fetch";
+import { messages_to_json } from "../../classes/message";
 
 // Implementation ported from gpt4free DeepInfra provider.
 
@@ -25,6 +26,7 @@ const headers = {
 
 export const getDeepInfraResponse = async function* (chat, options, max_retries = 5) {
   const model = options.model;
+  chat = messages_to_json(chat);
   let data = {
     model: model,
     messages: chat,

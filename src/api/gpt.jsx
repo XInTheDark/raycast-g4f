@@ -16,13 +16,14 @@ import {
 } from "@raycast/api";
 import { useEffect, useState } from "react";
 
-import { formatChatToGPT } from "../helpers/helper";
 import { help_action } from "../helpers/helpPage";
 import { autoCheckForUpdates } from "../helpers/update";
 
+import { Message, pairs_to_messages } from "../classes/message";
+
 // G4F module
+import { G4FProvider, getG4FResponse } from "./Providers/g4f";
 import { G4F } from "g4f";
-const g4f = new G4F();
 
 // Nexra module
 import { NexraProvider, getNexraResponse } from "./Providers/nexra";
@@ -43,12 +44,12 @@ import { ReplicateProvider, getReplicateResponse } from "./Providers/replicate";
 import { GeminiProvider, getGoogleGeminiResponse } from "./Providers/google_gemini";
 
 // All providers info
-// {Provider, Model, Stream}
+// {provider, model, stream, extra options}
 // prettier-ignore
 export const providers_info = {
   GPT35: { provider: NexraProvider, model: "chatgpt", stream: true },
-  GPT4: { provider: g4f.providers.GPT, model: "gpt-4-32k", stream: false },
-  Bing: { provider: g4f.providers.Bing, model: "gpt-4", stream: true },
+  GPT4: { provider: G4FProvider, model: "gpt-4-32k", stream: false, g4f_provider: G4FProvider.GPT },
+  Bing: { provider: G4FProvider, model: "gpt-4", stream: true, g4f_provider: G4FProvider.Bing },
   DeepInfraWizardLM2_8x22B: { provider: DeepInfraProvider, model: "microsoft/WizardLM-2-8x22B", stream: true },
   DeepInfraLlama3_8B: { provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3-8B-Instruct", stream: true },
   DeepInfraLlama3_70B: { provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3-70B-Instruct", stream: true },
@@ -166,7 +167,7 @@ export default (
 
     try {
       console.log(query);
-      const messages = [{ role: "user", content: query }];
+      const messages = [new Message({ role: "user", content: query })];
       // load provider and model from preferences
       const info = providers_info[default_provider_string()];
       // additional options
@@ -419,10 +420,14 @@ export default (
   );
 };
 
-// generate response using a chat context and options
+// Generate response using a chat context and options. This is the core function of the extension.
+
 // if stream_update is passed, we will call it with stream_update(new_message) every time a chunk is received
 // otherwise, this function returns an async generator (if stream = true) or a string (if stream = false)
 // if status is passed, we will stop generating when status() is true
+//
+// also note that the chat parameter is an array of Message objects, and how it is handled is up to the provider modules.
+// for most providers it is first converted into JSON format before being used.
 export const chatCompletion = async (chat, options, stream_update = null, status = null) => {
   const provider = options.provider;
   // additional options
@@ -447,9 +452,9 @@ export const chatCompletion = async (chat, options, stream_update = null, status
   } else if (provider === GeminiProvider) {
     // Google Gemini
     response = await getGoogleGeminiResponse(chat, options, stream_update);
-  } else {
-    // GPT
-    response = await g4f.chatCompletion(chat, options);
+  } else if (provider === G4FProvider) {
+    // G4F
+    response = await getG4FResponse(chat, options);
   }
 
   // stream = false
@@ -468,11 +473,10 @@ export const chatCompletion = async (chat, options, stream_update = null, status
   return response;
 };
 
-// generate response using a chat context and a query (optional)
+// generate response. input: currentChat is a chat object from AI Chat; query (string) is optional
 // see the documentation of chatCompletion for details on the other parameters
 export const getChatResponse = async (currentChat, query = null, stream_update = null, status = null) => {
-  let chat = formatChatToGPT(currentChat, query);
-
+  let chat = pairs_to_messages(currentChat.messages, query);
   // load provider and model
   const info = providers_info[get_provider_string(currentChat.provider)];
   // additional options
@@ -502,7 +506,12 @@ export const getChatResponseSync = async (currentChat, query = null) => {
 export const formatResponse = (response, provider = null) => {
   const is_code = response.includes("```");
 
-  if (provider === g4f.providers.Bing || provider === NexraProvider || !is_code) {
+  if (provider === G4FProvider || provider === NexraProvider || !is_code) {
+    // note: since the class rewrite, the first condition is actually flawed,
+    // because we include both G4FProvider.GPT and G4FProvider.Bing, even though
+    // only Bing is supposed to be included. However, this is not a problem because
+    // the response is never poorly formatted for GPT anyway.
+
     // replace escape characters: \n with a real newline, \t with a real tab, etc.
     response = response.replace(/\\n/g, "\n");
     response = response.replace(/\\t/g, "\t");
@@ -519,7 +528,7 @@ export const formatResponse = (response, provider = null) => {
   }
 
   // Bing: replace [^x> with a space where x is any string from 1 to 5 characters
-  if (provider === g4f.providers.Bing) {
+  if (provider === G4FProvider) {
     response = response.replace(/\[\^.{1,5}>/g, " ");
   }
 
@@ -538,7 +547,7 @@ export const formatResponse = (response, provider = null) => {
 
 // yield chunks incrementally from a response.
 export const processChunksIncrementalAsync = async function* (response, provider) {
-  if (provider === g4f.providers.Bing) {
+  if (provider === G4FProvider) {
     let prevChunk = "";
     // For Bing, we must not return the last chunk
     for await (const chunk of G4F.chunkProcessor(response)) {
