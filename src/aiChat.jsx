@@ -516,9 +516,9 @@ export default function Chat({ launchContext }) {
               onSubmit={(values) => {
                 pop();
 
-                // We remove the last message and insert the new one
-                chat.messages.shift();
-                chat.messages.unshift(new MessagePair({ prompt: values.message }));
+                chat.messages[0].prompt = values.message;
+                chat.messages[0].answer = "";
+                chat.messages[0].finished = false;
 
                 updateCurrentChat(chatData, setChatData, chat); // important to update the UI!
 
@@ -943,6 +943,8 @@ export default function Chat({ launchContext }) {
       }
 
       if (launchContext?.query) {
+        // query is an object consisting of text and files.
+
         setChatData((oldData) => {
           let newChatData = structuredClone(oldData);
           let newChatName = `From Quick AI at ${new Date().toLocaleString("en-US", {
@@ -956,9 +958,10 @@ export default function Chat({ launchContext }) {
             name: newChatName,
             messages: [
               new MessagePair({
-                prompt: launchContext.query,
+                prompt: launchContext.query.text,
                 answer: launchContext.response,
                 finished: true,
+                files: launchContext.query.files,
               }),
             ],
           });

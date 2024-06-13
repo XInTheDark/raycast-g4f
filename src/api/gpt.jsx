@@ -81,16 +81,17 @@ export default (
   const [markdown, setMarkdown] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [selectedState, setSelected] = useState("");
-  const [lastQuery, setLastQuery] = useState("");
+  const [lastQuery, setLastQuery] = useState({text: "", files: []});
   const [lastResponse, setLastResponse] = useState("");
 
+  // Input parameters: query - string, files - array of strings (file paths).
   const getResponse = async (query, { regenerate = false, files = [] } = {}) => {
     // handle processPrompt
     if (!regenerate && processPrompt) {
       query = processPrompt(context, query, selectedState);
     }
 
-    setLastQuery(query);
+    setLastQuery({text: query, files: files});
     setPage(Pages.Detail);
 
     await showToast({
@@ -126,6 +127,7 @@ export default (
           response = new_message;
           response = formatResponse(response, info.provider);
           setMarkdown(response);
+          setLastResponse(response);
 
           elapsed = (Date.now() - start) / 1000;
           chars = response.length;
@@ -257,7 +259,7 @@ export default (
         <ActionPanel>
           {allowPaste && <Action.Paste content={markdown} />}
           <Action.CopyToClipboard shortcut={Keyboard.Shortcut.Common.Copy} content={markdown} />
-          {lastQuery && (
+          {(lastQuery.text || lastQuery.files?.length > 0) && (
             <Action
               title="Continue in Chat"
               icon={Icon.Message}
@@ -306,7 +308,7 @@ export default (
                 }
               }
 
-              await getResponse(lastQuery, { regenerate: true });
+              await getResponse(lastQuery.text, { regenerate: true, files: lastQuery.files });
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "r" }}
           />

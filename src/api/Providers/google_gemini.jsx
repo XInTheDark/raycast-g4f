@@ -70,16 +70,18 @@ export const GeminiFormatChat = async (chat, googleGemini) => {
     const role = message.role === "user" ? "user" : "model"; // gemini-ai uses "user" and "model" roles
 
     // We now convert to a Message type as used in gemini-ai. It essentially just consists of role and parts.
-    // (see https://github.com/EvanZhouDev/gemini-ai/blob/b0963d015b482b26581130a0d681396c6e3a77ef/src/types.ts#L37)
+    // (see gemini-g4f, types.ts)
     //
-    // to do the conversion, we just call on gemini-ai's pre-existing messageToParts function.
-    // (see https://github.com/EvanZhouDev/gemini-ai/blob/b0963d015b482b26581130a0d681396c6e3a77ef/src/index.ts#L103)
-    // messageToParts takes in an array of [String | ArrayBuffer] and returns an array that can be passed to parts param.
+    // to do the conversion, we just call on gemini-ai's pre-existing messageToParts function. (see gemini-g4f, index.ts)
+    // messageToParts takes in an array of [String | ArrayBuffer | FileUpload] and returns an array that can be passed to parts param.
+    // where FileUpload is just { filePath: string, buffer: Buffer }.
     let geminiMessageParts;
     if (message.files && message.files.length > 0) {
       let arr = [message.content];
       for (const file of message.files) {
-        arr.push(fs.readFileSync(file));
+        const buffer = fs.readFileSync(file);
+        const fileUpload = { filePath: file, buffer: buffer };
+        arr.push(fileUpload);
       }
       geminiMessageParts = await messageToParts(arr, googleGemini);
     } else {
