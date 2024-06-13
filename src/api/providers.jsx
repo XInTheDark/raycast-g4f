@@ -31,6 +31,7 @@ export { ReplicateProvider, getReplicateResponse };
 
 // Google Gemini module
 import { GeminiProvider, getGoogleGeminiResponse } from "./Providers/google_gemini";
+import Gemini from "gemini-g4f";
 export { GeminiProvider, getGoogleGeminiResponse };
 
 /// All providers info
@@ -74,6 +75,9 @@ export const chat_providers = [
 export const ChatProvidersReact = chat_providers.map((x) => {
   return <Form.Dropdown.Item title={x[0]} value={x[1]} key={x[1]} />;
 });
+
+/// Providers that support file uploads
+export const file_supported_providers = [GeminiProvider];
 
 // Additional options
 export const provider_options = (provider, chatOptions = null) => {
