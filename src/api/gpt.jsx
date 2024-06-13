@@ -175,7 +175,9 @@ export default (
 
       // generate response
       let response = "";
-      let elapsed, chars, charPerSec;
+      let elapsed = 0.001,
+        chars,
+        charPerSec;
       let start = Date.now();
 
       if (!info.stream) {
