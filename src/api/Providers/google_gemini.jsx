@@ -1,7 +1,7 @@
-import Gemini from "gemini-ai";
+import Gemini, { messageToParts } from "gemini-ai";
 import { getPreferenceValues } from "@raycast/api";
 import fetch from "node-fetch";
-import { messages_to_json } from "../../classes/message";
+import fs from "fs";
 
 export const GeminiProvider = "GeminiProvider";
 
@@ -16,15 +16,12 @@ const safetySettings = {
 export const getGoogleGeminiResponse = async (chat, options, stream_update, max_retries = 3) => {
   let APIKeysStr = getPreferenceValues()["GeminiAPIKeys"];
   let APIKeys = APIKeysStr.split(",").map((x) => x.trim());
-  chat = messages_to_json(chat);
-  let formattedChat = GeminiFormatChat(chat);
 
   try {
     for (const APIKey of APIKeys) {
       const googleGemini = new Gemini(APIKey, { fetch: fetch });
+      let [formattedChat, query] = await GeminiFormatChat(chat, googleGemini);
 
-      // Create chat
-      let query = chat[chat.length - 1].content;
       const geminiChat = googleGemini.createChat({
         model: options.model,
         messages: formattedChat,
@@ -62,19 +59,37 @@ export const getGoogleGeminiResponse = async (chat, options, stream_update, max_
 };
 
 // Reformat chat to be in google gemini format
-export const GeminiFormatChat = (chat) => {
+// input: array of Message objects, output: array of gemini-ai Message objects that can be passed
+// directly to the messages parameter in createChat. This includes uploading files.
+// the googleGemini object is used internally in gemini-ai to upload large files via Google's files API.
+export const GeminiFormatChat = async (chat, googleGemini) => {
   let formattedChat = [];
 
-  let currentPair = [];
   for (let i = 0; i < chat.length; i++) {
-    const message = chat[i];
-    if (currentPair.length === 0) {
-      currentPair.push(message.content);
+    const message = chat[i]; // Message object
+    const role = message.role === "user" ? "user" : "model"; // gemini-ai uses "user" and "model" roles
+
+    // We now convert to a Message type as used in gemini-ai. It essentially just consists of role and parts.
+    // (see https://github.com/EvanZhouDev/gemini-ai/blob/b0963d015b482b26581130a0d681396c6e3a77ef/src/types.ts#L37)
+    //
+    // to do the conversion, we just call on gemini-ai's pre-existing messageToParts function.
+    // (see https://github.com/EvanZhouDev/gemini-ai/blob/b0963d015b482b26581130a0d681396c6e3a77ef/src/index.ts#L103)
+    // messageToParts takes in an array of [String | ArrayBuffer] and returns an array that can be passed to parts param.
+    let geminiMessageParts;
+    if (message.files && message.files.length > 0) {
+      let arr = [message.content];
+      for (const file of message.files) {
+        arr.push(fs.readFileSync(file));
+      }
+      geminiMessageParts = await messageToParts(arr, googleGemini);
     } else {
-      currentPair.push(message.content);
-      formattedChat.push(currentPair);
-      currentPair = [];
+      geminiMessageParts = [{ text: message.content }];
     }
+    let geminiMessage = { role: role, parts: geminiMessageParts };
+    formattedChat.push(geminiMessage);
   }
-  return formattedChat;
+
+  // remove last message and return it separately
+  const last_message = formattedChat.pop();
+  return [formattedChat, last_message];
 };

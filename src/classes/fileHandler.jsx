@@ -6,8 +6,8 @@ import fs from "fs";
 import { showToast, Toast } from "@raycast/api";
 
 export class FileHandler {
-  constructor() {
-    this.files = [];
+  constructor(files = []) {
+    this.files = files;
   }
 
   // Upload files

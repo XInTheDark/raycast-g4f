@@ -38,6 +38,7 @@ export default (
     forceShowForm = false,
     otherReactComponents = [],
     processPrompt = null,
+    allowUploadFiles = false,
   } = {}
 ) => {
   // The parameters are documented here:
@@ -67,6 +68,7 @@ export default (
   // For example, `Translate` command has a dropdown to select the target language.
   // 9. processPrompt: A function to be called to get the final prompt. The usage is
   // processPrompt(context, query, selected, otherReactComponents.values - if any).
+  // 10. allowUploadFiles: A boolean to allow uploading files in the Form. If true, a file upload field will be shown.
 
   const Pages = {
     Form: 0,
@@ -82,7 +84,7 @@ export default (
   const [lastQuery, setLastQuery] = useState("");
   const [lastResponse, setLastResponse] = useState("");
 
-  const getResponse = async (query, { regenerate = false } = {}) => {
+  const getResponse = async (query, { regenerate = false, files = [] } = {}) => {
     // handle processPrompt
     if (!regenerate && processPrompt) {
       query = processPrompt(context, query, selectedState);
@@ -98,7 +100,7 @@ export default (
 
     try {
       console.log(query);
-      const messages = [new Message({ role: "user", content: query })];
+      const messages = [new Message({ role: "user", content: query, files: files })];
       // load provider and model from preferences
       const info = providers.get_provider_info();
       // additional options
@@ -324,6 +326,7 @@ export default (
 
               let prompt;
               let systemPrompt = (context ? `${context}\n\n` : "") + (values.query ? values.query : "");
+              let files = values.files || [];
 
               if (processPrompt) {
                 // custom function
@@ -335,7 +338,7 @@ export default (
                 prompt = `${systemPrompt}`;
               }
 
-              await getResponse(prompt);
+              await getResponse(prompt, { files: files });
             }}
           />
         </ActionPanel>
@@ -346,13 +349,15 @@ export default (
         id="query"
         defaultValue={argQuery ? argQuery : !requireQuery && selectedState ? selectedState : ""}
       />
+      {allowUploadFiles && <Form.FilePicker title="Upload Files" id="files" />}
       {otherReactComponents}
     </Form>
   );
 };
 
-// Generate response using a chat context and options. This is the core function of the extension.
-
+// Generate response using a chat context (array of Messages, NOT MessagePairs - conversion should be done before this)
+// and options. This is the core function of the extension.
+//
 // if stream_update is passed, we will call it with stream_update(new_message) every time a chunk is received
 // otherwise, this function returns an async generator (if stream = true) or a string (if stream = false)
 // if status is passed, we will stop generating when status() is true
