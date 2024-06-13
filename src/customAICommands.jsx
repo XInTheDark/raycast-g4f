@@ -37,6 +37,7 @@ export default function CustomAICommands() {
               onSubmit={async (values) => {
                 command.name = values.name;
                 command.prompt = values.prompt;
+                command.options.allowUploadFiles = values.allowUploadFiles;
 
                 if (newCommand) {
                   setCommands([...commands, command]);
@@ -56,6 +57,12 @@ export default function CustomAICommands() {
         <Form.Description
           title=""
           text="In the prompt, you can use {input} or {selection} as a dynamic placeholder for the selected text or input text. Learn more by selecting the Help action."
+        />
+        <Form.Checkbox
+          id="allowUploadFiles"
+          title="Options"
+          label="Allow File Uploads"
+          info="Only certain providers support file uploads, please refer to the README for more info"
         />
       </Form>
     );
@@ -106,7 +113,15 @@ export default function CustomAICommands() {
 
   const RunCommand = (props) => {
     const command = props.command;
-    return useGPT({}, { showFormText: "Input", useSelected: true, processPrompt: command.processPromptFunction() });
+    return useGPT(
+      {},
+      {
+        showFormText: "Input",
+        useSelected: true,
+        allowUploadFiles: command.options?.allowUploadFiles,
+        processPrompt: command.processPromptFunction(),
+      }
+    );
   };
 
   // We show a list of commands

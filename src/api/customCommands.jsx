@@ -5,7 +5,7 @@ export class CustomCommand {
     this.name = name;
     this.prompt = prompt;
     this.id = id;
-    this.options = options; // unused for now
+    this.options = options;
   }
 
   processPrompt(prompt, context, query, selected) {
