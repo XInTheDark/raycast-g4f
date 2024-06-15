@@ -39,13 +39,61 @@ export default function Chat({ launchContext }) {
     });
   };
 
-  const default_all_chats_data = () => {
+  // With v1.2.1 chatData is now structured as follows:
+  // { currentChat: string, chats: [chat1.id, chat2.id, ..., chatN.id], lastPruneTime: number }
+  // This structure saves memory because we don't load each chat object into memory until it is needed.
+  // To support this, we have helper functions to operate on the chatData object.
+
+  const getStorageKey = (chat_id) => {
+    return `chat_${chat_id}`;
+  }
+
+  // add chat to storage, and add chat id to chatData
+  const addChat = async (chatData, setChatData, chat) => {
+    const id = chat.id;
+    await updateChat(chat);
+    setChatData((oldData) => {
+      let newChatData = structuredClone(oldData);
+      newChatData.chats.push(chat);
+      return newChatData;
+    });
+  }
+
+  // delete chat from storage, and remove chat id from chatData
+  const deleteChat = async (chatData, setChatData, chat) => {
+    const id = chat.id;
+    await Storage.delete(getStorageKey(id));
+    setChatData((oldData) => {
+      let newChatData = structuredClone(oldData);
+      newChatData.chats = newChatData.chats.filter((chat_id) => chat_id !== id);
+      return newChatData;
+    });
+  }
+
+  // update chat in storage
+  const updateChat = async (chat) => {
+    await Storage.write(getStorageKey(chat.id), chat);
+  }
+
+  // get chat from storage
+  const getChat = async (target, chat_data = chatData) => {
+    for (const id of chat_data.chats) {
+      if (id === target) {
+        return await Storage.read(getStorageKey(id));
+      }
+    }
+  };
+
+  // clear chat data and set it to default
+  const clear_chats_data = async (setChatData) => {
     let newChat = chat_data({});
-    return {
+    setChatData({
       currentChat: newChat.id,
-      chats: [newChat],
+      chats: [],
       lastPruneTime: Date.now(),
-    };
+    });
+    // this doesn't work! like if you log chatData right now, it is still null even though we just set it!
+    await addChat(chatData, setChatData, newChat);
   };
 
   const chat_data = ({
@@ -857,7 +905,7 @@ export default function Chat({ launchContext }) {
                 primaryAction: {
                   title: "Delete Chat Forever",
                   style: Action.Style.Destructive,
-                  onAction: () => {
+                  onAction: async () => {
                     let chatIdx = 0;
                     for (let i = 0; i < chatData.chats.length; i++) {
                       if (chatData.chats[i].id === chatData.currentChat) {
@@ -867,7 +915,7 @@ export default function Chat({ launchContext }) {
                     }
 
                     if (chatData.chats.length === 1) {
-                      setChatData(default_all_chats_data());
+                      await clear_chats_data(setChatData);
                       return;
                     }
 
@@ -912,8 +960,8 @@ export default function Chat({ launchContext }) {
                       primaryAction: {
                         title: "Delete ALL Chats Forever",
                         style: Action.Style.Destructive,
-                        onAction: () => {
-                          setChatData(default_all_chats_data());
+                        onAction: async () => {
+                          await clear_chats_data(setChatData);
                         },
                       },
                     });
@@ -938,9 +986,8 @@ export default function Chat({ launchContext }) {
         let newData = JSON.parse(storedChatData);
         setChatData(structuredClone(newData));
       } else {
-        const newChatData = default_all_chats_data();
-        await Storage.write("chatData", JSON.stringify(newChatData));
-        setChatData(newChatData);
+        await clear_chats_data(setChatData);
+        await Storage.write("chatData", JSON.stringify(chatData));
       }
 
       if (launchContext?.query) {
@@ -983,12 +1030,6 @@ export default function Chat({ launchContext }) {
   }, [chatData]);
 
   const [searchText, setSearchText] = useState("");
-
-  const getChat = (target, customChat = chatData.chats) => {
-    for (const chat of customChat) {
-      if (chat.id === target) return chat;
-    }
-  };
 
   return chatData === null ? (
     <List searchText={searchText} onSearchTextChange={setSearchText}>
