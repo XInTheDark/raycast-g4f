@@ -788,6 +788,7 @@ export default function Chat({ launchContext }) {
               updateCurrentChat(chatData, setChatData, chat);
               await toast(Toast.Style.Success, chat.pinned ? "Chat Pinned" : "Chat Unpinned");
             }}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "p" }}
           />
           <Action
             icon={Icon.Download}
