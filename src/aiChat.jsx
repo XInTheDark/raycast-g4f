@@ -231,6 +231,7 @@ export default function Chat({ launchContext }) {
 
       newChatData.chats = chats.filter((chat) => {
         if (chat.id === newChatData.currentChat) return true;
+        if (chat.pinned) return true;
         let lastMessageTime = chat.messages.length === 0 ? chat.creationDate : chat.messages[0].creationDate;
         lastMessageTime = new Date(lastMessageTime).getTime();
         const prune = currentTime - lastMessageTime >= pruneChatsLimit;
@@ -779,6 +780,16 @@ export default function Chat({ launchContext }) {
             shortcut={{ modifiers: ["cmd", "shift"], key: "m" }}
           />
           <Action
+            icon={Icon.Tack}
+            title="Pin Chat"
+            onAction={async () => {
+              let chat = getChat(chatData.currentChat);
+              chat.pinned = !chat.pinned;
+              updateCurrentChat(chatData, setChatData, chat);
+              await toast(Toast.Style.Success, chat.pinned ? "Chat Pinned" : "Chat Unpinned");
+            }}
+          />
+          <Action
             icon={Icon.Download}
             title="Export Chat"
             onAction={async () => {
@@ -1011,9 +1022,7 @@ export default function Chat({ launchContext }) {
           }}
           value={chatData.currentChat}
         >
-          {chatData.chats.map((x) => {
-            return <List.Dropdown.Item title={x.name} value={x.id} key={x.id} />;
-          })}
+          {to_list_dropdown_items(chatData.chats)}
         </List.Dropdown>
       }
     >
@@ -1059,4 +1068,27 @@ const isChatEmpty = (chat) => {
     if (message.visible) return false;
   }
   return true;
+};
+
+const to_list_dropdown_items = (chats) => {
+  let pinned = [],
+    unpinned = [];
+  for (const chat of chats) {
+    if (chat.pinned) pinned.push(chat);
+    else unpinned.push(chat);
+  }
+  return (
+    <>
+      <List.Dropdown.Section title="Pinned">
+        {pinned.map((x) => {
+          return <List.Dropdown.Item title={x.name} value={x.id} key={x.id} />;
+        })}
+      </List.Dropdown.Section>
+      <>
+        {unpinned.map((x) => {
+          return <List.Dropdown.Item title={x.name} value={x.id} key={x.id} />;
+        })}
+      </>
+    </>
+  );
 };
