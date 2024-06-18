@@ -671,9 +671,9 @@ export const loadImageOptions = (currentChat) => {
 };
 
 export const get_folder_path = (chatName) => {
-  return environment.supportPath + "/g4f-image-chats/" + encodeURI(chatName);
+  return environment.supportPath + "/g4f-image-chats/" + encodeURIComponent(chatName);
 };
 
 export const get_file_path = (folderPath) => {
-  return folderPath + "/g4f-image_" + encodeURI(new Date().toISOString().replace(/:/g, "-").split(".")[0] + ".png");
+  return folderPath + "/g4f-image_" + encodeURIComponent(new Date().toISOString().replace(/:/g, "-").split(".")[0] + ".png");
 };
