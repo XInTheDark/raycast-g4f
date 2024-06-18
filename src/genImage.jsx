@@ -1,12 +1,12 @@
 import {
   Action,
   ActionPanel,
-  confirmAlert,
   Clipboard,
+  confirmAlert,
   environment,
   Form,
-  Grid,
   Icon,
+  List,
   LocalStorage,
   showInFinder,
   showToast,
@@ -238,13 +238,11 @@ export default function genImage() {
 
                   // Each image chat has its own folder
                   // Ensure the folder exists
-                  const folderPath =
-                    environment.supportPath + "/g4f-image-chats/" + get_folder_name(chatData.currentChat);
+                  const folderPath = get_folder_path(chatData.currentChat);
                   if (!fs.existsSync(folderPath)) {
                     fs.mkdirSync(folderPath, { recursive: true });
                   }
-                  const filePath =
-                    folderPath + "/g4f-image_" + new Date().toISOString().replace(/:/g, "-").split(".")[0] + ".png";
+                  const filePath = get_file_path(folderPath);
 
                   imagePath = filePath;
 
@@ -344,7 +342,9 @@ export default function genImage() {
 
                     // delete image file
                     const imagePath = chat.messages[idx].answer;
-                    fs.rmSync(imagePath);
+                    try {
+                      fs.rmSync(imagePath);
+                    } catch (e) {} // eslint-disable-line
 
                     // delete index idx
                     chat.messages.splice(idx, 1);
@@ -439,11 +439,12 @@ export default function genImage() {
                     }
 
                     // Delete the image chat folder
-                    const folderPath =
-                      environment.supportPath + "/g4f-image-chats/" + get_folder_name(chatData.currentChat);
-                    fs.rm(folderPath, { recursive: true }, () => {
-                      return null;
-                    });
+                    const folderPath = get_folder_path(chatData.currentChat);
+                    try {
+                      fs.rm(folderPath, { recursive: true }, () => {
+                        return null;
+                      });
+                    } catch (e) {} // eslint-disable-line
 
                     if (chatData.chats.length === 1) {
                       setChatData(default_chat_data());
@@ -547,17 +548,17 @@ export default function genImage() {
   };
 
   return chatData === null ? (
-    <Grid columns={3} searchText={searchText} onSearchTextChange={setSearchText}>
-      <Grid.EmptyView icon={Icon.Stars} title="Imagine Anything..." />
-    </Grid>
+    <List searchText={searchText} onSearchTextChange={setSearchText}>
+      <List.EmptyView icon={Icon.Stars} title="Imagine Anything..." />
+    </List>
   ) : (
-    <Grid
-      columns={3}
+    <List
+      isShowingDetail={true}
       searchText={searchText}
       onSearchTextChange={setSearchText}
       searchBarPlaceholder="Generate image..."
       searchBarAccessory={
-        <Grid.Dropdown
+        <List.Dropdown
           tooltip="Your Image Chats"
           onChange={(newValue) => {
             setChatData((oldData) => ({
@@ -568,29 +569,29 @@ export default function genImage() {
           value={chatData.currentChat}
         >
           {chatData.chats.map((x) => {
-            return <Grid.Dropdown.Item title={x.name} value={x.name} key={x.name} />;
+            return <List.Dropdown.Item title={x.name} value={x.name} key={x.name} />;
           })}
-        </Grid.Dropdown>
+        </List.Dropdown>
       }
     >
       {(() => {
         let chat = getChat(chatData.currentChat);
         if (!chat.messages.length) {
-          return <Grid.EmptyView icon={Icon.Stars} title="Imagine Anything..." actions={<ImageActionPanel />} />;
+          return <List.EmptyView icon={Icon.Stars} title="Imagine Anything..." actions={<ImageActionPanel />} />;
         }
         return chat.messages.map((x, i) => {
           return (
-            <Grid.Item
-              content={{ source: x.answer }} // image path
+            <List.Item
               title={x.prompt}
               subtitle={formatDate(x.creationDate)}
-              key={x.prompt + x.creationDate}
+              key={i}
+              detail={<List.Item.Detail markdown={`![Image](${encodeURI(x.answer)}?raycast-height=350)`} />}
               actions={<ImageActionPanel idx={i} />}
             />
           );
         });
       })()}
-    </Grid>
+    </List>
   );
 }
 
@@ -622,6 +623,10 @@ export const loadImageOptions = (currentChat) => {
     };
 };
 
-export const get_folder_name = (chatName) => {
-  return chatName.replace(/[/\\?%*:|"<>]/g, "_");
+export const get_folder_path = (chatName) => {
+  return environment.supportPath + "/g4f-image-chats/" + encodeURI(chatName);
+};
+
+export const get_file_path = (folderPath) => {
+  return folderPath + "/g4f-image_" + encodeURI(new Date().toISOString().replace(/:/g, "-").split(".")[0] + ".png");
 };
