@@ -7,17 +7,18 @@ import {
   Form,
   Icon,
   List,
-  LocalStorage,
   showInFinder,
   showToast,
   Toast,
   useNavigation,
 } from "@raycast/api";
 import { useEffect, useState } from "react";
-import * as G4F from "g4f";
 import fs from "fs";
+
+import { Storage } from "./api/storage";
 import { formatDate } from "./helpers/helper";
 
+import * as G4F from "g4f";
 const g4f = new G4F.G4F();
 
 // Image Providers
@@ -563,7 +564,7 @@ export default function genImage() {
 
   useEffect(() => {
     (async () => {
-      const storedChatData = await LocalStorage.getItem("imageChatData");
+      const storedChatData = await Storage.read("imageChatData");
 
       if (storedChatData) {
         let newData = JSON.parse(storedChatData);
@@ -571,7 +572,7 @@ export default function genImage() {
       } else {
         const newChatData = default_chat_data();
 
-        await LocalStorage.setItem("imageChatData", JSON.stringify(newChatData));
+        await Storage.write("imageChatData", JSON.stringify(newChatData));
         setChatData(newChatData);
       }
     })();
@@ -580,7 +581,7 @@ export default function genImage() {
   useEffect(() => {
     if (chatData) {
       (async () => {
-        await LocalStorage.setItem("imageChatData", JSON.stringify(chatData));
+        await Storage.write("imageChatData", JSON.stringify(chatData));
       })();
     }
   }, [chatData]);
