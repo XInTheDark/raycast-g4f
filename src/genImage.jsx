@@ -292,7 +292,7 @@ export default function genImage() {
 
             const query = searchText;
             setSearchText("");
-            toast(Toast.Style.Animated, "Image Loading", "Please Wait");
+            await toast(Toast.Style.Animated, "Image Loading", "Please Wait");
 
             await generateImage(chatData, setChatData, query);
           }}
@@ -363,7 +363,7 @@ export default function genImage() {
               chat.messages.splice(idx, 1);
 
               // generate new image
-              toast(Toast.Style.Animated, "Image Loading", "Please Wait");
+              await toast(Toast.Style.Animated, "Image Loading", "Please Wait");
               await generateImage(chatData, setChatData, query);
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "r" }}
