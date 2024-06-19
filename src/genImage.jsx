@@ -220,7 +220,10 @@ export default function genImage() {
           <Form.Dropdown.Item title="DALL-E" value="Dalle" />
         </Form.Dropdown>
 
-        <Form.Description title="Image Model" text="The model used for this Image Chat. Leave as 'default' to use the default model. Select 'Help' for the list of available models." />
+        <Form.Description
+          title="Image Model"
+          text="The model used for this Image Chat. Leave as 'default' to use the default model. Select 'Help' for the list of available models."
+        />
         <Form.TextField id="model" defaultValue="default" />
 
         <Form.Description title="Image Quality" text="Higher quality images need more time to generate." />
