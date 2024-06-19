@@ -19,6 +19,7 @@ import { Storage } from "./api/storage";
 import { formatDate } from "./helpers/helper";
 
 import * as G4F from "g4f";
+import { help_action } from "./helpers/helpPage";
 const g4f = new G4F.G4F();
 
 // Image Providers
@@ -26,8 +27,6 @@ const image_providers = {
   Prodia: [
     g4f.providers.Prodia,
     {
-      // list of available models: https://rentry.co/b6i53fnm
-      model: "neverendingDream_v122.safetensors [f964ceeb]",
       cfgScale: 20,
       samplingMethod: "DPM++ 2M Karras",
     },
@@ -35,8 +34,6 @@ const image_providers = {
   ProdiaStableDiffusion: [
     g4f.providers.ProdiaStableDiffusion,
     {
-      // list of available models: https://rentry.co/pfwmx6y5
-      model: "neverendingDream_v122.safetensors [f964ceeb]",
       cfgScale: 7,
       samplingMethod: "DPM++ 2M Karras",
     },
@@ -44,8 +41,6 @@ const image_providers = {
   ProdiaStableDiffusionXL: [
     g4f.providers.ProdiaStableDiffusionXL,
     {
-      // list of available models: https://rentry.co/wfhsk8sv
-      model: "dreamshaperXL10_alpha2.safetensors [c8afe2ef]",
       height: 1024,
       width: 1024,
       cfgScale: 7,
@@ -55,9 +50,15 @@ const image_providers = {
   Dalle: [g4f.providers.Dalle, {}],
 };
 
-const defaultImageProvider = () => {
-  return "Prodia";
+// Default models for each provider
+const default_models = {
+  // Prodia: "neverendingDream_v122.safetensors [f964ceeb]",
+  Prodia: "ICantBelieveItsNotPhotography_seco.safetensors [4e7a3dfd]", // list: https://rentry.co/b6i53fnm
+  ProdiaStableDiffusion: "neverendingDream_v122.safetensors [f964ceeb]", // list: https://rentry.co/pfwmx6y5
+  ProdiaStableDiffusionXL: "dreamshaperXL10_alpha2.safetensors [c8afe2ef]", // list: https://rentry.co/wfhsk8sv
 };
+
+const defaultImageProvider = "Prodia";
 
 export default function genImage() {
   let toast = async (style, title, message) => {
@@ -75,7 +76,7 @@ export default function genImage() {
         {
           name: "New Image Chat",
           creationDate: new Date(),
-          provider: defaultImageProvider(),
+          provider: defaultImageProvider,
           imageQuality: "High",
           messages: [],
         },
@@ -184,6 +185,7 @@ export default function genImage() {
                       name: values.chatName,
                       creationDate: new Date(),
                       provider: values.provider,
+                      model: values.model.trim(),
                       imageQuality: values.imageQuality,
                       negativePrompt: values.negativePrompt,
                       messages: [],
@@ -195,6 +197,7 @@ export default function genImage() {
                 }
               }}
             />
+            {help_action("genImage")}
           </ActionPanel>
         }
       >
@@ -209,13 +212,16 @@ export default function genImage() {
             second: "2-digit",
           })}`}
         />
-        <Form.Description title="Image Model" text="The provider and model used for this Image Chat." />
+        <Form.Description title="Image Provider" text="The provider used for this Image Chat." />
         <Form.Dropdown id="provider" defaultValue="Prodia">
           <Form.Dropdown.Item title="Prodia" value="Prodia" />
           <Form.Dropdown.Item title="ProdiaStableDiffusion" value="ProdiaStableDiffusion" />
           <Form.Dropdown.Item title="ProdiaStableDiffusionXL" value="ProdiaStableDiffusionXL" />
           <Form.Dropdown.Item title="DALL-E" value="Dalle" />
         </Form.Dropdown>
+
+        <Form.Description title="Image Model" text="The model used for this Image Chat. Leave as 'default' to use the default model. Select 'Help' for the list of available models." />
+        <Form.TextField id="model" defaultValue="default" />
 
         <Form.Description title="Image Quality" text="Higher quality images need more time to generate." />
         <Form.Dropdown id="imageQuality" defaultValue="High">
@@ -556,6 +562,7 @@ export default function genImage() {
             style={Action.Style.Destructive}
           />
         </ActionPanel.Section>
+        {help_action("genImage")}
       </ActionPanel>
     );
   };
@@ -649,24 +656,31 @@ export default function genImage() {
 const loadImageOptions = (currentChat) => {
   // load provider and options
   const providerString = currentChat.provider,
+    modelString = currentChat.model,
     imageQuality = currentChat.imageQuality,
     negativePrompt = currentChat.negativePrompt;
-  const [provider, providerOptions] = image_providers[providerString];
+  let [provider, options] = image_providers[providerString];
+
+  let model = !modelString || modelString === "default" ? default_models[providerString] : modelString;
+  if (model) {
+    options = { ...options, model: model };
+  }
 
   // image quality and creativity settings are handled separately
   // only initialise samplingSteps if supported by the provider
   if (provider === g4f.providers.Prodia) {
-    providerOptions.samplingSteps = imageQuality === "Medium" ? 10 : imageQuality === "High" ? 15 : 20;
+    options.samplingSteps = imageQuality === "Medium" ? 10 : imageQuality === "High" ? 15 : 20;
   } else if (provider === g4f.providers.ProdiaStableDiffusion || provider === g4f.providers.ProdiaStableDiffusionXL) {
-    providerOptions.samplingSteps = imageQuality === "Medium" ? 20 : imageQuality === "High" ? 25 : 30;
+    options.samplingSteps = imageQuality === "Medium" ? 20 : imageQuality === "High" ? 25 : 30;
   }
 
-  if (negativePrompt) providerOptions.negativePrompt = negativePrompt;
+  if (negativePrompt) options.negativePrompt = negativePrompt;
 
-  if (providerOptions)
+  console.log("Image options: ", options);
+  if (options)
     return {
       provider: provider,
-      providerOptions: providerOptions,
+      providerOptions: options,
     };
   else
     return {
