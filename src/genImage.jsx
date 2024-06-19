@@ -22,7 +22,7 @@ import * as G4F from "g4f";
 const g4f = new G4F.G4F();
 
 // Image Providers
-export const image_providers = {
+const image_providers = {
   Prodia: [
     g4f.providers.Prodia,
     {
@@ -571,8 +571,12 @@ export default function genImage() {
         setChatData(structuredClone(newData));
       } else {
         const newChatData = default_chat_data();
-
         await Storage.write("imageChatData", JSON.stringify(newChatData));
+        // Delete all image chat folders
+        const folderPath = environment.supportPath + "/g4f-image-chats";
+        fs.rm(folderPath, { recursive: true }, () => {
+          return null;
+        });
         setChatData(newChatData);
       }
     })();
@@ -600,7 +604,7 @@ export default function genImage() {
     </List>
   ) : (
     <List
-      isShowingDetail={true}
+      isShowingDetail={!isChatEmpty(getChat(chatData.currentChat))}
       searchText={searchText}
       onSearchTextChange={setSearchText}
       searchBarPlaceholder="Generate image..."
@@ -632,7 +636,7 @@ export default function genImage() {
               title={x.prompt}
               subtitle={formatDate(x.creationDate)}
               key={i}
-              detail={<List.Item.Detail markdown={`![Image](${encodeURI(x.answer)}?raycast-height=350)`} />}
+              detail={<List.Item.Detail markdown={image_to_markdown(x.answer)} />}
               actions={<ImageActionPanel idx={i} />}
             />
           );
@@ -642,7 +646,7 @@ export default function genImage() {
   );
 }
 
-export const loadImageOptions = (currentChat) => {
+const loadImageOptions = (currentChat) => {
   // load provider and options
   const providerString = currentChat.provider,
     imageQuality = currentChat.imageQuality,
@@ -670,12 +674,24 @@ export const loadImageOptions = (currentChat) => {
     };
 };
 
-export const get_folder_path = (chatName) => {
+const get_folder_path = (chatName) => {
   return environment.supportPath + "/g4f-image-chats/" + encodeURIComponent(chatName);
 };
 
-export const get_file_path = (folderPath) => {
+const get_file_path = (folderPath) => {
   return (
     folderPath + "/g4f-image_" + encodeURIComponent(new Date().toISOString().replace(/:/g, "-").split(".")[0] + ".png")
   );
+};
+
+const isChatEmpty = (chat) => {
+  for (const message of chat.messages) {
+    if (message.prompt || message.answer) return false;
+  }
+  return true;
+};
+
+const image_to_markdown = (answer) => {
+  if (!answer) return "";
+  return `![Image](${encodeURI(answer)}?raycast-height=350)`;
 };
