@@ -1,4 +1,4 @@
-import { confirmAlert, Detail, Icon, popToRoot, showToast, Toast } from "@raycast/api";
+import { confirmAlert, Detail, Icon } from "@raycast/api";
 
 import { get_version, fetch_github_latest_version, is_up_to_date, download_and_install_update } from "./helpers/update";
 import { useEffect, useState } from "react";
@@ -10,23 +10,6 @@ export default function CheckForUpdates() {
 
   useEffect(() => {
     (async () => {
-      let userConfirmed = false;
-      await confirmAlert({
-        title: "Notice",
-        message:
-          "This feature is experimental and may not work as expected. Please report any issues on GitHub. Thank you!",
-        icon: Icon.Info,
-        primaryAction: {
-          title: "Proceed",
-          onAction: () => {
-            userConfirmed = true;
-          },
-        },
-      });
-      if (!userConfirmed) {
-        await popToRoot();
-      }
-
       // get latest version from github
       const latest_version = await fetch_github_latest_version();
       setMarkdown((prev) => `${prev}\n\n## Latest raycast-g4f version: ${latest_version}`);
