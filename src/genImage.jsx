@@ -286,7 +286,7 @@ export default function genImage() {
           title="Generate Image"
           onAction={async () => {
             if (searchText === "") {
-              toast(Toast.Style.Failure, "Please Enter a Prompt");
+              await toast(Toast.Style.Failure, "Please Enter a Prompt");
               return;
             }
 
