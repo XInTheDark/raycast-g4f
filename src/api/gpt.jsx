@@ -179,10 +179,6 @@ export default (
   // We work around this by preventing any generation when the generationStatus.loading flag is set to true.
   useEffect(() => {
     (async () => {
-      // This is also part of the workaround for the double rendering issue. If we are currently generating a response
-      // then we should not attempt to generate another response, or set the page to a Form.
-      if (generationStatus.loading) return;
-
       if (useSelected) {
         let systemPrompt = (context ? `${context}\n\n` : "") + (argQuery ? argQuery : "");
 
@@ -193,6 +189,14 @@ export default (
           selected = null;
         }
         if (selected && !selected.trim()) selected = null;
+
+        // This is also part of the workaround for the double rendering issue. If we are currently generating a response
+        // then we should not attempt to generate another response, or set the page to a Form.
+        // We do this check here instead of at the beginning, because getSelectedText() is sequential and the two calls to it
+        // will always complete one after the other. On the other hand, we can't check at the beginning because the two calls
+        // are started at the exact same time.
+        if (generationStatus.loading) return;
+
         setSelected(selected);
 
         // Before the rest of the code, handle forceShowForm
@@ -203,8 +207,9 @@ export default (
 
         // if not requireQuery, we use the selected text as the query
         if (!requireQuery) {
-          // handle the case where we don't use selected text: if !requireQuery, and we already have a context & query.
-          // For example: `Find Synonyms` command.
+          // handle the case where we don't use selected text: if we already have a context & query. e.g. "Find Synonyms" command.
+          // This is in fact not completely optimized, as we didn't have to get the selected text in the first place,
+          // but it's a niche case and the branching is already complex enough.
           if (context && argQuery) {
             await getResponse(`${systemPrompt}`);
             return;
