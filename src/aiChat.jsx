@@ -663,12 +663,12 @@ export default function Chat({ launchContext }) {
         />
         <Action.Push icon={Icon.BlankDocument} title="Compose Message" target={<ComposeMessageComponent />} />
         <ActionPanel.Section title="Current Chat">
-          {generationStatus.loading && (
+          {!generationStatus.stop && (
             <Action
               title="Stop Response"
               icon={Icon.Pause}
               onAction={() => {
-                generationStatus = { stop: true, loading: false };
+                generationStatus.stop = true;
               }}
               shortcut={{ modifiers: ["cmd", "shift", "opt"], key: "/" }}
             />

@@ -23,7 +23,7 @@ import { Message, pairs_to_messages } from "../classes/message";
 import * as providers from "./providers";
 import { G4F } from "g4f";
 
-let generationStatus = { stop: false };
+let generationStatus = { stop: false, loading: false };
 let get_status = () => generationStatus.stop;
 
 export default (
@@ -87,6 +87,10 @@ export default (
 
   // Input parameters: query - string, files - array of strings (file paths).
   const getResponse = async (query, { regenerate = false, files = [] } = {}) => {
+    // This is a workaround for multiple generation calls - see the comment above the useEffect.
+    if (generationStatus.loading) return;
+    generationStatus.loading = true;
+
     // handle processPrompt
     if (!regenerate && processPrompt) {
       query = processPrompt(context, query, selectedState);
@@ -166,8 +170,13 @@ export default (
     }
 
     setIsLoading(false);
+    generationStatus.loading = false;
   };
 
+  // For currently unknown reasons, this following useEffect is rendered twice, both at the same time.
+  // This results in getResponse() being called twice whenever a command is called directly (i.e. the form is not shown).
+  // This problem has always been present, and it's also present in the original raycast-gemini.
+  // We work around this by preventing any generation when the generationStatus.loading flag is set to true.
   useEffect(() => {
     (async () => {
       if (useSelected) {
@@ -180,6 +189,14 @@ export default (
           selected = null;
         }
         if (selected && !selected.trim()) selected = null;
+
+        // This is also part of the workaround for the double rendering issue. If we are currently generating a response
+        // then we should not attempt to generate another response, or set the page to a Form.
+        // We do this check here instead of at the beginning, because getSelectedText() is sequential and the two calls to it
+        // will always complete one after the other. On the other hand, we can't check at the beginning because the two calls
+        // are started at the exact same time.
+        if (generationStatus.loading) return;
+
         setSelected(selected);
 
         // Before the rest of the code, handle forceShowForm
@@ -190,8 +207,9 @@ export default (
 
         // if not requireQuery, we use the selected text as the query
         if (!requireQuery) {
-          // handle the case where we don't use selected text: if !requireQuery, and we already have a context & query.
-          // For example: `Find Synonyms` command.
+          // handle the case where we don't use selected text: if we already have a context & query. e.g. "Find Synonyms" command.
+          // This is in fact not completely optimized, as we didn't have to get the selected text in the first place,
+          // but it's a niche case and the branching is already complex enough.
           if (context && argQuery) {
             await getResponse(`${systemPrompt}`);
             return;
