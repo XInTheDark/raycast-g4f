@@ -179,6 +179,10 @@ export default (
   // We work around this by preventing any generation when the generationStatus.loading flag is set to true.
   useEffect(() => {
     (async () => {
+      // This is also part of the workaround for the double rendering issue. If we are currently generating a response
+      // then we should not attempt to generate another response, or set the page to a Form.
+      if (generationStatus.loading) return;
+
       if (useSelected) {
         let systemPrompt = (context ? `${context}\n\n` : "") + (argQuery ? argQuery : "");
 
