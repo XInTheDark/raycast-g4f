@@ -31,14 +31,10 @@ export default function Translate(props) {
       </Form.Dropdown>,
     ],
     processPrompt: (context, query, selected, values) => {
-      let str = query ? query : selected ? selected : "";
-      let language = values.language;
-      if (!str) {
-        showToast(Toast.Style.Failure, "No text provided");
-      }
-
+      const language = values.language;
       return (
-        `Translate the following text to ${language}. ONLY return the translated text and nothing else.` + `\n\n${str}`
+        `Translate the following text to ${language}. ONLY return the translated text and nothing else.` +
+        `\n\n${query}`
       );
     },
   });
