@@ -1,6 +1,6 @@
 # Raycast-G4F Privacy Policy
 
-Privacy Policy · [Homepage](README.md)
+[Homepage](README.md) · Privacy Policy
 
 ### Effective Date: 22 June 2024
 
