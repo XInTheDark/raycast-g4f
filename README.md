@@ -1,6 +1,6 @@
 # Raycast-G4F (GPT4Free)
 
-### Use the powerful GPT-4, Llama-3 and more AI models on Raycast, for FREE - no API Key required.</h3>
+**Use the powerful GPT-4, Llama-3 and more AI models on Raycast, for FREE - no API Key required.**
 
 Homepage · [Privacy Policy](Privacy.md)
 
