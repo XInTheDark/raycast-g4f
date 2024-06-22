@@ -4,8 +4,8 @@
   <h3>Use the powerful GPT-4, Llama-3 and more AI models on Raycast, for FREE - no API Key required.</h3>
   <br>
   Homepage
-  |
-  [Privacy Policy](Privacy.md)
+  ·
+  [Privacy Policy](https://github.com/XInTheDark/raycast-g4f/blob/main/Privacy.md)
 
 </div>
 
