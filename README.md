@@ -1,6 +1,14 @@
-# Raycast-G4F (GPT4Free)
+<div align="center">
 
-Use the powerful GPT-4, Llama-3 and more AI models on Raycast, for FREE - no API Key required.
+  <h2>Raycast-G4F (GPT4Free)</h2>
+  <h3>Use the powerful GPT-4, Llama-3 and more AI models on Raycast, for FREE - no API Key required.</h3>
+  <br>
+  Homepage
+  ·
+  [Privacy Policy][privacy-doc]
+
+</div>
+
 
 ## Getting Started
 
@@ -129,3 +137,6 @@ Third-party libraries used for generation:
 - [gemini-ai](https://github.com/EvanZhouDev/gemini-ai)
 
 Some of the code in this repository was inspired or ported from the original [gpt4free](https://github.com/xtekky/gpt4free) project (written in Python).
+
+[privacy-doc]: Privacy.md
+[commits-badge]:      https://img.shields.io/github/commits-since/official-stockfish/Stockfish/latest?style=for-the-badge
