@@ -5,7 +5,7 @@
   <br>
   Homepage
   ·
-  [Privacy Policy][privacy-doc]
+  [Privacy Policy](Privacy.md)
 </div>
 
 
@@ -136,5 +136,3 @@ Third-party libraries used for generation:
 - [gemini-ai](https://github.com/EvanZhouDev/gemini-ai)
 
 Some of the code in this repository was inspired or ported from the original [gpt4free](https://github.com/xtekky/gpt4free) project (written in Python).
-
-[privacy-doc]: Privacy.md
