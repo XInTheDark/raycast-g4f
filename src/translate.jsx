@@ -30,10 +30,9 @@ export default function Translate(props) {
         {languagesReact}
       </Form.Dropdown>,
     ],
-    processPrompt: (context, query, selected, values) => {
-      const language = values.language;
+    processPrompt: ({ query, values }) => {
       return (
-        `Translate the following text to ${language}. ONLY return the translated text and nothing else.` +
+        `Translate the following text to ${values.language}. ONLY return the translated text and nothing else.` +
         `\n\n${query}`
       );
     },
