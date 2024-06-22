@@ -6,7 +6,6 @@
   Homepage
   ·
   [Privacy Policy][privacy-doc]
-
 </div>
 
 
@@ -139,4 +138,3 @@ Third-party libraries used for generation:
 Some of the code in this repository was inspired or ported from the original [gpt4free](https://github.com/xtekky/gpt4free) project (written in Python).
 
 [privacy-doc]: Privacy.md
-[commits-badge]:      https://img.shields.io/github/commits-since/official-stockfish/Stockfish/latest?style=for-the-badge
