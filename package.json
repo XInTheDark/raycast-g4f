@@ -181,7 +181,7 @@
       "name": "configureG4FLocalApi",
       "title": "Configure GPT4Free Local API",
       "description": "Configure GPT4Free Local API settings",
-      "icon": "gpt-icon.png",
+      "icon": "box-icon.png",
       "mode": "view"
     }
   ],
