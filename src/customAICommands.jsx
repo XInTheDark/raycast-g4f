@@ -56,7 +56,7 @@ export default function CustomAICommands() {
         <Form.TextArea id="prompt" title="Prompt" defaultValue={command.prompt} />
         <Form.Description
           title=""
-          text="In the prompt, you can use {input} or {selection} as a dynamic placeholder for the selected text or input text. Learn more by selecting the Help action."
+          text="In the prompt, you can use dynamic placeholders like {input}, {clipboard} or {date}. Learn more by selecting the Help action."
         />
         <Form.Checkbox
           id="allowUploadFiles"

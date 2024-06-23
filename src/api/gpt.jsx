@@ -67,23 +67,26 @@ export default (
   // 8. otherReactComponents: An array of additional React components to be shown in the Form.
   // For example, `Translate` command has a dropdown to select the target language.
   // 9. processPrompt: A function to be called to get the final prompt. The usage is
-  // processPrompt(context, query, selected, otherReactComponents.values - if any).
+  // processPrompt({context: context, query: query, selected: selected, values: otherReactComponents.values - if any}).
+  // Both async and non-async functions are supported - in particular, we just always `await` the function.
   // 10. allowUploadFiles: A boolean to allow uploading files in the Form. If true, a file upload field will be shown.
   // 11. defaultFiles: Files to always include in the prompt. This is an array of file paths.
 
+  /// Init
   const Pages = {
     Form: 0,
     Detail: 1,
   };
-  let { query: argQuery } = props.arguments ?? {};
-  if (!argQuery) argQuery = props.fallbackText ?? "";
-
   const [page, setPage] = useState(Pages.Detail);
   const [markdown, setMarkdown] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [selectedState, setSelected] = useState("");
   const [lastQuery, setLastQuery] = useState({ text: "", files: [] });
   const [lastResponse, setLastResponse] = useState("");
+
+  // Init parameters
+  let { query: argQuery } = props.arguments ?? {};
+  if (!argQuery) argQuery = props.fallbackText ?? "";
 
   // Input parameters: query - string, files - array of strings (file paths).
   const getResponse = async (query, { regenerate = false, files = [] } = {}) => {
@@ -93,7 +96,7 @@ export default (
 
     // handle processPrompt
     if (!regenerate && processPrompt) {
-      query = processPrompt(context, query, selectedState);
+      query = await processPrompt({ context: context, query: query, selected: selectedState });
     }
 
     // handle files: we combine files (files that the user uploads)
@@ -357,7 +360,12 @@ export default (
 
               if (processPrompt) {
                 // custom function
-                prompt = processPrompt(context, values.query, selectedState, values);
+                prompt = await processPrompt({
+                  context: context,
+                  query: values.query,
+                  selected: selectedState,
+                  values: values,
+                });
                 processPrompt = null; // only call once
               } else if (useSelected && selectedState) {
                 prompt = `${systemPrompt}\n\n${selectedState}`;
