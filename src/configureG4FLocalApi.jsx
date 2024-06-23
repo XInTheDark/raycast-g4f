@@ -1,5 +1,7 @@
 import { getG4FExecutablePath, getG4FTimeout, DEFAULT_TIMEOUT, getG4FModelsDropdown } from "./api/Providers/g4f_local";
 import { Storage } from "./api/storage";
+import { help_action } from "./helpers/helpPage";
+
 import { Form, ActionPanel, Action, useNavigation, showToast, Toast } from "@raycast/api";
 import { useState, useEffect } from "react";
 
@@ -34,6 +36,7 @@ export default function ConfigureG4FLocalApi() {
               await showToast(Toast.Style.Success, "Configuration Saved");
             }}
           />
+          {help_action("g4fLocal")}
         </ActionPanel>
       }
     >
