@@ -33,8 +33,12 @@ export { ReplicateProvider, getReplicateResponse };
 import { GeminiProvider, getGoogleGeminiResponse } from "./Providers/google_gemini";
 export { GeminiProvider, getGoogleGeminiResponse };
 
+// G4F Local module
+import { G4FLocalProvider, getG4FLocalResponse } from "./Providers/g4f_local";
+export { G4FLocalProvider, getG4FLocalResponse };
+
 /// All providers info
-// {provider, model, stream, extra options}
+// { provider internal name, {provider, model, stream, extra options} }
 // prettier-ignore
 export const providers_info = {
   GPT35: { provider: NexraProvider, model: "chatgpt", stream: true },
@@ -51,6 +55,7 @@ export const providers_info = {
   ReplicateLlama3_70B: { provider: ReplicateProvider, model: "meta/meta-llama-3-70b-instruct", stream: true },
   ReplicateMixtral_8x7B: { provider: ReplicateProvider, model: "mistralai/mixtral-8x7b-instruct-v0.1", stream: true },
   GoogleGemini: { provider: GeminiProvider, model: "gemini-1.5-flash-latest", stream: true },
+  G4FLocal: { provider: G4FLocalProvider, stream: true },
 };
 
 /// Chat providers (user-friendly names)
@@ -69,6 +74,7 @@ export const chat_providers = [
   ["Replicate (meta-llama-3-70b)", "ReplicateLlama3_70B"],
   ["Replicate (mixtral-8x7b)", "ReplicateMixtral_8x7B"],
   ["Google Gemini (requires API Key)", "GoogleGemini"],
+  ["GPT4Free Local API", "G4FLocal"],
 ];
 
 export const ChatProvidersReact = chat_providers.map((x) => {
