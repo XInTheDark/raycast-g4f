@@ -176,12 +176,19 @@
       "description": "Check for extension updates from the official GitHub source",
       "icon": "update-icon.png",
       "mode": "view"
+    },
+    {
+      "name": "configureG4FLocalApi",
+      "title": "Configure GPT4Free Local API",
+      "description": "Configure GPT4Free Local API settings",
+      "icon": "gpt-icon.png",
+      "mode": "view"
     }
   ],
   "preferences": [
     {
       "name": "gptProvider",
-      "title": "Default GPT Provider",
+      "title": "Default Provider",
       "description": "The default provider and model used in this extension.",
       "required": false,
       "type": "dropdown",
@@ -241,6 +248,10 @@
         {
           "title": "Google Gemini (requires API Key)",
           "value": "GoogleGemini"
+        },
+        {
+          "title": "GPT4Free Local API",
+          "value": "G4FLocal"
         }
       ],
       "default": "GPT35"

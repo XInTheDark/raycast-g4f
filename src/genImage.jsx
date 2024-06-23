@@ -120,7 +120,7 @@ export default function genImage() {
             if (err) {
               toast(Toast.Style.Failure, "Error saving image");
               console.log("Error saving image. Current path: " + __dirname);
-              console.error(err);
+              console.log(err);
               imagePath = "";
             }
           });

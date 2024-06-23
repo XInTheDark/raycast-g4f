@@ -285,7 +285,7 @@ export default function Chat({ launchContext }) {
         }
       >
         <Form.TextArea id="chatText" title="Chat Transcript" />
-        <Form.Description title="GPT Model" text="The provider and model used for this chat." />
+        <Form.Description title="Provider" text="The provider and model used for this chat." />
         <Form.Dropdown id="provider" defaultValue={providers.default_provider_string()}>
           {providers.ChatProvidersReact}
         </Form.Dropdown>
@@ -416,7 +416,7 @@ export default function Chat({ launchContext }) {
             second: "2-digit",
           })}`}
         />
-        <Form.Description title="GPT Model" text="The provider and model used for this chat." />
+        <Form.Description title="Provider" text="The provider and model used for this chat." />
         <Form.Dropdown id="provider" defaultValue={defaultProviderString}>
           {providers.ChatProvidersReact}
         </Form.Dropdown>

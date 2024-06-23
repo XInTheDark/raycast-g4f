@@ -49,19 +49,17 @@ export const getDeepInfraResponse = async function* (chat, options, max_retries 
     const reader = response.body;
     for await (let chunk of reader) {
       const str = chunk.toString();
-
       let lines = str.split("\n");
+
       for (let i = 0; i < lines.length; i++) {
         let line = lines[i];
         if (line.startsWith("data: ")) {
           let chunk = line.substring(6);
           if (chunk.trim() === "[DONE]") return; // trim() is important
 
-          let data = JSON.parse(chunk);
-          let choice = data["choices"][0];
-          // python: if "content" in choice["delta"] and choice["delta"]["content"]:
-          if ("delta" in choice && "content" in choice["delta"] && choice["delta"]["content"]) {
-            let delta = choice["delta"]["content"];
+          try {
+            let data = JSON.parse(chunk);
+            let delta = data["choices"][0]["delta"]["content"];
             if (first) {
               delta = delta.trimStart();
             }
@@ -69,9 +67,11 @@ export const getDeepInfraResponse = async function* (chat, options, max_retries 
               first = false;
               yield delta;
             }
+          } catch (e) {
+            continue;
           }
         }
-      } // readline
+      }
     }
   } catch (e) {
     if (max_retries > 0) {

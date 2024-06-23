@@ -109,7 +109,8 @@ export const Storage = {
     await Storage.run_sync();
   },
 
-  // combined read function - read from local storage, fallback to file storage
+  // combined read function - read from local storage, fallback to file storage.
+  // also writes the default value to local storage if it is provided and key is not found
   read: async (key, default_value = undefined) => {
     let value;
     if (await Storage.localStorage_has(key)) {
