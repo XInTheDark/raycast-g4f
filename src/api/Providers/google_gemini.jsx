@@ -43,9 +43,7 @@ export const getGoogleGeminiResponse = async (chat, options, stream_update, max_
           response = await geminiChat.ask(query, { safetySettings: safetySettings });
           return response;
         }
-      } catch (e) {
-        continue;
-      }
+      } catch (e) {} // eslint-disable-line
     }
   } catch (e) {
     // if all API keys fail, we allow a few retries

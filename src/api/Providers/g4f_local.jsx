@@ -57,9 +57,7 @@ export const getG4FLocalResponse = async function* (chat, options) {
           if (delta) {
             yield delta;
           }
-        } catch (e) {
-          continue;
-        }
+        } catch (e) {} // eslint-disable-line
       }
     }
   }

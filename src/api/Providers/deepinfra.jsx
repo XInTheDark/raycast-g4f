@@ -67,9 +67,7 @@ export const getDeepInfraResponse = async function* (chat, options, max_retries 
               first = false;
               yield delta;
             }
-          } catch (e) {
-            continue;
-          }
+          } catch (e) {} // eslint-disable-line
         }
       }
     }
