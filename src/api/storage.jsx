@@ -108,7 +108,7 @@ export const Storage = {
   // first write to local storage function only, and then add key to sync cache to add to file storage later
   write: async (key, value) => {
     await Storage.localStorage_write(key, value);
-    if (this.persistent) {
+    if (Storage.persistent) {
       await Storage.add_to_sync_cache(key);
       await Storage.run_sync();
     }
@@ -123,7 +123,7 @@ export const Storage = {
       // note how we only sync here, as it only makes sense when we have a value in local storage
       await Storage.add_to_sync_cache(key);
       await Storage.run_sync();
-    } else if (this.persistent && (await Storage.fileStorage_has(key))) {
+    } else if (Storage.persistent && (await Storage.fileStorage_has(key))) {
       console.log(`Reading key: ${key} from file storage`);
       value = await Storage.fileStorage_read(key);
       // write to local storage
