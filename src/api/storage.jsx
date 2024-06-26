@@ -1,16 +1,19 @@
 // This is the Storage interface, which combines LocalStorage with more persistent file system storage.
-// We generally also keep the two versions in sync, but the sync process happens only periodically
-// and thus the file storage should not be relied upon for immediate consistency.
+// If the persistent storage preference is enabled, we also keep the two versions in sync,
+// but the sync process happens only periodically so the file storage should not be relied upon for immediate consistency.
 // Note that persistent storage is not always the best option as file I/O is relatively expensive.
-// Thus, only use it when you really need to persist data across sessions.
+// Thus, only use it when you really need to persist data across sessions. Otherwise, use local storage.
 
-import { environment, LocalStorage } from "@raycast/api";
+import { environment, getPreferenceValues, LocalStorage } from "@raycast/api";
 import fs from "fs";
 
 const not_found = (x) => x === undefined || x === null;
 const found = (x) => !not_found(x);
 
 export const Storage = {
+  // whether to enable persistent/combined storage
+  persistent: getPreferenceValues()["persistentStorage"] || false,
+
   /// Local storage functions - these provide quicker access that is not critical to persist
 
   // check if item exists in local storage
@@ -105,8 +108,10 @@ export const Storage = {
   // first write to local storage function only, and then add key to sync cache to add to file storage later
   write: async (key, value) => {
     await Storage.localStorage_write(key, value);
-    await Storage.add_to_sync_cache(key);
-    await Storage.run_sync();
+    if (this.persistent) {
+      await Storage.add_to_sync_cache(key);
+      await Storage.run_sync();
+    }
   },
 
   // combined read function - read from local storage, fallback to file storage.
@@ -118,7 +123,7 @@ export const Storage = {
       // note how we only sync here, as it only makes sense when we have a value in local storage
       await Storage.add_to_sync_cache(key);
       await Storage.run_sync();
-    } else if (await Storage.fileStorage_has(key)) {
+    } else if (this.persistent && (await Storage.fileStorage_has(key))) {
       console.log(`Reading key: ${key} from file storage`);
       value = await Storage.fileStorage_read(key);
       // write to local storage
@@ -126,7 +131,7 @@ export const Storage = {
     } else {
       console.log(`Key: ${key} not found, returning default value`);
       value = default_value;
-      // write to both local and file storage
+      // write default key to storage
       if (value !== undefined) await Storage.write(key, value);
     }
     return value;
