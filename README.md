@@ -104,6 +104,7 @@ along with the option to update the extension with a single click.
 ### Persistent Storage
 Enable more persistent storage of the extension's data, like AI Chat data or Custom Commands.
 This will back up a copy of this data to files on your computer.
+
 ---
 
 ## FAQs
