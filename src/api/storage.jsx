@@ -121,8 +121,10 @@ export const Storage = {
     if (await Storage.localStorage_has(key)) {
       value = await Storage.localStorage_read(key);
       // note how we only sync here, as it only makes sense when we have a value in local storage
-      await Storage.add_to_sync_cache(key);
-      await Storage.run_sync();
+      if (Storage.persistent) {
+        await Storage.add_to_sync_cache(key);
+        await Storage.run_sync();
+      }
     } else if (Storage.persistent && (await Storage.fileStorage_has(key))) {
       console.log(`Reading key: ${key} from file storage`);
       value = await Storage.fileStorage_read(key);
