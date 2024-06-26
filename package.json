@@ -258,9 +258,9 @@
     },
     {
       "name": "webSearch",
-      "title": "Experimental Features",
+      "title": "Features",
       "label": "Enable Web Search",
-      "description": "Adds web search capabilities to GPT. Available in AI Chat.",
+      "description": "Add web search capabilities to GPT. Available in AI Chat.",
       "required": false,
       "type": "checkbox",
       "default": false
@@ -268,7 +268,7 @@
     {
       "name": "smartChatNaming",
       "label": "Enable Smart Chat Naming",
-      "description": "Automatically renames chat sessions based on the messages you send.",
+      "description": "Automatically rename chat sessions based on the messages you send.",
       "required": false,
       "type": "checkbox",
       "default": false
@@ -284,7 +284,7 @@
     {
       "name": "persistentStorage",
       "label": "Persistent Storage",
-      "description": "Enable more persistent storage of the extension's data.",
+      "description": "Enable more persistent storage of the extension's data. Do not use if you have sensitive data.",
       "required": false,
       "type": "checkbox",
       "default": false
