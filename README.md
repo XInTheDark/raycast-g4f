@@ -97,9 +97,13 @@ This should be enough for most users, but similarly you can also create multiple
 Let GPT automatically come up with a name for the current chat session after you send the first message. For example, this is similar to what the ChatGPT web UI does.
 - **How to enable**: Go to the extension preferences and check the "Enable Smart Chat Naming" box.
 
-### Automatically Check for Updates (Beta)
+### Automatically Check for Updates
 Let the extension automatically check for updates every day. If a new version is available, you will be notified,
 along with the option to update the extension with a single click.
+
+### Persistent Storage
+Enable more persistent storage of the extension's data, like AI Chat data or Custom Commands.
+This will back up a copy of this data to files on your computer.
 
 ---
 

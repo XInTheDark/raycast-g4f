@@ -275,8 +275,16 @@
     },
     {
       "name": "autoCheckForUpdates",
-      "label": "Automatically Check for Updates (BETA)",
+      "label": "Automatically Check for Updates",
       "description": "Automatically check for updates from the official GitHub source.",
+      "required": false,
+      "type": "checkbox",
+      "default": false
+    },
+    {
+      "name": "persistentStorage",
+      "label": "Persistent Storage",
+      "description": "Enable more persistent storage of the extension's data.",
       "required": false,
       "type": "checkbox",
       "default": false
