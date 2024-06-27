@@ -1,4 +1,4 @@
-import { getG4FExecutablePath, getG4FTimeout, DEFAULT_TIMEOUT, getG4FModelsDropdown } from "./api/Providers/g4f_local";
+import { getG4FExecutablePath, getG4FTimeout, DEFAULT_TIMEOUT, getG4FModelsComponent } from "./api/Providers/g4f_local";
 import { Storage } from "./api/storage";
 import { help_action } from "./helpers/helpPage";
 
@@ -8,7 +8,7 @@ import { useState, useEffect } from "react";
 export default function ConfigureG4FLocalApi() {
   const [executablePath, setExecutablePath] = useState("");
   const [timeout, setTimeout] = useState("");
-  const [modelsDropdown, setModelsDropdown] = useState([]);
+  const [modelsComponent, setModelsComponent] = useState([]);
   const [rendered, setRendered] = useState(false);
 
   const { pop } = useNavigation();
@@ -17,7 +17,7 @@ export default function ConfigureG4FLocalApi() {
     (async () => {
       setExecutablePath(await getG4FExecutablePath());
       setTimeout((await getG4FTimeout()).toString());
-      setModelsDropdown(await getG4FModelsDropdown());
+      setModelsComponent(await getG4FModelsComponent());
       setRendered(true);
     })();
   }, []);
@@ -32,7 +32,10 @@ export default function ConfigureG4FLocalApi() {
               pop();
               await Storage.write("g4f_executable", values.g4f_executable);
               await Storage.write("g4f_timeout", values.g4f_timeout || DEFAULT_TIMEOUT);
-              await Storage.write("g4f_model", values.model);
+              await Storage.write(
+                "g4f_info",
+                JSON.stringify({ model: values.model, provider: values.provider.trim() })
+              );
               await showToast(Toast.Style.Success, "Configuration Saved");
             }}
           />
@@ -58,7 +61,7 @@ export default function ConfigureG4FLocalApi() {
           if (rendered) setTimeout(x);
         }}
       />
-      {modelsDropdown}
+      {modelsComponent}
     </Form>
   );
 }

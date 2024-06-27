@@ -11,6 +11,9 @@ import { environment, Form } from "@raycast/api";
 
 // constants
 const DEFAULT_MODEL = "meta-ai";
+const DEFAULT_PROVIDER = null;
+const DEFAULT_INFO = JSON.stringify({ model: DEFAULT_MODEL, provider: DEFAULT_PROVIDER });
+
 export const DEFAULT_TIMEOUT = "900";
 
 const BASE_URL = "http://localhost:1337/v1";
@@ -25,7 +28,9 @@ export const getG4FLocalResponse = async function* (chat, options) {
   }
 
   chat = messages_to_json(chat);
-  const model = await getSelectedG4FModel();
+  const info = await getG4FModelInfo();
+  const model = info.model || DEFAULT_MODEL,
+    provider = info.provider || DEFAULT_PROVIDER;
 
   const response = await fetch(API_URL, {
     method: "POST",
@@ -34,6 +39,7 @@ export const getG4FLocalResponse = async function* (chat, options) {
     },
     body: JSON.stringify({
       model: model,
+      provider: provider,
       stream: options.stream,
       messages: chat,
     }),
@@ -89,14 +95,23 @@ const getG4FModels = async () => {
 };
 
 // get available models as dropdown component
-export const getG4FModelsDropdown = async () => {
+export const getG4FModelsComponent = async () => {
   const models = await getG4FModels();
+  const info = await getG4FModelInfo();
   return (
-    <Form.Dropdown id="model" title="Model" defaultValue={await getSelectedG4FModel()}>
-      {models.map((model) => {
-        return <Form.Dropdown.Item title={model.id} key={model.id} value={model.id} />;
-      })}
-    </Form.Dropdown>
+    <>
+      <Form.Dropdown id="model" title="Model" defaultValue={info.model}>
+        {models.map((model) => {
+          return <Form.Dropdown.Item title={model.id} key={model.id} value={model.id} />;
+        })}
+      </Form.Dropdown>
+      <Form.TextField
+        id="provider"
+        title="Provider"
+        info="(Optional) The provider to use in the API. The API will automatically select the best provider if this is not set."
+        defaultValue={info.provider}
+      />
+    </>
   );
 };
 
@@ -105,9 +120,9 @@ export const getG4FExecutablePath = async () => {
   return await Storage.read("g4f_executable", "g4f");
 };
 
-// get the currently selected G4F model from storage
-const getSelectedG4FModel = async () => {
-  return await Storage.read("g4f_model", DEFAULT_MODEL);
+// get the currently selected G4F model and provider from storage
+const getG4FModelInfo = async () => {
+  return JSON.parse(await Storage.read("g4f_info", DEFAULT_INFO));
 };
 
 // get G4F API timeout (in seconds) from storage
