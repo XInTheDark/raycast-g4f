@@ -94,14 +94,16 @@ export default (
     if (generationStatus.loading) return;
     generationStatus.loading = true;
 
-    // handle processPrompt
-    if (!regenerate && processPrompt) {
-      query = await processPrompt({ context: context, query: query, selected: selectedState });
-    }
+    if (!regenerate) {
+      // handle processPrompt
+      if (processPrompt) {
+        query = await processPrompt({ context: context, query: query, selected: selectedState });
+      }
 
-    // handle files: we combine files (files that the user uploads)
-    // with defaultFiles (files that are passed as a parameter and are always included)
-    files = [...defaultFiles, ...files];
+      // handle files: we combine files (files that the user uploads)
+      // with defaultFiles (files that are passed as a parameter and are always included)
+      files = [...defaultFiles, ...files];
+    }
 
     setLastQuery({ text: query, files: files });
     setPage(Pages.Detail);
