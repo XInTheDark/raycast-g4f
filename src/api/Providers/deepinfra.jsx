@@ -31,7 +31,7 @@ export const getDeepInfraResponse = async function* (chat, options, max_retries 
     model: model,
     messages: chat,
     temperature: options.temperature ?? 0.7,
-    max_tokens: model.includes("Meta-Llama-3") ? 1028 : null,
+    max_tokens: 100000,
     stream: true,
     headers: headers,
   };

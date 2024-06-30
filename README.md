@@ -61,7 +61,7 @@ updating manually also allows you to fetch and view the latest changes to the so
 | Bing               | gpt-4                   | ✅         | ![Unknown][unknown-badge] | Slow      | 6/10, generation speed is likely quite slow but comes with built-in web search ability.       |
 | DeepInfra          | WizardLM-2-8x22B        | ✅         | ![Active][active-badge]   | Medium    | 7.5/10, capable model for general use.                                                        |
 | DeepInfra          | meta-llama-3-8b         | ✅         | ![Active][active-badge]   | Very fast | 6.5/10                                                                                        |
-| DeepInfra          | meta-llama-3-70b        | ✅         | ![Active][active-badge]   | Fast      | 7/10                                                                                          |
+| DeepInfra          | meta-llama-3-70b        | ✅         | ![Active][active-badge]   | Medium    | 7/10                                                                                          |
 | DeepInfra          | Mixtral-8x22B           | ✅         | ![Active][active-badge]   | Fast      | 7/10                                                                                          |
 | DeepInfra          | Qwen2-72B               | ✅         | ![Active][active-badge]   | Fast      | 7.5/10                                                                                        |
 | Blackbox           | custom model            | ✅         | ![Active][active-badge]   | Very fast | 6.5/10, very fast generation with built-in web search ability, but is optimized for coding.   |
