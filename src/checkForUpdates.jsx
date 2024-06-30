@@ -7,9 +7,13 @@ export default function CheckForUpdates() {
   let version = get_version();
   let default_markdown = `## Current raycast-g4f version: ${version}`;
   let [markdown, setMarkdown] = useState(default_markdown);
+  let fetched = false; // fix for the double rendering issue, similar to the one in useGPT
 
   useEffect(() => {
     (async () => {
+      if (fetched) return;
+      fetched = true;
+
       // get latest version from github
       const latest_version = await fetch_github_latest_version();
       setMarkdown((prev) => `${prev}\n\n## Latest raycast-g4f version: ${latest_version}`);
