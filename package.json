@@ -222,8 +222,8 @@
           "value": "DeepInfraMixtral_8x22B"
         },
         {
-          "title": "DeepInfra (Dolphin-2.6-8x7B)",
-          "value": "DeepInfraDolphin26_8x7B"
+          "title": "DeepInfra (Qwen2-72B)",
+          "value": "DeepInfraQwen2_72B"
         },
         {
           "title": "Blackbox (custom-model)",
