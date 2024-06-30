@@ -34,6 +34,7 @@ export const getDeepInfraResponse = async function* (chat, options, max_retries 
     max_tokens: 100000,
     stream: true,
     headers: headers,
+    ...(model_options[model] ?? {}),
   };
 
   try {
@@ -79,4 +80,8 @@ export const getDeepInfraResponse = async function* (chat, options, max_retries 
       throw e;
     }
   }
+};
+
+const model_options = {
+  "Qwen/Qwen2-72B-Instruct": { repetition_penalty: 1.2 },
 };
