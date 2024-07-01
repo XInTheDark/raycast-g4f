@@ -45,7 +45,7 @@ export const webSearchTool = {
   },
 };
 
-export const getWebResult = async (query) => {
+export const getWebResult = async (query, { mode = "basic" } = {}) => {
   console.log("Web search query:", query);
   if (!query) return "No results found.";
   let APIKeysStr = getPreferenceValues()["TavilyAPIKeys"];
@@ -56,7 +56,7 @@ export const getWebResult = async (query) => {
     let data = {
       api_key: APIKey,
       query: query,
-      max_results: 4,
+      max_results: mode === "basic" ? 4 : 8,
       search_depth: "advanced",
     };
 

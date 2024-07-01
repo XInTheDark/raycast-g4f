@@ -84,7 +84,7 @@ export const getDeepInfraResponse = async function* (chat, options, max_retries 
               web_search_call.query = args["query"];
               let call_id = delta["tool_calls"][0]["id"];
 
-              let webResponse = await getWebResult(web_search_call.query);
+              let webResponse = await getWebResult(web_search_call.query, { mode: "advanced" });
               let msg = {
                 role: "tool",
                 content: webResponse,
