@@ -27,8 +27,9 @@ const headers = {
   "sec-ch-ua-platform": '"macOS"',
 };
 
+// Models that support function calling
 const function_supported_models = ["mistralai/Mixtral-8x22B-Instruct-v0.1", "Qwen/Qwen2-72B-Instruct"];
-// chatContext is a reference to the currentChat object which we modify directly when using function calls
+
 export const getDeepInfraResponse = async function* (chat, options, max_retries = 5) {
   const model = options.model;
   chat = messages_to_json(chat);
