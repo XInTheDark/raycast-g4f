@@ -37,8 +37,8 @@ export const getDeepInfraResponse = async function* (chat, options, max_retries 
   const useWebSearch = getPreferenceValues()["webSearch"] && function_supported_models.includes(model);
   const tools = useWebSearch ? [webSearchTool] : null;
 
-  // system prompt
-  if (useWebSearch) {
+  // use ChatGPT-style system prompt for web search
+  if (useWebSearch && chat[0]?.role !== "system") {
     chat.unshift({
       role: "system",
       content: webSystemPrompt_ChatGPT,

@@ -29,35 +29,23 @@ export class MessagePair {
   // but they are still being treated as MessagePair objects, and this is fine.
 
   // When initialising, we can pass in either prompt and answer, or first and second.
-  // prompt and answer are just shortcuts to initialise the user/assistant roles.
-  // first and second are useful when we have custom roles like "system" or "tool".
+  // prompt and answer are just shortcuts to initialise the user/assistant roles; don't ever access them.
+  // When accessing, always strictly use the first and second properties. e.g. messagePair.first.content for the user message.
   constructor({
     prompt = "",
     answer = "",
-    first = null,
-    second = null,
+    first = { role: "user", content: "" },
+    second = { role: "assistant", content: "" },
     creationDate = new Date(),
     id = new Date().getTime(),
     finished = false,
     visible = true,
     files = [],
   } = {}) {
-    if (prompt) {
-      this.first = { role: "user", content: prompt };
-      this.prompt = prompt; // for compatibility with usages in AI Chat
-    }
-    if (answer) {
-      this.second = { role: "assistant", content: answer };
-      this.answer = answer;
-    }
-    if (first) {
-      this.first = first;
-      if (first.role === "user") this.prompt = first.content;
-    }
-    if (second) {
-      this.second = second;
-      if (second.role === "assistant") this.answer = second.content;
-    }
+    this.first = { role: "user", content: prompt };
+    this.second = { role: "assistant", content: answer };
+    if (first.content) this.first = first;
+    if (second.content) this.second = second;
 
     this.creationDate = creationDate;
     this.id = id;
@@ -78,7 +66,7 @@ export const pairs_to_messages = (pairs, query = null) => {
   for (let i = pairs.length - 1; i >= 0; i--) {
     // reverse order, index 0 is latest message
     let messagePair = pairs[i];
-    if (!messagePair.first && !messagePair.files) continue;
+    if (!messagePair.first.content && !messagePair.files) continue;
     chat.push(
       messagePair.files
         ? new Message({
@@ -89,7 +77,7 @@ export const pairs_to_messages = (pairs, query = null) => {
           })
         : new Message({ ...messagePair.first, role: messagePair.first.role, content: messagePair.first.content })
     );
-    if (messagePair.second)
+    if (messagePair.second.content)
       chat.push(
         new Message({ ...messagePair.second, role: messagePair.second.role, content: messagePair.second.content })
       );
