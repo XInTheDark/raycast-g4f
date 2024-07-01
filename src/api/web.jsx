@@ -1,5 +1,6 @@
 import { getPreferenceValues, Toast, showToast } from "@raycast/api";
 import fetch from "node-fetch";
+import * as providers from "./providers";
 
 export const webToken = "<|web_search|>",
   webTokenEnd = "<|end_web_search|>";
@@ -25,7 +26,28 @@ export const webSystemPrompt =
   "Do your best to be informative. However, you MUST NOT make up any information. If you think you might not know something, search for it.\n";
 export const systemResponse = "Understood. I will strictly follow these instructions in this conversation.";
 
+// a tool to be passed into OpenAI-compatible APIs
+export const webSearchTool = {
+  type: "function",
+  function: {
+    name: "web_search",
+    description: "Return the web search results for the given query",
+    parameters: {
+      type: "object",
+      properties: {
+        query: {
+          type: "string",
+          description: "The query to search for",
+        },
+      },
+      required: ["query"],
+    },
+  },
+};
+
 export const getWebResult = async (query) => {
+  console.log("Web search query:", query);
+  if (!query) return "No results found.";
   let APIKeysStr = getPreferenceValues()["TavilyAPIKeys"];
   let APIKeys = APIKeysStr.split(",").map((x) => x.trim());
 
@@ -78,4 +100,8 @@ export const processWebResults = (results) => {
     answer += rst;
   }
   return answer;
+};
+
+export const web_search_enabled = (provider) => {
+  return getPreferenceValues()["webSearch"] && !providers.function_supported_providers.includes(provider);
 };

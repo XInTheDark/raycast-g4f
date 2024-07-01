@@ -84,6 +84,9 @@ export const ChatProvidersReact = chat_providers.map((x) => {
 /// Providers that support file uploads
 export const file_supported_providers = [GeminiProvider];
 
+/// Providers that support function calling
+export const function_supported_providers = [DeepInfraProvider];
+
 // Additional options
 export const provider_options = (provider, chatOptions = null) => {
   let options = {};

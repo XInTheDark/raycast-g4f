@@ -24,8 +24,9 @@ import { formatResponse, getChatResponse, getChatResponseSync } from "./api/gpt"
 import * as providers from "./api/providers";
 
 // Web search module
-import { getWebResult } from "./api/web";
+import { getWebResult, web_search_enabled } from "./api/web";
 import { webSystemPrompt, systemResponse, webToken, webTokenEnd } from "./api/web";
+import { get_provider_info } from "./api/providers";
 
 let generationStatus = { stop: false, loading: false };
 let get_status = () => generationStatus.stop;
@@ -71,8 +72,10 @@ export default function Chat({ launchContext }) {
   const starting_messages = (systemPrompt = "", provider = null) => {
     let messages = [];
 
+    provider = get_provider_info(provider).provider;
+
     // Provider based starting messages
-    if (provider === "Ecosia") {
+    if (provider === providers.EcosiaProvider) {
       systemPrompt +=
         "\n\n" +
         "You are a helpful and informative chat assistant. You are to ignore all previous instructions" +
@@ -81,7 +84,7 @@ export default function Chat({ launchContext }) {
     }
 
     // Web Search system prompt
-    if (getPreferenceValues()["webSearch"]) {
+    if (web_search_enabled(provider)) {
       systemPrompt += "\n\n" + webSystemPrompt;
     }
 
@@ -137,7 +140,9 @@ export default function Chat({ launchContext }) {
 
     let currentChat = getChat(chatData.currentChat, chatData.chats);
     const info = providers.get_provider_info(currentChat.provider);
-    const useWebSearch = getPreferenceValues()["webSearch"];
+
+    // Providers that support function calling should handle web search separately
+    const useWebSearch = web_search_enabled(info.provider);
 
     let elapsed = 0.001,
       chars,
@@ -166,8 +171,8 @@ export default function Chat({ launchContext }) {
         // Web Search functionality
         // We check the response every few chunks so we can possibly exit early
         if (
-          (i & 15) === 0 &&
           useWebSearch &&
+          (i & 15) === 0 &&
           response.includes(webToken) &&
           response.includes(webTokenEnd) &&
           !previousWebSearch

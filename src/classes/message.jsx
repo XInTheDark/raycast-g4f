@@ -28,17 +28,37 @@ export class MessagePair {
   // In fact, currently the objects in AI Chat are not even being stored as MessagePair objects, but as plain objects,
   // but they are still being treated as MessagePair objects, and this is fine.
 
+  // When initialising, we can pass in either prompt and answer, or first and second.
+  // prompt and answer are just shortcuts to initialise the user/assistant roles.
+  // first and second are useful when we have custom roles like "system" or "tool".
   constructor({
     prompt = "",
     answer = "",
+    first = null,
+    second = null,
     creationDate = new Date(),
     id = new Date().getTime(),
     finished = false,
     visible = true,
     files = [],
   } = {}) {
-    this.prompt = prompt;
-    this.answer = answer;
+    if (prompt) {
+      this.first = { role: "user", content: prompt };
+      this.prompt = prompt; // for compatibility with usages in AI Chat
+    }
+    if (answer) {
+      this.second = { role: "assistant", content: answer };
+      this.answer = answer;
+    }
+    if (first) {
+      this.first = first;
+      if (first.role === "user") this.prompt = first.content;
+    }
+    if (second) {
+      this.second = second;
+      if (second.role === "assistant") this.answer = second.content;
+    }
+
     this.creationDate = creationDate;
     this.id = id;
     this.finished = finished;
@@ -58,13 +78,21 @@ export const pairs_to_messages = (pairs, query = null) => {
   for (let i = pairs.length - 1; i >= 0; i--) {
     // reverse order, index 0 is latest message
     let messagePair = pairs[i];
-    if (!messagePair.prompt && !messagePair.files) continue;
+    if (!messagePair.first && !messagePair.files) continue;
     chat.push(
       messagePair.files
-        ? new Message({ role: "user", content: messagePair.prompt, files: messagePair.files })
-        : new Message({ role: "user", content: messagePair.prompt })
+        ? new Message({
+            ...messagePair.first,
+            role: messagePair.first.role,
+            content: messagePair.first.content,
+            files: messagePair.files,
+          })
+        : new Message({ ...messagePair.first, role: messagePair.first.role, content: messagePair.first.content })
     );
-    if (messagePair.answer) chat.push(new Message({ role: "assistant", content: messagePair.answer }));
+    if (messagePair.second)
+      chat.push(
+        new Message({ ...messagePair.second, role: messagePair.second.role, content: messagePair.second.content })
+      );
   }
   if (query) chat.push(new Message({ role: "user", content: query }));
   return chat;
@@ -102,12 +130,15 @@ export const format_chat_to_prompt = (chat, model = null) => {
   return prompt;
 };
 
-// Format an array of Messages (NOT pairs) into a simple JSON array consisting of role and content
-// this is used in many OpenAI-based APIs
+// Format an array of Messages (NOT pairs) into a simple JSON array consisting of role and content,
+// and occasionally other properties (e.g. tool call info). this is used in many OpenAI-based APIs.
+// Currently, the only modification is to remove the files property.
 export const messages_to_json = (chat) => {
   let json = [];
   for (let i = 0; i < chat.length; i++) {
-    json.push({ role: chat[i].role, content: chat[i].content });
+    let msg = structuredClone(chat[i]);
+    delete msg.files;
+    json.push(msg);
   }
   return json;
 };
