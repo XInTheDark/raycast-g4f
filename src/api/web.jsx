@@ -33,7 +33,7 @@ export const webSystemPrompt_ChatGPT = `
 ## web_search
 You have the tool \`web_search\`. Use the \`web_search\` function in the following circumstances:
     - User is asking about current events or something that requires real-time information (weather, sports scores, etc.)
-    - User is asking about some term you are totally unfamiliar with (it might be new)
+    - User is asking about some term you are unfamiliar with (it might be new)
     - User explicitly asks you to search or provide links to references
 
 Given a query that requires retrieval, you will:
