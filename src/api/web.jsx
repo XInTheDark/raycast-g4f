@@ -102,6 +102,8 @@ export const processWebResults = (results) => {
   return answer;
 };
 
+// Check if web search should be enabled.
+// Providers that support function calling should handle web search separately
 export const web_search_enabled = (provider) => {
   return getPreferenceValues()["webSearch"] && !providers.function_supported_providers.includes(provider);
 };

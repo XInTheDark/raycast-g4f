@@ -141,7 +141,6 @@ export default function Chat({ launchContext }) {
     let currentChat = getChat(chatData.currentChat, chatData.chats);
     const info = providers.get_provider_info(currentChat.provider);
 
-    // Providers that support function calling should handle web search separately
     const useWebSearch = web_search_enabled(info.provider);
 
     let elapsed = 0.001,
