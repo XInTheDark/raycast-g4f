@@ -3,7 +3,7 @@ import { getPreferenceValues } from "@raycast/api";
 export const DeepInfraProvider = "DeepInfraProvider";
 import fetch from "node-fetch";
 import { messages_to_json } from "../../classes/message";
-import { getWebResult, webSearchTool } from "../web";
+import { getWebResult, webSearchTool, webSystemPrompt_ChatGPT } from "../web";
 
 // Implementation ported from gpt4free DeepInfra provider.
 
@@ -36,6 +36,14 @@ export const getDeepInfraResponse = async function* (chat, options, max_retries 
 
   const useWebSearch = getPreferenceValues()["webSearch"] && function_supported_models.includes(model);
   const tools = useWebSearch ? [webSearchTool] : null;
+
+  // system prompt
+  if (useWebSearch) {
+    chat.unshift({
+      role: "system",
+      content: webSystemPrompt_ChatGPT,
+    });
+  }
 
   let data = {
     model: model,

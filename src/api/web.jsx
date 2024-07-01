@@ -26,6 +26,23 @@ export const webSystemPrompt =
   "Do your best to be informative. However, you MUST NOT make up any information. If you think you might not know something, search for it.\n";
 export const systemResponse = "Understood. I will strictly follow these instructions in this conversation.";
 
+// shorter version of the web search prompt, optimised for function calling
+// loosely based on the ChatGPT prompt
+export const webSystemPrompt_ChatGPT = `
+# Tools
+## web_search
+You have the tool \`web_search\`. Use the \`web_search\` function in the following circumstances:
+    - User is asking about current events or something that requires real-time information (weather, sports scores, etc.)
+    - User is asking about some term you are totally unfamiliar with (it might be new)
+    - User explicitly asks you to search or provide links to references
+
+Given a query that requires retrieval, you will:
+1. Call the web_search function to get a list of results.
+2. Write a response to the user based on these results.
+
+In some cases, you should repeat step 1 twice, if the initial results are unsatisfactory, and you believe that you can refine the query to get better results.
+`;
+
 // a tool to be passed into OpenAI-compatible APIs
 export const webSearchTool = {
   type: "function",
@@ -50,6 +67,11 @@ export const getWebResult = async (query, { mode = "basic" } = {}) => {
   if (!query) return "No results found.";
   let APIKeysStr = getPreferenceValues()["TavilyAPIKeys"];
   let APIKeys = APIKeysStr.split(",").map((x) => x.trim());
+
+  // Tavily requires query to be minimum 5 characters. We pad with spaces if it's less.
+  if (query.length < 5) {
+    query = query.padEnd(5, " ");
+  }
 
   for (const APIKey of APIKeys) {
     const api_url = "https://api.tavily.com/search";
