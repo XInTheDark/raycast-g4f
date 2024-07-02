@@ -1,6 +1,9 @@
+import { getPreferenceValues } from "@raycast/api";
+
 export const DeepInfraProvider = "DeepInfraProvider";
 import fetch from "node-fetch";
 import { messages_to_json } from "../../classes/message";
+import { getWebResult, webSearchTool, webSystemPrompt_ChatGPT } from "../web";
 
 // Implementation ported from gpt4free DeepInfra provider.
 
@@ -24,12 +27,28 @@ const headers = {
   "sec-ch-ua-platform": '"macOS"',
 };
 
+// Models that support function calling
+const function_supported_models = ["mistralai/Mixtral-8x22B-Instruct-v0.1", "Qwen/Qwen2-72B-Instruct"];
+
 export const getDeepInfraResponse = async function* (chat, options, max_retries = 5) {
   const model = options.model;
   chat = messages_to_json(chat);
+
+  const useWebSearch = getPreferenceValues()["webSearch"] && function_supported_models.includes(model);
+  const tools = useWebSearch ? [webSearchTool] : null;
+
+  // use ChatGPT-style system prompt for web search
+  if (useWebSearch && chat[0]?.role !== "system") {
+    chat.unshift({
+      role: "system",
+      content: webSystemPrompt_ChatGPT,
+    });
+  }
+
   let data = {
     model: model,
     messages: chat,
+    tools: tools,
     temperature: options.temperature ?? 0.7,
     max_tokens: 100000,
     stream: true,
@@ -46,6 +65,12 @@ export const getDeepInfraResponse = async function* (chat, options, max_retries 
 
     // Implementation taken from gpt4free: g4f/Provider/needs_auth/Openai.py at async def create_async_generator()
     let first = true;
+    // Function calling
+    let web_search_call = {
+      name: null,
+      query: "",
+    };
+
     const reader = response.body;
     for await (let chunk of reader) {
       const str = chunk.toString();
@@ -59,15 +84,44 @@ export const getDeepInfraResponse = async function* (chat, options, max_retries 
 
           try {
             let data = JSON.parse(chunk);
-            let delta = data["choices"][0]["delta"]["content"];
+            let delta = data["choices"][0]["delta"];
+
+            // Function calling
+            if (delta["tool_calls"]) {
+              web_search_call.name = delta["tool_calls"][0]["function"]["name"];
+              let args = JSON.parse(delta["tool_calls"][0]["function"]["arguments"]);
+              web_search_call.query = args["query"];
+              let call_id = delta["tool_calls"][0]["id"];
+
+              let webResponse = await getWebResult(web_search_call.query, { mode: "advanced" });
+              let msg = {
+                role: "tool",
+                content: webResponse,
+                tool_call_id: call_id,
+              };
+              chat.push(msg);
+
+              // Notice how the message is only temporarily added to the chat object,
+              // and thus the web search results are not saved in the chat object.
+              // This is due to difficulty of implementation in the current code base.
+              // TODO: rewrite codebase so this is possible!
+
+              // generate a new request
+              yield* getDeepInfraResponse(chat, options, max_retries);
+              return;
+            }
+
+            let content = delta["content"];
             if (first) {
-              delta = delta.trimStart();
+              content = content.trimStart();
             }
-            if (delta) {
+            if (content) {
               first = false;
-              yield delta;
+              yield content;
             }
-          } catch (e) {} // eslint-disable-line
+          } catch (e) {
+            console.log(e);
+          }
         }
       }
     }

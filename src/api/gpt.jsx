@@ -492,6 +492,9 @@ export const formatResponse = (response, provider = null) => {
     response = response.replace(/\\n/g, "\n");
     response = response.replace(/\\t/g, "\t");
     response = response.replace(/\\r/g, "\r");
+    // quotes (single and double)
+    response = response.replace(/\\'/g, "'");
+    response = response.replace(/\\"/g, '"');
 
     // the following escape characters are still displayed correctly even without the replacement,
     // but we currently have features that depend on stuff being in the response, for example

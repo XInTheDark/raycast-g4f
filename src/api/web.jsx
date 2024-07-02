@@ -1,5 +1,6 @@
 import { getPreferenceValues, Toast, showToast } from "@raycast/api";
 import fetch from "node-fetch";
+import * as providers from "./providers";
 
 export const webToken = "<|web_search|>",
   webTokenEnd = "<|end_web_search|>";
@@ -25,16 +26,59 @@ export const webSystemPrompt =
   "Do your best to be informative. However, you MUST NOT make up any information. If you think you might not know something, search for it.\n";
 export const systemResponse = "Understood. I will strictly follow these instructions in this conversation.";
 
-export const getWebResult = async (query) => {
+// shorter version of the web search prompt, optimised for function calling
+// loosely based on the ChatGPT prompt
+export const webSystemPrompt_ChatGPT = `
+# Tools
+## web_search
+You have the tool \`web_search\`. Use the \`web_search\` function in the following circumstances:
+    - User is asking about current events or something that requires real-time information (weather, sports scores, etc.)
+    - User is asking about some term you are unfamiliar with (it might be new)
+    - User explicitly asks you to search or provide links to references
+
+Given a query that requires retrieval, you will:
+1. Call the web_search function to get a list of results.
+2. Write a response to the user based on these results.
+
+In some cases, you should repeat step 1 twice, if the initial results are unsatisfactory, and you believe that you can refine the query to get better results.
+`;
+
+// a tool to be passed into OpenAI-compatible APIs
+export const webSearchTool = {
+  type: "function",
+  function: {
+    name: "web_search",
+    description: "Return the web search results for the given query",
+    parameters: {
+      type: "object",
+      properties: {
+        query: {
+          type: "string",
+          description: "The query to search for",
+        },
+      },
+      required: ["query"],
+    },
+  },
+};
+
+export const getWebResult = async (query, { mode = "basic" } = {}) => {
+  console.log("Web search query:", query);
+  if (!query) return "No results found.";
   let APIKeysStr = getPreferenceValues()["TavilyAPIKeys"];
   let APIKeys = APIKeysStr.split(",").map((x) => x.trim());
+
+  // Tavily requires query to be minimum 5 characters. We pad with spaces if it's less.
+  if (query.length < 5) {
+    query = query.padEnd(5, " ");
+  }
 
   for (const APIKey of APIKeys) {
     const api_url = "https://api.tavily.com/search";
     let data = {
       api_key: APIKey,
       query: query,
-      max_results: 4,
+      max_results: mode === "basic" ? 4 : 8,
       search_depth: "advanced",
     };
 
@@ -78,4 +122,10 @@ export const processWebResults = (results) => {
     answer += rst;
   }
   return answer;
+};
+
+// Check if web search should be enabled.
+// Providers that support function calling should handle web search separately
+export const web_search_enabled = (provider) => {
+  return getPreferenceValues()["webSearch"] && !providers.function_supported_providers.includes(provider);
 };

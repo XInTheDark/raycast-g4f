@@ -54,23 +54,23 @@ updating manually also allows you to fetch and view the latest changes to the so
 
 ## Providers & Models
 
-| Provider           | Model                   | Streaming | Status                    | Speed     | Rating and remarks by extension author                                                        |
-|--------------------|-------------------------|-----------|---------------------------|-----------|-----------------------------------------------------------------------------------------------|
-| GPT                | gpt-3.5-turbo (default) | ✅         | ![Active][active-badge]   | Fast      | 7.5/10, the most reliable and decently performing model but there are some stronger models.   |
-| GPT                | gpt-4                   | ❌         | ![Active][active-badge]   | Medium    | 6/10, no streaming support but otherwise a great model.                                       |
-| Bing               | gpt-4                   | ✅         | ![Unknown][unknown-badge] | Slow      | 6/10, generation speed is likely quite slow but comes with built-in web search ability.       |
-| DeepInfra          | WizardLM-2-8x22B        | ✅         | ![Active][active-badge]   | Medium    | 7.5/10, capable model for general use.                                                        |
-| DeepInfra          | meta-llama-3-8b         | ✅         | ![Active][active-badge]   | Very fast | 6.5/10                                                                                        |
-| DeepInfra          | meta-llama-3-70b        | ✅         | ![Active][active-badge]   | Medium    | 7/10                                                                                          |
-| DeepInfra          | Mixtral-8x22B           | ✅         | ![Active][active-badge]   | Fast      | 7/10                                                                                          |
-| DeepInfra          | Qwen2-72B               | ✅         | ![Active][active-badge]   | Fast      | 7.5/10                                                                                        |
-| Blackbox           | custom model            | ✅         | ![Active][active-badge]   | Very fast | 6.5/10, very fast generation with built-in web search ability, but is optimized for coding.   |
-| Ecosia             | gpt-3.5-turbo           | ✅         | ![Active][active-badge]   | Very fast | 7.5/10, near instant responses with a recent model.                                           |
-| Replicate          | meta-llama-3-8b         | ✅         | ![Active][active-badge]   | Fast      | ?/10                                                                                          |
-| Replicate          | meta-llama-3-70b        | ✅         | ![Unknown][unknown-badge] | Medium    | ?/10                                                                                          |
-| Replicate          | mixtral-8x7b            | ✅         | ![Active][active-badge]   | Medium    | ?/10                                                                                          |
-| Google Gemini      | gemini-1.5-flash-latest | ✅         | ![Active][active-badge]   | Very fast | 8.5/10, very good overall model but requires an API Key. (It's *free*, see the section below) |
-| GPT4Free Local API | -                       | ✅         | ![Active][active-badge]   | -         | allows access to a large variety of providers. [read more][g4f-api-help]                      |
+| Provider           | Model                   | Streaming | Status                    | Speed     | Rating and remarks by extension author                                                      |
+|--------------------|-------------------------|-----------|---------------------------|-----------|---------------------------------------------------------------------------------------------|
+| GPT                | gpt-3.5-turbo (default) | ✅         | ![Active][active-badge]   | Fast      | 7.5/10, the most reliable and decently performing model but there are some stronger models. |
+| GPT                | gpt-4                   | ❌         | ![Active][active-badge]   | Medium    | 6.5/10, no streaming support but otherwise a great model.                                   |
+| Bing               | gpt-4                   | ✅         | ![Unknown][unknown-badge] | Slow      | 6/10, generation speed is likely quite slow but comes with built-in web search ability.     |
+| DeepInfra          | Mixtral-8x22B           | ✅         | ![Active][active-badge]   | Fast      | 7.5/10, capable model for general use.                                                      |
+| DeepInfra          | Qwen2-72B               | ✅         | ![Active][active-badge]   | Fast      | 7.5/10                                                                                      |
+| DeepInfra          | WizardLM-2-8x22B        | ✅         | ![Active][active-badge]   | Medium    | 7/10                                                                                        |
+| DeepInfra          | meta-llama-3-8b         | ✅         | ![Active][active-badge]   | Very fast | 6.5/10                                                                                      |
+| DeepInfra          | meta-llama-3-70b        | ✅         | ![Active][active-badge]   | Medium    | 7/10                                                                                        |
+| Blackbox           | custom model            | ✅         | ![Active][active-badge]   | Very fast | 6.5/10, very fast generation with built-in web search ability, but is optimized for coding. |
+| Ecosia             | gpt-3.5-turbo           | ✅         | ![Active][active-badge]   | Very fast | 7.5/10, near instant responses with a recent model.                                         |
+| Replicate          | meta-llama-3-8b         | ✅         | ![Active][active-badge]   | Fast      | ?/10                                                                                        |
+| Replicate          | meta-llama-3-70b        | ✅         | ![Unknown][unknown-badge] | Medium    | ?/10                                                                                        |
+| Replicate          | mixtral-8x7b            | ✅         | ![Active][active-badge]   | Medium    | ?/10                                                                                        |
+| Google Gemini      | gemini-1.5-flash-latest | ✅         | ![Active][active-badge]   | Very fast | 8/10, very good overall model but requires an API Key. (It's *free*, see the section below) |
+| GPT4Free Local API | -                       | ✅         | ![Active][active-badge]   | -         | allows access to a large variety of providers. [read more][g4f-api-help]                    |
 
 ### Provider-specific notes
 
