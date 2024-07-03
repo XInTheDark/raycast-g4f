@@ -3,12 +3,13 @@ import fetch from "node-fetch";
 import { messages_to_json } from "../../classes/message";
 
 // Reference: https://nexra.aryahcr.cc/documentation/chatgpt/en (under ChatGPT v2)
-const api_url = "https://nexra.aryahcr.cc/api/chat/complements";
+const api_url_stream = "https://nexra.aryahcr.cc/api/chat/complements";
+const api_url_no_stream = "https://nexra.aryahcr.cc/api/chat/gpt";
 const headers = {
   "Content-Type": "application/json",
 };
 
-export const getNexraResponse = async function* (chat, options, max_retries = 5) {
+export const getNexraResponseStream = async function* (chat, options, max_retries = 5) {
   chat = messages_to_json(chat);
   let data = {
     messages: chat,
@@ -19,7 +20,7 @@ export const getNexraResponse = async function* (chat, options, max_retries = 5)
 
   try {
     // POST
-    const response = await fetch(api_url, {
+    const response = await fetch(api_url_stream, {
       method: "POST",
       headers: headers,
       body: JSON.stringify(data),
@@ -54,9 +55,37 @@ export const getNexraResponse = async function* (chat, options, max_retries = 5)
   } catch (e) {
     if (max_retries > 0) {
       console.log(e, "Retrying...");
-      yield* getNexraResponse(chat, options, max_retries - 1);
+      yield* getNexraResponseStream(chat, options, max_retries - 1);
     } else {
       throw e;
     }
+  }
+};
+
+export const getNexraResponseNoStream = async (chat, options) => {
+  chat = messages_to_json(chat);
+  let data = {
+    messages: chat,
+    stream: false,
+    markdown: false,
+    model: options.model,
+  };
+
+  // POST
+  const response = await fetch(api_url_no_stream, {
+    method: "POST",
+    headers: headers,
+    body: JSON.stringify(data),
+  });
+
+  const json = JSON.parse(await response.text());
+  return json["gpt"];
+};
+
+export const getNexraResponse = async (chat, options) => {
+  if (options.stream) {
+    return getNexraResponseStream(chat, options);
+  } else {
+    return await getNexraResponseNoStream(chat, options);
   }
 };

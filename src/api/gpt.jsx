@@ -21,7 +21,6 @@ import { autoCheckForUpdates } from "../helpers/update";
 import { Message, pairs_to_messages } from "../classes/message";
 
 import * as providers from "./providers";
-import { G4F } from "g4f";
 
 let generationStatus = { stop: false, loading: false };
 let get_status = () => generationStatus.stop;
@@ -425,9 +424,6 @@ export const chatCompletion = async (chat, options, stream_update = null, status
   } else if (provider === providers.GeminiProvider) {
     // Google Gemini
     response = await providers.getGoogleGeminiResponse(chat, options, stream_update);
-  } else if (provider === providers.G4FProvider) {
-    // G4F
-    response = await providers.getG4FResponse(chat, options);
   } else if (provider === providers.G4FLocalProvider) {
     // G4F Local
     response = await providers.getG4FLocalResponse(chat, options);
@@ -482,12 +478,7 @@ export const getChatResponseSync = async (currentChat, query = null) => {
 export const formatResponse = (response, provider = null) => {
   const is_code = response.includes("```");
 
-  if (provider === providers.G4FProvider || provider === providers.NexraProvider || !is_code) {
-    // note: since the class rewrite, the first condition is actually flawed,
-    // because we include both G4FProvider.GPT and G4FProvider.Bing, even though
-    // only Bing is supposed to be included. However, this is not a problem because
-    // the response is never poorly formatted for GPT anyway.
-
+  if (provider === providers.NexraProvider || !is_code) {
     // replace escape characters: \n with a real newline, \t with a real tab, etc.
     response = response.replace(/\\n/g, "\n");
     response = response.replace(/\\t/g, "\t");
@@ -506,11 +497,6 @@ export const formatResponse = (response, provider = null) => {
     response = response.replace(/<\/sup>/g, "");
   }
 
-  // Bing: replace [^x> with a space where x is any string from 1 to 5 characters
-  if (provider === providers.G4FProvider) {
-    response = response.replace(/\[\^.{1,5}>/g, " ");
-  }
-
   if (provider === providers.BlackboxProvider) {
     // replace only once
     // example: remove $@$v=v1.13$@$ or $@$v=undefined%@$
@@ -526,20 +512,8 @@ export const formatResponse = (response, provider = null) => {
 
 // yield chunks incrementally from a response.
 export const processChunksIncrementalAsync = async function* (response, provider) {
-  if (provider === providers.G4FProvider) {
-    let prevChunk = "";
-    // For Bing, we must not return the last chunk
-    for await (const chunk of G4F.chunkProcessor(response)) {
-      yield prevChunk;
-      prevChunk = chunk;
-    }
-  } else if ([].includes(provider)) {
-    // nothing here currently.
-    yield* G4F.chunkProcessor(response);
-  } else {
-    // default case. response must be an async generator.
-    yield* response;
-  }
+  // default case. response must be an async generator.
+  yield* response;
 };
 
 export const processChunksIncremental = async function* (response, provider, status = null) {
