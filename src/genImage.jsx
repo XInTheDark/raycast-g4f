@@ -75,98 +75,100 @@ export default function genImage() {
   };
 
   let default_chat_data = () => {
+    let newChat = {
+      name: "New Image Chat",
+      creationDate: new Date(),
+      id: Date.now().toString(),
+      provider: defaultImageProvider,
+      imageQuality: "High",
+      messages: [],
+    };
     return {
-      currentChat: "New Image Chat",
-      chats: [
-        {
-          name: "New Image Chat",
-          creationDate: new Date(),
-          provider: defaultImageProvider,
-          imageQuality: "High",
-          messages: [],
-        },
-      ],
+      currentChat: newChat.id,
+      chats: [newChat],
     };
   };
 
-  let generateImage = async (chatData, setChatData, query) => {
-    setChatData((x) => {
-      let newChatData = structuredClone(x);
-      let currentChat = getChat(chatData.currentChat, newChatData.chats);
-      let messageID = Date.now();
-
-      currentChat.messages.unshift({
-        prompt: query,
-        answer: "",
-        creationDate: new Date().toISOString(),
-        id: messageID,
-        finished: false,
-      });
-
-      (async () => {
-        try {
-          const [provider, options] = loadImageOptions(currentChat);
-          const base64Image = await generate(query, provider, options, { fetch: fetch });
-
-          // save image
-          let imagePath = "";
-
-          // Each image chat has its own folder
-          // Ensure the folder exists
-          const folderPath = get_folder_path(chatData.currentChat);
-          if (!fs.existsSync(folderPath)) {
-            fs.mkdirSync(folderPath, { recursive: true });
-          }
-          const filePath = get_file_path(folderPath);
-
-          imagePath = filePath;
-
-          fs.writeFile(filePath, base64Image, "base64", (err) => {
-            if (err) {
-              toast(Toast.Style.Failure, "Error saving image");
-              console.log("Error saving image. Current path: " + __dirname);
-              console.log(err);
-              imagePath = "";
-            }
-          });
-
-          setChatData((oldData) => {
-            let newChatData = structuredClone(oldData);
-            let chat = getChat(chatData.currentChat, newChatData.chats);
-            // get message index
-            let idx = -1;
-            for (let i = 0; i < chat.messages.length; i++) {
-              if (chat.messages[i].id === messageID) {
-                idx = i;
-                break;
-              }
-            }
-            if (idx === -1) {
-              toast(Toast.Style.Failure, "Error saving image");
-              return newChatData;
-            }
-
-            chat.messages[idx].prompt = query;
-            chat.messages[idx].answer = imagePath;
-            chat.messages[idx].finished = true;
-
-            console.log("Image saved to: " + imagePath);
-            return newChatData;
-          });
-
-          await toast(Toast.Style.Success, "Image Generated");
-        } catch (e) {
-          console.log(e);
-          setChatData((oldData) => {
-            let newChatData = structuredClone(oldData);
-            getChat(chatData.currentChat, newChatData.chats).messages.shift();
-            return newChatData;
-          });
-          await toast(Toast.Style.Failure, "GPT cannot process this prompt.");
+  const setCurrentChatData = (chatData, setChatData, messageID, prompt = null, answer = null, finished = null) => {
+    setChatData((oldData) => {
+      let newChatData = structuredClone(oldData);
+      let messages = getChat(chatData.currentChat, newChatData.chats).messages;
+      for (let i = 0; i < messages.length; i++) {
+        if (messages[i].id === messageID) {
+          if (prompt !== null) messages[i].prompt = prompt;
+          if (answer !== null) messages[i].answer = answer;
+          if (finished !== null) messages[i].finished = finished;
         }
-      })();
+      }
       return newChatData;
     });
+  };
+
+  const updateCurrentChat = (chatData, setChatData, chat) => {
+    setChatData((oldData) => {
+      let newChatData = structuredClone(oldData);
+      for (let i = 0; i < newChatData.chats.length; i++) {
+        if (newChatData.chats[i].id === chat.id) {
+          newChatData.chats[i] = chat;
+          break;
+        }
+      }
+      return newChatData;
+    });
+  };
+
+  let generateImage = async (chatData, setChatData, query) => {
+    let currentChat = getChat(chatData.currentChat);
+    let messageID = Date.now();
+
+    currentChat.messages.unshift({
+      prompt: query,
+      answer: "",
+      creationDate: new Date().toISOString(),
+      id: messageID,
+      finished: false,
+    });
+    updateCurrentChat(chatData, setChatData, currentChat);
+
+    try {
+      const [provider, options] = loadImageOptions(currentChat);
+      const base64Image = await generate(query, provider, options, { fetch: fetch });
+
+      // save image
+      let imagePath = "";
+
+      // Each image chat has its own folder
+      // Ensure the folder exists
+      const folderPath = get_folder_path(chatData.currentChat);
+      if (!fs.existsSync(folderPath)) {
+        fs.mkdirSync(folderPath, { recursive: true });
+      }
+      const filePath = get_file_path(folderPath);
+
+      imagePath = filePath;
+
+      fs.writeFile(filePath, base64Image, "base64", (err) => {
+        if (err) {
+          toast(Toast.Style.Failure, "Error saving image");
+          console.log("Error saving image. Current path: " + __dirname);
+          console.log(err);
+          imagePath = "";
+        }
+      });
+
+      setCurrentChatData(chatData, setChatData, messageID, query, imagePath, true);
+      console.log("Image saved to: " + imagePath);
+
+      await toast(Toast.Style.Success, "Image Generated");
+    } catch (e) {
+      console.log(e);
+      setChatData((oldData) => {
+        let newChatData = structuredClone(oldData);
+        getChat(chatData.currentChat, newChatData.chats).messages.shift();
+        return newChatData;
+      });
+      await toast(Toast.Style.Failure, "GPT cannot process this prompt.");
+    }
   };
 
   let CreateChat = () => {
@@ -179,28 +181,24 @@ export default function genImage() {
             <Action.SubmitForm
               title="Create Image Chat"
               onSubmit={(values) => {
-                if (values.chatName === "") {
-                  toast(Toast.Style.Failure, "Chat name cannot be empty");
-                } else if (chatData.chats.map((x) => x.name).includes(values.chatName)) {
-                  toast(Toast.Style.Failure, "Chat with that name already exists");
-                } else {
-                  pop();
-                  setChatData((oldData) => {
-                    let newChatData = structuredClone(oldData);
-                    newChatData.chats.push({
-                      name: values.chatName,
-                      creationDate: new Date(),
-                      provider: values.provider,
-                      model: values.model.trim(),
-                      imageQuality: values.imageQuality,
-                      negativePrompt: values.negativePrompt,
-                      messages: [],
-                    });
-                    newChatData.currentChat = values.chatName;
+                pop();
+                setChatData((oldData) => {
+                  let newChatData = structuredClone(oldData);
+                  let newChat = {
+                    name: values.chatName,
+                    creationDate: new Date(),
+                    id: Date.now().toString(),
+                    provider: values.provider,
+                    model: values.model.trim(),
+                    imageQuality: values.imageQuality,
+                    negativePrompt: values.negativePrompt,
+                    messages: [],
+                  };
+                  newChatData.chats.push(newChat);
+                  newChatData.currentChat = newChat.id;
 
-                    return newChatData;
-                  });
-                }
+                  return newChatData;
+                });
               }}
             />
             {help_action("genImage")}
@@ -260,28 +258,11 @@ export default function genImage() {
               onSubmit={(values) => {
                 pop();
 
-                // check if there is a currently generating message
-                for (let i = 0; i < chat.messages.length; i++) {
-                  if (!chat.messages[i].finished) {
-                    toast(Toast.Style.Failure, "Cannot rename while loading image");
-                    return;
-                  }
-                }
-
-                // check if chat with new name already exists
-                if (chatData.chats.map((x) => x.name).includes(values.chatName)) {
-                  toast(Toast.Style.Failure, "Chat with that name already exists");
-                  return;
-                }
-
                 setChatData((oldData) => {
                   let newChatData = structuredClone(oldData);
                   getChat(chatData.currentChat, newChatData.chats).name = values.chatName;
-                  newChatData.currentChat = values.chatName; // chat must be currentChat
                   return newChatData;
                 });
-
-                //
               }}
             />
           </ActionPanel>
@@ -443,7 +424,7 @@ export default function genImage() {
             onAction={() => {
               let chatIdx = 0;
               for (let i = 0; i < chatData.chats.length; i++) {
-                if (chatData.chats[i].name === chatData.currentChat) {
+                if (chatData.chats[i].id === chatData.currentChat) {
                   chatIdx = i;
                   break;
                 }
@@ -452,7 +433,7 @@ export default function genImage() {
               else {
                 setChatData((oldData) => ({
                   ...oldData,
-                  currentChat: chatData.chats[chatIdx + 1].name,
+                  currentChat: chatData.chats[chatIdx + 1].id,
                 }));
               }
             }}
@@ -464,7 +445,7 @@ export default function genImage() {
             onAction={() => {
               let chatIdx = 0;
               for (let i = 0; i < chatData.chats.length; i++) {
-                if (chatData.chats[i].name === chatData.currentChat) {
+                if (chatData.chats[i].id === chatData.currentChat) {
                   chatIdx = i;
                   break;
                 }
@@ -473,7 +454,7 @@ export default function genImage() {
               else {
                 setChatData((oldData) => ({
                   ...oldData,
-                  currentChat: chatData.chats[chatIdx - 1].name,
+                  currentChat: chatData.chats[chatIdx - 1].id,
                 }));
               }
             }}
@@ -495,7 +476,7 @@ export default function genImage() {
                   onAction: () => {
                     let chatIdx = 0;
                     for (let i = 0; i < chatData.chats.length; i++) {
-                      if (chatData.chats[i].name === chatData.currentChat) {
+                      if (chatData.chats[i].id === chatData.currentChat) {
                         chatIdx = i;
                         break;
                       }
@@ -518,14 +499,14 @@ export default function genImage() {
                       setChatData((oldData) => {
                         let newChatData = structuredClone(oldData);
                         newChatData.chats.splice(chatIdx);
-                        newChatData.currentChat = newChatData.chats[chatIdx - 1].name;
+                        newChatData.currentChat = newChatData.chats[chatIdx - 1].id;
                         return newChatData;
                       });
                     } else {
                       setChatData((oldData) => {
                         let newChatData = structuredClone(oldData);
                         newChatData.chats.splice(chatIdx, 1);
-                        newChatData.currentChat = newChatData.chats[chatIdx].name;
+                        newChatData.currentChat = newChatData.chats[chatIdx].id;
                         return newChatData;
                       });
                     }
@@ -611,7 +592,7 @@ export default function genImage() {
 
   let getChat = (target, customChat = chatData.chats) => {
     for (const chat of customChat) {
-      if (chat.name === target) return chat;
+      if (chat.id === target) return chat;
     }
   };
 
@@ -637,7 +618,7 @@ export default function genImage() {
           value={chatData.currentChat}
         >
           {chatData.chats.map((x) => {
-            return <List.Dropdown.Item title={x.name} value={x.name} key={x.name} />;
+            return <List.Dropdown.Item title={x.name} value={x.id} key={x.id} />;
           })}
         </List.Dropdown>
       }
@@ -694,8 +675,8 @@ const loadImageOptions = (currentChat) => {
   return [provider, options];
 };
 
-const get_folder_path = (chatName) => {
-  return getSupportPath() + "/g4f-image-chats/" + encodeURIComponent(chatName);
+const get_folder_path = (chatId) => {
+  return getSupportPath() + "/g4f-image-chats/" + chatId.toString();
 };
 
 const get_file_path = (folderPath) => {
