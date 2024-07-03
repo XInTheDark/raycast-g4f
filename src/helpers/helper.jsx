@@ -1,3 +1,5 @@
+import { environment } from "@raycast/api";
+
 export const formatDate = (dateToCheckISO) => {
   // Calculate the date difference between the current date and the date to check
   // and format it like: 2y, 3mo, 4d, 5h, 6m (no seconds because updates will be too frequent)
@@ -60,4 +62,12 @@ export const removeSuffix = (str, suffix) => {
     return str.substring(0, str.length - suffix.length);
   }
   return str;
+};
+
+export const getSupportPath = () => {
+  return environment.supportPath;
+};
+
+export const getAssetsPath = () => {
+  return environment.assetsPath;
 };

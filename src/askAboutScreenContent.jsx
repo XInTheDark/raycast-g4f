@@ -1,6 +1,7 @@
-import { environment, closeMainWindow, launchCommand, LaunchType } from "@raycast/api";
+import { closeMainWindow, launchCommand, LaunchType } from "@raycast/api";
 import util from "util";
 import { exec } from "child_process";
+import { getAssetsPath } from "./helpers/helper";
 
 // Note how this command is a very special case: it is a "no-view" type command,
 // which means it does not return any UI view, and instead calls askAI to handle the rendering.
@@ -8,8 +9,8 @@ import { exec } from "child_process";
 export default async function AskAboutScreenContent(props) {
   const execPromise = util.promisify(exec);
   await closeMainWindow();
-  const path = `${environment.assetsPath}/screenshot.png`;
-  await execPromise(`/usr/sbin/screencapture ${path}`);
+  const path = `${getAssetsPath()}/screenshot.png`;
+  await execPromise(`/usr/sbin/screencapture "${path}"`);
 
   await launchCommand({
     name: "askAI",

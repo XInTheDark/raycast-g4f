@@ -1,6 +1,6 @@
 import { getPreferenceValues, Toast, showToast } from "@raycast/api";
 import fetch from "node-fetch";
-import * as providers from "./providers";
+import * as providers from "../providers";
 
 export const webToken = "<|web_search|>",
   webTokenEnd = "<|end_web_search|>";
@@ -29,8 +29,7 @@ export const systemResponse = "Understood. I will strictly follow these instruct
 // shorter version of the web search prompt, optimised for function calling
 // loosely based on the ChatGPT prompt
 export const webSystemPrompt_ChatGPT = `
-# Tools
-## web_search
+# Function calling: web_search
 You have the tool \`web_search\`. Use the \`web_search\` function in the following circumstances:
     - User is asking about current events or something that requires real-time information (weather, sports scores, etc.)
     - User is asking about some term you are unfamiliar with (it might be new)
@@ -48,7 +47,7 @@ export const webSearchTool = {
   type: "function",
   function: {
     name: "web_search",
-    description: "Return the web search results for the given query",
+    description: webSystemPrompt_ChatGPT,
     parameters: {
       type: "object",
       properties: {

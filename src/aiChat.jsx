@@ -24,8 +24,8 @@ import { formatResponse, getChatResponse, getChatResponseSync } from "./api/gpt"
 import * as providers from "./api/providers";
 
 // Web search module
-import { getWebResult, web_search_enabled } from "./api/web";
-import { webSystemPrompt, systemResponse, webToken, webTokenEnd } from "./api/web";
+import { getWebResult, web_search_enabled } from "./api/tools/web";
+import { webSystemPrompt, systemResponse, webToken, webTokenEnd } from "./api/tools/web";
 import { get_provider_info } from "./api/providers";
 
 let generationStatus = { stop: false, loading: false };

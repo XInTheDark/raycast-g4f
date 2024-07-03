@@ -287,8 +287,16 @@
     },
     {
       "name": "persistentStorage",
-      "label": "Persistent Storage",
+      "label": "Enable Persistent Storage",
       "description": "Enable more persistent storage of the extension's data. Do not use if you have sensitive data.",
+      "required": false,
+      "type": "checkbox",
+      "default": false
+    },
+    {
+      "name": "codeInterpreter",
+      "label": "Enable Code Interpreter (BETA)",
+      "description": "Allows GPT to interpret and run Python code locally, based on your queries. Use at your own risk!",
       "required": false,
       "type": "checkbox",
       "default": false

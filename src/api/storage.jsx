@@ -4,7 +4,8 @@
 // Note that persistent storage is not always the best option as file I/O is relatively expensive.
 // Thus, only use it when you really need to persist data across sessions. Otherwise, use local storage.
 
-import { environment, getPreferenceValues, LocalStorage } from "@raycast/api";
+import { getPreferenceValues, LocalStorage } from "@raycast/api";
+import { getSupportPath } from "../helpers/helper";
 import fs from "fs";
 
 const not_found = (x) => x === undefined || x === null;
@@ -45,7 +46,7 @@ export const Storage = {
   // get file storage path for a key
   // it is the user's responsibility to ensure that the key is a valid file name
   fileStoragePath: (key) => {
-    return `${environment.supportPath}/storage/${key}.txt`;
+    return `${getSupportPath()}/storage/${key}.txt`;
   },
 
   // check if item exists in file storage
@@ -56,7 +57,7 @@ export const Storage = {
   // write to file storage
   fileStorage_write: async (key, value) => {
     // ensure storage directory exists
-    const dir = `${environment.supportPath}/storage`;
+    const dir = `${getSupportPath()}/storage`;
     if (!fs.existsSync(dir)) fs.mkdirSync(dir);
     const path = Storage.fileStoragePath(key);
     fs.writeFileSync(path, value);

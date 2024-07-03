@@ -7,7 +7,8 @@ import fetch from "node-fetch";
 import { Storage } from "../storage";
 import { messages_to_json } from "../../classes/message";
 
-import { environment, Form } from "@raycast/api";
+import { Form } from "@raycast/api";
+import { getSupportPath } from "../../helpers/helper";
 
 // constants
 const DEFAULT_MODEL = "meta-ai";
@@ -134,8 +135,8 @@ export const getG4FTimeout = async () => {
 const startG4F = async () => {
   const exe = await getG4FExecutablePath();
   const timeout_s = await getG4FTimeout();
-  const START_COMMAND = `export PATH="/opt/homebrew/bin:$PATH"; ( ${exe} api ) & sleep ${timeout_s} ; kill $!`;
-  const dirPath = environment.supportPath;
+  const START_COMMAND = `export PATH="/opt/homebrew/bin:$PATH"; ( "${exe}" api ) & sleep ${timeout_s} ; kill $!`;
+  const dirPath = getSupportPath();
   try {
     const child = exec(START_COMMAND, { cwd: dirPath });
     console.log("G4F API Process ID:", child.pid);
