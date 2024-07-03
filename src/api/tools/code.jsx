@@ -5,7 +5,7 @@ import { getSupportPath } from "../../helpers/helper";
 export const codeInterpreterPrompt = `
 # Function calling: run_code
 You have the tool \`run_code\`. It accepts only Python code as input, and returns the output of the code (i.e. the text printed to stdout). 
-Note that the code must be valid Python code that will be saved to a temporary file and executed. For example, "print(1+2)" is valid but "1+2" is not. Separate newlines with '\\n' characters.
+Note that the code must be valid Python code that will be saved to a temporary .py file and executed. Only print() statements will output text. For example, "print(1+2)" is valid but "1+2" is not. Separate newlines with '\\n' characters.
 
 Use the \`run_code\` function ONLY if you need to access accurate information that can be done using Python code (e.g. mathematical calculations, data processing, string manipulation, etc.)
 
