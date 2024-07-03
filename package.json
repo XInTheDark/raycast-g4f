@@ -354,7 +354,7 @@
   ],
   "dependencies": {
     "@raycast/api": "^1.77.1",
-    "g4f-image": "^1.0.0-beta6",
+    "g4f-image": "^1.0.0",
     "gemini-g4f": "^12.3.5",
     "node-fetch": "^3.3.2"
   },
