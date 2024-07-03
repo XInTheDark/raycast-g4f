@@ -50,3 +50,8 @@ export const runCode = async (code) => {
     });
   });
 };
+
+export const getCodeInterpreterResult = async (code) => {
+  let codeResponse = await runCode(code);
+  return `Code output:\n${codeResponse}\n\nPython code:\n\`\`\`\n${code}\n\`\`\``;
+};

@@ -3,8 +3,8 @@ import { getPreferenceValues } from "@raycast/api";
 export const DeepInfraProvider = "DeepInfraProvider";
 import fetch from "node-fetch";
 import { messages_to_json } from "../../classes/message";
-import { getWebResult, webSearchTool, webSystemPrompt_ChatGPT } from "../tools/web";
-import { codeInterpreterTool, codeInterpreterPrompt, runCode } from "../tools/code";
+import { getWebResult, webSearchTool } from "../tools/web";
+import { codeInterpreterTool, getCodeInterpreterResult } from "../tools/code";
 
 // Implementation ported from gpt4free DeepInfra provider.
 
@@ -127,8 +127,7 @@ export const getDeepInfraResponse = async function* (chat, options, max_retries 
               } else if (call_name === "run_code") {
                 let code = call_args["code"];
                 // yield `## Running code:\n\`\`\`\n${code}\n\`\`\`\n\n`;
-                let codeResponse = await runCode(code);
-                codeResponse = "Code output:\n" + codeResponse;
+                let codeResponse = await getCodeInterpreterResult(code);
                 let msg = {
                   role: "tool",
                   content: codeResponse,
