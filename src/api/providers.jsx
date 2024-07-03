@@ -5,10 +5,6 @@
 import { Form, getPreferenceValues } from "@raycast/api";
 
 /// Provider modules
-// G4F module
-import { G4FProvider, getG4FResponse } from "./Providers/g4f";
-export { G4FProvider, getG4FResponse };
-
 // Nexra module
 import { NexraProvider, getNexraResponse } from "./Providers/nexra";
 export { NexraProvider, getNexraResponse };
@@ -42,7 +38,7 @@ export { G4FLocalProvider, getG4FLocalResponse };
 // prettier-ignore
 export const providers_info = {
   GPT35: { provider: NexraProvider, model: "chatgpt", stream: true },
-  GPT4: { provider: G4FProvider, model: "gpt-4-32k", stream: false, g4f_provider: G4FProvider.GPT },
+  GPT4: { provider: NexraProvider, model: "gpt-4-32k", stream: false },
   DeepInfraMixtral_8x22B: { provider: DeepInfraProvider, model: "mistralai/Mixtral-8x22B-Instruct-v0.1", stream: true },
   DeepInfraQwen2_72B: { provider: DeepInfraProvider, model: "Qwen/Qwen2-72B-Instruct", stream: true },
   DeepInfraMistral_7B: { provider: DeepInfraProvider, model: "mistralai/Mistral-7B-Instruct-v0.3", stream: true },

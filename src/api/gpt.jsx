@@ -21,7 +21,6 @@ import { autoCheckForUpdates } from "../helpers/update";
 import { Message, pairs_to_messages } from "../classes/message";
 
 import * as providers from "./providers";
-import { G4F } from "g4f";
 
 let generationStatus = { stop: false, loading: false };
 let get_status = () => generationStatus.stop;
@@ -425,9 +424,6 @@ export const chatCompletion = async (chat, options, stream_update = null, status
   } else if (provider === providers.GeminiProvider) {
     // Google Gemini
     response = await providers.getGoogleGeminiResponse(chat, options, stream_update);
-  } else if (provider === providers.G4FProvider) {
-    // G4F
-    response = await providers.getG4FResponse(chat, options);
   } else if (provider === providers.G4FLocalProvider) {
     // G4F Local
     response = await providers.getG4FLocalResponse(chat, options);
@@ -482,7 +478,7 @@ export const getChatResponseSync = async (currentChat, query = null) => {
 export const formatResponse = (response, provider = null) => {
   const is_code = response.includes("```");
 
-  if (provider === providers.G4FProvider || provider === providers.NexraProvider || !is_code) {
+  if (provider === providers.NexraProvider || !is_code) {
     // replace escape characters: \n with a real newline, \t with a real tab, etc.
     response = response.replace(/\\n/g, "\n");
     response = response.replace(/\\t/g, "\t");
