@@ -32,6 +32,7 @@ const headers = {
 const function_supported_models = [
   "mistralai/Mixtral-8x22B-Instruct-v0.1",
   "mistralai/Mistral-7B-Instruct-v0.3",
+  "Qwen/Qwen2-72B-Instruct",
   "meta-llama/Meta-Llama-3-8B-Instruct",
   "meta-llama/Meta-Llama-3-70B-Instruct",
 ];
