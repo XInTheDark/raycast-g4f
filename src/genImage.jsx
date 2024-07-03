@@ -670,7 +670,6 @@ const loadImageOptions = (currentChat) => {
   if (negativePrompt) data.negativePrompt = negativePrompt;
 
   options.data = data;
-  console.log("Image options: ", options);
 
   return [provider, options];
 };
