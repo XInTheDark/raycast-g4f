@@ -294,6 +294,14 @@
       "default": false
     },
     {
+      "name": "codeInterpreter",
+      "label": "Enable Code Interpreter (ALPHA)",
+      "description": "Allows GPT to interpret and run code locally. Use at your own risk!",
+      "required": false,
+      "type": "checkbox",
+      "default": false
+    },
+    {
       "name": "TavilyAPIKeys",
       "title": "Tavily API Keys",
       "description": "Optional. Only used if Web Search is enabled. Multiple keys are supported - separate them with commas.",
