@@ -10,7 +10,7 @@ export default async function AskAboutScreenContent(props) {
   const execPromise = util.promisify(exec);
   await closeMainWindow();
   const path = `${getAssetsPath()}/screenshot.png`;
-  await execPromise(`/usr/sbin/screencapture ${path}`);
+  await execPromise(`/usr/sbin/screencapture "${path}"`);
 
   await launchCommand({
     name: "askAI",
