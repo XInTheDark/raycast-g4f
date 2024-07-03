@@ -3,7 +3,6 @@ import {
   ActionPanel,
   Clipboard,
   confirmAlert,
-  environment,
   Form,
   Icon,
   List,
@@ -16,7 +15,7 @@ import { useEffect, useState } from "react";
 import fs from "fs";
 
 import { Storage } from "./api/storage";
-import { formatDate } from "./helpers/helper";
+import { formatDate, getSupportPath } from "./helpers/helper";
 import { help_action } from "./helpers/helpPage";
 
 import * as G4F from "g4f";
@@ -550,7 +549,7 @@ export default function genImage() {
                         style: Action.Style.Destructive,
                         onAction: () => {
                           // Delete all image chat folders
-                          const folderPath = environment.supportPath + "/g4f-image-chats";
+                          const folderPath = getSupportPath() + "/g4f-image-chats";
                           fs.rm(folderPath, { recursive: true }, () => {
                             return null;
                           });
@@ -583,7 +582,7 @@ export default function genImage() {
         const newChatData = default_chat_data();
         await Storage.write("imageChatData", JSON.stringify(newChatData));
         // Delete all image chat folders
-        const folderPath = environment.supportPath + "/g4f-image-chats";
+        const folderPath = getSupportPath() + "/g4f-image-chats";
         fs.rm(folderPath, { recursive: true }, () => {
           return null;
         });
@@ -692,7 +691,7 @@ const loadImageOptions = (currentChat) => {
 };
 
 const get_folder_path = (chatName) => {
-  return environment.supportPath + "/g4f-image-chats/" + encodeURIComponent(chatName);
+  return getSupportPath() + "/g4f-image-chats/" + encodeURIComponent(chatName);
 };
 
 const get_file_path = (folderPath) => {

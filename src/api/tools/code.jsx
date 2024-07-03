@@ -1,6 +1,6 @@
 import { exec } from "child_process";
 import fs from "fs";
-import { environment } from "@raycast/api";
+import { getSupportPath } from "../../helpers/helper";
 
 export const codeInterpreterPrompt = `
 # Function calling: run_code
@@ -36,14 +36,17 @@ export const codeInterpreterTool = {
 export const runCode = async (code) => {
   console.log("Running code:", code);
   // put code in temp file in assets folder
-  const path = environment.assetsPath + "/temp_run_code.py";
+  const dirPath = getSupportPath();
+  const path = dirPath + "/temp_run_code.py";
   fs.writeFileSync(path, code);
 
+  const cmd = `python3 "${path}"`;
+
   return new Promise((resolve, reject) => {
-    exec(`python3 ${path}`, (error, stdout, stderr) => {
+    exec(cmd, { cwd: dirPath }, (error, stdout, stderr) => {
       if (error) {
         console.log(`exec error: ${error}`);
-        resolve(`ERROR: ${error.name} - ${error.message}`);
+        resolve(`ERROR: ${error}`);
       }
       console.log(`stdout: ${stdout}`);
       resolve(stdout);
