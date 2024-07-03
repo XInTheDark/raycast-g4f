@@ -45,15 +45,6 @@ export const getDeepInfraResponse = async function* (chat, options, max_retries 
   const useCodeInterpreter = getPreferenceValues()["codeInterpreter"] && function_supported_models.includes(model);
   const tools = [...(useWebSearch ? [webSearchTool] : []), ...(useCodeInterpreter ? [codeInterpreterTool] : [])];
 
-  // Function calling: system prompts
-  let systemPrompt = get_system_prompt(useWebSearch, useCodeInterpreter);
-  if (systemPrompt && chat[0]?.role !== "system") {
-    chat.unshift({
-      role: "system",
-      content: systemPrompt,
-    });
-  }
-
   let data = {
     model: model,
     messages: chat,
@@ -73,7 +64,6 @@ export const getDeepInfraResponse = async function* (chat, options, max_retries 
     });
 
     if (!response.ok) {
-      // log error message
       throw new Error(`status: ${response.status}, error: ${await response.text()}`);
     }
 
@@ -103,6 +93,7 @@ export const getDeepInfraResponse = async function* (chat, options, max_retries 
                 call_args = JSON.parse(call_args.toString());
               } catch (e) {} // eslint-disable-line
               let call_id = delta["tool_calls"][0]["id"];
+
               console.log("Function call:", call_name, call_args);
 
               if (call_name === "web_search") {
@@ -126,7 +117,6 @@ export const getDeepInfraResponse = async function* (chat, options, max_retries 
                 return;
               } else if (call_name === "run_code") {
                 let code = call_args["code"];
-                // yield `## Running code:\n\`\`\`\n${code}\n\`\`\`\n\n`;
                 let codeResponse = await getCodeInterpreterResult(code);
                 let msg = {
                   role: "tool",
@@ -162,16 +152,3 @@ export const getDeepInfraResponse = async function* (chat, options, max_retries 
     }
   }
 };
-
-const get_system_prompt = (useWebSearch, useCodeInterpreter) => {
-  // const useSystemPrompt = useWebSearch || useCodeInterpreter;
-  // if (!useSystemPrompt) return null;
-  // return `${defaultSystemPrompt}\n\n${useWebSearch ? webSystemPrompt_ChatGPT : ""}${
-  //   useCodeInterpreter ? codeInterpreterPrompt : ""
-  // }`;
-
-  /// System prompts degrade the performance of function calling. They are disabled for now.
-  return null;
-};
-
-const defaultSystemPrompt = "You are ChatGPT, a large language model. Be a helpful assistant.";
