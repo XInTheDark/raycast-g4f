@@ -4,7 +4,6 @@ import { messages_to_json } from "../../classes/message";
 
 export const G4FProvider = {
   GPT: g4f.providers.GPT,
-  Bing: g4f.providers.Bing,
 };
 
 export const getG4FResponse = async (chat, options) => {

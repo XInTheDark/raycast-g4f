@@ -26,7 +26,7 @@ By using the Extension, you agree to this Policy.
 
 | Provider      | Link to Terms                                                                                                                                                |
 |---------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| GPT, Bing     | [https://nexra.aryahcr.cc/terms](https://nexra.aryahcr.cc/terms)                                                                                             |
+| GPT           | [https://nexra.aryahcr.cc/terms](https://nexra.aryahcr.cc/terms)                                                                                             |
 | DeepInfra     | [https://deepinfra.com/terms](https://deepinfra.com/terms)                                                                                                   |
 | Blackbox      | [https://www.useblackbox.io/terms](https://www.useblackbox.io/terms), [https://www.useblackbox.io/privacy](https://www.useblackbox.io/privacy)               |
 | Ecosia        | [https://www.ecosia.org/terms-of-service](https://www.ecosia.org/terms-of-service), [https://www.ecosia.org/privacy](https://www.ecosia.org/privacy)         |

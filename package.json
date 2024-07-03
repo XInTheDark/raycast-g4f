@@ -202,10 +202,6 @@
           "value": "GPT4"
         },
         {
-          "title": "Bing (gpt-4)",
-          "value": "Bing"
-        },
-        {
           "title": "DeepInfra (Mixtral-8x22B)",
           "value": "DeepInfraMixtral_8x22B"
         },
