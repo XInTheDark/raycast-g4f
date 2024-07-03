@@ -13,48 +13,46 @@ import {
 } from "@raycast/api";
 import { useEffect, useState } from "react";
 import fs from "fs";
+import fetch from "node-fetch";
 
 import { Storage } from "./api/storage";
 import { formatDate, getSupportPath } from "./helpers/helper";
 import { help_action } from "./helpers/helpPage";
 
-import * as G4F from "g4f";
-const g4f = new G4F.G4F();
+import { provider, generate } from "g4f-image";
 
 // Image Providers
-const image_providers = {
-  Prodia: [
-    g4f.providers.Prodia,
-    {
+const default_options = {
+  Prodia: {
+    model: "prodia",
+    data: {
       cfgScale: 20,
       samplingMethod: "DPM++ 2M Karras",
     },
-  ],
-  ProdiaStableDiffusion: [
-    g4f.providers.ProdiaStableDiffusion,
-    {
-      cfgScale: 7,
+  },
+  ProdiaStableDiffusion: {
+    model: "prodia-stablediffusion",
+    data: {
+      cfgScale: 20,
       samplingMethod: "DPM++ 2M Karras",
     },
-  ],
-  ProdiaStableDiffusionXL: [
-    g4f.providers.ProdiaStableDiffusionXL,
-    {
-      height: 1024,
-      width: 1024,
-      cfgScale: 7,
-      samplingMethod: "DPM++ 2M Karras",
-    },
-  ],
-  Dalle: [g4f.providers.Dalle, {}],
+  },
+  Dalle: {
+    model: "dalle",
+    data: {},
+  },
+};
+
+const provider_map = {
+  Prodia: provider.Nexra,
+  ProdiaStableDiffusion: provider.Nexra,
+  Dalle: provider.Nexra,
 };
 
 // Default models for each provider
 const default_models = {
-  // Prodia: "neverendingDream_v122.safetensors [f964ceeb]",
-  Prodia: "ICantBelieveItsNotPhotography_seco.safetensors [4e7a3dfd]", // list: https://rentry.co/b6i53fnm
-  ProdiaStableDiffusion: "neverendingDream_v122.safetensors [f964ceeb]", // list: https://rentry.co/pfwmx6y5
-  ProdiaStableDiffusionXL: "dreamshaperXL10_alpha2.safetensors [c8afe2ef]", // list: https://rentry.co/wfhsk8sv
+  Prodia: "ICantBelieveItsNotPhotography_seco.safetensors [4e7a3dfd]",
+  ProdiaStableDiffusion: "neverendingDream_v122.safetensors [f964ceeb]",
 };
 
 const defaultImageProvider = "Prodia";
@@ -99,8 +97,8 @@ export default function genImage() {
 
       (async () => {
         try {
-          const options = loadImageOptions(currentChat);
-          const base64Image = await g4f.imageGeneration(query, options);
+          const [provider, options] = loadImageOptions(currentChat);
+          const base64Image = await generate(query, provider, options, { fetch: fetch });
 
           // save image
           let imagePath = "";
@@ -149,7 +147,8 @@ export default function genImage() {
           });
 
           await toast(Toast.Style.Success, "Image Generated");
-        } catch {
+        } catch (e) {
+          console.log(e);
           setChatData((oldData) => {
             let newChatData = structuredClone(oldData);
             getChat(chatData.currentChat, newChatData.chats).messages.shift();
@@ -655,39 +654,35 @@ export default function genImage() {
   );
 }
 
+// load provider and options
 const loadImageOptions = (currentChat) => {
-  // load provider and options
   const providerString = currentChat.provider,
     modelString = currentChat.model,
     imageQuality = currentChat.imageQuality,
     negativePrompt = currentChat.negativePrompt;
-  let [provider, options] = image_providers[providerString];
+  let provider = provider_map[providerString] ?? provider.Nexra;
+  let options = default_options[providerString];
+  let data = options.data;
 
   let model = !modelString || modelString === "default" ? default_models[providerString] : modelString;
   if (model) {
-    options = { ...options, model: model };
+    data = { ...data, model: model };
   }
 
   // image quality and creativity settings are handled separately
   // only initialise samplingSteps if supported by the provider
-  if (provider === g4f.providers.Prodia) {
-    options.samplingSteps = imageQuality === "Medium" ? 10 : imageQuality === "High" ? 15 : 20;
-  } else if (provider === g4f.providers.ProdiaStableDiffusion || provider === g4f.providers.ProdiaStableDiffusionXL) {
-    options.samplingSteps = imageQuality === "Medium" ? 20 : imageQuality === "High" ? 25 : 30;
+  if (providerString === "Prodia") {
+    data.samplingSteps = imageQuality === "Medium" ? 10 : imageQuality === "High" ? 15 : 20;
+  } else if (providerString === "ProdiaStableDiffusion" || providerString === "ProdiaStableDiffusionXL") {
+    data.samplingSteps = imageQuality === "Medium" ? 20 : imageQuality === "High" ? 25 : 30;
   }
 
-  if (negativePrompt) options.negativePrompt = negativePrompt;
+  if (negativePrompt) data.negativePrompt = negativePrompt;
 
+  options.data = data;
   console.log("Image options: ", options);
-  if (options)
-    return {
-      provider: provider,
-      providerOptions: options,
-    };
-  else
-    return {
-      provider: provider,
-    };
+
+  return [provider, options];
 };
 
 const get_folder_path = (chatName) => {
