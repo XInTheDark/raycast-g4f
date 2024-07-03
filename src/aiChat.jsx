@@ -100,14 +100,7 @@ export default function Chat({ launchContext }) {
     return messages;
   };
 
-  const setCurrentChatData = async (
-    chatData,
-    setChatData,
-    messageID,
-    query = null,
-    response = null,
-    finished = null
-  ) => {
+  const setCurrentChatData = (chatData, setChatData, messageID, query = null, response = null, finished = null) => {
     setChatData((oldData) => {
       let newChatData = structuredClone(oldData);
       let messages = getChat(chatData.currentChat, newChatData.chats).messages;
@@ -136,7 +129,7 @@ export default function Chat({ launchContext }) {
   };
 
   const updateChatResponse = async (chatData, setChatData, messageID, query = null, previousWebSearch = false) => {
-    await setCurrentChatData(chatData, setChatData, messageID, null, ""); // set response to empty string
+    setCurrentChatData(chatData, setChatData, messageID, null, ""); // set response to empty string
 
     let currentChat = getChat(chatData.currentChat, chatData.chats);
     const info = providers.get_provider_info(currentChat.provider);
@@ -151,7 +144,7 @@ export default function Chat({ launchContext }) {
 
     if (!info.stream) {
       response = await getChatResponse(currentChat, query);
-      await setCurrentChatData(chatData, setChatData, messageID, null, response);
+      setCurrentChatData(chatData, setChatData, messageID, null, response);
 
       elapsed = (Date.now() - start) / 1000;
       chars = response.length;
@@ -165,7 +158,7 @@ export default function Chat({ launchContext }) {
         i++;
         response = new_message;
         response = formatResponse(response, info.provider);
-        await setCurrentChatData(chatData, setChatData, messageID, null, response);
+        setCurrentChatData(chatData, setChatData, messageID, null, response);
 
         // Web Search functionality
         // We check the response every few chunks so we can possibly exit early
@@ -198,7 +191,7 @@ export default function Chat({ launchContext }) {
       return;
     }
 
-    await setCurrentChatData(chatData, setChatData, messageID, null, null, true);
+    setCurrentChatData(chatData, setChatData, messageID, null, null, true);
 
     await toast(
       Toast.Style.Success,
@@ -376,31 +369,27 @@ export default function Chat({ launchContext }) {
             <Action.SubmitForm
               title="Create Chat"
               onSubmit={(values) => {
-                if (values.chatName === "") {
-                  toast(Toast.Style.Failure, "Chat name cannot be empty");
-                } else {
-                  pop();
+                pop();
 
-                  // Check input length
-                  if (values.chatName.length > 1000) {
-                    toast(Toast.Style.Failure, "Chat name is too long");
-                    return;
-                  }
-
-                  setChatData((oldData) => {
-                    let newChatData = structuredClone(oldData);
-                    let newChat = chat_data({
-                      name: values.chatName,
-                      provider: values.provider,
-                      systemPrompt: values.systemPrompt,
-                      options: { creativity: values.creativity },
-                    });
-                    newChatData.chats.push(newChat);
-                    newChatData.currentChat = newChat.id;
-
-                    return newChatData;
-                  });
+                // Check input length
+                if (values.chatName.length > 1000) {
+                  toast(Toast.Style.Failure, "Chat name is too long");
+                  return;
                 }
+
+                setChatData((oldData) => {
+                  let newChatData = structuredClone(oldData);
+                  let newChat = chat_data({
+                    name: values.chatName,
+                    provider: values.provider,
+                    systemPrompt: values.systemPrompt,
+                    options: { creativity: values.creativity },
+                  });
+                  newChatData.chats.push(newChat);
+                  newChatData.currentChat = newChat.id;
+
+                  return newChatData;
+                });
               }}
             />
           </ActionPanel>
@@ -595,7 +584,7 @@ export default function Chat({ launchContext }) {
 
   // Web Search functionality
   const processWebSearchResponse = async (chatData, setChatData, currentChat, messageID, response, query) => {
-    await setCurrentChatData(chatData, setChatData, messageID, null, null, false);
+    setCurrentChatData(chatData, setChatData, messageID, null, null, false);
     await showToast(Toast.Style.Animated, "Searching Web");
     // get everything AFTER webToken and BEFORE webTokenEnd
     let webQuery = response.includes(webTokenEnd)
