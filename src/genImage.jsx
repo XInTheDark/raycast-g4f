@@ -22,7 +22,7 @@ import { help_action } from "./helpers/helpPage";
 import { provider, generate } from "g4f-image";
 
 // Image Providers
-const default_options = {
+const image_providers = {
   Prodia: {
     model: "prodia",
     data: {
@@ -670,7 +670,7 @@ const loadImageOptions = (currentChat) => {
     imageQuality = currentChat.imageQuality,
     negativePrompt = currentChat.negativePrompt;
   let provider = provider_map[providerString] ?? provider.Nexra;
-  let options = default_options[providerString];
+  let options = image_providers[providerString];
   let data = options.data;
 
   let model = !modelString || modelString === "default" ? default_models[providerString] : modelString;
