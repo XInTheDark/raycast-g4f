@@ -295,7 +295,7 @@
     },
     {
       "name": "codeInterpreter",
-      "label": "Enable Code Interpreter (ALPHA)",
+      "label": "Enable Code Interpreter (BETA)",
       "description": "Allows GPT to interpret and run Python code locally. Use at your own risk!",
       "required": false,
       "type": "checkbox",
