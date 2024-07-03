@@ -37,6 +37,12 @@ const default_options = {
       samplingMethod: "DPM++ 2M Karras",
     },
   },
+  StableDiffusionLite: {
+    model: "stablediffusion-1.5",
+  },
+  StableDiffusionPlus: {
+    model: "stablediffusion-2.1",
+  },
   Dalle: {
     model: "dalle",
     data: {},
@@ -46,6 +52,8 @@ const default_options = {
 const provider_map = {
   Prodia: provider.Nexra,
   ProdiaStableDiffusion: provider.Nexra,
+  StableDiffusionLite: provider.Nexra,
+  StableDiffusionPlus: provider.Nexra,
   Dalle: provider.Nexra,
 };
 
@@ -214,7 +222,8 @@ export default function genImage() {
         <Form.Dropdown id="provider" defaultValue="Prodia">
           <Form.Dropdown.Item title="Prodia" value="Prodia" />
           <Form.Dropdown.Item title="ProdiaStableDiffusion" value="ProdiaStableDiffusion" />
-          <Form.Dropdown.Item title="ProdiaStableDiffusionXL" value="ProdiaStableDiffusionXL" />
+          <Form.Dropdown.Item title="StableDiffusionLite" value="StableDiffusionLite" />
+          <Form.Dropdown.Item title="StableDiffusionPlus" value="StableDiffusionPlus" />
           <Form.Dropdown.Item title="DALL-E" value="Dalle" />
         </Form.Dropdown>
 
@@ -673,7 +682,7 @@ const loadImageOptions = (currentChat) => {
   // only initialise samplingSteps if supported by the provider
   if (providerString === "Prodia") {
     data.samplingSteps = imageQuality === "Medium" ? 10 : imageQuality === "High" ? 15 : 20;
-  } else if (providerString === "ProdiaStableDiffusion" || providerString === "ProdiaStableDiffusionXL") {
+  } else if (providerString === "ProdiaStableDiffusion") {
     data.samplingSteps = imageQuality === "Medium" ? 20 : imageQuality === "High" ? 25 : 30;
   }
 
