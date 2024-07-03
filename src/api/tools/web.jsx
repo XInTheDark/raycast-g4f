@@ -47,7 +47,7 @@ export const webSearchTool = {
   type: "function",
   function: {
     name: "web_search",
-    description: "Return the web search results for the given query",
+    description: webSystemPrompt_ChatGPT,
     parameters: {
       type: "object",
       properties: {

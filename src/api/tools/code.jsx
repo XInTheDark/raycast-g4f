@@ -18,7 +18,7 @@ export const codeInterpreterTool = {
   type: "function",
   function: {
     name: "run_code",
-    description: "Run the given Python code and return the output. Use this tool responsibly.",
+    description: codeInterpreterPrompt,
     parameters: {
       type: "object",
       properties: {

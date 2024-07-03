@@ -165,11 +165,14 @@ export const getDeepInfraResponse = async function* (chat, options, max_retries 
 };
 
 const get_system_prompt = (useWebSearch, useCodeInterpreter) => {
-  const useSystemPrompt = useWebSearch || useCodeInterpreter;
-  if (!useSystemPrompt) return null;
-  return `${defaultSystemPrompt}\n\n${useWebSearch ? webSystemPrompt_ChatGPT : ""}${
-    useCodeInterpreter ? codeInterpreterPrompt : ""
-  }`;
+  // const useSystemPrompt = useWebSearch || useCodeInterpreter;
+  // if (!useSystemPrompt) return null;
+  // return `${defaultSystemPrompt}\n\n${useWebSearch ? webSystemPrompt_ChatGPT : ""}${
+  //   useCodeInterpreter ? codeInterpreterPrompt : ""
+  // }`;
+
+  /// System prompts degrade the performance of function calling. They are disabled for now.
+  return null;
 };
 
 const defaultSystemPrompt = "You are ChatGPT, a large language model. Be a helpful assistant.";
