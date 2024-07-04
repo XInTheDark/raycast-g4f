@@ -88,12 +88,6 @@ export const provider_options = (provider, chatOptions = null) => {
   let options = {};
   if (chatOptions?.creativity) {
     let temperature = parseFloat(chatOptions.creativity);
-    if (temperature >= 0.6 && getPreferenceValues()["webSearch"]) {
-      temperature -= 0.2; // reduce temperature if web search is enabled
-
-      // note that in the future when we implement web search in more places, all this logic needs to be replaced
-      // with a more reliable detection mechanism as to whether we are actually using web search.
-    }
     temperature = Math.max(0.0, temperature).toFixed(1);
     options.temperature = temperature;
   }

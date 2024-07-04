@@ -49,7 +49,7 @@ export const getDeepInfraResponse = async function* (chat, options, max_retries 
     model: model,
     messages: chat,
     tools: tools,
-    temperature: options.temperature ?? 0.7,
+    temperature: options.temperature,
     max_tokens: 100000,
     stream: true,
     headers: headers,
