@@ -172,8 +172,10 @@ https://github.com/raycast/extensions/tree/main/extensions/raycast-gemini) by Ev
 
 Third-party libraries used for generation:
 
-- [g4f](https://github.com/VictorMRojas/g4f-ts)
-- [gemini-ai](https://github.com/EvanZhouDev/gemini-ai)
+- [g4f-image](https://www.npmjs.com/package/g4f-image)
+- [gemini-g4f](https://www.npmjs.com/package/gemini-g4f)
+
+*(Both packages are maintained by the extension author.)*
 
 Some of the code in this repository was inspired or ported from the
 original [gpt4free](https://github.com/xtekky/gpt4free) project (written in Python).
