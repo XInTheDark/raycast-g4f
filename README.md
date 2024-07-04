@@ -112,8 +112,6 @@ separate them with commas in the preferences.
 Let GPT automatically come up with a name for the current chat session after you send the first message. For example,
 this is similar to what the ChatGPT web UI does.
 
-- **How to enable**: Go to the extension preferences and check the "Enable Smart Chat Naming" box.
-
 ### Automatically Check for Updates
 
 Let the extension automatically check for updates every day. If a new version is available, you will be notified,
@@ -124,6 +122,13 @@ along with the option to update the extension with a single click.
 Enable more persistent storage of the extension's data, like AI Chat data or Custom Commands.
 This will back up a copy of this data to files on your computer. Useful for saving large amounts of data.
 *Note: With this option off, your data is already well preserved. Do not enable this if you have sensitive data.*
+
+### Code Interpreter (BETA)
+
+Allows GPT to execute Python code locally. The model has been instructed to strictly only produce safe code, 
+but use at your own risk!
+
+Only models with function calling capabilities support this feature. Currently, this includes only selected DeepInfra models.
 
 ---
 
