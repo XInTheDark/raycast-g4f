@@ -61,8 +61,10 @@ updating manually also allows you to fetch and view the latest changes to the so
 | DeepInfra          | Mixtral-8x22B           | ✅         | ![Active][active-badge]   | Fast      | 7.5/10, capable model for general use.                                                      |
 | DeepInfra          | Mixtral-8x7B            | ✅         | ![Active][active-badge]   | Very fast | 7.5/10                                                                                      |
 | DeepInfra          | Qwen2-72B               | ✅         | ![Active][active-badge]   | Medium    | 7/10                                                                                        |
+| DeepInfra          | Mistral-7B              | ✅         | ![Active][active-badge]   | Very fast | 6.5/10                                                                                      |
+| DeepInfra          | openchat-3.6-8b         | ✅         | ![Active][active-badge]   | Very fast | 7/10                                                                                        |
 | DeepInfra          | meta-llama-3-70b        | ✅         | ![Active][active-badge]   | Medium    | 7/10                                                                                        |
-| DeepInfra          | meta-llama-3-8b         | ✅         | ![Active][active-badge]   | Very fast | 6.5/10                                                                                      |
+| DeepInfra          | meta-llama-3-8b         | ✅         | ![Active][active-badge]   | Very fast | 6/10                                                                                        |
 | DeepInfra          | gemma-2-27b             | ✅         | ![Active][active-badge]   | Very fast | 6.5/10                                                                                      |
 | DeepInfra          | WizardLM-2-8x22B        | ✅         | ![Unknown][unknown-badge] | Medium    | 7/10                                                                                        |
 | Blackbox           | custom model            | ✅         | ![Active][active-badge]   | Very fast | 6.5/10, very fast generation with built-in web search ability, but is optimized for coding. |
