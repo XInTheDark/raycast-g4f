@@ -37,6 +37,11 @@ const function_supported_models = [
   "meta-llama/Meta-Llama-3-70B-Instruct",
 ];
 
+// max_tokens parameter overrides - some models have short context lengths
+const max_tokens_overrides = {
+  "google/gemma-2-27b-it": 512,
+};
+
 export const getDeepInfraResponse = async function* (chat, options, max_retries = 5) {
   const model = options.model;
   chat = messages_to_json(chat);
@@ -50,7 +55,7 @@ export const getDeepInfraResponse = async function* (chat, options, max_retries 
     messages: chat,
     tools: tools,
     temperature: options.temperature,
-    max_tokens: 100000,
+    max_tokens: max_tokens_overrides[model] || 100000,
     stream: true,
     headers: headers,
   };
