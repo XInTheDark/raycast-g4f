@@ -21,6 +21,7 @@ export const getGoogleGeminiResponse = async (chat, options, stream_update, max_
     for (const APIKey of APIKeys) {
       const googleGemini = new Gemini(APIKey, { fetch: fetch });
       let [formattedChat, query] = await GeminiFormatChat(chat, googleGemini);
+
       const geminiChat = googleGemini.createChat({
         model: options.model,
         messages: formattedChat,
