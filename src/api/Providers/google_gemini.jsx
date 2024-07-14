@@ -25,8 +25,8 @@ export const getGoogleGeminiResponse = async (chat, options, stream_update, max_
       const geminiChat = googleGemini.createChat({
         model: options.model,
         messages: formattedChat,
-        maxOutputTokens: 8192, // accurate as of 2024-05-31, for gemini-1.5-flash-latest
-        temperature: options.temperature,
+        maxOutputTokens: 8192, // maximum for v1.5 models
+        temperature: options.temperature * 1.5, // v1.5 models have temperature in [0, 2] so we scale it up
       });
 
       // Send message

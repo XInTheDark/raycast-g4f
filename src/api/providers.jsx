@@ -53,7 +53,7 @@ export const providers_info = {
   ReplicateLlama3_8B: { provider: ReplicateProvider, model: "meta/meta-llama-3-8b-instruct", stream: true },
   ReplicateLlama3_70B: { provider: ReplicateProvider, model: "meta/meta-llama-3-70b-instruct", stream: true },
   ReplicateMixtral_8x7B: { provider: ReplicateProvider, model: "mistralai/mixtral-8x7b-instruct-v0.1", stream: true },
-  GoogleGemini: { provider: GeminiProvider, model: "gemini-1.5-flash-latest", stream: true },
+  GoogleGemini: { provider: GeminiProvider, model: "auto", stream: true },
   G4FLocal: { provider: G4FLocalProvider, stream: true },
 };
 
