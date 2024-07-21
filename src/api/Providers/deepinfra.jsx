@@ -91,13 +91,14 @@ export const getDeepInfraResponse = async function* (chat, options, max_retries 
             let delta = data["choices"][0]["delta"];
 
             // Function calling
-            if (delta["tool_calls"]) {
-              let call_name = delta["tool_calls"][0]["function"]["name"];
-              let call_args = JSON.parse(delta["tool_calls"][0]["function"]["arguments"]);
+            let tool_calls = delta["tool_calls"];
+            if (tool_calls && tool_calls.length > 0) {
+              let call_name = tool_calls[0]["function"]["name"];
+              let call_args = JSON.parse(tool_calls[0]["function"]["arguments"]);
               try {
                 call_args = JSON.parse(call_args.toString());
               } catch (e) {} // eslint-disable-line
-              let call_id = delta["tool_calls"][0]["id"];
+              let call_id = tool_calls[0]["id"];
 
               console.log("Function call:", call_name, call_args);
 
