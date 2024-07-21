@@ -35,6 +35,13 @@
       "mode": "view"
     },
     {
+      "name": "aiPresets",
+      "title": "AI Presets",
+      "description": "Manage AI presets",
+      "icon": "preset-icon.png",
+      "mode": "view"
+    },
+    {
       "name": "askAboutSelectedText",
       "title": "Ask About Selected Text",
       "description": "Ask GPT about selected text",
