@@ -1,4 +1,4 @@
-import { Storage } from "./storage";
+import { Storage } from "../api/storage";
 import { Clipboard } from "@raycast/api";
 
 export class CustomCommand {
