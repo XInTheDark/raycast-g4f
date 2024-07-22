@@ -19,7 +19,7 @@ export const setAIPresets = async (presets) => {
 };
 
 export const getSubtitle = (preset) => {
-  return `Provider: ${preset.provider} | Creativity: ${preset.creativity} | ${preset.systemPrompt.slice(0, 50)}`;
+  return `Provider: ${preset.provider} | ${preset.systemPrompt.slice(0, 50)}`;
 };
 
 export const getPreset = (presets, name) => {

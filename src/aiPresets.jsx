@@ -27,7 +27,7 @@ export default function AIPresets() {
     const idx = props.idx || 0;
     const newPreset = props.newPreset || false;
     let preset = newPreset
-      ? new AIPreset({ name: "New Preset", provider: providers.default_provider_string })
+      ? new AIPreset({ name: "New Preset", provider: providers.default_provider_string(), creativity: "0.7" })
       : presets[idx];
 
     return (
