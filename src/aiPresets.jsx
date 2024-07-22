@@ -26,7 +26,9 @@ export default function AIPresets() {
 
     const idx = props.idx || 0;
     const newPreset = props.newPreset || false;
-    let preset = newPreset ? new AIPreset({ name: "New Preset" }) : presets[idx];
+    let preset = newPreset
+      ? new AIPreset({ name: "New Preset", provider: providers.default_provider_string })
+      : presets[idx];
 
     return (
       <Form
@@ -64,7 +66,7 @@ export default function AIPresets() {
       >
         <Form.TextField id="name" title="Name" defaultValue={preset.name} />
         <Form.Description title="Provider" text="The provider and model used for this chat." />
-        <Form.Dropdown id="provider" defaultValue={providers.default_provider_string()}>
+        <Form.Dropdown id="provider" defaultValue={preset.provider}>
           {providers.ChatProvidersReact}
         </Form.Dropdown>
 
@@ -72,7 +74,7 @@ export default function AIPresets() {
           title="Creativity"
           text="Technical tasks like coding require less creativity, while open-ended ones require more."
         />
-        <Form.Dropdown id="creativity" defaultValue="0.7">
+        <Form.Dropdown id="creativity" defaultValue={preset.creativity}>
           <Form.Dropdown.Item title="None" value="0.0" />
           <Form.Dropdown.Item title="Low" value="0.3" />
           <Form.Dropdown.Item title="Medium" value="0.5" />
@@ -81,7 +83,7 @@ export default function AIPresets() {
         </Form.Dropdown>
 
         <Form.Description title="System Prompt" text="This prompt will be sent to GPT to start the conversation." />
-        <Form.TextArea id="systemPrompt" defaultValue="" />
+        <Form.TextArea id="systemPrompt" defaultValue={preset.systemPrompt} />
       </Form>
     );
   };
