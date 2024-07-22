@@ -135,7 +135,7 @@ export default function AIPresets() {
     return (
       <List>
         <List.EmptyView
-          icon={Icon.Layers}
+          icon={Icon.Bookmark}
           title="Start by creating an AI Preset..."
           actions={
             <ActionPanel>
