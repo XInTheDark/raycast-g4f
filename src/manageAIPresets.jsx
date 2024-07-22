@@ -4,7 +4,7 @@ import { Form, List, Action, ActionPanel, Icon, useNavigation, confirmAlert, sho
 import { help_action } from "./helpers/helpPage";
 import * as providers from "./api/providers";
 
-export default function AIPresets() {
+export default function ManageAIPresets() {
   let [presets, setPresets] = useState(null);
   useEffect(() => {
     (async () => {

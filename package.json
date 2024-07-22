@@ -35,13 +35,6 @@
       "mode": "view"
     },
     {
-      "name": "aiPresets",
-      "title": "AI Presets",
-      "description": "Manage AI presets",
-      "icon": "preset-icon.png",
-      "mode": "view"
-    },
-    {
       "name": "askAboutSelectedText",
       "title": "Ask About Selected Text",
       "description": "Ask GPT about selected text",
@@ -189,6 +182,13 @@
       "title": "Configure GPT4Free Local API",
       "description": "Configure GPT4Free Local API settings",
       "icon": "box-icon.png",
+      "mode": "view"
+    },
+    {
+      "name": "manageAIPresets",
+      "title": "Manage AI Presets",
+      "description": "Manage AI presets",
+      "icon": "preset-icon.png",
       "mode": "view"
     }
   ],
