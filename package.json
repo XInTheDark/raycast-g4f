@@ -183,6 +183,13 @@
       "description": "Configure GPT4Free Local API settings",
       "icon": "box-icon.png",
       "mode": "view"
+    },
+    {
+      "name": "manageAIPresets",
+      "title": "Manage AI Presets",
+      "description": "Manage AI presets",
+      "icon": "preset-icon.png",
+      "mode": "view"
     }
   ],
   "preferences": [

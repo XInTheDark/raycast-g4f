@@ -1,4 +1,4 @@
-import { CustomCommand, getCustomCommands, setCustomCommands } from "./api/customCommands";
+import { CustomCommand, getCustomCommands, setCustomCommands } from "./helpers/customCommands";
 import { useEffect, useState } from "react";
 import { Form, List, Action, ActionPanel, Icon, useNavigation, confirmAlert } from "@raycast/api";
 import useGPT from "./api/gpt";

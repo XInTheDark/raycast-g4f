@@ -22,11 +22,11 @@ import { MessagePair, format_chat_to_prompt, pairs_to_messages } from "./classes
 
 import { formatResponse, getChatResponse, getChatResponseSync } from "./api/gpt";
 import * as providers from "./api/providers";
+import { getAIPresets, getPreset } from "./helpers/presets";
 
 // Web search module
 import { getWebResult, web_search_enabled } from "./api/tools/web";
 import { webSystemPrompt, systemResponse, webToken, webTokenEnd } from "./api/tools/web";
-import { get_provider_info } from "./api/providers";
 
 let generationStatus = { stop: false, loading: false };
 let get_status = () => generationStatus.stop;
@@ -72,7 +72,7 @@ export default function Chat({ launchContext }) {
   const starting_messages = (systemPrompt = "", provider = null) => {
     let messages = [];
 
-    provider = get_provider_info(provider).provider;
+    provider = providers.get_provider_info(provider).provider;
 
     // Provider based starting messages
     if (provider === providers.EcosiaProvider) {
@@ -359,9 +359,6 @@ export default function Chat({ launchContext }) {
   let CreateChatComponent = () => {
     const { pop } = useNavigation();
 
-    const preferences = getPreferenceValues();
-    const defaultProviderString = preferences["gptProvider"];
-
     return (
       <Form
         actions={
@@ -375,6 +372,13 @@ export default function Chat({ launchContext }) {
                 if (values.chatName.length > 1000) {
                   toast(Toast.Style.Failure, "Chat name is too long");
                   return;
+                }
+
+                if (values.preset) {
+                  let preset = getPreset(AIPresets, values.preset);
+                  values.provider = preset.provider;
+                  values.creativity = preset.creativity;
+                  values.systemPrompt = preset.systemPrompt;
                 }
 
                 setChatData((oldData) => {
@@ -409,8 +413,17 @@ export default function Chat({ launchContext }) {
             second: "2-digit",
           })}`}
         />
+
+        <Form.Description title="AI Preset" text="The preset will override the options below." />
+        <Form.Dropdown id="preset" defaultValue="">
+          {[
+            <Form.Dropdown.Item title="" value="" key="" />,
+            ...AIPresets.map((x) => <Form.Dropdown.Item title={x.name} key={x.name} value={x.name} />),
+          ]}
+        </Form.Dropdown>
+
         <Form.Description title="Provider" text="The provider and model used for this chat." />
-        <Form.Dropdown id="provider" defaultValue={defaultProviderString}>
+        <Form.Dropdown id="provider" defaultValue={providers.default_provider_string()}>
           {providers.ChatProvidersReact}
         </Form.Dropdown>
 
@@ -935,7 +948,9 @@ export default function Chat({ launchContext }) {
   };
 
   let [chatData, setChatData] = useState(null);
+  let [AIPresets, setAIPresets] = useState([]);
 
+  // Initialize the above variables
   useEffect(() => {
     (async () => {
       const storedChatData = await Storage.read("chatData");
@@ -976,6 +991,11 @@ export default function Chat({ launchContext }) {
           return newChatData;
         });
       }
+    })();
+
+    (async () => {
+      const storedAIPresets = await getAIPresets();
+      setAIPresets(storedAIPresets);
     })();
   }, []);
 
