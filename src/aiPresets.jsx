@@ -61,6 +61,7 @@ export default function AIPresets() {
                 pop();
               }}
             />
+            {help_action("aiPresets")}
           </ActionPanel>
         }
       >
@@ -119,6 +120,7 @@ export default function AIPresets() {
           shortcut={{ modifiers: ["cmd", "shift"], key: "delete" }}
           style={Action.Style.Destructive}
         />
+        {help_action("aiPresets")}
       </ActionPanel>
     );
   };
@@ -140,6 +142,7 @@ export default function AIPresets() {
           actions={
             <ActionPanel>
               <Action.Push title="Create Preset" icon={Icon.PlusCircle} target={<EditPresetForm newPreset={true} />} />
+              {help_action("aiPresets")}
             </ActionPanel>
           }
         />
