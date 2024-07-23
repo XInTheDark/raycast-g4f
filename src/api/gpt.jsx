@@ -415,9 +415,6 @@ export const chatCompletion = async (chat, options, stream_update = null, status
   } else if (provider === providers.BlackboxProvider) {
     // Blackbox
     response = await providers.getBlackboxResponse(chat);
-  } else if (provider === providers.EcosiaProvider) {
-    // Ecosia
-    response = await providers.getEcosiaResponse(chat, options);
   } else if (provider === providers.ReplicateProvider) {
     // Replicate
     response = await providers.getReplicateResponse(chat, options);
