@@ -68,7 +68,6 @@ updating manually also allows you to fetch and view the latest changes to the so
 | DeepInfra          | gemma-2-27b                               | ✅         | ![Active][active-badge]   | Very fast | 6.5/10                                                                                      |
 | DeepInfra          | WizardLM-2-8x22B                          | ✅         | ![Unknown][unknown-badge] | Medium    | 7/10                                                                                        |
 | Blackbox           | custom model                              | ✅         | ![Active][active-badge]   | Very fast | 6.5/10, very fast generation with built-in web search ability, but is optimized for coding. |
-| Ecosia             | gpt-3.5-turbo                             | ✅         | ![Active][active-badge]   | Very fast | 7.5/10, near instant responses with a recent model.                                         |
 | Replicate          | mixtral-8x7b                              | ✅         | ![Active][active-badge]   | Medium    | ?/10                                                                                        |
 | Replicate          | meta-llama-3-70b                          | ✅         | ![Unknown][unknown-badge] | Medium    | ?/10                                                                                        |
 | Replicate          | meta-llama-3-8b                           | ✅         | ![Active][active-badge]   | Fast      | ?/10                                                                                        |
