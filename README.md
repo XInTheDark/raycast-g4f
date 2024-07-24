@@ -60,6 +60,7 @@ updating manually also allows you to fetch and view the latest changes to the so
 | GPT                | gpt-4                                     | ❌         | ![Active][active-badge]   | Medium    | 6.5/10, no streaming support but otherwise a great model.                                   |
 | DeepInfra          | meta-llama-3.1-70b                        | ✅         | ![Active][active-badge]   | Medium    | 8/10, new model with large context size.                                                    |
 | DeepInfra          | meta-llama-3.1-8b                         | ✅         | ![Active][active-badge]   | Very fast | 7.5/10, new model with large context size.                                                  |
+| DeepInfra          | meta-llama-3.1-405b                       | ✅         | ![Active][active-badge]   | Very slow | 6/10, state-of-the-art open source model but very slow. Suitable for very complex tasks.    |
 | DeepInfra          | Mixtral-8x22B                             | ✅         | ![Active][active-badge]   | Fast      | 7.5/10, capable model for general use.                                                      |
 | DeepInfra          | Mixtral-8x7B                              | ✅         | ![Active][active-badge]   | Very fast | 7.5/10                                                                                      |
 | DeepInfra          | Qwen2-72B                                 | ✅         | ![Active][active-badge]   | Medium    | 7/10                                                                                        |
