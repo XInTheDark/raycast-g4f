@@ -17,6 +17,10 @@ export { DeepInfraProvider, getDeepInfraResponse };
 import { BlackboxProvider, getBlackboxResponse } from "./Providers/blackbox";
 export { BlackboxProvider, getBlackboxResponse };
 
+// DuckDuckGo module
+import { DuckDuckGoProvider, getDuckDuckGoResponse } from "./Providers/duckduckgo";
+export { DuckDuckGoProvider, getDuckDuckGoResponse };
+
 // Replicate module
 import { ReplicateProvider, getReplicateResponse } from "./Providers/replicate";
 export { ReplicateProvider, getReplicateResponse };
@@ -45,6 +49,10 @@ export const providers_info = {
   DeepInfraOpenChat36_8B: { provider: DeepInfraProvider, model: "openchat/openchat-3.6-8b", stream: true },
   DeepInfraGemma2_27B: { provider: DeepInfraProvider, model: "google/gemma-2-27b-it", stream: true },
   Blackbox: { provider: BlackboxProvider, model: "", stream: true },
+  DuckDuckGo_GPT35Turbo: { provider: DuckDuckGoProvider, model: "gpt-3.5-turbo-0125", stream: true },
+  DuckDuckGo_Claude3Haiku: { provider: DuckDuckGoProvider, model: "claude-3-haiku-20240307", stream: true },
+  DuckDuckGo_Llama3_70B: { provider: DuckDuckGoProvider, model: "meta-llama/Llama-3-70b-chat-hf", stream: true },
+  DuckDuckGo_Mixtral_8x7B: { provider: DuckDuckGoProvider, model: "mistralai/Mixtral-8x7B-Instruct-v0.1", stream: true },
   ReplicateLlama3_8B: { provider: ReplicateProvider, model: "meta/meta-llama-3-8b-instruct", stream: true },
   ReplicateLlama3_70B: { provider: ReplicateProvider, model: "meta/meta-llama-3-70b-instruct", stream: true },
   ReplicateMixtral_8x7B: { provider: ReplicateProvider, model: "mistralai/mixtral-8x7b-instruct-v0.1", stream: true },
@@ -66,6 +74,10 @@ export const chat_providers = [
   ["DeepInfra (gemma-2-27b)", "DeepInfraGemma2_27B"],
   ["DeepInfra (WizardLM-2-8x22B)", "DeepInfraWizardLM2_8x22B"],
   ["Blackbox (custom-model)", "Blackbox"],
+  ["DuckDuckGo (gpt-3.5-turbo)", "DuckDuckGo_GPT35Turbo"],
+  ["DuckDuckGo (claude-3-haiku)", "DuckDuckGo_Claude3Haiku"],
+  ["DuckDuckGo (meta-llama-3-70b)", "DuckDuckGo_Llama3_70B"],
+  ["DuckDuckGo (mixtral-8x7b)", "DuckDuckGo_Mixtral_8x7B"],
   ["Replicate (mixtral-8x7b)", "ReplicateMixtral_8x7B"],
   ["Replicate (meta-llama-3-70b)", "ReplicateLlama3_70B"],
   ["Replicate (meta-llama-3-8b)", "ReplicateLlama3_8B"],
