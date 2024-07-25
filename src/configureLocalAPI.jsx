@@ -43,7 +43,7 @@ export default function ConfigureLocalAPI() {
               await showToast(Toast.Style.Success, "Configuration Saved");
             }}
           />
-          {help_action("g4fLocal")}
+          {help_action("localAPI")}
         </ActionPanel>
       }
     >
