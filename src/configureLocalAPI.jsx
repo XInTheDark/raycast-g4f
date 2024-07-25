@@ -6,7 +6,7 @@ import { Form, ActionPanel, Action, useNavigation, showToast, Toast } from "@ray
 import { useState, useEffect } from "react";
 import { getOllamaModelsComponent } from "./api/Providers/ollama_local";
 
-export default function ConfigureLocalApi() {
+export default function ConfigureLocalAPI() {
   const [executablePath, setExecutablePath] = useState("");
   const [timeout, setTimeout] = useState("");
   const [g4fModelsComponent, setG4fModelsComponent] = useState([]);
