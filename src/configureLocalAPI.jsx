@@ -47,7 +47,7 @@ export default function ConfigureLocalAPI() {
         </ActionPanel>
       }
     >
-      <Form.Description text="Configure the GPT4Free Local API. Select 'Help' for the full guide." />
+      <Form.Description text="Configure the GPT4Free and Ollama Local APIs. Select 'Help' for the full guide." />
       <Form.TextField
         id="g4f_executable"
         title="G4F Executable Path"
