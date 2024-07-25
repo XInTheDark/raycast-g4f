@@ -107,8 +107,8 @@ export const getG4FModelsComponent = async () => {
         })}
       </Form.Dropdown>
       <Form.TextField
-        id="provider"
-        title="Provider"
+        id="g4f_provider"
+        title="G4F Provider"
         info="(Optional) The provider to use in the API. The API will automatically select the best provider if this is not set."
         defaultValue={info.provider}
       />

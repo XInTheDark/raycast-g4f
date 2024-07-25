@@ -9,8 +9,8 @@ import { getOllamaModelsComponent } from "./api/Providers/ollama_local";
 export default function ConfigureLocalAPIs() {
   const [executablePath, setExecutablePath] = useState("");
   const [timeout, setTimeout] = useState("");
-  const [g4fModelsComponent, setG4fModelsComponent] = useState([]);
-  const [ollamaModelsComponent, setOllamaModelsComponent] = useState("");
+  const [g4fModelsComponent, setG4fModelsComponent] = useState(null);
+  const [ollamaModelsComponent, setOllamaModelsComponent] = useState(null);
   const [rendered, setRendered] = useState(false);
 
   const { pop } = useNavigation();
@@ -37,7 +37,7 @@ export default function ConfigureLocalAPIs() {
               await Storage.write("g4f_timeout", values.g4f_timeout || DEFAULT_TIMEOUT);
               await Storage.write(
                 "g4f_info",
-                JSON.stringify({ model: values.g4f_model, provider: values.provider.trim() })
+                JSON.stringify({ model: values.g4f_model, provider: values.g4f_provider.trim() })
               );
               await Storage.write("ollama_model", JSON.stringify({ model: values.ollama_model }));
               await showToast(Toast.Style.Success, "Configuration Saved");
