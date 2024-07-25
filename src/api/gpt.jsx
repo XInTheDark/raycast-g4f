@@ -424,6 +424,9 @@ export const chatCompletion = async (chat, options, stream_update = null, status
   } else if (provider === providers.G4FLocalProvider) {
     // G4F Local
     response = await providers.getG4FLocalResponse(chat, options);
+  } else if (provider === providers.OllamaLocalProvider) {
+    // Ollama Local
+    response = await providers.getOllamaLocalResponse(chat, options);
   }
 
   // stream = false

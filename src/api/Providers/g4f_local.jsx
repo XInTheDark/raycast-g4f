@@ -101,7 +101,7 @@ export const getG4FModelsComponent = async () => {
   const info = await getG4FModelInfo();
   return (
     <>
-      <Form.Dropdown id="model" title="Model" defaultValue={info.model}>
+      <Form.Dropdown id="g4f_model" title="G4F Model" defaultValue={info.model}>
         {models.map((model) => {
           return <Form.Dropdown.Item title={model.id} key={model.id} value={model.id} />;
         })}

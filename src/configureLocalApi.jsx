@@ -4,11 +4,13 @@ import { help_action } from "./helpers/helpPage";
 
 import { Form, ActionPanel, Action, useNavigation, showToast, Toast } from "@raycast/api";
 import { useState, useEffect } from "react";
+import { getOllamaModelsComponent } from "./api/Providers/ollama_local";
 
-export default function ConfigureG4FLocalApi() {
+export default function ConfigureLocalApi() {
   const [executablePath, setExecutablePath] = useState("");
   const [timeout, setTimeout] = useState("");
-  const [modelsComponent, setModelsComponent] = useState([]);
+  const [g4fModelsComponent, setG4fModelsComponent] = useState([]);
+  const [ollamaModelsComponent, setOllamaModelsComponent] = useState("");
   const [rendered, setRendered] = useState(false);
 
   const { pop } = useNavigation();
@@ -17,7 +19,8 @@ export default function ConfigureG4FLocalApi() {
     (async () => {
       setExecutablePath(await getG4FExecutablePath());
       setTimeout((await getG4FTimeout()).toString());
-      setModelsComponent(await getG4FModelsComponent());
+      setG4fModelsComponent(await getG4FModelsComponent());
+      setOllamaModelsComponent(await getOllamaModelsComponent());
       setRendered(true);
     })();
   }, []);
@@ -34,8 +37,9 @@ export default function ConfigureG4FLocalApi() {
               await Storage.write("g4f_timeout", values.g4f_timeout || DEFAULT_TIMEOUT);
               await Storage.write(
                 "g4f_info",
-                JSON.stringify({ model: values.model, provider: values.provider.trim() })
+                JSON.stringify({ model: values.g4f_model, provider: values.provider.trim() })
               );
+              await Storage.write("ollama_model", JSON.stringify({ model: values.ollama_model }));
               await showToast(Toast.Style.Success, "Configuration Saved");
             }}
           />
@@ -61,7 +65,8 @@ export default function ConfigureG4FLocalApi() {
           if (rendered) setTimeout(x);
         }}
       />
-      {modelsComponent}
+      {g4fModelsComponent}
+      {ollamaModelsComponent}
     </Form>
   );
 }

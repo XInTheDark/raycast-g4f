@@ -29,6 +29,10 @@ export { GeminiProvider, getGoogleGeminiResponse };
 import { G4FLocalProvider, getG4FLocalResponse } from "./Providers/g4f_local";
 export { G4FLocalProvider, getG4FLocalResponse };
 
+// Ollama Local module
+import { OllamaLocalProvider, getOllamaLocalResponse } from "./Providers/ollama_local";
+export { OllamaLocalProvider, getOllamaLocalResponse };
+
 /// All providers info
 // { provider internal name, {provider, model, stream, extra options} }
 // prettier-ignore
@@ -53,6 +57,7 @@ export const providers_info = {
   ReplicateMixtral_8x7B: { provider: ReplicateProvider, model: "mistralai/mixtral-8x7b-instruct-v0.1", stream: true },
   GoogleGemini: { provider: GeminiProvider, model: "auto", stream: true },
   G4FLocal: { provider: G4FLocalProvider, stream: true },
+  OllamaLocal: { provider: OllamaLocalProvider, stream: true },
 };
 
 /// Chat providers (user-friendly names)
@@ -77,6 +82,7 @@ export const chat_providers = [
   ["Replicate (meta-llama-3-8b)", "ReplicateLlama3_8B"],
   ["Google Gemini (requires API Key)", "GoogleGemini"],
   ["GPT4Free Local API", "G4FLocal"],
+  ["Ollama Local API", "OllamaLocal"],
 ];
 
 export const ChatProvidersReact = chat_providers.map((x) => {

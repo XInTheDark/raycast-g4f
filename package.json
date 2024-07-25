@@ -178,9 +178,9 @@
       "mode": "view"
     },
     {
-      "name": "configureG4FLocalApi",
-      "title": "Configure GPT4Free Local API",
-      "description": "Configure GPT4Free Local API settings",
+      "name": "configureLocalAPI",
+      "title": "Configure Local APIs",
+      "description": "Configure GPT4Free and Ollama Local API settings",
       "icon": "box-icon.png",
       "mode": "view"
     },
@@ -279,6 +279,10 @@
         {
           "title": "GPT4Free Local API",
           "value": "G4FLocal"
+        },
+        {
+          "title": "Ollama Local API",
+          "value": "OllamaLocal"
         }
       ],
       "default": "GPT35"
