@@ -1,10 +1,10 @@
 import { getG4FExecutablePath, getG4FTimeout, DEFAULT_TIMEOUT, getG4FModelsComponent } from "./api/Providers/g4f_local";
+import { getOllamaModelsComponent } from "./api/Providers/ollama_local";
 import { Storage } from "./api/storage";
 import { help_action } from "./helpers/helpPage";
 
 import { Form, ActionPanel, Action, useNavigation, showToast, Toast } from "@raycast/api";
 import { useState, useEffect } from "react";
-import { getOllamaModelsComponent } from "./api/Providers/ollama_local";
 
 export default function ConfigureLocalAPIs() {
   const [executablePath, setExecutablePath] = useState("");
