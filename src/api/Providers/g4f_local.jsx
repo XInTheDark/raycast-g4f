@@ -101,14 +101,14 @@ export const getG4FModelsComponent = async () => {
   const info = await getG4FModelInfo();
   return (
     <>
-      <Form.Dropdown id="model" title="Model" defaultValue={info.model}>
+      <Form.Dropdown id="g4f_model" title="G4F Model" defaultValue={info.model}>
         {models.map((model) => {
           return <Form.Dropdown.Item title={model.id} key={model.id} value={model.id} />;
         })}
       </Form.Dropdown>
       <Form.TextField
-        id="provider"
-        title="Provider"
+        id="g4f_provider"
+        title="G4F Provider"
         info="(Optional) The provider to use in the API. The API will automatically select the best provider if this is not set."
         defaultValue={info.provider}
       />

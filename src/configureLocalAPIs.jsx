@@ -1,14 +1,16 @@
 import { getG4FExecutablePath, getG4FTimeout, DEFAULT_TIMEOUT, getG4FModelsComponent } from "./api/Providers/g4f_local";
+import { getOllamaModelsComponent } from "./api/Providers/ollama_local";
 import { Storage } from "./api/storage";
 import { help_action } from "./helpers/helpPage";
 
 import { Form, ActionPanel, Action, useNavigation, showToast, Toast } from "@raycast/api";
 import { useState, useEffect } from "react";
 
-export default function ConfigureG4FLocalApi() {
+export default function ConfigureLocalAPIs() {
   const [executablePath, setExecutablePath] = useState("");
   const [timeout, setTimeout] = useState("");
-  const [modelsComponent, setModelsComponent] = useState([]);
+  const [g4fModelsComponent, setG4fModelsComponent] = useState(null);
+  const [ollamaModelsComponent, setOllamaModelsComponent] = useState(null);
   const [rendered, setRendered] = useState(false);
 
   const { pop } = useNavigation();
@@ -17,7 +19,8 @@ export default function ConfigureG4FLocalApi() {
     (async () => {
       setExecutablePath(await getG4FExecutablePath());
       setTimeout((await getG4FTimeout()).toString());
-      setModelsComponent(await getG4FModelsComponent());
+      setG4fModelsComponent(await getG4FModelsComponent());
+      setOllamaModelsComponent(await getOllamaModelsComponent());
       setRendered(true);
     })();
   }, []);
@@ -34,16 +37,17 @@ export default function ConfigureG4FLocalApi() {
               await Storage.write("g4f_timeout", values.g4f_timeout || DEFAULT_TIMEOUT);
               await Storage.write(
                 "g4f_info",
-                JSON.stringify({ model: values.model, provider: values.provider.trim() })
+                JSON.stringify({ model: values.g4f_model, provider: values.g4f_provider.trim() })
               );
+              await Storage.write("ollama_model", JSON.stringify({ model: values.ollama_model }));
               await showToast(Toast.Style.Success, "Configuration Saved");
             }}
           />
-          {help_action("g4fLocal")}
+          {help_action("localAPI")}
         </ActionPanel>
       }
     >
-      <Form.Description text="Configure the GPT4Free Local API. Select 'Help' for the full guide." />
+      <Form.Description text="Configure the GPT4Free and Ollama Local APIs. Select 'Help' for the full guide." />
       <Form.TextField
         id="g4f_executable"
         title="G4F Executable Path"
@@ -61,7 +65,8 @@ export default function ConfigureG4FLocalApi() {
           if (rendered) setTimeout(x);
         }}
       />
-      {modelsComponent}
+      {g4fModelsComponent}
+      {ollamaModelsComponent}
     </Form>
   );
 }
