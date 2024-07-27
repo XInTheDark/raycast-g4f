@@ -1,10 +1,10 @@
-import { getPreferenceValues } from "@raycast/api";
-
 export const DeepInfraProvider = "DeepInfraProvider";
+
 import fetch from "node-fetch";
 import { messages_to_json } from "../../classes/message";
 import { getWebResult, webSearchTool } from "../tools/web";
 import { codeInterpreterTool, getCodeInterpreterResult } from "../tools/code";
+import { getPreferenceValues } from "@raycast/api";
 
 // Implementation ported from gpt4free DeepInfra provider.
 

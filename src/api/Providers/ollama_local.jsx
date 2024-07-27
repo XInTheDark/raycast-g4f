@@ -1,6 +1,8 @@
 // This module allows communication and requests to the local Ollama API.
 // Read more here: https://github.com/ollama/ollama/blob/main/docs/api.md
 
+export const OllamaLocalProvider = "OllamaLocalProvider";
+
 import fetch from "node-fetch";
 
 import { Storage } from "../storage";
@@ -16,7 +18,6 @@ const API_URL = "http://localhost:11434/api/chat";
 const MODELS_URL = "http://localhost:11434/api/tags";
 
 // main function
-export const OllamaLocalProvider = "OllamaLocalProvider";
 export const getOllamaLocalResponse = async function* (chat, options) {
   chat = messages_to_json(chat);
   const model = (await getOllamaModelInfo()).model;

@@ -1,6 +1,8 @@
 // This module allows communication and requests to the local G4F API.
 // Read more here: https://github.com/xtekky/gpt4free/blob/main/docs/interference.md
 
+export const G4FLocalProvider = "G4FLocalProvider";
+
 import { exec } from "child_process";
 import fetch from "node-fetch";
 
@@ -22,7 +24,6 @@ const API_URL = "http://localhost:1337/v1/chat/completions";
 const MODELS_URL = "http://localhost:1337/v1/models";
 
 // main function
-export const G4FLocalProvider = "G4FLocalProvider";
 export const getG4FLocalResponse = async function* (chat, options) {
   if (!(await isG4FRunning())) {
     await startG4F();

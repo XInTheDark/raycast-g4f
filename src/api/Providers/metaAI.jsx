@@ -1,8 +1,8 @@
 export const MetaAIProvider = "MetaAIProvider";
+
 import fetch from "node-fetch";
 import { format_chat_to_prompt } from "../../classes/message";
 import { randomUUID } from "crypto";
-import fs from "fs";
 
 // Implementation ported from gpt4free MetaAI provider.
 
