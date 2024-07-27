@@ -109,7 +109,7 @@ export default (
 
     await showToast({
       style: Toast.Style.Animated,
-      title: "Response Loading",
+      title: "Response loading",
     });
 
     try {
@@ -135,7 +135,7 @@ export default (
         chars = response.length;
         charPerSec = (chars / elapsed).toFixed(1);
       } else {
-        let loadingToast = await showToast(Toast.Style.Animated, "Response Loading");
+        let loadingToast = await showToast(Toast.Style.Animated, "Response loading");
         generationStatus.stop = false;
 
         const handler = (new_message) => {
@@ -156,7 +156,7 @@ export default (
 
       await showToast({
         style: Toast.Style.Success,
-        title: "Response Finished",
+        title: "Response finished",
         message: `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`,
       });
 
@@ -169,7 +169,7 @@ export default (
       );
       await showToast({
         style: Toast.Style.Failure,
-        title: "Response Failed",
+        title: "Response failed",
       });
     }
 
@@ -251,7 +251,7 @@ export default (
             await popToRoot();
             await showToast({
               style: Toast.Style.Failure,
-              title: "No Query Provided",
+              title: "No query provided",
             });
           }
         }
@@ -274,7 +274,7 @@ export default (
             await popToRoot();
             await showToast({
               style: Toast.Style.Failure,
-              title: "No Query Provided",
+              title: "No query provided",
             });
           }
         }
