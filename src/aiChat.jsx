@@ -347,6 +347,54 @@ export default function Chat({ launchContext }) {
     toast(Toast.Style.Success, "Chat Imported");
   };
 
+  let EditChatForm = (chat = null) => {
+    return (
+      <>
+      <Form.Description
+          title="Chat Name"
+          text="In each chat, GPT will remember the previous messages you send in it."
+        />
+        <Form.TextField
+          id="chatName"
+          defaultValue={chat?.name || `New Chat ${new Date().toLocaleString("en-US", {
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          })}`}
+        />
+
+        <Form.Description title="AI Preset" text="The preset will override the options below." />
+        <Form.Dropdown id="preset" defaultValue="">
+          {[
+            <Form.Dropdown.Item title="" value="" key="" />,
+            ...AIPresets.map((x) => <Form.Dropdown.Item title={x.name} key={x.name} value={x.name} />),
+          ]}
+        </Form.Dropdown>
+
+        <Form.Description title="Provider" text="The provider and model used for this chat." />
+        <Form.Dropdown id="provider" defaultValue={chat?.provider || providers.default_provider_string()}>
+          {providers.ChatProvidersReact}
+        </Form.Dropdown>
+
+        <Form.Description
+          title="Creativity"
+          text="Technical tasks like coding require less creativity, while open-ended ones require more."
+        />
+        <Form.Dropdown id="creativity" defaultValue={chat?.options?.creativity || "0.7"}>
+          <Form.Dropdown.Item title="None" value="0.0" />
+          <Form.Dropdown.Item title="Low" value="0.3" />
+          <Form.Dropdown.Item title="Medium" value="0.5" />
+          <Form.Dropdown.Item title="High" value="0.7" />
+          <Form.Dropdown.Item title="Very High" value="1.0" />
+        </Form.Dropdown>
+
+        <Form.Description title="System Prompt" text="This prompt will be sent to GPT to start the conversation." />
+        <Form.TextArea id="systemPrompt" defaultValue={chat?.systemPrompt || ""} />
+        </>);
+  }
+
   let CreateChatComponent = () => {
     const { pop } = useNavigation();
 
@@ -390,48 +438,7 @@ export default function Chat({ launchContext }) {
           </ActionPanel>
         }
       >
-        <Form.Description
-          title="Chat Name"
-          text="In each chat, GPT will remember the previous messages you send in it."
-        />
-        <Form.TextField
-          id="chatName"
-          defaultValue={`New Chat ${new Date().toLocaleString("en-US", {
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-          })}`}
-        />
-
-        <Form.Description title="AI Preset" text="The preset will override the options below." />
-        <Form.Dropdown id="preset" defaultValue="">
-          {[
-            <Form.Dropdown.Item title="" value="" key="" />,
-            ...AIPresets.map((x) => <Form.Dropdown.Item title={x.name} key={x.name} value={x.name} />),
-          ]}
-        </Form.Dropdown>
-
-        <Form.Description title="Provider" text="The provider and model used for this chat." />
-        <Form.Dropdown id="provider" defaultValue={providers.default_provider_string()}>
-          {providers.ChatProvidersReact}
-        </Form.Dropdown>
-
-        <Form.Description
-          title="Creativity"
-          text="Technical tasks like coding require less creativity, while open-ended ones require more."
-        />
-        <Form.Dropdown id="creativity" defaultValue="0.7">
-          <Form.Dropdown.Item title="None" value="0.0" />
-          <Form.Dropdown.Item title="Low" value="0.3" />
-          <Form.Dropdown.Item title="Medium" value="0.5" />
-          <Form.Dropdown.Item title="High" value="0.7" />
-          <Form.Dropdown.Item title="Very High" value="1.0" />
-        </Form.Dropdown>
-
-        <Form.Description title="System Prompt" text="This prompt will be sent to GPT to start the conversation." />
-        <Form.TextArea id="systemPrompt" defaultValue="" />
+        {EditChatForm()}
       </Form>
     );
   };
@@ -555,22 +562,6 @@ export default function Chat({ launchContext }) {
                   return;
                 }
 
-                // // check if there is a currently generating message
-                // // this is now legacy because we use chat ID instead of name for identification
-                // for (let i = 0; i < chat.messages.length; i++) {
-                //   if (!chat.messages[i].finished) {
-                //     toast(Toast.Style.Failure, "Cannot rename while loading response");
-                //     return;
-                //   }
-                // }
-                //
-                // // check if chat with new name already exists
-                // // similarly this is now legacy
-                // if (chatData.chats.map((x) => x.name).includes(values.chatName)) {
-                //   toast(Toast.Style.Failure, "Chat with that name already exists");
-                //   return;
-                // }
-
                 setChatData((oldData) => {
                   let newChatData = structuredClone(oldData);
                   getChat(chatData.currentChat, newChatData.chats).name = values.chatName;
@@ -585,6 +576,38 @@ export default function Chat({ launchContext }) {
       </Form>
     );
   };
+
+  let ChangeProviderComponent = () => {
+    let currentProvider = getChat(chatData.currentChat).provider;
+
+    const { pop } = useNavigation();
+
+    return (
+      <Form
+        actions={
+          <ActionPanel>
+            <Action.SubmitForm
+              title="Change Provider"
+              onSubmit={(values) => {
+                pop();
+
+                setChatData((oldData) => {
+                  let newChatData = structuredClone(oldData);
+                  getChat(chatData.currentChat, newChatData.chats).provider = values.provider;
+                  return newChatData;
+                });
+              }}
+            />
+          </ActionPanel>
+        }
+      >
+        <Form.Description title="Provider" text="The provider and model used for this chat." />
+        <Form.Dropdown id="provider" defaultValue={currentProvider}>
+          {providers.ChatProvidersReact}
+        </Form.Dropdown>
+      </Form>
+    );
+  }
 
   // Web Search functionality
   const processWebSearchResponse = async (chatData, setChatData, currentChat, messageID, response, query) => {
@@ -786,6 +809,12 @@ export default function Chat({ launchContext }) {
               await toast(Toast.Style.Success, chat.pinned ? "Chat Pinned" : "Chat Unpinned");
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "p" }}
+          />
+          <Action.Push
+            icon={Icon.Switch}
+            title="Change Provider"
+            target={<ChangeProviderComponent />}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "o" }}
           />
           <Action
             icon={Icon.Download}
