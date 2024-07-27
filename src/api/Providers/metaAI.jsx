@@ -1,8 +1,9 @@
 export const MetaAIProvider = "MetaAIProvider";
 
 import fetch from "node-fetch";
-import { format_chat_to_prompt } from "../../classes/message";
 import { randomUUID } from "crypto";
+import { format_chat_to_prompt } from "../../classes/message";
+import { sleep } from "../../helpers/helper";
 
 // Implementation ported from gpt4free MetaAI provider.
 
@@ -87,12 +88,12 @@ export const getMetaAIResponse = async function* (chat, options, max_retries = 5
       doc_id: "7604648749596940",
     };
     const headers = {
+      ...defaultHeaders,
       "x-fb-friendly-name": "useAbraAcceptTOSForTempUserMutation",
       "x-fb-lsd": lsd,
       "x-asbd-id": "129477",
       "alt-used": "www.meta.ai",
       "sec-fetch-site": "same-origin",
-      ...defaultHeaders,
       cookie: formatCookies(cookies),
     };
     const response = await fetch(access_token_url, {
@@ -108,14 +109,16 @@ export const getMetaAIResponse = async function* (chat, options, max_retries = 5
     if (!cookies) await updateCookies();
     if (!accessToken) await updateAccessToken();
 
+    await sleep(500); // sleep for a bit to avoid rate limits
+
     const headers = {
+      ...defaultHeaders,
       "content-type": "application/x-www-form-urlencoded",
       cookie: formatCookies(cookies),
       origin: "https://www.meta.ai",
       referer: "https://www.meta.ai/",
       "x-asbd-id": "129477",
       "x-fb-friendly-name": "useAbraSendMessageMutation",
-      ...defaultHeaders,
     };
 
     const payload = {
@@ -201,9 +204,9 @@ export const getMetaAIResponse = async function* (chat, options, max_retries = 5
 
   const fetchSources = async (fetchId) => {
     const headers = {
+      ...defaultHeaders,
       authority: "graph.meta.ai",
       "x-fb-friendly-name": "AbraSearchPluginDialogQuery",
-      ...defaultHeaders,
     };
 
     const payload = {
