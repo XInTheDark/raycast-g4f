@@ -1,7 +1,8 @@
 export const MetaAIProvider = "MetaAIProvider";
 import fetch from "node-fetch";
-import { format_chat_to_prompt, messages_to_json } from "../../classes/message";
+import { format_chat_to_prompt } from "../../classes/message";
 import { randomUUID } from "crypto";
+import fs from "fs";
 
 // Implementation ported from gpt4free MetaAI provider.
 
@@ -58,8 +59,6 @@ const formatCookies = (cookies) => {
 };
 
 export const getMetaAIResponse = async function* (chat, options, max_retries = 5) {
-  chat = messages_to_json(chat);
-
   let accessToken = null;
   let lsd = null;
   let cookies = null;
@@ -107,7 +106,7 @@ export const getMetaAIResponse = async function* (chat, options, max_retries = 5
 
   const prompt = async function* (message) {
     if (!cookies) await updateCookies();
-    if (cookies && !accessToken) await updateAccessToken();
+    if (!accessToken) await updateAccessToken();
 
     const headers = {
       "content-type": "application/x-www-form-urlencoded",
@@ -149,38 +148,37 @@ export const getMetaAIResponse = async function* (chat, options, max_retries = 5
     let lastSnippetLen = 0;
     let fetchId = null;
 
-    for await (let line of response.body) {
+    const reader = response.body;
+    for await (let line of reader) {
       line = line.toString();
-      if (line.includes("<h1>Something Went Wrong</h1>")) {
-        throw new Error("Response: Something Went Wrong");
-      }
 
-      let jsonLine;
       try {
-        jsonLine = JSON.parse(line);
-      } catch {
-        continue;
-      }
+        line = JSON.parse(line);
+        const botResponseMessage = line?.data?.node?.bot_response_message || {};
+        const streamingState = botResponseMessage.streaming_state;
+        fetchId = botResponseMessage.fetch_id || fetchId;
 
-      const botResponseMessage = jsonLine?.data?.node?.bot_response_message || {};
-      const streamingState = botResponseMessage.streaming_state;
-      fetchId = botResponseMessage.fetch_id || fetchId;
-
-      if (streamingState === "STREAMING" || streamingState === "OVERALL_DONE") {
-        const snippet = botResponseMessage.snippet;
-        const newSnippetLen = snippet.length;
-        if (newSnippetLen > lastSnippetLen) {
-          yield snippet.slice(lastSnippetLen);
-          lastSnippetLen = newSnippetLen;
+        if (streamingState === "STREAMING" || streamingState === "OVERALL_DONE") {
+          const snippet = botResponseMessage.snippet;
+          const newSnippetLen = snippet.length;
+          if (newSnippetLen > lastSnippetLen) {
+            yield snippet.substring(lastSnippetLen);
+            lastSnippetLen = newSnippetLen;
+          }
         }
+      } catch (e) {
+        console.log(e);
       }
+    }
 
-      if (streamingState === "OVERALL_DONE" && fetchId) {
-        const sources = await fetchSources(fetchId);
-        if (sources) {
-          yield sources;
-        }
+    if (fetchId) {
+      const sources = await fetchSources(fetchId);
+      if (sources) {
+        yield sources;
       }
+    }
+    if (lastSnippetLen === 0) {
+      throw new Error("No response received");
     }
   };
 
@@ -220,7 +218,8 @@ export const getMetaAIResponse = async function* (chat, options, max_retries = 5
   };
 
   try {
-    yield* prompt(format_chat_to_prompt(chat));
+    let chatPrompt = format_chat_to_prompt(chat);
+    yield* prompt(chatPrompt);
   } catch (e) {
     if (max_retries > 0) {
       console.log(e, "Retrying...");
