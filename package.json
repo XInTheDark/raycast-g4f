@@ -265,6 +265,10 @@
           "value": "ReplicateMixtral_8x7B"
         },
         {
+          "title": "Replicate (meta-llama-3.1-405b)",
+          "value": "ReplicateLlama31_405B"
+        },
+        {
           "title": "Replicate (meta-llama-3-70b)",
           "value": "ReplicateLlama3_70B"
         },
