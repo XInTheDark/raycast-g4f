@@ -350,19 +350,22 @@ export default function Chat({ launchContext }) {
   let EditChatForm = (chat = null) => {
     return (
       <>
-      <Form.Description
+        <Form.Description
           title="Chat Name"
           text="In each chat, GPT will remember the previous messages you send in it."
         />
         <Form.TextField
           id="chatName"
-          defaultValue={chat?.name || `New Chat ${new Date().toLocaleString("en-US", {
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-          })}`}
+          defaultValue={
+            chat?.name ||
+            `New Chat ${new Date().toLocaleString("en-US", {
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+            })}`
+          }
         />
 
         <Form.Description title="AI Preset" text="The preset will override the options below." />
@@ -392,8 +395,9 @@ export default function Chat({ launchContext }) {
 
         <Form.Description title="System Prompt" text="This prompt will be sent to GPT to start the conversation." />
         <Form.TextArea id="systemPrompt" defaultValue={chat?.systemPrompt || ""} />
-        </>);
-  }
+      </>
+    );
+  };
 
   let CreateChatComponent = () => {
     const { pop } = useNavigation();
@@ -611,7 +615,7 @@ export default function Chat({ launchContext }) {
         {EditChatForm(chat)}
       </Form>
     );
-  }
+  };
 
   // Web Search functionality
   const processWebSearchResponse = async (chatData, setChatData, currentChat, messageID, response, query) => {
