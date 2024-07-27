@@ -1,4 +1,5 @@
 export const BlackboxProvider = "BlackboxProvider";
+
 import fetch from "node-fetch";
 import { messages_to_json } from "../../classes/message";
 import { randomBytes, randomUUID } from "crypto";

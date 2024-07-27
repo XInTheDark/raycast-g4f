@@ -17,6 +17,10 @@ export { DeepInfraProvider, getDeepInfraResponse };
 import { BlackboxProvider, getBlackboxResponse } from "./Providers/blackbox";
 export { BlackboxProvider, getBlackboxResponse };
 
+// Meta AI module
+import { MetaAIProvider, getMetaAIResponse } from "./Providers/metaAI";
+export { MetaAIProvider, getMetaAIResponse };
+
 // Replicate module
 import { ReplicateProvider, getReplicateResponse } from "./Providers/replicate";
 export { ReplicateProvider, getReplicateResponse };
@@ -52,6 +56,7 @@ export const providers_info = {
   DeepInfraOpenChat36_8B: { provider: DeepInfraProvider, model: "openchat/openchat-3.6-8b", stream: true },
   DeepInfraGemma2_27B: { provider: DeepInfraProvider, model: "google/gemma-2-27b-it", stream: true },
   Blackbox: { provider: BlackboxProvider, model: "", stream: true },
+  MetaAI: { provider: MetaAIProvider, model: "", stream: true },
   ReplicateLlama3_8B: { provider: ReplicateProvider, model: "meta/meta-llama-3-8b-instruct", stream: true },
   ReplicateLlama3_70B: { provider: ReplicateProvider, model: "meta/meta-llama-3-70b-instruct", stream: true },
   ReplicateLlama31_405B: { provider: ReplicateProvider, model: "meta/meta-llama-3.1-405b-instruct", stream: true },
@@ -78,6 +83,7 @@ export const chat_providers = [
   ["DeepInfra (gemma-2-27b)", "DeepInfraGemma2_27B"],
   ["DeepInfra (WizardLM-2-8x22B)", "DeepInfraWizardLM2_8x22B"],
   ["Blackbox (custom-model)", "Blackbox"],
+  ["Meta AI (meta-llama-3.1)", "MetaAI"],
   ["Replicate (mixtral-8x7b)", "ReplicateMixtral_8x7B"],
   ["Replicate (meta-llama-3.1-405b)", "ReplicateLlama31_405B"],
   ["Replicate (meta-llama-3-70b)", "ReplicateLlama3_70B"],

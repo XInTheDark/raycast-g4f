@@ -1,9 +1,9 @@
+export const GeminiProvider = "GeminiProvider";
+
 import Gemini, { messageToParts } from "gemini-g4f";
 import { getPreferenceValues } from "@raycast/api";
 import fetch from "node-fetch";
 import fs from "fs";
-
-export const GeminiProvider = "GeminiProvider";
 
 // By default, we set the most lenient safety settings
 const safetySettings = {

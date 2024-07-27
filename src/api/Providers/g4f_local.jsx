@@ -1,11 +1,14 @@
 // This module allows communication and requests to the local G4F API.
 // Read more here: https://github.com/xtekky/gpt4free/blob/main/docs/interference.md
 
+export const G4FLocalProvider = "G4FLocalProvider";
+
 import { exec } from "child_process";
 import fetch from "node-fetch";
 
 import { Storage } from "../storage";
 import { messages_to_json } from "../../classes/message";
+import { sleep } from "../../helpers/helper";
 
 import { Form } from "@raycast/api";
 import { getSupportPath } from "../../helpers/helper";
@@ -22,7 +25,6 @@ const API_URL = "http://localhost:1337/v1/chat/completions";
 const MODELS_URL = "http://localhost:1337/v1/models";
 
 // main function
-export const G4FLocalProvider = "G4FLocalProvider";
 export const getG4FLocalResponse = async function* (chat, options) {
   if (!(await isG4FRunning())) {
     await startG4F();
@@ -144,7 +146,7 @@ const startG4F = async () => {
       console.log("g4f >", data);
     });
     // sleep for some time to allow the API to start
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await sleep(2000);
     console.log(`G4F API started with timeout ${timeout_s}`);
   } catch (e) {
     console.log(e);

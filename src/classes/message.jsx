@@ -110,9 +110,9 @@ export const format_chat_to_prompt = (chat, model = null) => {
     // note how prompt ends with [/INST]
   } else {
     for (let i = 0; i < chat.length; i++) {
-      prompt += chat[i].role + ": " + chat[i].content + "\n";
+      prompt += capitalize(chat[i].role) + ": " + chat[i].content + "\n";
     }
-    prompt += "assistant:";
+    prompt += "Assistant:";
   }
 
   return prompt;
@@ -129,4 +129,8 @@ export const messages_to_json = (chat) => {
     json.push(msg);
   }
   return json;
+};
+
+export const capitalize = (str) => {
+  return str.charAt(0).toUpperCase() + str.slice(1);
 };
