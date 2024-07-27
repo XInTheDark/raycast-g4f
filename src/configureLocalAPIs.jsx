@@ -40,7 +40,7 @@ export default function ConfigureLocalAPIs() {
                 JSON.stringify({ model: values.g4f_model, provider: values.g4f_provider.trim() })
               );
               await Storage.write("ollama_model", JSON.stringify({ model: values.ollama_model }));
-              await showToast(Toast.Style.Success, "Configuration Saved");
+              await showToast(Toast.Style.Success, "Configuration saved");
             }}
           />
           {help_action("localAPI")}

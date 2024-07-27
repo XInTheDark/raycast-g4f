@@ -141,7 +141,7 @@ export default function Chat({ launchContext }) {
       chars = response.length;
       charPerSec = (chars / elapsed).toFixed(1);
     } else {
-      let loadingToast = await toast(Toast.Style.Animated, "Response Loading");
+      let loadingToast = await toast(Toast.Style.Animated, "Response loading");
       generationStatus = { stop: false, loading: true };
       let i = 0;
 
@@ -186,7 +186,7 @@ export default function Chat({ launchContext }) {
 
     await toast(
       Toast.Style.Success,
-      "Response Finished",
+      "Response finished",
       `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`
     );
     generationStatus.loading = false;
@@ -344,7 +344,59 @@ export default function Chat({ launchContext }) {
       return newChatData;
     });
 
-    toast(Toast.Style.Success, "Chat Imported");
+    toast(Toast.Style.Success, "Chat imported");
+  };
+
+  let EditChatForm = (chat = null) => {
+    return (
+      <>
+        <Form.Description
+          title="Chat Name"
+          text="In each chat, GPT will remember the previous messages you send in it."
+        />
+        <Form.TextField
+          id="chatName"
+          defaultValue={
+            chat?.name ||
+            `New Chat ${new Date().toLocaleString("en-US", {
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+            })}`
+          }
+        />
+
+        <Form.Description title="AI Preset" text="The preset will override the options below." />
+        <Form.Dropdown id="preset" defaultValue="">
+          {[
+            <Form.Dropdown.Item title="" value="" key="" />,
+            ...AIPresets.map((x) => <Form.Dropdown.Item title={x.name} key={x.name} value={x.name} />),
+          ]}
+        </Form.Dropdown>
+
+        <Form.Description title="Provider" text="The provider and model used for this chat." />
+        <Form.Dropdown id="provider" defaultValue={chat?.provider || providers.default_provider_string()}>
+          {providers.ChatProvidersReact}
+        </Form.Dropdown>
+
+        <Form.Description
+          title="Creativity"
+          text="Technical tasks like coding require less creativity, while open-ended ones require more."
+        />
+        <Form.Dropdown id="creativity" defaultValue={chat?.options?.creativity || "0.7"}>
+          <Form.Dropdown.Item title="None" value="0.0" />
+          <Form.Dropdown.Item title="Low" value="0.3" />
+          <Form.Dropdown.Item title="Medium" value="0.5" />
+          <Form.Dropdown.Item title="High" value="0.7" />
+          <Form.Dropdown.Item title="Very High" value="1.0" />
+        </Form.Dropdown>
+
+        <Form.Description title="System Prompt" text="This prompt will be sent to GPT to start the conversation." />
+        <Form.TextArea id="systemPrompt" defaultValue={chat?.systemPrompt || ""} />
+      </>
+    );
   };
 
   let CreateChatComponent = () => {
@@ -358,12 +410,6 @@ export default function Chat({ launchContext }) {
               title="Create Chat"
               onSubmit={(values) => {
                 pop();
-
-                // Check input length
-                if (values.chatName.length > 1000) {
-                  toast(Toast.Style.Failure, "Chat name is too long");
-                  return;
-                }
 
                 if (values.preset) {
                   let preset = getPreset(AIPresets, values.preset);
@@ -390,48 +436,7 @@ export default function Chat({ launchContext }) {
           </ActionPanel>
         }
       >
-        <Form.Description
-          title="Chat Name"
-          text="In each chat, GPT will remember the previous messages you send in it."
-        />
-        <Form.TextField
-          id="chatName"
-          defaultValue={`New Chat ${new Date().toLocaleString("en-US", {
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-          })}`}
-        />
-
-        <Form.Description title="AI Preset" text="The preset will override the options below." />
-        <Form.Dropdown id="preset" defaultValue="">
-          {[
-            <Form.Dropdown.Item title="" value="" key="" />,
-            ...AIPresets.map((x) => <Form.Dropdown.Item title={x.name} key={x.name} value={x.name} />),
-          ]}
-        </Form.Dropdown>
-
-        <Form.Description title="Provider" text="The provider and model used for this chat." />
-        <Form.Dropdown id="provider" defaultValue={providers.default_provider_string()}>
-          {providers.ChatProvidersReact}
-        </Form.Dropdown>
-
-        <Form.Description
-          title="Creativity"
-          text="Technical tasks like coding require less creativity, while open-ended ones require more."
-        />
-        <Form.Dropdown id="creativity" defaultValue="0.7">
-          <Form.Dropdown.Item title="None" value="0.0" />
-          <Form.Dropdown.Item title="Low" value="0.3" />
-          <Form.Dropdown.Item title="Medium" value="0.5" />
-          <Form.Dropdown.Item title="High" value="0.7" />
-          <Form.Dropdown.Item title="Very High" value="1.0" />
-        </Form.Dropdown>
-
-        <Form.Description title="System Prompt" text="This prompt will be sent to GPT to start the conversation." />
-        <Form.TextArea id="systemPrompt" defaultValue="" />
+        {EditChatForm()}
       </Form>
     );
   };
@@ -444,12 +449,12 @@ export default function Chat({ launchContext }) {
     let files = values?.files || [];
 
     if (query === "") {
-      toast(Toast.Style.Failure, "Please Enter a Query");
+      toast(Toast.Style.Failure, "Please enter a query");
       return;
     }
 
     setSearchText("");
-    toast(Toast.Style.Animated, "Response Loading");
+    toast(Toast.Style.Animated, "Response loading");
 
     let currentChat = getChat(chatData.currentChat, chatData.chats);
     let newMessagePair = new MessagePair({ prompt: query, files: files });
@@ -499,7 +504,7 @@ export default function Chat({ launchContext }) {
     let chat = getChat(chatData.currentChat);
 
     if (chat.messages.length === 0) {
-      toast(Toast.Style.Failure, "No Messages in Chat");
+      toast(Toast.Style.Failure, "No messages in chat");
       return;
     }
 
@@ -555,22 +560,6 @@ export default function Chat({ launchContext }) {
                   return;
                 }
 
-                // // check if there is a currently generating message
-                // // this is now legacy because we use chat ID instead of name for identification
-                // for (let i = 0; i < chat.messages.length; i++) {
-                //   if (!chat.messages[i].finished) {
-                //     toast(Toast.Style.Failure, "Cannot rename while loading response");
-                //     return;
-                //   }
-                // }
-                //
-                // // check if chat with new name already exists
-                // // similarly this is now legacy
-                // if (chatData.chats.map((x) => x.name).includes(values.chatName)) {
-                //   toast(Toast.Style.Failure, "Chat with that name already exists");
-                //   return;
-                // }
-
                 setChatData((oldData) => {
                   let newChatData = structuredClone(oldData);
                   getChat(chatData.currentChat, newChatData.chats).name = values.chatName;
@@ -586,10 +575,52 @@ export default function Chat({ launchContext }) {
     );
   };
 
+  let EditChatComponent = () => {
+    let chat = getChat(chatData.currentChat);
+
+    const { pop } = useNavigation();
+
+    return (
+      <Form
+        actions={
+          <ActionPanel>
+            <Action.SubmitForm
+              title="Edit Chat Settings"
+              onSubmit={(values) => {
+                pop();
+
+                if (values.preset) {
+                  let preset = getPreset(AIPresets, values.preset);
+                  values.provider = preset.provider;
+                  values.creativity = preset.creativity;
+                  values.systemPrompt = preset.systemPrompt;
+                }
+
+                setChatData((oldData) => {
+                  let newChatData = structuredClone(oldData);
+                  chat = getChat(chatData.currentChat, newChatData.chats);
+                  chat.name = values.chatName;
+                  chat.provider = values.provider;
+                  chat.systemPrompt = values.systemPrompt;
+                  chat.options = { creativity: values.creativity };
+                  return newChatData;
+                });
+
+                toast(Toast.Style.Success, "Chat settings saved");
+              }}
+            />
+          </ActionPanel>
+        }
+      >
+        {EditChatForm(chat)}
+      </Form>
+    );
+  };
+
   // Web Search functionality
   const processWebSearchResponse = async (chatData, setChatData, currentChat, messageID, response, query) => {
     setCurrentChatData(chatData, setChatData, messageID, null, null, false);
-    await showToast(Toast.Style.Animated, "Searching Web");
+    await toast(Toast.Style.Animated, "Searching web");
     // get everything AFTER webToken and BEFORE webTokenEnd
     let webQuery = response.includes(webTokenEnd)
       ? response.substring(response.indexOf(webToken) + webToken.length, response.indexOf(webTokenEnd)).trim()
@@ -677,13 +708,13 @@ export default function Chat({ launchContext }) {
               let chat = getChat(chatData.currentChat);
 
               if (chat.messages.length === 0) {
-                await toast(Toast.Style.Failure, "No Messages in Chat");
+                await toast(Toast.Style.Failure, "No messages in chat");
                 return;
               }
 
               let response = chat.messages[idx].second.content;
               await Clipboard.copy(response);
-              await toast(Toast.Style.Success, "Response Copied");
+              await toast(Toast.Style.Success, "Response copied");
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
           />
@@ -694,7 +725,7 @@ export default function Chat({ launchContext }) {
               let chat = getChat(chatData.currentChat);
 
               if (chat.messages.length === 0) {
-                await toast(Toast.Style.Failure, "No Messages in Chat");
+                await toast(Toast.Style.Failure, "No messages in chat");
                 return;
               }
 
@@ -752,7 +783,7 @@ export default function Chat({ launchContext }) {
                     let chat = getChat(chatData.currentChat);
 
                     if (chat.messages.length === 0) {
-                      toast(Toast.Style.Failure, "No Messages to Delete");
+                      toast(Toast.Style.Failure, "No messages to delete");
                       return;
                     }
 
@@ -763,7 +794,7 @@ export default function Chat({ launchContext }) {
                       getChat(chatData.currentChat, newChatData.chats).messages = chat.messages;
                       return newChatData;
                     });
-                    toast(Toast.Style.Success, "Message Deleted");
+                    toast(Toast.Style.Success, "Message deleted");
                   },
                 },
               });
@@ -783,9 +814,15 @@ export default function Chat({ launchContext }) {
               let chat = getChat(chatData.currentChat);
               chat.pinned = !chat.pinned;
               updateCurrentChat(chatData, setChatData, chat);
-              await toast(Toast.Style.Success, chat.pinned ? "Chat Pinned" : "Chat Unpinned");
+              await toast(Toast.Style.Success, chat.pinned ? "Chat pinned" : "Chat unpinned");
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "p" }}
+          />
+          <Action.Push
+            icon={Icon.Switch}
+            title="Edit Chat Settings"
+            target={<EditChatComponent />}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "o" }}
           />
           <Action
             icon={Icon.Download}
@@ -793,13 +830,13 @@ export default function Chat({ launchContext }) {
             onAction={async () => {
               let chat = getChat(chatData.currentChat);
               if (chat.messages.length === 0) {
-                await toast(Toast.Style.Failure, "No Messages in Chat");
+                await toast(Toast.Style.Failure, "No messages in chat");
                 return;
               }
 
               let transcript = exportChat(chat);
               await Clipboard.copy(transcript);
-              await toast(Toast.Style.Success, "Chat Transcript Copied");
+              await toast(Toast.Style.Success, "Chat transcript copied");
             }}
           />
         </ActionPanel.Section>
@@ -821,7 +858,7 @@ export default function Chat({ launchContext }) {
                   break;
                 }
               }
-              if (chatIdx === chatData.chats.length - 1) toast(Toast.Style.Failure, "No Chats After Current");
+              if (chatIdx === chatData.chats.length - 1) toast(Toast.Style.Failure, "No chats after current");
               else {
                 setChatData((oldData) => ({
                   ...oldData,
@@ -842,7 +879,7 @@ export default function Chat({ launchContext }) {
                   break;
                 }
               }
-              if (chatIdx === 0) toast(Toast.Style.Failure, "No Chats Before Current");
+              if (chatIdx === 0) toast(Toast.Style.Failure, "No chats before current");
               else {
                 setChatData((oldData) => ({
                   ...oldData,
