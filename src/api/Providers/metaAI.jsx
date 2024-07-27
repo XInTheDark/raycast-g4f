@@ -148,12 +148,27 @@ export const getMetaAIResponse = async function* (chat, options, max_retries = 5
     let lastSnippetLen = 0;
     let fetchId = null;
 
+    // Sometimes the JSON-parseable response is split across multiple lines
+    let prevLine = "";
+
     const reader = response.body;
     for await (let line of reader) {
       line = line.toString();
 
       try {
         line = JSON.parse(line);
+      } catch (e) {
+        prevLine += line;
+        try {
+          line = JSON.parse(prevLine);
+          // Parsed JSON from multiple lines
+          prevLine = "";
+        } catch (e) {
+          continue;
+        }
+      }
+
+      try {
         const botResponseMessage = line?.data?.node?.bot_response_message || {};
         const streamingState = botResponseMessage.streaming_state;
         fetchId = botResponseMessage.fetch_id || fetchId;
@@ -166,6 +181,8 @@ export const getMetaAIResponse = async function* (chat, options, max_retries = 5
             lastSnippetLen = newSnippetLen;
           }
         }
+
+        prevLine = ""; // also reset prevLine if we parsed a line successfully
       } catch (e) {
         console.log(e);
       }
