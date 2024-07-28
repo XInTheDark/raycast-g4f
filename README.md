@@ -42,7 +42,7 @@ updating manually also allows you to fetch and view the latest changes to the so
 
 ## Summary
 
-- ⛓️ Streaming support - see messages load in real-time, providing a seamless experience.
+- ▶️️ Streaming support - see messages load in real-time, providing a seamless experience.
 - ⚡ Ask anything from anywhere - with 18 commands available, there's something for you no matter what you need.
 - 💪 Support for many providers & models (more info below!)
 - 💬 Chat command - interact with the AI in a conversation, and your chat history will be stored in the extension.
@@ -54,31 +54,37 @@ updating manually also allows you to fetch and view the latest changes to the so
 
 ## Providers & Models
 
-| Provider           | Model                                     | Streaming | File uploads   | Status                  | Speed     | Rating and remarks by extension author                                                      |
-|--------------------|-------------------------------------------|-----------|----------------|-------------------------|-----------|---------------------------------------------------------------------------------------------|
-| GPT                | gpt-3.5-turbo (default)                   | ✅         | ❌              | ![Active][active-badge] | Fast      | 7.5/10, the most reliable and decently performing model but there are some stronger models. |
-| GPT                | gpt-4                                     | ❌         | ❌              | ![Active][active-badge] | Medium    | 6.5/10, no streaming support but otherwise a great model.                                   |
-| DeepInfra          | meta-llama-3.1-405b                       | ✅         | ❌              | ![Active][active-badge] | Medium    | 8.5/10, state-of-the-art open model, suitable for complex tasks.                            |
-| DeepInfra          | meta-llama-3.1-70b                        | ✅         | ❌              | ![Active][active-badge] | Fast      | 8/10, recent model with large context size.                                                 |
-| DeepInfra          | meta-llama-3.1-8b                         | ✅         | ❌              | ![Active][active-badge] | Very fast | 7.5/10, recent model with large context size.                                               |
-| DeepInfra          | Mixtral-8x22B                             | ✅         | ❌              | ![Active][active-badge] | Fast      | 7.5/10, capable model for general use.                                                      |
-| DeepInfra          | Mixtral-8x7B                              | ✅         | ❌              | ![Active][active-badge] | Very fast | 7.5/10                                                                                      |
-| DeepInfra          | Qwen2-72B                                 | ✅         | ❌              | ![Active][active-badge] | Medium    | 7/10                                                                                        |
-| DeepInfra          | Mistral-7B                                | ✅         | ❌              | ![Active][active-badge] | Very fast | 6.5/10                                                                                      |
-| DeepInfra          | openchat-3.6-8b                           | ✅         | ❌              | ![Active][active-badge] | Very fast | 7/10                                                                                        |
-| DeepInfra          | meta-llama-3-70b                          | ✅         | ❌              | ![Active][active-badge] | Medium    | 7/10                                                                                        |
-| DeepInfra          | meta-llama-3-8b                           | ✅         | ❌              | ![Active][active-badge] | Very fast | 6/10                                                                                        |
-| DeepInfra          | gemma-2-27b                               | ✅         | ❌              | ![Active][active-badge] | Very fast | 6.5/10                                                                                      |
-| DeepInfra          | WizardLM-2-8x22B                          | ✅         | ❌              | ![Active][active-badge] | Medium    | 7/10                                                                                        |
-| DeepInfra          | llava-1.5-7b                              | ✅         | ✅ (image only) | ![Active][active-badge] | Fast      | 6/10, supports image input                                                                  |
-| Blackbox           | custom model                              | ✅         | ❌              | ![Active][active-badge] | Very fast | 6.5/10, very fast generation with built-in web search ability, but is optimized for coding. |
-| Meta AI            | meta-llama-3.1                            | ✅         | ❌              | ![Active][active-badge] | Medium    | 7/10, recent model with internet access.                                                    |
-| Replicate          | mixtral-8x7b                              | ✅         | ❌              | ![Active][active-badge] | Medium    | ?/10                                                                                        |
-| Replicate          | meta-llama-3.1-405b                       | ✅         | ❌              | ![Active][active-badge] | Medium    | ?/10                                                                                        |
-| Replicate          | meta-llama-3-70b                          | ✅         | ❌              | ![Active][active-badge] | Medium    | ?/10                                                                                        |
-| Replicate          | meta-llama-3-8b                           | ✅         | ❌              | ![Active][active-badge] | Fast      | ?/10                                                                                        |
-| Google Gemini      | auto (gemini-1.5-pro or gemini-1.5-flash) | ✅         | ✅              | ![Active][active-badge] | Very fast | 8/10, very good overall model but requires an API Key. (It's *free*, see the section below) |
-| GPT4Free Local API | -                                         | ✅         | ❌              | ![Active][active-badge] | -         | allows access to a large variety of providers. [read more][g4f-api-help]                    |
+| Provider           | Model                                     | Features | Status                  | Speed     | Rating and remarks by extension author                                                      |
+|--------------------|-------------------------------------------|----------|-------------------------|-----------|---------------------------------------------------------------------------------------------|
+| GPT                | gpt-3.5-turbo (default)                   | ▶️       | ![Active][active-badge] | Fast      | 7.5/10, the most reliable and decently performing model but there are some stronger models. |
+| GPT                | gpt-4                                     |          | ![Active][active-badge] | Medium    | 6.5/10, no streaming support but otherwise a great model.                                   |
+| DeepInfra          | meta-llama-3.1-405b                       | ▶️       | ![Active][active-badge] | Medium    | 8.5/10, state-of-the-art open model, suitable for complex tasks.                            |
+| DeepInfra          | meta-llama-3.1-70b                        | ▶️       | ![Active][active-badge] | Fast      | 8/10, recent model with large context size.                                                 |
+| DeepInfra          | meta-llama-3.1-8b                         | ▶️       | ![Active][active-badge] | Very fast | 7.5/10, recent model with large context size.                                               |
+| DeepInfra          | Mixtral-8x22B                             | ▶️       | ![Active][active-badge] | Fast      | 7.5/10, capable model for general use.                                                      |
+| DeepInfra          | Mixtral-8x7B                              | ▶️       | ![Active][active-badge] | Very fast | 7.5/10                                                                                      |
+| DeepInfra          | Qwen2-72B                                 | ▶️       | ![Active][active-badge] | Medium    | 7/10                                                                                        |
+| DeepInfra          | Mistral-7B                                | ▶️       | ![Active][active-badge] | Very fast | 6.5/10                                                                                      |
+| DeepInfra          | openchat-3.6-8b                           | ▶️       | ![Active][active-badge] | Very fast | 7/10                                                                                        |
+| DeepInfra          | meta-llama-3-70b                          | ▶️       | ![Active][active-badge] | Medium    | 7/10                                                                                        |
+| DeepInfra          | meta-llama-3-8b                           | ▶️       | ![Active][active-badge] | Very fast | 6/10                                                                                        |
+| DeepInfra          | gemma-2-27b                               | ▶️       | ![Active][active-badge] | Very fast | 6.5/10                                                                                      |
+| DeepInfra          | WizardLM-2-8x22B                          | ▶️       | ![Active][active-badge] | Medium    | 7/10                                                                                        |
+| DeepInfra          | llava-1.5-7b                              | ▶️ 📄¹   | ![Active][active-badge] | Fast      | 6/10, supports image input                                                                  |
+| Blackbox           | custom model                              | ▶️       | ![Active][active-badge] | Very fast | 6.5/10, very fast generation with built-in web search ability, but is optimized for coding. |
+| Meta AI            | meta-llama-3.1                            | ▶️       | ![Active][active-badge] | Medium    | 7/10, recent model with internet access.                                                    |
+| Replicate          | mixtral-8x7b                              | ▶️       | ![Active][active-badge] | Medium    | ?/10                                                                                        |
+| Replicate          | meta-llama-3.1-405b                       | ▶️       | ![Active][active-badge] | Medium    | ?/10                                                                                        |
+| Replicate          | meta-llama-3-70b                          | ▶️       | ![Active][active-badge] | Medium    | ?/10                                                                                        |
+| Replicate          | meta-llama-3-8b                           | ▶️       | ![Active][active-badge] | Fast      | ?/10                                                                                        |
+| Google Gemini      | auto (gemini-1.5-pro or gemini-1.5-flash) | ▶️ 📄    | ![Active][active-badge] | Very fast | 8/10, very good overall model but requires an API Key. (It's *free*, see the section below) |
+| GPT4Free Local API | -                                         | ▶️       | ![Active][active-badge] | -         | allows access to a large variety of providers. [read more][g4f-api-help]                    |
+
+▶️ - Supports streaming.
+
+📄 - Supports file upload.
+
+*¹: Supports images only.*
 
 ### Provider-specific notes
 
