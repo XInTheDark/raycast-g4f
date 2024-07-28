@@ -257,6 +257,10 @@
           "value": "DeepInfraWizardLM2_8x22B"
         },
         {
+          "title": "DeepInfra (llava-1.5-7b)",
+          "value": "DeepInfraLlava15_7B"
+        },
+        {
           "title": "Blackbox (custom-model)",
           "value": "Blackbox"
         },
