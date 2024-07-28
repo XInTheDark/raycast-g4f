@@ -55,6 +55,7 @@ export const providers_info = {
   DeepInfraLlama3_70B: { provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3-70B-Instruct", stream: true },
   DeepInfraOpenChat36_8B: { provider: DeepInfraProvider, model: "openchat/openchat-3.6-8b", stream: true },
   DeepInfraGemma2_27B: { provider: DeepInfraProvider, model: "google/gemma-2-27b-it", stream: true },
+  DeepInfraLlava15_7B: { provider: DeepInfraProvider, model: "llava-hf/llava-1.5-7b-hf", stream: true },
   Blackbox: { provider: BlackboxProvider, model: "", stream: true },
   MetaAI: { provider: MetaAIProvider, model: "", stream: true },
   ReplicateLlama3_8B: { provider: ReplicateProvider, model: "meta/meta-llama-3-8b-instruct", stream: true },
@@ -82,6 +83,7 @@ export const chat_providers = [
   ["DeepInfra (meta-llama-3-8b)", "DeepInfraLlama3_8B"],
   ["DeepInfra (gemma-2-27b)", "DeepInfraGemma2_27B"],
   ["DeepInfra (WizardLM-2-8x22B)", "DeepInfraWizardLM2_8x22B"],
+  ["DeepInfra (llava-1.5-7b)", "DeepInfraLlava15_7B"],
   ["Blackbox (custom-model)", "Blackbox"],
   ["Meta AI (meta-llama-3.1)", "MetaAI"],
   ["Replicate (mixtral-8x7b)", "ReplicateMixtral_8x7B"],
@@ -98,7 +100,7 @@ export const ChatProvidersReact = chat_providers.map((x) => {
 });
 
 /// Providers that support file uploads
-export const file_supported_providers = [GeminiProvider];
+export const file_supported_providers = [GeminiProvider, DeepInfraProvider];
 
 /// Providers that support function calling
 export const function_supported_providers = [DeepInfraProvider];

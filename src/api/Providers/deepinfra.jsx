@@ -1,6 +1,8 @@
 export const DeepInfraProvider = "DeepInfraProvider";
 
 import fetch from "node-fetch";
+import fs from "fs";
+
 import { messages_to_json } from "../../classes/message";
 import { getWebResult, webSearchTool } from "../tools/web";
 import { codeInterpreterTool, getCodeInterpreterResult } from "../tools/code";
@@ -37,14 +39,18 @@ const function_supported_models = [
   "meta-llama/Meta-Llama-3-70B-Instruct",
 ];
 
+// Models that support file uploads
+const file_supported_models = ["llava-hf/llava-1.5-7b-hf"];
+
 // max_tokens parameter overrides - some models have short context lengths
 const max_tokens_overrides = {
   "google/gemma-2-27b-it": 512,
+  "llava-hf/llava-1.5-7b-hf": 512,
 };
 
 export const getDeepInfraResponse = async function* (chat, options, max_retries = 5) {
   const model = options.model;
-  chat = messages_to_json(chat);
+  const json_chat = DeepInfraFormatChat(chat, model);
 
   const useWebSearch = getPreferenceValues()["webSearch"] && function_supported_models.includes(model);
   const useCodeInterpreter = getPreferenceValues()["codeInterpreter"] && function_supported_models.includes(model);
@@ -52,7 +58,7 @@ export const getDeepInfraResponse = async function* (chat, options, max_retries 
 
   let data = {
     model: model,
-    messages: chat,
+    messages: json_chat,
     tools: tools,
     temperature: options.temperature,
     max_tokens: max_tokens_overrides[model] || 100000,
@@ -136,11 +142,11 @@ export const getDeepInfraResponse = async function* (chat, options, max_retries 
             }
 
             let content = delta["content"];
-            if (first) {
-              content = content.trimStart();
-            }
             if (content) {
-              first = false;
+              if (first) {
+                content = content.trimStart();
+                first = false;
+              }
               yield content;
             }
           } catch (e) {
@@ -156,5 +162,43 @@ export const getDeepInfraResponse = async function* (chat, options, max_retries 
     } else {
       throw e;
     }
+  }
+};
+
+const DeepInfraFormatChat = (chat, model) => {
+  if (!file_supported_models.includes(model)) {
+    return messages_to_json(chat);
+  } else {
+    let formattedChat = [];
+    for (let i = 0; i < chat.length; i++) {
+      const message = chat[i];
+      let msg = {
+        role: message.role,
+        content: [],
+      };
+
+      if (message.files && message.files.length > 0) {
+        for (const file of message.files) {
+          let base64 = fs.readFileSync(file, { encoding: "base64" });
+          let ext = file.split(".").pop();
+          base64 = `data:image/${ext};base64,${base64}`;
+          msg.content.push({
+            type: "image_url",
+            image_url: {
+              url: base64,
+            },
+          });
+        }
+        msg.content.push({
+          type: "text",
+          text: message.content,
+        });
+      } else {
+        msg.content = message.content;
+      }
+
+      formattedChat.push(msg);
+    }
+    return formattedChat;
   }
 };
