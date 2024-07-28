@@ -70,6 +70,7 @@ updating manually also allows you to fetch and view the latest changes to the so
 | DeepInfra          | meta-llama-3-8b                           | ✅         | ![Active][active-badge] | Very fast | 6/10                                                                                        |
 | DeepInfra          | gemma-2-27b                               | ✅         | ![Active][active-badge] | Very fast | 6.5/10                                                                                      |
 | DeepInfra          | WizardLM-2-8x22B                          | ✅         | ![Active][active-badge] | Medium    | 7/10                                                                                        |
+| DeepInfra          | llava-1.5-7b                              | ✅         | ![Active][active-badge] | Fast      | 6/10, supports image input                                                                  |
 | Blackbox           | custom model                              | ✅         | ![Active][active-badge] | Very fast | 6.5/10, very fast generation with built-in web search ability, but is optimized for coding. |
 | Meta AI            | meta-llama-3.1                            | ✅         | ![Active][active-badge] | Medium    | 7/10, recent model with internet access.                                                    |
 | Replicate          | mixtral-8x7b                              | ✅         | ![Active][active-badge] | Medium    | ?/10                                                                                        |
