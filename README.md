@@ -4,7 +4,7 @@
 
 Homepage · [Privacy Policy](Privacy.md)
 
-## Demo
+## Screenshots
 <img src=https://github.com/user-attachments/assets/1085b901-c72f-4bd9-9a37-473057e95393 width=400 alt="1">
 <img src=https://github.com/user-attachments/assets/fb74f124-f1ac-4957-928e-363394ac0c3b width=400 alt="2">
 <img src=https://github.com/user-attachments/assets/cf425e1a-8eaa-49d1-af31-e5fe8c6702db width=400 alt="3">
