@@ -70,9 +70,9 @@ export const providers_info = {
 export const chat_providers = [
   ["ChatGPT (gpt-3.5-turbo)", "GPT35"],
   ["ChatGPT (gpt-4-32k)", "GPT4"],
+  ["DeepInfra (meta-llama-3.1-405b)", "DeepInfraLlama31_405B"],
   ["DeepInfra (meta-llama-3.1-70b)", "DeepInfraLlama31_70B"],
   ["DeepInfra (meta-llama-3.1-8b)", "DeepInfraLlama31_8B"],
-  ["DeepInfra (meta-llama-3.1-405b)", "DeepInfraLlama31_405B"],
   ["DeepInfra (Mixtral-8x22B)", "DeepInfraMixtral_8x22B"],
   ["DeepInfra (Mixtral-8x7B)", "DeepInfraMixtral_8x7B"],
   ["DeepInfra (Qwen2-72B)", "DeepInfraQwen2_72B"],
