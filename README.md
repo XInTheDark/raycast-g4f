@@ -78,7 +78,8 @@ updating manually also allows you to fetch and view the latest changes to the so
 | Replicate          | meta-llama-3-70b                          | ▶️       | ![Active][active-badge] | Medium    | ?/10                                                                                        |
 | Replicate          | meta-llama-3-8b                           | ▶️       | ![Active][active-badge] | Fast      | ?/10                                                                                        |
 | Google Gemini      | auto (gemini-1.5-pro or gemini-1.5-flash) | ▶️ 📄    | ![Active][active-badge] | Very fast | 8/10, very good overall model but requires an API Key. (It's *free*, see the section below) |
-| GPT4Free Local API | -                                         | ▶️       | ![Active][active-badge] | -         | allows access to a large variety of providers. [read more][g4f-api-help]                    |
+| GPT4Free Local API | -                                         | ▶️       | ![Active][active-badge] | -         | allows access to a large variety of providers. [read more][local-api-help]                  |
+| Ollama Local API   | -                                         | ▶️       | ![Active][active-badge] | -         | allows local inference. [read more][local-api-help]                                         |
 
 ▶️ - Supports streaming.
 
@@ -170,7 +171,7 @@ Only models with function calling capabilities support this feature. Currently, 
 - Regarding the models available, and the AI quality: Raycast AI definitely has more model options - after all, money
   talks ;) But please rest assured that the quality of AI responses in my extension is by no means subpar! Some models
   available are gpt-3.5-turbo, gpt-4 (authentic!), Google Gemini, as well as large & capable open-source models like
-  Llama3-70B and Mixtral-8x22B. If you still doubt it, I'd encourage you to give the extension a try! :-)
+  Llama 3.1 and Mixtral-8x22B. If you still doubt it, I'd encourage you to give the extension a try! :-)
 
 ---
 
@@ -198,4 +199,4 @@ original [gpt4free](https://github.com/xtekky/gpt4free) project (written in Pyth
 
 [active-badge]: https://img.shields.io/badge/Active-brightgreen
 [unknown-badge]: https://img.shields.io/badge/Unknown-grey
-[g4f-api-help]: https://github.com/XInTheDark/raycast-g4f/wiki/Help-page:-GPT4Free-Local-API
+[local-api-help]: https://github.com/XInTheDark/raycast-g4f/wiki/Help-page:-Configure-Local-APIs
