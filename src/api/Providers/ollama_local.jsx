@@ -59,9 +59,9 @@ export const getOllamaLocalResponse = async function* (chat, options) {
 /// utilities
 
 // get available models
-const getOllamaModels = async () => {
+const getOllamaModels = async (path = null) => {
   try {
-    const api_url = await getOllamaAPIPath();
+    const api_url = path ? path : await getOllamaAPIPath();
     const models_url = `${api_url}/api/tags`;
 
     const response = await fetch(models_url);
@@ -80,8 +80,8 @@ export const getOllamaAPIPath = async () => {
 };
 
 // get available models as dropdown component
-export const getOllamaModelsComponent = async () => {
-  const models = await getOllamaModels();
+export const getOllamaModelsComponent = async (path = null) => {
+  const models = await getOllamaModels(path);
   const defaultModel = (await getOllamaModelInfo()).model;
   return (
     <>

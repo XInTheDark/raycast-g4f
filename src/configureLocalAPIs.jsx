@@ -3,7 +3,7 @@ import { getOllamaAPIPath, getOllamaCtxSize, getOllamaModelsComponent } from "./
 import { Storage } from "./api/storage";
 import { help_action } from "./helpers/helpPage";
 
-import { Form, ActionPanel, Action, useNavigation, showToast, Toast } from "@raycast/api";
+import { Form, ActionPanel, Action, showToast, Toast } from "@raycast/api";
 import { useState, useEffect } from "react";
 
 export default function ConfigureLocalAPIs() {
@@ -79,6 +79,10 @@ export default function ConfigureLocalAPIs() {
         value={ollamaAPIPath}
         onChange={(x) => {
           if (rendered) setOllamaAPIPath(x);
+        }}
+        onBlur={async (event) => {
+          const path = event.target.value;
+          setOllamaModelsComponent(await getOllamaModelsComponent(path));
         }}
       />
       {ollamaModelsComponent}
