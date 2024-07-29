@@ -15,8 +15,6 @@ export default function ConfigureLocalAPIs() {
   const [ollamaCtxSize, setOllamaCtxSize] = useState("");
   const [rendered, setRendered] = useState(false);
 
-  const { pop } = useNavigation();
-
   useEffect(() => {
     (async () => {
       setG4fExePath(await getG4FExecutablePath());
@@ -36,7 +34,6 @@ export default function ConfigureLocalAPIs() {
           <Action.SubmitForm
             title="Save"
             onSubmit={async (values) => {
-              pop();
               await Storage.write("g4f_executable", values.g4f_executable);
               await Storage.write("g4f_timeout", values.g4f_timeout || DEFAULT_TIMEOUT);
               await Storage.write(
