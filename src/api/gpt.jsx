@@ -418,6 +418,9 @@ export const chatCompletion = async (chat, options, stream_update = null, status
   } else if (provider === providers.MetaAIProvider) {
     // Meta AI
     response = await providers.getMetaAIResponse(chat, options);
+  } else if (provider === providers.SambaNovaProvider) {
+    // SambaNova
+    response = await providers.getSambaNovaResponse(chat, options);
   } else if (provider === providers.ReplicateProvider) {
     // Replicate
     response = await providers.getReplicateResponse(chat, options);
