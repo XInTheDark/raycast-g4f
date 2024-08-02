@@ -21,6 +21,10 @@ export { BlackboxProvider, getBlackboxResponse };
 import { MetaAIProvider, getMetaAIResponse } from "./Providers/metaAI";
 export { MetaAIProvider, getMetaAIResponse };
 
+// SambaNova module
+import { SambaNovaProvider, getSambaNovaResponse } from "./Providers/sambanova";
+export { SambaNovaProvider, getSambaNovaResponse };
+
 // Replicate module
 import { ReplicateProvider, getReplicateResponse } from "./Providers/replicate";
 export { ReplicateProvider, getReplicateResponse };
@@ -58,6 +62,9 @@ export const providers_info = {
   DeepInfraLlava15_7B: { provider: DeepInfraProvider, model: "llava-hf/llava-1.5-7b-hf", stream: true },
   Blackbox: { provider: BlackboxProvider, model: "", stream: true },
   MetaAI: { provider: MetaAIProvider, model: "", stream: true },
+  SambaNovaLlama3_405B: { provider: SambaNovaProvider, model: "llama3-405b", stream: true },
+  SambaNovaLlama3_70B: { provider: SambaNovaProvider, model: "llama3-70b", stream: true },
+  SambaNovaLlama3_8B: { provider: SambaNovaProvider, model: "llama3-8b", stream: true },
   ReplicateLlama3_8B: { provider: ReplicateProvider, model: "meta/meta-llama-3-8b-instruct", stream: true },
   ReplicateLlama3_70B: { provider: ReplicateProvider, model: "meta/meta-llama-3-70b-instruct", stream: true },
   ReplicateLlama31_405B: { provider: ReplicateProvider, model: "meta/meta-llama-3.1-405b-instruct", stream: true },
@@ -86,6 +93,9 @@ export const chat_providers = [
   ["DeepInfra (llava-1.5-7b)", "DeepInfraLlava15_7B"],
   ["Blackbox (custom-model)", "Blackbox"],
   ["Meta AI (meta-llama-3.1)", "MetaAI"],
+  ["SambaNova (llama3-405b)", "SambaNovaLlama3_405B"],
+  ["SambaNova (llama3-70b)", "SambaNovaLlama3_70B"],
+  ["SambaNova (llama3-8b)", "SambaNovaLlama3_8B"],
   ["Replicate (mixtral-8x7b)", "ReplicateMixtral_8x7B"],
   ["Replicate (meta-llama-3.1-405b)", "ReplicateLlama31_405B"],
   ["Replicate (meta-llama-3-70b)", "ReplicateLlama3_70B"],

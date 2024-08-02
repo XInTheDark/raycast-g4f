@@ -269,6 +269,18 @@
           "value": "MetaAI"
         },
         {
+          "title": "SambaNova (llama3-405b)",
+          "value": "SambaNovaLlama3_405B"
+        },
+        {
+          "title": "SambaNova (llama3-70b)",
+          "value": "SambaNovaLlama3_70B"
+        },
+        {
+          "title": "SambaNova (llama3-8b)",
+          "value": "SambaNovaLlama3_8B"
+        },
+        {
           "title": "Replicate (mixtral-8x7b)",
           "value": "ReplicateMixtral_8x7B"
         },
