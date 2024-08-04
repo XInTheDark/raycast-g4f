@@ -24,15 +24,16 @@ By using the Extension, you agree to this Policy.
 
 **4. Third-Party Providers**
 
-| Provider      | Link to Terms                                                                  |
-|---------------|--------------------------------------------------------------------------------|
-| GPT           | https://nexra.aryahcr.cc/terms                                                 |
-| DeepInfra     | https://deepinfra.com/terms, https://deepinfra.com/privacy                     |
-| Blackbox      | https://www.useblackbox.io/terms, https://www.useblackbox.io/privacy           |
-| Meta AI       | https://www.facebook.com/legal/ai-terms                                        |
-| SambaNova     | https://sambanova.ai/terms-and-conditions, https://sambanova.ai/privacy-policy |
-| Replicate     | https://replicate.com/terms, https://replicate.com/privacy                     |
-| Google Gemini | https://ai.google.dev/gemini-api/terms, https://developers.google.com/terms    |
+| Provider      | Link to Terms                                                                                        |
+|---------------|------------------------------------------------------------------------------------------------------|
+| GPT           | https://nexra.aryahcr.cc/terms                                                                       |
+| DeepInfra     | https://deepinfra.com/terms, https://deepinfra.com/privacy                                           |
+| Blackbox      | https://www.useblackbox.io/terms, https://www.useblackbox.io/privacy                                 |
+| Meta AI       | https://www.facebook.com/legal/ai-terms                                                              |
+| SambaNova     | https://sambanova.ai/terms-and-conditions, https://sambanova.ai/privacy-policy                       |
+| Replicate     | https://replicate.com/terms, https://replicate.com/privacy                                           |
+| MagickPen     | https://magickpen.com, https://magickpen.notion.site/Privacy-Policy-9f90d7e60f7d40c9baedb6919c46792b |
+| Google Gemini | https://ai.google.dev/gemini-api/terms, https://developers.google.com/terms                          |
 
 **5. Data Security**
 
