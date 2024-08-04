@@ -1,8 +1,8 @@
 export const DuckDuckGoProvider = "DuckDuckGoProvider";
 
 import fetch from "node-fetch";
-import { messages_to_json } from "../../classes/message";
-import { Storage } from "../storage";
+import { format_chat_to_prompt, messages_to_json } from "../../classes/message";
+import { sleep } from "../../helpers/helper";
 
 const status_url = "https://duckduckgo.com/duckchat/v1/status";
 const chat_url = "https://duckduckgo.com/duckchat/v1/chat";
@@ -20,7 +20,7 @@ const headers = {
   "Content-Type": "application/json",
   Origin: origin,
   Connection: "keep-alive",
-  Cookie: "dcm=3",
+  Cookie: "dcm=3; s=l; bf=1",
   "Sec-Fetch-Dest": "empty",
   "Sec-Fetch-Mode": "cors",
   "Sec-Fetch-Site": "same-origin",
@@ -32,30 +32,21 @@ const get_vqd = async () => {
   const _headers = { ...headers, "x-vqd-accept": "1" };
   const response = await fetch(status_url, { headers: _headers });
 
-  let stored_vqd = false;
-  let vqd_4 = response.headers.get("x-vqd-4");
-  if (!vqd_4) {
-    // try to get from storage
-    vqd_4 = await Storage.read("duckduckgo_vqd");
-    stored_vqd = true;
-  }
-
-  await Storage.write("duckduckgo_vqd", vqd_4);
-  return [vqd_4, stored_vqd];
+  return response.headers.get("x-vqd-4");
 };
 
 export const getDuckDuckGoResponse = async function* (chat, options, max_retries = 3) {
   chat = messages_to_json(chat);
 
   try {
-    let vqd_4, stored_vqd;
+    let vqd_4;
     for (let _ = 0; _ < 3; _++) {
       try {
-        [vqd_4, stored_vqd] = await get_vqd();
+        vqd_4 = await get_vqd();
         break;
       } catch (e) {
         // sleep for a while before retrying
-        await new Promise((r) => setTimeout(r, 1000));
+        await sleep(1000);
       }
     }
 
@@ -63,12 +54,16 @@ export const getDuckDuckGoResponse = async function* (chat, options, max_retries
       throw new Error("Failed to get vqd");
     }
 
-    // if starting a new conversation, only use the last message
-    let messages = stored_vqd ? chat : [chat[chat.length - 1]];
-
+    // I really don't know how the vqd_4 storage thing works,
+    // so we just format the chat as a single message instead
     let payload = {
       model: options.model,
-      messages: messages,
+      messages: [
+        {
+          "role": "user",
+          "content": format_chat_to_prompt(chat),
+        }
+      ]
     };
 
     let _headers = {
