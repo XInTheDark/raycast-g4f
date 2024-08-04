@@ -297,6 +297,10 @@
           "value": "ReplicateLlama3_8B"
         },
         {
+          "title": "MagickPen (gpt-4o-mini)",
+          "value": "MagickPen"
+        },
+        {
           "title": "Google Gemini (requires API Key)",
           "value": "GoogleGemini"
         },

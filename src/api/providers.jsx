@@ -29,6 +29,10 @@ export { SambaNovaProvider, getSambaNovaResponse };
 import { ReplicateProvider, getReplicateResponse } from "./Providers/replicate";
 export { ReplicateProvider, getReplicateResponse };
 
+// MagickPen module
+import { MagickPenProvider, getMagickPenResponse } from "./Providers/magickpen";
+export { MagickPenProvider, getMagickPenResponse };
+
 // Google Gemini module
 import { GeminiProvider, getGoogleGeminiResponse } from "./Providers/google_gemini";
 export { GeminiProvider, getGoogleGeminiResponse };
@@ -69,6 +73,7 @@ export const providers_info = {
   ReplicateLlama3_70B: { provider: ReplicateProvider, model: "meta/meta-llama-3-70b-instruct", stream: true },
   ReplicateLlama31_405B: { provider: ReplicateProvider, model: "meta/meta-llama-3.1-405b-instruct", stream: true },
   ReplicateMixtral_8x7B: { provider: ReplicateProvider, model: "mistralai/mixtral-8x7b-instruct-v0.1", stream: true },
+  MagickPen: { provider: MagickPenProvider, model: "", stream: true },
   GoogleGemini: { provider: GeminiProvider, model: "auto", stream: true },
   G4FLocal: { provider: G4FLocalProvider, stream: true },
   OllamaLocal: { provider: OllamaLocalProvider, stream: true },
@@ -100,6 +105,7 @@ export const chat_providers = [
   ["Replicate (meta-llama-3.1-405b)", "ReplicateLlama31_405B"],
   ["Replicate (meta-llama-3-70b)", "ReplicateLlama3_70B"],
   ["Replicate (meta-llama-3-8b)", "ReplicateLlama3_8B"],
+  ["MagickPen (gpt-4o-mini)", "MagickPen"],
   ["Google Gemini (requires API Key)", "GoogleGemini"],
   ["GPT4Free Local API", "G4FLocal"],
   ["Ollama Local API", "OllamaLocal"],
