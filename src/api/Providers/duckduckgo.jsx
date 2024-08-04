@@ -60,10 +60,10 @@ export const getDuckDuckGoResponse = async function* (chat, options, max_retries
       model: options.model,
       messages: [
         {
-          "role": "user",
-          "content": format_chat_to_prompt(chat),
-        }
-      ]
+          role: "user",
+          content: format_chat_to_prompt(chat),
+        },
+      ],
     };
 
     let _headers = {
@@ -85,7 +85,7 @@ export const getDuckDuckGoResponse = async function* (chat, options, max_retries
       for (let line of lines) {
         if (line.startsWith("data: ")) {
           let chunk = line.substring(6);
-          if (chunk.trim() === "[DONE]") return; // trim() is important
+          if (chunk.trim() === "[DONE]") return;
 
           try {
             let data = JSON.parse(chunk);
