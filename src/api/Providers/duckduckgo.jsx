@@ -1,7 +1,7 @@
 export const DuckDuckGoProvider = "DuckDuckGoProvider";
 
 import fetch from "node-fetch";
-import { format_chat_to_prompt, messages_to_json } from "../../classes/message";
+import { format_chat_to_prompt } from "../../classes/message";
 import { sleep } from "../../helpers/helper";
 
 const status_url = "https://duckduckgo.com/duckchat/v1/status";
@@ -36,8 +36,6 @@ const get_vqd = async () => {
 };
 
 export const getDuckDuckGoResponse = async function* (chat, options, max_retries = 3) {
-  chat = messages_to_json(chat);
-
   try {
     let vqd_4;
     for (let _ = 0; _ < 3; _++) {
