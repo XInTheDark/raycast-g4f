@@ -1,7 +1,7 @@
 export const MagickPenProvider = "MagickPenProvider";
 
 import fetch from "node-fetch";
-import { format_chat_to_prompt } from "../../classes/message";
+import { messages_to_json } from "../../classes/message";
 
 const api_url = "https://api.magickpen.com/chat/free";
 
@@ -24,8 +24,9 @@ const headers = {
 };
 
 export const getMagickPenResponse = async function* (chat, options, max_retries = 3) {
+  chat = messages_to_json(chat);
   let data = {
-    history: [{ role: "user", content: format_chat_to_prompt(chat) }],
+    history: chat,
   };
 
   try {
