@@ -109,7 +109,7 @@ export default (
 
     await showToast({
       style: Toast.Style.Animated,
-      title: "Response Loading",
+      title: "Response loading",
     });
 
     try {
@@ -135,7 +135,7 @@ export default (
         chars = response.length;
         charPerSec = (chars / elapsed).toFixed(1);
       } else {
-        let loadingToast = await showToast(Toast.Style.Animated, "Response Loading");
+        let loadingToast = await showToast(Toast.Style.Animated, "Response loading");
         generationStatus.stop = false;
 
         const handler = (new_message) => {
@@ -156,7 +156,7 @@ export default (
 
       await showToast({
         style: Toast.Style.Success,
-        title: "Response Finished",
+        title: "Response finished",
         message: `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`,
       });
 
@@ -169,7 +169,7 @@ export default (
       );
       await showToast({
         style: Toast.Style.Failure,
-        title: "Response Failed",
+        title: "Response failed",
       });
     }
 
@@ -251,7 +251,7 @@ export default (
             await popToRoot();
             await showToast({
               style: Toast.Style.Failure,
-              title: "No Query Provided",
+              title: "No query provided",
             });
           }
         }
@@ -274,7 +274,7 @@ export default (
             await popToRoot();
             await showToast({
               style: Toast.Style.Failure,
-              title: "No Query Provided",
+              title: "No query provided",
             });
           }
         }
@@ -418,7 +418,15 @@ export const chatCompletion = async (chat, options, stream_update = null, status
   } else if (provider === providers.DuckDuckGoProvider) {
     // DuckDuckGo
     response = await providers.getDuckDuckGoResponse(chat, options);
-  } else if (provider === providers.ReplicateProvider) {
+  }
+  else if (provider === providers.MetaAIProvider) {
+    // Meta AI
+    response = await providers.getMetaAIResponse(chat, options);
+  } else if (provider === providers.SambaNovaProvider) {
+    // SambaNova
+    response = await providers.getSambaNovaResponse(chat, options);
+  }
+  else if (provider === providers.ReplicateProvider) {
     // Replicate
     response = await providers.getReplicateResponse(chat, options);
   } else if (provider === providers.GeminiProvider) {
@@ -427,6 +435,9 @@ export const chatCompletion = async (chat, options, stream_update = null, status
   } else if (provider === providers.G4FLocalProvider) {
     // G4F Local
     response = await providers.getG4FLocalResponse(chat, options);
+  } else if (provider === providers.OllamaLocalProvider) {
+    // Ollama Local
+    response = await providers.getOllamaLocalResponse(chat, options);
   }
 
   // stream = false
@@ -498,13 +509,11 @@ export const formatResponse = (response, provider = null) => {
   }
 
   if (provider === providers.BlackboxProvider) {
-    // replace only once
-    // example: remove $@$v=v1.13$@$ or $@$v=undefined%@$
+    // remove version number - example: remove $@$v=v1.13$@$ or $@$v=undefined%@$
     response = response.replace(/\$@\$v=.{1,30}\$@\$/, "");
 
-    // remove sources
-    // remove the chunk of text starting with $~~~$[ and ending with ]$~~~$
-    response = response.replace(/\$~~~\$\[.*]\$~~~\$/, "");
+    // remove sources - the chunk of text starting with $~~~$[ and ending with ]$~~~$
+    response = response.replace(/\$~~~\$\[[^]*]\$~~~\$/, "");
   }
 
   return response;

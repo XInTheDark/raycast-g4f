@@ -159,7 +159,7 @@ export default function genImage() {
       setCurrentChatData(chatData, setChatData, messageID, query, imagePath, true);
       console.log("Image saved to: " + imagePath);
 
-      await toast(Toast.Style.Success, "Image Generated");
+      await toast(Toast.Style.Success, "Image generated");
     } catch (e) {
       console.log(e);
       setChatData((oldData) => {
@@ -283,13 +283,13 @@ export default function genImage() {
           title="Generate Image"
           onAction={async () => {
             if (searchText === "") {
-              await toast(Toast.Style.Failure, "Please Enter a Prompt");
+              await toast(Toast.Style.Failure, "Please enter a prompt");
               return;
             }
 
             const query = searchText;
             setSearchText("");
-            await toast(Toast.Style.Animated, "Image Loading", "Please Wait");
+            await toast(Toast.Style.Animated, "Image loading", "Please wait");
 
             await generateImage(chatData, setChatData, query);
           }}
@@ -305,7 +305,7 @@ export default function genImage() {
               try {
                 await showInFinder(path);
               } catch (e) {
-                await toast(Toast.Style.Failure, "Image Not Found");
+                await toast(Toast.Style.Failure, "Image not found");
               }
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "enter" }}
@@ -318,7 +318,7 @@ export default function genImage() {
               const message = messages[idx];
               const path = message.answer;
               await Clipboard.copy(path);
-              await toast(Toast.Style.Success, "Image Path Copied");
+              await toast(Toast.Style.Success, "Image path copied");
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
           />
@@ -329,7 +329,7 @@ export default function genImage() {
               let chat = getChat(chatData.currentChat);
 
               if (chat.messages.length === 0) {
-                await toast(Toast.Style.Failure, "No Images in Chat");
+                await toast(Toast.Style.Failure, "No images in chat");
                 return;
               }
 
@@ -360,7 +360,7 @@ export default function genImage() {
               chat.messages.splice(idx, 1);
 
               // generate new image
-              await toast(Toast.Style.Animated, "Image Loading", "Please Wait");
+              await toast(Toast.Style.Animated, "Image loading", "Please wait");
               await generateImage(chatData, setChatData, query);
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "r" }}
@@ -380,7 +380,7 @@ export default function genImage() {
                     let chat = getChat(chatData.currentChat);
 
                     if (chat.messages.length === 0) {
-                      toast(Toast.Style.Failure, "No Images in Chat");
+                      toast(Toast.Style.Failure, "No images in chat");
                       return;
                     }
 
@@ -397,7 +397,7 @@ export default function genImage() {
                       getChat(chatData.currentChat, newChatData.chats).messages = chat.messages;
                       return newChatData;
                     });
-                    toast(Toast.Style.Success, "Image Deleted");
+                    toast(Toast.Style.Success, "Image deleted");
                   },
                 },
               });
@@ -429,7 +429,7 @@ export default function genImage() {
                   break;
                 }
               }
-              if (chatIdx === chatData.chats.length - 1) toast(Toast.Style.Failure, "No Image Chats After Current");
+              if (chatIdx === chatData.chats.length - 1) toast(Toast.Style.Failure, "No chats after current");
               else {
                 setChatData((oldData) => ({
                   ...oldData,
@@ -450,7 +450,7 @@ export default function genImage() {
                   break;
                 }
               }
-              if (chatIdx === 0) toast(Toast.Style.Failure, "No Chats Before Current");
+              if (chatIdx === 0) toast(Toast.Style.Failure, "No chats before current");
               else {
                 setChatData((oldData) => ({
                   ...oldData,

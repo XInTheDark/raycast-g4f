@@ -71,3 +71,7 @@ export const getSupportPath = () => {
 export const getAssetsPath = () => {
   return environment.assetsPath;
 };
+
+export const sleep = async (ms) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
