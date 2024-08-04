@@ -75,9 +75,8 @@ export const getDuckDuckGoResponse = async function* (chat, options, max_retries
       body: JSON.stringify(payload),
     });
 
-    const reader = await response.text();
-    const reader_lines = reader.split("\n");
-    for (let chunk of reader_lines) {
+    const reader = response.body;
+    for await (let chunk of reader) {
       const str = chunk.toString();
       let lines = str.split("\n");
       for (let line of lines) {
