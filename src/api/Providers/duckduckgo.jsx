@@ -9,7 +9,8 @@ const chat_url = "https://duckduckgo.com/duckchat/v1/chat";
 const referer = "https://duckduckgo.com/";
 const origin = "https://duckduckgo.com";
 
-const user_agent = "Mozilla/5.0 (Windows NT 10.0; rv:127.0) Gecko/20100101 Firefox/127.0";
+const user_agent =
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36";
 const headers = {
   "User-Agent": user_agent,
   Accept: "text/event-stream",
@@ -101,13 +102,11 @@ export const getDuckDuckGoResponse = async function* (chat, options, max_retries
         }
       }
     }
-  }
-  catch (e) {
+  } catch (e) {
     if (max_retries > 0) {
       console.log(e, "Retrying...");
       yield* getDuckDuckGoResponse(chat, options, max_retries - 1);
-    }
-    else {
+    } else {
       throw e;
     }
   }
