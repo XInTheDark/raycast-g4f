@@ -29,6 +29,7 @@ By using the Extension, you agree to this Policy.
 | GPT           | https://nexra.aryahcr.cc/terms                                                 |
 | DeepInfra     | https://deepinfra.com/terms, https://deepinfra.com/privacy                     |
 | Blackbox      | https://www.useblackbox.io/terms, https://www.useblackbox.io/privacy           |
+| DuckDuckGo    | https://duckduckgo.com/aichat/privacy-terms                                    |
 | Meta AI       | https://www.facebook.com/legal/ai-terms                                        |
 | SambaNova     | https://sambanova.ai/terms-and-conditions, https://sambanova.ai/privacy-policy |
 | Replicate     | https://replicate.com/terms, https://replicate.com/privacy                     |
