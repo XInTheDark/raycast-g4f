@@ -265,6 +265,22 @@
           "value": "Blackbox"
         },
         {
+          "title": "DuckDuckGo (gpt-4o-mini)",
+          "value": "DuckDuckGo_GPT4oMini"
+        },
+        {
+          "title": "DuckDuckGo (claude-3-haiku)",
+          "value": "DuckDuckGo_Claude3Haiku"
+        },
+        {
+          "title": "DuckDuckGo (meta-llama-3-70b)",
+          "value": "DuckDuckGo_Llama3_70B"
+        },
+        {
+          "title": "DuckDuckGo (mixtral-8x7b)",
+          "value": "DuckDuckGo_Mixtral_8x7B"
+        },
+        {
           "title": "Meta AI (meta-llama-3.1)",
           "value": "MetaAI"
         },

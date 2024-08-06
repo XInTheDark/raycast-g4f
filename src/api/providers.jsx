@@ -17,6 +17,10 @@ export { DeepInfraProvider, getDeepInfraResponse };
 import { BlackboxProvider, getBlackboxResponse } from "./Providers/blackbox";
 export { BlackboxProvider, getBlackboxResponse };
 
+// DuckDuckGo module
+import { DuckDuckGoProvider, getDuckDuckGoResponse } from "./Providers/duckduckgo";
+export { DuckDuckGoProvider, getDuckDuckGoResponse };
+
 // Meta AI module
 import { MetaAIProvider, getMetaAIResponse } from "./Providers/metaAI";
 export { MetaAIProvider, getMetaAIResponse };
@@ -61,6 +65,10 @@ export const providers_info = {
   DeepInfraGemma2_27B: { provider: DeepInfraProvider, model: "google/gemma-2-27b-it", stream: true },
   DeepInfraLlava15_7B: { provider: DeepInfraProvider, model: "llava-hf/llava-1.5-7b-hf", stream: true },
   Blackbox: { provider: BlackboxProvider, model: "", stream: true },
+  DuckDuckGo_GPT4oMini: { provider: DuckDuckGoProvider, model: "gpt-4o-mini", stream: true },
+  DuckDuckGo_Claude3Haiku: { provider: DuckDuckGoProvider, model: "claude-3-haiku-20240307", stream: true },
+  DuckDuckGo_Llama3_70B: { provider: DuckDuckGoProvider, model: "meta-llama/Llama-3-70b-chat-hf", stream: true },
+  DuckDuckGo_Mixtral_8x7B: { provider: DuckDuckGoProvider, model: "mistralai/Mixtral-8x7B-Instruct-v0.1", stream: true },
   MetaAI: { provider: MetaAIProvider, model: "", stream: true },
   SambaNovaLlama3_405B: { provider: SambaNovaProvider, model: "llama3-405b", stream: true },
   SambaNovaLlama3_70B: { provider: SambaNovaProvider, model: "llama3-70b", stream: true },
@@ -92,6 +100,10 @@ export const chat_providers = [
   ["DeepInfra (WizardLM-2-8x22B)", "DeepInfraWizardLM2_8x22B"],
   ["DeepInfra (llava-1.5-7b)", "DeepInfraLlava15_7B"],
   ["Blackbox (custom-model)", "Blackbox"],
+  ["DuckDuckGo (gpt-4o-mini)", "DuckDuckGo_GPT4oMini"],
+  ["DuckDuckGo (claude-3-haiku)", "DuckDuckGo_Claude3Haiku"],
+  ["DuckDuckGo (meta-llama-3-70b)", "DuckDuckGo_Llama3_70B"],
+  ["DuckDuckGo (mixtral-8x7b)", "DuckDuckGo_Mixtral_8x7B"],
   ["Meta AI (meta-llama-3.1)", "MetaAI"],
   ["SambaNova (llama3-405b)", "SambaNovaLlama3_405B"],
   ["SambaNova (llama3-70b)", "SambaNovaLlama3_70B"],
