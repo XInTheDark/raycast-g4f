@@ -94,6 +94,7 @@ export const truncate_chat = (chat, providerInfo) => {
   let newChat = [];
   let totalChars = 0,
     totalTokens = 0;
+
   // start from end of chat to get the most recent messages
   for (let i = chat.length - 1; i >= 0; i--) {
     let message = chat[i];
