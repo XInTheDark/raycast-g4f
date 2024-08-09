@@ -1,5 +1,7 @@
 import useGPT from "./api/gpt";
-import { Form, showToast, Toast } from "@raycast/api";
+import { Form } from "@raycast/api";
+import { Storage } from "./api/storage";
+import { useEffect, useState } from "react";
 
 const languages = [
   ["🇬🇧 English", "English"],
@@ -19,6 +21,21 @@ const languagesReact = languages.map(([title, value]) => (
 ));
 
 export default function Translate(props) {
+  let [language, setLanguage] = useState("");
+
+  useEffect(() => {
+    (async () => {
+      setLanguage(await Storage.read("translateLanguage", "English"));
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      if (!language) return;
+      await Storage.write("translateLanguage", language);
+    })();
+  }, [language]);
+
   return useGPT(props, {
     useSelected: true,
     showFormText: "Text to translate",
@@ -26,7 +43,7 @@ export default function Translate(props) {
     forceShowForm: true,
     allowUploadFiles: true,
     otherReactComponents: [
-      <Form.Dropdown id="language" defaultValue="English" key="languageDropdown">
+      <Form.Dropdown id="language" value={language} onChange={setLanguage} key="languageDropdown">
         {languagesReact}
       </Form.Dropdown>,
     ],
