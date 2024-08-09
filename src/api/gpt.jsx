@@ -15,12 +15,14 @@ import {
 } from "@raycast/api";
 import { useEffect, useState } from "react";
 
+import * as providers from "./providers";
+
 import { help_action } from "../helpers/helpPage";
 import { autoCheckForUpdates } from "../helpers/update";
 
 import { Message, pairs_to_messages } from "../classes/message";
 
-import * as providers from "./providers";
+import { truncate_chat } from "../helpers/helper";
 
 let generationStatus = { stop: false, loading: false };
 let get_status = () => generationStatus.stop;
@@ -457,11 +459,14 @@ export const chatCompletion = async (chat, options, stream_update = null, status
 // generate response. input: currentChat is a chat object from AI Chat; query (string) is optional
 // see the documentation of chatCompletion for details on the other parameters
 export const getChatResponse = async (currentChat, query = null, stream_update = null, status = null) => {
-  let chat = pairs_to_messages(currentChat.messages, query);
   // load provider and model
   const info = providers.get_provider_info(currentChat.provider);
   // additional options
   let options = { ...info, ...providers.provider_options(info.provider, currentChat.options) };
+
+  // format chat
+  let chat = pairs_to_messages(currentChat.messages, query);
+  chat = truncate_chat(chat, info);
 
   // generate response
   return await chatCompletion(chat, options, stream_update, status);
