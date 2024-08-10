@@ -14,7 +14,7 @@ import {
 import { useEffect, useState } from "react";
 
 import { Storage } from "./api/storage";
-import { formatDate, useAsyncState } from "./helpers/helper";
+import { formatDate } from "./helpers/helper";
 import { help_action, help_action_panel } from "./helpers/helpPage";
 import { autoCheckForUpdates } from "./helpers/update";
 
@@ -40,11 +40,17 @@ export default function Chat({ launchContext }) {
     });
   };
 
+  /// The following utilities are used for managing chats.
+  /// In v3.0, the chat system was rewritten so that we now only load chats from storage
+  /// when they are needed. We maintain two main data structures: chatData and currentChatData.
+  /// chatData contains all the chats (a lite version that only contains metadata), while
+  /// currentChatData contains the full chat data for the currently selected chat.
+
   const getStorageKey = (chat_id) => {
     return `chat_${chat_id}`;
   };
 
-  // add chat to storage, and add chat id to chatData
+  // add chat to storage and chatData
   const addChat = async (chatData, setChatData, chat) => {
     await updateChat(chat);
     setChatData((oldData) => {
@@ -54,15 +60,32 @@ export default function Chat({ launchContext }) {
     });
   };
 
-  // delete chat from storage, and remove chat id from chatData
-  const deleteChat = async (chatData, setChatData, chat) => {
-    const id = chat.id;
+  // delete chat from storage and chatData
+  const deleteChat = async (setChatData, id) => {
     await Storage.delete(getStorageKey(id));
-    setChatData((oldData) => {
-      let newChatData = structuredClone(oldData);
-      newChatData.chats = newChatData.chats.filter((chat_id) => chat_id !== id);
-      return newChatData;
-    });
+
+    let chatIdx = chatData.chats.findIndex((chat) => chat.id === id);
+    if (chatIdx === -1) return;
+    if (chatData.chats.length === 1) {
+      await clear_chats_data(setChatData, setCurrentChatData);
+      return;
+    }
+
+    if (chatIdx === chatData.chats.length - 1) {
+      setChatData((oldData) => {
+        let newChatData = structuredClone(oldData);
+        newChatData.chats.splice(chatIdx);
+        newChatData.currentChat = newChatData.chats[chatIdx - 1].id;
+        return newChatData;
+      });
+    } else {
+      setChatData((oldData) => {
+        let newChatData = structuredClone(oldData);
+        newChatData.chats.splice(chatIdx, 1);
+        newChatData.currentChat = newChatData.chats[chatIdx].id;
+        return newChatData;
+      });
+    }
   };
 
   // update chat in storage
@@ -79,6 +102,7 @@ export default function Chat({ launchContext }) {
     }
   };
 
+  // the lite version of the chat, stored in chatData
   const to_lite_chat_data = (chat) => {
     return {
       name: chat.name,
@@ -910,8 +934,6 @@ export default function Chat({ launchContext }) {
                   ...oldData,
                   currentChat: chatData.chats[chatIdx + 1].id,
                 }));
-
-                /// TODO: if the useEffect on chatdata.currentchat doesnt work then update currentchat here
               }
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "arrowDown" }}
@@ -952,35 +974,7 @@ export default function Chat({ launchContext }) {
                   title: "Delete Chat Forever",
                   style: Action.Style.Destructive,
                   onAction: async () => {
-                    let chatIdx = 0;
-                    for (let i = 0; i < chatData.chats.length; i++) {
-                      if (chatData.chats[i].id === chatData.currentChat) {
-                        chatIdx = i;
-                        break;
-                      }
-                    }
-
-                    if (chatData.chats.length === 1) {
-                      await clear_chats_data(setChatData, setCurrentChatData);
-                      return;
-                    }
-
-                    if (chatIdx === chatData.chats.length - 1) {
-                      setChatData((oldData) => {
-                        let newChatData = structuredClone(oldData);
-                        newChatData.chats.splice(chatIdx);
-                        newChatData.currentChat = newChatData.chats[chatIdx - 1].id;
-                        return newChatData;
-                        /// TODO; see above
-                      });
-                    } else {
-                      setChatData((oldData) => {
-                        let newChatData = structuredClone(oldData);
-                        newChatData.chats.splice(chatIdx, 1);
-                        newChatData.currentChat = newChatData.chats[chatIdx].id;
-                        return newChatData;
-                      });
-                    }
+                    await deleteChat(setChatData, chatData.currentChat);
                   },
                 },
               });
@@ -1024,8 +1018,8 @@ export default function Chat({ launchContext }) {
     );
   };
 
-  let [chatData, setChatData] = useAsyncState(null);
-  let [currentChatData, setCurrentChatData] = useAsyncState(null);
+  let [chatData, setChatData] = useState(null);
+  let [currentChatData, setCurrentChatData] = useState(null);
   let [AIPresets, setAIPresets] = useState([]);
 
   // Initialize the above variables

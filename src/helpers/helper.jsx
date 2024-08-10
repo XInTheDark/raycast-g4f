@@ -117,19 +117,3 @@ export const truncate_chat = (chat, providerInfo) => {
 
   return newChat;
 };
-
-export const useAsyncState = (initialState) => {
-  const [state, setState] = useState(initialState);
-
-  const asyncSetState = (value) => {
-    return new Promise((resolve) => {
-      setState(value);
-      setState((current) => {
-        resolve(current);
-        return current;
-      });
-    });
-  };
-
-  return [state, asyncSetState];
-};
