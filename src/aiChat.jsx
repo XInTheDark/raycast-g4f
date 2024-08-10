@@ -93,6 +93,25 @@ export default function Chat({ launchContext }) {
     await Storage.write(getStorageKey(chat.id), JSON.stringify(chat));
   };
 
+  // change a property of a chat
+  // we only update whatever object is passed
+  const changeChatProperty = (setChatData, setCurrentChatData, property, value) => {
+    if (setChatData) {
+      setChatData((oldData) => {
+      let newChatData = structuredClone(oldData);
+      getChatFromChatData(chatData.currentChat, newChatData)[property] = value;
+      return newChatData;
+    });
+    }
+    if (setCurrentChatData) {
+      setCurrentChatData((oldData) => {
+        let newChatData = structuredClone(oldData);
+        newChatData[property] = value;
+        return newChatData;
+      });
+    }
+  }
+
   // get chat from storage
   const getChat = async (target, data = chatData) => {
     for (const chat of data.chats) {
@@ -275,7 +294,7 @@ export default function Chat({ launchContext }) {
 
     // Smart Chat Naming functionality
     if (getPreferenceValues()["smartChatNaming"] && currentChatData.messages.length <= 2) {
-      await processSmartChatNaming(currentChatData, setCurrentChatData, currentChatData);
+      await processSmartChatNaming(chatData, setChatData, currentChatData, setCurrentChatData);
     }
 
     // functions that run periodically
@@ -638,11 +657,7 @@ export default function Chat({ launchContext }) {
                   return;
                 }
 
-                setCurrentChatData((oldData) => {
-                  let newChatData = structuredClone(oldData);
-                  newChatData.name = values.chatName;
-                  return newChatData;
-                });
+                changeChatProperty(setChatData, setCurrentChatData, "name", values.chatName);
               }}
             />
           </ActionPanel>
@@ -720,10 +735,10 @@ export default function Chat({ launchContext }) {
   };
 
   // Smart Chat Naming functionality
-  const processSmartChatNaming = async (chatData, setChatData, currentChat) => {
+  const processSmartChatNaming = async (chatData, setChatData, currentChatData, setCurrentChatData) => {
     try {
       // Special handling: don't include first message (system prompt)
-      let newChat = structuredClone(currentChat);
+      let newChat = structuredClone(currentChatData);
       if (!newChat.messages[newChat.messages.length - 1].visible) {
         newChat.messages.pop();
       }
@@ -737,16 +752,14 @@ export default function Chat({ launchContext }) {
 
       let newChatName = await getChatResponseSync({
         messages: [new MessagePair({ prompt: newQuery })],
-        provider: currentChat.provider,
+        provider: currentChatData.provider,
       });
       newChatName = newChatName.trim();
 
       // Rename chat
-      setChatData((oldData) => {
-        let newChatData = structuredClone(oldData);
-        getChat(chatData.currentChat, newChatData.chats).name = newChatName;
-        return newChatData;
-      });
+      if (newChatName) {
+        changeChatProperty(setChatData, setCurrentChatData, "name", newChatName);
+      }
     } catch (e) {
       console.log("Smart Chat Naming failed: ", e);
     }
