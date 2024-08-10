@@ -102,6 +102,15 @@ export default function Chat({ launchContext }) {
     }
   };
 
+  // get chat from chatData (lite version)
+  const getChatFromChatData = (target, data = chatData) => {
+    for (const chat of data.chats) {
+      if (chat.id === target) {
+        return chat;
+      }
+    }
+  };
+
   // the lite version of the chat, stored in chatData
   const to_lite_chat_data = (chat) => {
     return {
@@ -187,10 +196,6 @@ export default function Chat({ launchContext }) {
     });
   };
 
-  const updateCurrentChat = (currentChatData, setCurrentChatData, chat) => {
-    setCurrentChatData(chat);
-  };
-
   const updateChatResponse = async (
     currentChatData,
     setCurrentChatData,
@@ -238,14 +243,7 @@ export default function Chat({ launchContext }) {
           !previousWebSearch
         ) {
           generationStatus.stop = true; // stop generating the current response
-          await processWebSearchResponse(
-            currentChatData,
-            setCurrentChatData,
-            currentChatData,
-            messageID,
-            response,
-            query
-          );
+          await processWebSearchResponse(currentChatData, setCurrentChatData, messageID, response, query);
           return;
         }
 
@@ -262,7 +260,7 @@ export default function Chat({ launchContext }) {
     // Process web search response again in case streaming is false, or if it was not processed during streaming
     if (useWebSearch && response.includes(webToken) && !previousWebSearch) {
       generationStatus.stop = true;
-      await processWebSearchResponse(currentChatData, setCurrentChatData, currentChatData, messageID, response, query);
+      await processWebSearchResponse(currentChatData, setCurrentChatData, messageID, response, query);
       return;
     }
 
@@ -545,7 +543,7 @@ export default function Chat({ launchContext }) {
     let newMessageID = newMessagePair.id;
 
     currentChatData.messages.unshift(newMessagePair);
-    updateCurrentChat(currentChatData, setCurrentChatData, currentChatData); // possibly redundant, put here for safety and consistency
+    setCurrentChatData(currentChatData); // possibly redundant, put here for safety and consistency
 
     try {
       // Note how we don't pass query here because it is already in the chat
@@ -606,7 +604,7 @@ export default function Chat({ launchContext }) {
                 currentChatData.messages[0].second.content = "";
                 currentChatData.messages[0].finished = false;
 
-                updateCurrentChat(currentChatData, setCurrentChatData, currentChatData); // important to update the UI!
+                setCurrentChatData(currentChatData); // important to update the UI!
 
                 let messageID = currentChatData.messages[0].id;
                 updateChatResponse(currentChatData, setCurrentChatData, messageID).then(() => {
@@ -695,8 +693,8 @@ export default function Chat({ launchContext }) {
   };
 
   // Web Search functionality
-  const processWebSearchResponse = async (chatData, setChatData, currentChat, messageID, response, query) => {
-    setCurrentChatMessage(chatData, setChatData, messageID, null, null, false);
+  const processWebSearchResponse = async (currentChatData, setCurrentChatData, messageID, response, query) => {
+    setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, null, null, false);
     await toast(Toast.Style.Animated, "Searching web");
     // get everything AFTER webToken and BEFORE webTokenEnd
     let webQuery = response.includes(webTokenEnd)
@@ -707,18 +705,18 @@ export default function Chat({ launchContext }) {
 
     // Append web search results to the last user message
     // special case: If e.g. the message was edited, query is not passed as a parameter, so it is null
-    if (!query) query = currentChat.messages[0].first.content;
+    if (!query) query = currentChatData.messages[0].first.content;
     let newQuery = query + webResponse;
 
     // remove latest message and insert new one (similar to EditLastMessage)
-    currentChat.messages.shift();
-    currentChat.messages.unshift(new MessagePair({ prompt: newQuery }));
-    let newMessageID = currentChat.messages[0].id;
+    currentChatData.messages.shift();
+    currentChatData.messages.unshift(new MessagePair({ prompt: newQuery }));
+    let newMessageID = currentChatData.messages[0].id;
 
-    updateCurrentChat(chatData, setChatData, currentChat); // important to update the UI!
+    setCurrentChatData(currentChatData); // important to update the UI!
 
     // Note how we don't pass query here because it is already in the chat
-    await updateChatResponse(chatData, setChatData, newMessageID, null, true);
+    await updateChatResponse(currentChatData, setCurrentChatData, newMessageID, null, true);
   };
 
   // Smart Chat Naming functionality
@@ -827,7 +825,7 @@ export default function Chat({ launchContext }) {
 
               currentChatData.messages[0].second.content = "";
               currentChatData.messages[0].finished = false;
-              updateCurrentChat(currentChatData, setCurrentChatData, currentChatData);
+              setCurrentChatData(currentChatData);
 
               let messageID = currentChatData.messages[0].id;
               // Note how we don't pass the prompt here because it is already in the chat
@@ -882,10 +880,14 @@ export default function Chat({ launchContext }) {
             icon={Icon.Tack}
             title="Pin Chat"
             onAction={async () => {
-              let chat = getChat(chatData.currentChat);
-              chat.pinned = !chat.pinned;
-              updateCurrentChat(chatData, setChatData, chat);
-              await toast(Toast.Style.Success, chat.pinned ? "Chat pinned" : "Chat unpinned");
+              setChatData((oldData) => {
+                let newChatData = structuredClone(oldData);
+                let chat = getChatFromChatData(newChatData.currentChat, newChatData);
+                chat.pinned = !chat.pinned;
+
+                toast(Toast.Style.Success, chat.pinned ? "Chat pinned" : "Chat unpinned");
+                return newChatData;
+              });
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "p" }}
           />
