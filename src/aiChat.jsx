@@ -50,14 +50,24 @@ export default function Chat({ launchContext }) {
     return `chat_${chat_id}`;
   };
 
-  // add chat to storage and chatData
-  const addChat = async (chatData, setChatData, chat) => {
-    await updateChat(chat);
+  // add chat to chatData
+  const addChat = (setChatData, setCurrentChatData, chat) => {
     setChatData((oldData) => {
       let newChatData = structuredClone(oldData);
       newChatData.chats.push(to_lite_chat_data(chat));
       return newChatData;
     });
+  };
+
+  // add chat to chatData and set it as the current chat
+  const addChatAsCurrent = (setChatData, setCurrentChatData, chat) => {
+    addChat(setChatData, setCurrentChatData, chat);
+    setChatData((oldData) => {
+      let newChatData = structuredClone(oldData);
+      newChatData.currentChat = chat.id;
+      return newChatData;
+    });
+    setCurrentChatData(chat);
   };
 
   // delete chat from storage and chatData
@@ -147,7 +157,7 @@ export default function Chat({ launchContext }) {
       chats: [],
       lastPruneTime: Date.now(),
     });
-    await addChat(chatData, setChatData, newChat);
+    await addChatAsCurrent(setChatData, setCurrentChatData, newChat);
     setCurrentChatData(newChat);
   };
 
@@ -444,14 +454,7 @@ export default function Chat({ launchContext }) {
       messages: messages,
     });
 
-    await addChat(chatData, setChatData, newChat);
-
-    // set to current chat
-    setChatData((oldData) => {
-      let newChatData = structuredClone(oldData);
-      newChatData.currentChat = newChat.id;
-      return newChatData;
-    });
+    await addChatAsCurrent(setChatData, setCurrentChatData, newChat);
 
     await toast(Toast.Style.Success, "Chat imported");
   };
@@ -534,13 +537,7 @@ export default function Chat({ launchContext }) {
                   options: { creativity: values.creativity },
                 });
 
-                await addChat(chatData, setChatData, newChat);
-
-                setChatData((oldData) => {
-                  let newChatData = structuredClone(oldData);
-                  newChatData.currentChat = newChat.id;
-                  return newChatData;
-                });
+                await addChatAsCurrent(setChatData, setCurrentChatData, newChat);
               }}
             />
           </ActionPanel>
@@ -1076,13 +1073,7 @@ export default function Chat({ launchContext }) {
             }),
           ],
         });
-
-        await addChat(chatData, setChatData, newChat);
-        setChatData((oldData) => {
-          let newChatData = structuredClone(oldData);
-          newChatData.currentChat = newChat.id;
-          return newChatData;
-        });
+        addChatAsCurrent(setChatData, setCurrentChatData, newChat);
       }
     })();
 
