@@ -348,8 +348,10 @@ export default function Chat({ launchContext }) {
     await Storage.write("lastPruneChatsTime", currentTime);
   };
 
-  const pruneStoredChatsInterval = 6 * 60 * 60 * 1000; // interval to prune stored chats (in ms)
+  const pruneStoredChatsInterval = 24 * 60 * 60 * 1000; // interval to prune stored chats (in ms)
 
+  // prune stored chats. this actually takes effect quite rarely since we already
+  // clean up when deleting chats.
   const pruneStoredChats = async (chatData) => {
     const lastPruneTime = Number(await Storage.read("lastPruneStoredChatsTime", 0));
     const currentTime = Date.now();
@@ -366,7 +368,6 @@ export default function Chat({ launchContext }) {
       if (key.startsWith(storageKeyPrefix) && !chatIDs[removePrefix(key, storageKeyPrefix)]) {
         await Storage.delete(key);
         prunedCnt++;
-        console.log(`Pruned stored chat ${key}`);
       }
     }
 
