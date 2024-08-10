@@ -1057,42 +1057,29 @@ export default function Chat({ launchContext }) {
         await clear_chats_data(setChatData, setCurrentChatData);
       }
 
-      // // initialise currentChatData
-      // if (!currentChatData) {
-      //   const key = getStorageKey(chatData.currentChat);
-      //   const storedCurrentChatData = await Storage.read(key);
-      //   if (storedCurrentChatData) {
-      //     let newData = JSON.parse(storedCurrentChatData);
-      //     setCurrentChatData(structuredClone(newData));
-      //   } else {
-      //     setCurrentChatData(chat_data({}));
-      //   }
-      // }
-
       if (launchContext?.query) {
-        // query is an object consisting of text and files.
+        let newChatName = `From Quick AI at ${new Date().toLocaleString("en-US", {
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        })}`;
+        let newChat = chat_data({
+          name: newChatName,
+          messages: [
+            new MessagePair({
+              prompt: launchContext.query.text,
+              answer: launchContext.response,
+              finished: true,
+              files: launchContext.query.files,
+            }),
+          ],
+        });
 
+        await addChat(chatData, setChatData, newChat);
         setChatData((oldData) => {
           let newChatData = structuredClone(oldData);
-          let newChatName = `From Quick AI at ${new Date().toLocaleString("en-US", {
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-          })}`;
-          let newChat = chat_data({
-            name: newChatName,
-            messages: [
-              new MessagePair({
-                prompt: launchContext.query.text,
-                answer: launchContext.response,
-                finished: true,
-                files: launchContext.query.files,
-              }),
-            ],
-          });
-          newChatData.chats.push(newChat);
           newChatData.currentChat = newChat.id;
           return newChatData;
         });
