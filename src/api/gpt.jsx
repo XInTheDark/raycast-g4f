@@ -490,9 +490,7 @@ export const getChatResponseSync = async (currentChat, query = null) => {
 
 // format response using some heuristics
 export const formatResponse = (response, provider = null) => {
-  const is_code = response.includes("```");
-
-  if (provider === providers.NexraProvider || !is_code) {
+  if (provider === providers.NexraProvider) {
     // replace escape characters: \n with a real newline, \t with a real tab, etc.
     response = response.replace(/\\n/g, "\n");
     response = response.replace(/\\t/g, "\t");
