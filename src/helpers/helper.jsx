@@ -1,4 +1,5 @@
 import { environment } from "@raycast/api";
+import { useState } from "react";
 
 export const formatDate = (dateToCheckISO) => {
   // Calculate the date difference between the current date and the date to check
@@ -115,4 +116,20 @@ export const truncate_chat = (chat, providerInfo) => {
   }
 
   return newChat;
+};
+
+export const useAsyncState = (initialState) => {
+  const [state, setState] = useState(initialState);
+
+  const asyncSetState = (value) => {
+    return new Promise((resolve) => {
+      setState(value);
+      setState((current) => {
+        resolve(current);
+        return current;
+      });
+    });
+  };
+
+  return [state, asyncSetState];
 };

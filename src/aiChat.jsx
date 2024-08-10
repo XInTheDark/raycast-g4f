@@ -14,7 +14,7 @@ import {
 import { useEffect, useState } from "react";
 
 import { Storage } from "./api/storage";
-import { formatDate } from "./helpers/helper";
+import { formatDate, useAsyncState } from "./helpers/helper";
 import { help_action, help_action_panel } from "./helpers/helpPage";
 import { autoCheckForUpdates } from "./helpers/update";
 
@@ -40,13 +40,55 @@ export default function Chat({ launchContext }) {
     });
   };
 
-  const default_all_chats_data = () => {
+  const getStorageKey = (chat_id) => {
+    return `chat_${chat_id}`;
+  };
+
+  // add chat to storage, and add chat id to chatData
+  const addChat = async (chatData, setChatData, chat) => {
+    await updateChat(chat);
+    setChatData((oldData) => {
+      let newChatData = structuredClone(oldData);
+      newChatData.chats.push(chat.id);
+      return newChatData;
+    });
+  };
+
+  // delete chat from storage, and remove chat id from chatData
+  const deleteChat = async (chatData, setChatData, chat) => {
+    const id = chat.id;
+    await Storage.delete(getStorageKey(id));
+    setChatData((oldData) => {
+      let newChatData = structuredClone(oldData);
+      newChatData.chats = newChatData.chats.filter((chat_id) => chat_id !== id);
+      return newChatData;
+    });
+  };
+
+  // update chat in storage
+  const updateChat = async (chat) => {
+    await Storage.write(getStorageKey(chat.id), chat);
+  };
+
+  // get chat from storage
+  const getChat = async (target, chat_data = chatData) => {
+    for (const id of chat_data.chats) {
+      if (id === target) {
+        return await Storage.read(getStorageKey(id));
+      }
+    }
+  };
+
+  // clear chat data and set it to default
+  const clear_chats_data = async (setChatData) => {
     let newChat = chat_data({});
-    return {
+    setChatData({
       currentChat: newChat.id,
-      chats: [newChat],
+      chats: [],
       lastPruneTime: Date.now(),
-    };
+    });
+    // this doesn't work! like if you log chatData right now, it is still null even though we just set it!
+    await addChat(chatData, setChatData, newChat);
   };
 
   const chat_data = ({
@@ -91,7 +133,7 @@ export default function Chat({ launchContext }) {
     return messages;
   };
 
-  const setCurrentChatData = (chatData, setChatData, messageID, query = null, response = null, finished = null) => {
+  const setCurrentChatMessage = (chatData, setChatData, messageID, query = null, response = null, finished = null) => {
     setChatData((oldData) => {
       let newChatData = structuredClone(oldData);
       let messages = getChat(chatData.currentChat, newChatData.chats).messages;
@@ -120,7 +162,7 @@ export default function Chat({ launchContext }) {
   };
 
   const updateChatResponse = async (chatData, setChatData, messageID, query = null, previousWebSearch = false) => {
-    setCurrentChatData(chatData, setChatData, messageID, null, ""); // set response to empty string
+    setCurrentChatMessage(chatData, setChatData, messageID, null, ""); // set response to empty string
 
     let currentChat = getChat(chatData.currentChat, chatData.chats);
     const info = providers.get_provider_info(currentChat.provider);
@@ -135,7 +177,7 @@ export default function Chat({ launchContext }) {
 
     if (!info.stream) {
       response = await getChatResponse(currentChat, query);
-      setCurrentChatData(chatData, setChatData, messageID, null, response);
+      setCurrentChatMessage(chatData, setChatData, messageID, null, response);
 
       elapsed = (Date.now() - start) / 1000;
       chars = response.length;
@@ -149,7 +191,7 @@ export default function Chat({ launchContext }) {
         i++;
         response = new_message;
         response = formatResponse(response, info.provider);
-        setCurrentChatData(chatData, setChatData, messageID, null, response);
+        setCurrentChatMessage(chatData, setChatData, messageID, null, response);
 
         // Web Search functionality
         // We check the response every few chunks so we can possibly exit early
@@ -182,7 +224,7 @@ export default function Chat({ launchContext }) {
       return;
     }
 
-    setCurrentChatData(chatData, setChatData, messageID, null, null, true);
+    setCurrentChatMessage(chatData, setChatData, messageID, null, null, true);
 
     await toast(
       Toast.Style.Success,
@@ -619,7 +661,7 @@ export default function Chat({ launchContext }) {
 
   // Web Search functionality
   const processWebSearchResponse = async (chatData, setChatData, currentChat, messageID, response, query) => {
-    setCurrentChatData(chatData, setChatData, messageID, null, null, false);
+    setCurrentChatMessage(chatData, setChatData, messageID, null, null, false);
     await toast(Toast.Style.Animated, "Searching web");
     // get everything AFTER webToken and BEFORE webTokenEnd
     let webQuery = response.includes(webTokenEnd)
@@ -903,7 +945,7 @@ export default function Chat({ launchContext }) {
                 primaryAction: {
                   title: "Delete Chat Forever",
                   style: Action.Style.Destructive,
-                  onAction: () => {
+                  onAction: async () => {
                     let chatIdx = 0;
                     for (let i = 0; i < chatData.chats.length; i++) {
                       if (chatData.chats[i].id === chatData.currentChat) {
@@ -913,7 +955,7 @@ export default function Chat({ launchContext }) {
                     }
 
                     if (chatData.chats.length === 1) {
-                      setChatData(default_all_chats_data());
+                      await clear_chats_data();
                       return;
                     }
 
@@ -958,8 +1000,8 @@ export default function Chat({ launchContext }) {
                       primaryAction: {
                         title: "Delete ALL Chats Forever",
                         style: Action.Style.Destructive,
-                        onAction: () => {
-                          setChatData(default_all_chats_data());
+                        onAction: async () => {
+                          await clear_chats_data();
                         },
                       },
                     });
@@ -975,7 +1017,8 @@ export default function Chat({ launchContext }) {
     );
   };
 
-  let [chatData, setChatData] = useState(null);
+  let [chatData, setChatData] = useAsyncState(null);
+  let [currentChatData, setCurrentChatData] = useAsyncState(null);
   let [AIPresets, setAIPresets] = useState([]);
 
   // Initialize the above variables
@@ -986,9 +1029,7 @@ export default function Chat({ launchContext }) {
         let newData = JSON.parse(storedChatData);
         setChatData(structuredClone(newData));
       } else {
-        const newChatData = default_all_chats_data();
-        await Storage.write("chatData", JSON.stringify(newChatData));
-        setChatData(newChatData);
+        await clear_chats_data();
       }
 
       if (launchContext?.query) {
@@ -1036,12 +1077,6 @@ export default function Chat({ launchContext }) {
   }, [chatData]);
 
   const [searchText, setSearchText] = useState("");
-
-  const getChat = (target, customChat = chatData.chats) => {
-    for (const chat of customChat) {
-      if (chat.id === target) return chat;
-    }
-  };
 
   return chatData === null ? (
     <List searchText={searchText} onSearchTextChange={setSearchText}>
