@@ -45,6 +45,11 @@ export const Storage = {
     await LocalStorage.removeItem(key);
   },
 
+  // list all items in local storage
+  localStorage_list: async () => {
+    return await LocalStorage.allItems();
+  },
+
   /// For file storage we use a dedicated directory within the support path.
   /// As a speedup, we store each key-value pair in a separate file.
 

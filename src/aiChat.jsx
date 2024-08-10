@@ -14,7 +14,7 @@ import {
 import { useEffect, useState } from "react";
 
 import { Storage } from "./api/storage";
-import { formatDate } from "./helpers/helper";
+import { formatDate, removePrefix } from "./helpers/helper";
 import { help_action, help_action_panel } from "./helpers/helpPage";
 import { autoCheckForUpdates } from "./helpers/update";
 
@@ -46,8 +46,9 @@ export default function Chat({ launchContext }) {
   /// chatData contains all the chats (a lite version that only contains metadata), while
   /// currentChatData contains the full chat data for the currently selected chat.
 
+  const storageKeyPrefix = "AIChat_";
   const getStorageKey = (chat_id) => {
-    return `chat_${chat_id}`;
+    return `${storageKeyPrefix}${chat_id}`;
   };
 
   // add chat to chatData
@@ -155,7 +156,6 @@ export default function Chat({ launchContext }) {
     setChatData({
       currentChat: newChat.id,
       chats: [],
-      lastPruneTime: Date.now(),
     });
     await addChatAsCurrent(setChatData, setCurrentChatData, newChat);
     setCurrentChatData(newChat);
@@ -309,13 +309,14 @@ export default function Chat({ launchContext }) {
 
     // functions that run periodically
     await pruneChats(chatData, setChatData);
+    await pruneStoredChats(chatData);
     await autoCheckForUpdates();
   };
 
   const pruneChatsInterval = 30 * 60 * 1000; // interval to prune inactive chats (in ms)
 
   const pruneChats = async (chatData, setChatData) => {
-    const lastPruneTime = chatData.lastPruneTime || 0;
+    const lastPruneTime = Number(await Storage.read("lastPruneChatsTime", 0));
     const currentTime = Date.now();
     if (currentTime - lastPruneTime < pruneChatsInterval) return;
 
@@ -344,11 +345,33 @@ export default function Chat({ launchContext }) {
     }
 
     console.log(`Pruned ${prunedCnt} chats`);
-    setChatData((oldData) => {
-      let newChatData = structuredClone(oldData);
-      newChatData.lastPruneTime = currentTime;
-      return newChatData;
-    });
+    await Storage.write("lastPruneChatsTime", currentTime);
+  };
+
+  const pruneStoredChatsInterval = 6 * 60 * 60 * 1000; // interval to prune stored chats (in ms)
+
+  const pruneStoredChats = async (chatData) => {
+    const lastPruneTime = Number(await Storage.read("lastPruneStoredChatsTime", 0));
+    const currentTime = Date.now();
+    if (currentTime - lastPruneTime < pruneStoredChatsInterval) return;
+
+    let storedChats = await Storage.localStorage_list();
+    let prunedCnt = 0;
+
+    let chatIDs = chatData.chats.reduce((acc, chat) => {
+      acc[chat.id] = true;
+      return acc;
+    }, {});
+    for (const key of Object.keys(storedChats)) {
+      if (key.startsWith(storageKeyPrefix) && !chatIDs[removePrefix(key, storageKeyPrefix)]) {
+        await Storage.delete(key);
+        prunedCnt++;
+        console.log(`Pruned stored chat ${key}`);
+      }
+    }
+
+    console.log(`Pruned ${prunedCnt} stored chats`);
+    await Storage.write("lastPruneStoredChatsTime", currentTime);
   };
 
   const exportChat = (chat) => {
