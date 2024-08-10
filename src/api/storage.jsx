@@ -40,6 +40,16 @@ export const Storage = {
     return retrieved;
   },
 
+  // delete from local storage
+  localStorage_delete: async (key) => {
+    await LocalStorage.removeItem(key);
+  },
+
+  // list all items in local storage
+  localStorage_list: async () => {
+    return await LocalStorage.allItems();
+  },
+
   /// For file storage we use a dedicated directory within the support path.
   /// As a speedup, we store each key-value pair in a separate file.
 
@@ -75,6 +85,14 @@ export const Storage = {
     return fs.readFileSync(path, "utf8");
   },
 
+  // delete from file storage
+  fileStorage_delete: async (key) => {
+    const path = Storage.fileStoragePath(key);
+    if (fs.existsSync(path)) {
+      fs.unlinkSync(path);
+    }
+  },
+
   /// Sync functions
   /// We carry out a sync process periodically when either read or write is called
 
@@ -97,7 +115,9 @@ export const Storage = {
     let syncCache = JSON.parse(await Storage.localStorage_read("syncCache", "{}"));
     for (const key of Object.keys(syncCache)) {
       const local = await Storage.localStorage_read(key);
-      await Storage.fileStorage_write(key, local);
+      if (local) {
+        await Storage.fileStorage_write(key, local);
+      }
     }
 
     // clear sync cache, reset last sync time
@@ -138,5 +158,11 @@ export const Storage = {
       if (value !== undefined) await Storage.write(key, value);
     }
     return value;
+  },
+
+  // combined delete function - delete from both local and file storage
+  delete: async (key) => {
+    await Storage.localStorage_delete(key);
+    await Storage.fileStorage_delete(key);
   },
 };
