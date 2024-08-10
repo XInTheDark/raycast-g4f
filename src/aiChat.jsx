@@ -95,8 +95,6 @@ export default function Chat({ launchContext }) {
       chats: [],
       lastPruneTime: Date.now(),
     });
-    // this doesn't work! like if you log chatData right now, it is still null even though we just set it!
-    console.log(chatData);
     await addChat(chatData, setChatData, newChat);
     setCurrentChatData(newChat);
   };
