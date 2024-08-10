@@ -110,7 +110,9 @@ export const Storage = {
     let syncCache = JSON.parse(await Storage.localStorage_read("syncCache", "{}"));
     for (const key of Object.keys(syncCache)) {
       const local = await Storage.localStorage_read(key);
-      await Storage.fileStorage_write(key, local);
+      if (local) {
+        await Storage.fileStorage_write(key, local);
+      }
     }
 
     // clear sync cache, reset last sync time
