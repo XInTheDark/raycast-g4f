@@ -371,10 +371,9 @@ export default function Chat({ launchContext }) {
           <ActionPanel>
             <Action.SubmitForm
               title="Import Chat"
-              onSubmit={(values) => {
+              onSubmit={async (values) => {
                 pop();
-                let str = values.chatText;
-                processImportChat(str, chatData, setChatData, values.provider); /// TODO.
+                await processImportChat(values.chatText, chatData, setChatData, values.provider); /// TODO.
               }}
             />
           </ActionPanel>
@@ -389,7 +388,7 @@ export default function Chat({ launchContext }) {
     );
   };
 
-  const processImportChat = (str, chatData, setChatData, provider) => {
+  const processImportChat = async (str, chatData, setChatData, provider) => {
     let lines = str.split("\n");
     let messages = [];
     let currentMessage = null;
@@ -433,26 +432,28 @@ export default function Chat({ launchContext }) {
       messages.unshift(currentMessage);
     }
 
+    let newChat = chat_data({
+      name: `Imported at ${new Date().toLocaleString("en-US", {
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      })}`,
+      provider: provider,
+      messages: messages,
+    });
+
+    await addChat(chatData, setChatData, newChat);
+
+    // set to current chat
     setChatData((oldData) => {
       let newChatData = structuredClone(oldData);
-      newChatData.chats.push(
-        chat_data({
-          name: `Imported at ${new Date().toLocaleString("en-US", {
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-          })}`,
-          provider: provider,
-          messages: messages,
-        })
-      );
-      newChatData.currentChat = newChatData.chats[newChatData.chats.length - 1].id;
+      newChatData.currentChat = newChat.id;
       return newChatData;
     });
 
-    toast(Toast.Style.Success, "Chat imported");
+    await toast(Toast.Style.Success, "Chat imported");
   };
 
   let EditChatForm = (chat = null) => {
