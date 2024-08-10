@@ -373,7 +373,7 @@ export default function Chat({ launchContext }) {
               title="Import Chat"
               onSubmit={async (values) => {
                 pop();
-                await processImportChat(values.chatText, chatData, setChatData, values.provider); /// TODO.
+                await processImportChat(values.chatText, chatData, setChatData, values.provider);
               }}
             />
           </ActionPanel>
