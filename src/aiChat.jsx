@@ -75,14 +75,18 @@ export default function Chat({ launchContext }) {
       setChatData((oldData) => {
         let newChatData = structuredClone(oldData);
         newChatData.chats.splice(chatIdx);
-        newChatData.currentChat = newChatData.chats[chatIdx - 1].id;
+        if (id === newChatData.currentChat) {
+          newChatData.currentChat = newChatData.chats[chatIdx - 1].id;
+        }
         return newChatData;
       });
     } else {
       setChatData((oldData) => {
         let newChatData = structuredClone(oldData);
         newChatData.chats.splice(chatIdx, 1);
-        newChatData.currentChat = newChatData.chats[chatIdx].id;
+        if (id === newChatData.currentChat) {
+          newChatData.currentChat = newChatData.chats[chatIdx].id;
+        }
         return newChatData;
       });
     }
@@ -98,10 +102,10 @@ export default function Chat({ launchContext }) {
   const changeChatProperty = (setChatData, setCurrentChatData, property, value) => {
     if (setChatData) {
       setChatData((oldData) => {
-      let newChatData = structuredClone(oldData);
-      getChatFromChatData(chatData.currentChat, newChatData)[property] = value;
-      return newChatData;
-    });
+        let newChatData = structuredClone(oldData);
+        getChatFromChatData(chatData.currentChat, newChatData)[property] = value;
+        return newChatData;
+      });
     }
     if (setCurrentChatData) {
       setCurrentChatData((oldData) => {
@@ -110,15 +114,11 @@ export default function Chat({ launchContext }) {
         return newChatData;
       });
     }
-  }
+  };
 
   // get chat from storage
-  const getChat = async (target, data = chatData) => {
-    for (const chat of data.chats) {
-      if (chat.id === target) {
-        return JSON.parse(await Storage.read(getStorageKey(chat.id), JSON.stringify(chat_data({}))));
-      }
-    }
+  const getChat = async (target) => {
+    return JSON.parse(await Storage.read(getStorageKey(target), JSON.stringify(chat_data({}))));
   };
 
   // get chat from chatData (lite version)
@@ -298,13 +298,13 @@ export default function Chat({ launchContext }) {
     }
 
     // functions that run periodically
-    pruneChats(chatData, setChatData); /// TODO. write pruneChats properly
+    await pruneChats(chatData, setChatData);
     await autoCheckForUpdates();
   };
 
   const pruneChatsInterval = 30 * 60 * 1000; // interval to prune inactive chats (in ms)
 
-  const pruneChats = (chatData, setChatData) => {
+  const pruneChats = async (chatData, setChatData) => {
     const lastPruneTime = chatData.lastPruneTime || 0;
     const currentTime = Date.now();
     if (currentTime - lastPruneTime < pruneChatsInterval) return;
@@ -313,22 +313,29 @@ export default function Chat({ launchContext }) {
     pruneChatsLimit = Number(pruneChatsLimit) * 60 * 60 * 1000; // convert hours to ms
     if (pruneChatsLimit === 0) return;
 
+    const keepChat = async (chat) => {
+      if (chat.id === chatData.currentChat) return true;
+      if (chat.pinned) return true;
+      const fullChat = await getChat(chat.id);
+      let lastMessageTime = fullChat.messages.length === 0 ? fullChat.creationDate : fullChat.messages[0].creationDate;
+      lastMessageTime = new Date(lastMessageTime).getTime();
+      return currentTime - lastMessageTime < pruneChatsLimit;
+    };
+
+    let chats = chatData.chats;
+    let prunedCnt = 0;
+
+    for (const chat of chats) {
+      let keep = await keepChat(chat);
+      if (!keep) {
+        prunedCnt++;
+        await deleteChat(setChatData, chat.id);
+      }
+    }
+
+    console.log(`Pruned ${prunedCnt} chats`);
     setChatData((oldData) => {
       let newChatData = structuredClone(oldData);
-      let chats = newChatData.chats;
-      let prunedCnt = 0;
-
-      newChatData.chats = chats.filter((chat) => {
-        if (chat.id === newChatData.currentChat) return true;
-        if (chat.pinned) return true;
-        let lastMessageTime = chat.messages.length === 0 ? chat.creationDate : chat.messages[0].creationDate;
-        lastMessageTime = new Date(lastMessageTime).getTime();
-        const prune = currentTime - lastMessageTime >= pruneChatsLimit;
-        if (prune) prunedCnt++;
-        return !prune; // false if pruned
-      });
-
-      console.log(`Pruned ${prunedCnt} chats`);
       newChatData.lastPruneTime = currentTime;
       return newChatData;
     });
