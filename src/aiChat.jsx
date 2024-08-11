@@ -152,6 +152,9 @@ export default function Chat({ launchContext }) {
 
   // clear chat data and set it to default
   const clear_chats_data = async (setChatData, setCurrentChatData) => {
+    // first we clear all chats from storage; since we are deleting everything, we can do this first
+    await pruneStoredChats([]);
+
     let newChat = chat_data({});
     setChatData({
       currentChat: newChat.id,
@@ -309,7 +312,6 @@ export default function Chat({ launchContext }) {
 
     // functions that run periodically
     await pruneChats(chatData, setChatData);
-    await pruneStoredChats(chatData);
     await autoCheckForUpdates();
   };
 
@@ -348,19 +350,13 @@ export default function Chat({ launchContext }) {
     await Storage.write("lastPruneChatsTime", currentTime);
   };
 
-  const pruneStoredChatsInterval = 24 * 60 * 60 * 1000; // interval to prune stored chats (in ms)
-
-  // prune stored chats. this actually takes effect quite rarely since we already
-  // clean up when deleting chats.
-  const pruneStoredChats = async (chatData) => {
-    const lastPruneTime = Number(await Storage.read("lastPruneStoredChatsTime", 0));
-    const currentTime = Date.now();
-    if (currentTime - lastPruneTime < pruneStoredChatsInterval) return;
-
+  // prune stored chats. we loop through all stored chats and delete those that are not in chatData
+  // since this is potentially risky (if chatData is corrupted), we do this extremely sparingly
+  const pruneStoredChats = async (chats) => {
     let storedChats = await Storage.localStorage_list();
     let prunedCnt = 0;
 
-    let chatIDs = chatData.chats.reduce((acc, chat) => {
+    let chatIDs = chats.reduce((acc, chat) => {
       acc[chat.id] = true;
       return acc;
     }, {});
@@ -372,7 +368,6 @@ export default function Chat({ launchContext }) {
     }
 
     console.log(`Pruned ${prunedCnt} stored chats`);
-    await Storage.write("lastPruneStoredChatsTime", currentTime);
   };
 
   const exportChat = (chat) => {
