@@ -1,5 +1,4 @@
 import { environment } from "@raycast/api";
-import { useState } from "react";
 
 export const formatDate = (dateToCheckISO) => {
   // Calculate the date difference between the current date and the date to check
