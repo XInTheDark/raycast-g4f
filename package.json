@@ -273,8 +273,8 @@
           "value": "DuckDuckGo_Claude3Haiku"
         },
         {
-          "title": "DuckDuckGo (meta-llama-3-70b)",
-          "value": "DuckDuckGo_Llama3_70B"
+          "title": "DuckDuckGo (meta-llama-3.1-70b)",
+          "value": "DuckDuckGo_Llama31_70B"
         },
         {
           "title": "DuckDuckGo (mixtral-8x7b)",
