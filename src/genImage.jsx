@@ -274,7 +274,7 @@ export default function genImage() {
   };
 
   let ImageActionPanel = (props) => {
-    const idx = props.idx || 0;
+    const idx = props.idx ?? 0;
 
     return (
       <ActionPanel>
