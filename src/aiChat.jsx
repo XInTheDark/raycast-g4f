@@ -52,7 +52,7 @@ export default function Chat({ launchContext }) {
   };
 
   // add chat to chatData
-  const addChat = (setChatData, setCurrentChatData, chat) => {
+  const addChat = (setChatData, chat) => {
     setChatData((oldData) => {
       let newChatData = structuredClone(oldData);
       newChatData.chats.push(to_lite_chat_data(chat));
@@ -62,7 +62,7 @@ export default function Chat({ launchContext }) {
 
   // add chat to chatData and set it as the current chat
   const addChatAsCurrent = (setChatData, setCurrentChatData, chat) => {
-    addChat(setChatData, setCurrentChatData, chat);
+    addChat(setChatData, chat);
     setChatData((oldData) => {
       let newChatData = structuredClone(oldData);
       newChatData.currentChat = chat.id;
