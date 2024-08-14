@@ -24,7 +24,7 @@ export default function CustomAICommands() {
 
     if (props.props) props = props.props; // wow
 
-    const idx = props.idx || 0;
+    const idx = props.idx ?? 0;
     const newCommand = props.newCommand || false;
     let command = newCommand ? new CustomCommand({ name: "New Command" }) : commands[idx];
 

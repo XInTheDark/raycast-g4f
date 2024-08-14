@@ -104,8 +104,9 @@ export default function Chat({ launchContext }) {
   };
 
   // update chat in storage
-  const updateChat = async (chat) => {
-    await Storage.write(getStorageKey(chat.id), JSON.stringify(chat));
+  const updateChat = async (chat, id = null) => {
+    id = id ?? chat.id;
+    await Storage.write(getStorageKey(id), JSON.stringify(chat));
   };
 
   // change a property of a chat
@@ -376,7 +377,7 @@ export default function Chat({ launchContext }) {
       let message = chat.messages[i];
       let prompt = message.first.content,
         answer = message.second.content;
-      let visible = message.visible || true,
+      let visible = message.visible ?? true,
         visibleToken = visible ? "" : "<|invisible_token|>";
       let time = new Date(message.creationDate).getTime();
       str += `<|start_message_token|>${visibleToken}${time}<|end_message_token|>\n`;
@@ -488,7 +489,7 @@ export default function Chat({ launchContext }) {
         <Form.TextField
           id="chatName"
           defaultValue={
-            chat?.name ||
+            chat?.name ??
             `New Chat ${new Date().toLocaleString("en-US", {
               month: "2-digit",
               day: "2-digit",
@@ -525,7 +526,7 @@ export default function Chat({ launchContext }) {
         </Form.Dropdown>
 
         <Form.Description title="System Prompt" text="This prompt will be sent to GPT to start the conversation." />
-        <Form.TextArea id="systemPrompt" defaultValue={chat?.systemPrompt || ""} />
+        <Form.TextArea id="systemPrompt" defaultValue={chat?.systemPrompt ?? ""} />
       </>
     );
   };
@@ -572,7 +573,7 @@ export default function Chat({ launchContext }) {
     if (values) {
       query = values.message;
     }
-    let files = values?.files || [];
+    let files = values?.files ?? [];
 
     if (query === "") {
       toast(Toast.Style.Failure, "Please enter a query");
@@ -790,7 +791,7 @@ export default function Chat({ launchContext }) {
   };
 
   let GPTActionPanel = (props) => {
-    const idx = props.idx || 0;
+    const idx = props.idx ?? 0;
 
     return (
       <ActionPanel>
@@ -1113,8 +1114,7 @@ export default function Chat({ launchContext }) {
   useEffect(() => {
     if (currentChatData && chatData?.currentChat) {
       (async () => {
-        const key = getStorageKey(chatData.currentChat);
-        await Storage.write(key, JSON.stringify(currentChatData));
+        await updateChat(currentChatData, chatData.currentChat);
       })();
     }
   }, [currentChatData]);
