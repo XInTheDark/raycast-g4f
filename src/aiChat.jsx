@@ -593,12 +593,7 @@ export default function Chat({ launchContext }) {
       // Note how we don't pass query here because it is already in the chat
       await updateChatResponse(currentChatData, setCurrentChatData, newMessageID);
     } catch {
-      setCurrentChatData((oldData) => {
-        let newChatData = structuredClone(oldData);
-        newChatData.messages.shift();
-        return newChatData;
-      });
-      await toast(Toast.Style.Failure, "GPT cannot process this message.");
+      await toast(Toast.Style.Failure, "An error occurred");
     }
   };
 
