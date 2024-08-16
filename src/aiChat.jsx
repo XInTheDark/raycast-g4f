@@ -1115,7 +1115,7 @@ export default function Chat({ launchContext }) {
   }, [currentChatData]);
 
   useEffect(() => {
-    if (chatData?.currentChat) {
+    if (chatData?.currentChat && currentChatData?.id !== chatData.currentChat) {
       (async () => {
         let chat = await getChat(chatData.currentChat);
         setCurrentChatData(chat);
