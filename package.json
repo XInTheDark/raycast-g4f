@@ -213,6 +213,10 @@
           "value": "NexraGPT4"
         },
         {
+          "title": "Nexra (Bing)",
+          "value": "NexraBing"
+        },
+        {
           "title": "Nexra (llama-3.1)",
           "value": "NexraLlama31"
         },
