@@ -495,14 +495,11 @@ export const formatResponse = (response, provider = null) => {
     response = response.replace(/\\n/g, "\n");
     response = response.replace(/\\t/g, "\t");
     response = response.replace(/\\r/g, "\r");
-    // quotes (single and double)
     response = response.replace(/\\'/g, "'");
     response = response.replace(/\\"/g, '"');
 
-    // the following escape characters are still displayed correctly even without the replacement,
-    // but we currently have features that depend on stuff being in the response, for example
-    // web search that requires the <|web_search|> token to be present.
-    response = response.replace(/\\_/g, "_");
+    // remove all remaining backslashes
+    response = response.replace(/\\/g, "");
 
     // remove <sup>, </sup> tags (not supported apparently)
     response = response.replace(/<sup>/g, "");
