@@ -14,7 +14,7 @@ import {
 import { useEffect, useState } from "react";
 
 import { Storage } from "./api/storage";
-import { formatDate, removePrefix } from "./helpers/helper";
+import { current_datetime, formatDate, removePrefix } from "./helpers/helper";
 import { help_action, help_action_panel } from "./helpers/helpPage";
 import { autoCheckForUpdates } from "./helpers/update";
 
@@ -101,6 +101,8 @@ export default function Chat({ launchContext }) {
         return newChatData;
       });
     }
+
+    await toast(Toast.Style.Success, "Chat deleted");
   };
 
   // update chat in storage
@@ -463,13 +465,7 @@ export default function Chat({ launchContext }) {
     }
 
     let newChat = chat_data({
-      name: `Imported at ${new Date().toLocaleString("en-US", {
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      })}`,
+      name: `Imported at ${current_datetime()}`,
       provider: provider,
       messages: messages,
     });
@@ -486,19 +482,7 @@ export default function Chat({ launchContext }) {
           title="Chat Name"
           text="In each chat, GPT will remember the previous messages you send in it."
         />
-        <Form.TextField
-          id="chatName"
-          defaultValue={
-            chat?.name ??
-            `New Chat ${new Date().toLocaleString("en-US", {
-              month: "2-digit",
-              day: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-            })}`
-          }
-        />
+        <Form.TextField id="chatName" defaultValue={chat?.name ?? `New Chat ${current_datetime()}`} />
 
         <Form.Description title="AI Preset" text="The preset will override the options below." />
         <Form.Dropdown id="preset" defaultValue="">
@@ -953,6 +937,18 @@ export default function Chat({ launchContext }) {
             shortcut={{ modifiers: ["cmd"], key: "n" }}
           />
           <Action
+            icon={Icon.PlusTopRightSquare}
+            title="Quickly Create Chat"
+            onAction={async () => {
+              let newChat = chat_data({
+                name: `New Chat ${current_datetime()}`,
+              });
+              await addChatAsCurrent(setChatData, setCurrentChatData, newChat);
+              await toast(Toast.Style.Success, "Chat created");
+            }}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "n" }}
+          />
+          <Action
             icon={Icon.ArrowDown}
             title="Next Chat"
             onAction={() => {
@@ -1070,13 +1066,7 @@ export default function Chat({ launchContext }) {
       }
 
       if (launchContext?.query) {
-        let newChatName = `From Quick AI at ${new Date().toLocaleString("en-US", {
-          month: "2-digit",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-        })}`;
+        let newChatName = `From Quick AI at ${current_datetime()}`;
         let newChat = chat_data({
           name: newChatName,
           messages: [
