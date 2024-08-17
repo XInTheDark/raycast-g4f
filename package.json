@@ -201,12 +201,28 @@
       "type": "dropdown",
       "data": [
         {
-          "title": "ChatGPT (gpt-3.5-turbo)",
-          "value": "GPT35"
+          "title": "Nexra (chatgpt)",
+          "value": "NexraChatGPT"
         },
         {
-          "title": "ChatGPT (gpt-4-32k)",
-          "value": "GPT4"
+          "title": "Nexra (gpt-4o)",
+          "value": "NexraGPT4o"
+        },
+        {
+          "title": "Nexra (gpt-4-32k)",
+          "value": "NexraGPT4"
+        },
+        {
+          "title": "Nexra (Bing)",
+          "value": "NexraBing"
+        },
+        {
+          "title": "Nexra (llama-3.1)",
+          "value": "NexraLlama31"
+        },
+        {
+          "title": "Nexra (gemini-1.0-pro)",
+          "value": "NexraGeminiPro"
         },
         {
           "title": "DeepInfra (meta-llama-3.1-405b)",
@@ -285,15 +301,15 @@
           "value": "MetaAI"
         },
         {
-          "title": "SambaNova (llama3-405b)",
-          "value": "SambaNovaLlama3_405B"
+          "title": "SambaNova (llama-3.1-405b)",
+          "value": "SambaNovaLlama31_405B"
         },
         {
-          "title": "SambaNova (llama3-70b)",
+          "title": "SambaNova (llama-3-70b)",
           "value": "SambaNovaLlama3_70B"
         },
         {
-          "title": "SambaNova (llama3-8b)",
+          "title": "SambaNova (llama-3-8b)",
           "value": "SambaNovaLlama3_8B"
         },
         {
@@ -325,7 +341,7 @@
           "value": "OllamaLocal"
         }
       ],
-      "default": "GPT35"
+      "default": "NexraChatGPT"
     },
     {
       "name": "webSearch",

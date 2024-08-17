@@ -49,8 +49,12 @@ export { OllamaLocalProvider, getOllamaLocalResponse };
 // { provider internal name, {provider, model, stream, extra options} }
 // prettier-ignore
 export const providers_info = {
-  GPT35: { provider: NexraProvider, model: "chatgpt", stream: true },
-  GPT4: { provider: NexraProvider, model: "gpt-4-32k", stream: false },
+  NexraChatGPT: { provider: NexraProvider, model: "chatgpt", stream: true },
+  NexraGPT4o: { provider: NexraProvider, model: "gpt-4o", stream: true },
+  NexraGPT4: { provider: NexraProvider, model: "gpt-4-32k", stream: false },
+  NexraBing: { provider: NexraProvider, model: "Bing", stream: true },
+  NexraLlama31: { provider: NexraProvider, model: "llama-3.1", stream: true },
+  NexraGeminiPro: { provider: NexraProvider, model: "gemini-pro", stream: true },
   DeepInfraLlama31_70B: { provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3.1-70B-Instruct", stream: true },
   DeepInfraLlama31_8B: { provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3.1-8B-Instruct", stream: true },
   DeepInfraLlama31_405B: { provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3.1-405B-Instruct", stream: true },
@@ -70,7 +74,7 @@ export const providers_info = {
   DuckDuckGo_Llama31_70B: { provider: DuckDuckGoProvider, model: "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo", stream: true, context_tokens: 4096 },
   DuckDuckGo_Mixtral_8x7B: { provider: DuckDuckGoProvider, model: "mistralai/Mixtral-8x7B-Instruct-v0.1", stream: true, context_tokens: 4096 },
   MetaAI: { provider: MetaAIProvider, model: "", stream: true },
-  SambaNovaLlama3_405B: { provider: SambaNovaProvider, model: "llama3-405b", stream: true, context_tokens: 4096 },
+  SambaNovaLlama31_405B: { provider: SambaNovaProvider, model: "llama3-405b", stream: true, context_tokens: 4096 },
   SambaNovaLlama3_70B: { provider: SambaNovaProvider, model: "llama3-70b", stream: true },
   SambaNovaLlama3_8B: { provider: SambaNovaProvider, model: "llama3-8b", stream: true },
   ReplicateLlama3_8B: { provider: ReplicateProvider, model: "meta/meta-llama-3-8b-instruct", stream: true },
@@ -84,8 +88,12 @@ export const providers_info = {
 
 /// Chat providers (user-friendly names)
 export const chat_providers = [
-  ["ChatGPT (gpt-3.5-turbo)", "GPT35"],
-  ["ChatGPT (gpt-4-32k)", "GPT4"],
+  ["Nexra (chatgpt)", "NexraChatGPT"],
+  ["Nexra (gpt-4o)", "NexraGPT4o"],
+  ["Nexra (gpt-4-32k)", "NexraGPT4"],
+  ["Nexra (Bing)", "NexraBing"],
+  ["Nexra (llama-3.1)", "NexraLlama31"],
+  ["Nexra (gemini-1.0-pro)", "NexraGeminiPro"],
   ["DeepInfra (meta-llama-3.1-405b)", "DeepInfraLlama31_405B"],
   ["DeepInfra (meta-llama-3.1-70b)", "DeepInfraLlama31_70B"],
   ["DeepInfra (meta-llama-3.1-8b)", "DeepInfraLlama31_8B"],
@@ -105,9 +113,9 @@ export const chat_providers = [
   ["DuckDuckGo (meta-llama-3.1-70b)", "DuckDuckGo_Llama31_70B"],
   ["DuckDuckGo (mixtral-8x7b)", "DuckDuckGo_Mixtral_8x7B"],
   ["Meta AI (meta-llama-3.1)", "MetaAI"],
-  ["SambaNova (llama3-405b)", "SambaNovaLlama3_405B"],
-  ["SambaNova (llama3-70b)", "SambaNovaLlama3_70B"],
-  ["SambaNova (llama3-8b)", "SambaNovaLlama3_8B"],
+  ["SambaNova (llama-3.1-405b)", "SambaNovaLlama31_405B"],
+  ["SambaNova (llama-3-70b)", "SambaNovaLlama3_70B"],
+  ["SambaNova (llama-3-8b)", "SambaNovaLlama3_8B"],
   ["Replicate (mixtral-8x7b)", "ReplicateMixtral_8x7B"],
   ["Replicate (meta-llama-3.1-405b)", "ReplicateLlama31_405B"],
   ["Replicate (meta-llama-3-70b)", "ReplicateLlama3_70B"],
