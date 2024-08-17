@@ -348,7 +348,7 @@ export default function Chat({ launchContext }) {
     }
 
     console.log(`Pruned ${prunedCnt} chats`);
-    await Storage.write("lastPruneChatsTime", currentTime);
+    await Storage.write("lastPruneChatsTime", JSON.stringify(currentTime));
   };
 
   // prune stored chats. we loop through all stored chats and delete those that are not in chatData
