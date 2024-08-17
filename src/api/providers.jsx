@@ -73,7 +73,7 @@ export const providers_info = {
   DuckDuckGo_Llama31_70B: { provider: DuckDuckGoProvider, model: "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo", stream: true, context_tokens: 4096 },
   DuckDuckGo_Mixtral_8x7B: { provider: DuckDuckGoProvider, model: "mistralai/Mixtral-8x7B-Instruct-v0.1", stream: true, context_tokens: 4096 },
   MetaAI: { provider: MetaAIProvider, model: "", stream: true },
-  SambaNovaLlama31_405B: { provider: SambaNovaProvider, model: "llama3.1-405b", stream: true, context_tokens: 4096 },
+  SambaNovaLlama31_405B: { provider: SambaNovaProvider, model: "llama3-405b", stream: true, context_tokens: 4096 },
   SambaNovaLlama3_70B: { provider: SambaNovaProvider, model: "llama3-70b", stream: true },
   SambaNovaLlama3_8B: { provider: SambaNovaProvider, model: "llama3-8b", stream: true },
   ReplicateLlama3_8B: { provider: ReplicateProvider, model: "meta/meta-llama-3-8b-instruct", stream: true },
