@@ -128,6 +128,12 @@ export const Storage = {
   // combined write function
   // first write to local storage function only, and then add key to sync cache to add to file storage later
   write: async (key, value) => {
+    if (typeof value !== "string") {
+      // value must be a string. To avoid crashes we serialize it, but log a warning.
+      value = JSON.stringify(value);
+      console.log(`Storage API: Warning: value for key ${key} is not a string`);
+    }
+
     await Storage.localStorage_write(key, value);
     if (Storage.persistent) {
       await Storage.add_to_sync_cache(key);
