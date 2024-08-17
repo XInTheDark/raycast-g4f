@@ -142,6 +142,8 @@ export const provider_options = (provider, chatOptions = null) => {
     let temperature = parseFloat(chatOptions.creativity);
     temperature = Math.max(0.0, temperature).toFixed(1);
     options.temperature = temperature;
+  } else {
+    options.temperature = 0.7;
   }
   return options;
 };
