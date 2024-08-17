@@ -213,6 +213,10 @@
           "value": "NexraGPT4"
         },
         {
+          "title": "Nexra (llama-3.1)",
+          "value": "NexraLlama31"
+        },
+        {
           "title": "Nexra (gemini-1.0-pro)",
           "value": "NexraGeminiPro"
         },
@@ -293,15 +297,15 @@
           "value": "MetaAI"
         },
         {
-          "title": "SambaNova (llama3-405b)",
-          "value": "SambaNovaLlama3_405B"
+          "title": "SambaNova (llama-3.1-405b)",
+          "value": "SambaNovaLlama31_405B"
         },
         {
-          "title": "SambaNova (llama3-70b)",
+          "title": "SambaNova (llama-3-70b)",
           "value": "SambaNovaLlama3_70B"
         },
         {
-          "title": "SambaNova (llama3-8b)",
+          "title": "SambaNova (llama-3-8b)",
           "value": "SambaNovaLlama3_8B"
         },
         {
