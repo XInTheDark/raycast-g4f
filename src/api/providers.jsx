@@ -49,8 +49,9 @@ export { OllamaLocalProvider, getOllamaLocalResponse };
 // { provider internal name, {provider, model, stream, extra options} }
 // prettier-ignore
 export const providers_info = {
-  GPT35: { provider: NexraProvider, model: "chatgpt", stream: true },
-  GPT4: { provider: NexraProvider, model: "gpt-4-32k", stream: false },
+  NexraChatGPT: { provider: NexraProvider, model: "chatgpt", stream: true },
+  NexraGPT4o: { provider: NexraProvider, model: "gpt-4o", stream: true },
+  NexraGPT4: { provider: NexraProvider, model: "gpt-4-32k", stream: false },
   DeepInfraLlama31_70B: { provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3.1-70B-Instruct", stream: true },
   DeepInfraLlama31_8B: { provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3.1-8B-Instruct", stream: true },
   DeepInfraLlama31_405B: { provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3.1-405B-Instruct", stream: true },
@@ -84,8 +85,9 @@ export const providers_info = {
 
 /// Chat providers (user-friendly names)
 export const chat_providers = [
-  ["ChatGPT (gpt-3.5-turbo)", "GPT35"],
-  ["ChatGPT (gpt-4-32k)", "GPT4"],
+  ["Nexra (chatgpt)", "NexraChatGPT"],
+  ["Nexra (gpt-4o)", "NexraGPT4o"],
+  ["Nexra (gpt-4-32k)", "NexraGPT4"],
   ["DeepInfra (meta-llama-3.1-405b)", "DeepInfraLlama31_405B"],
   ["DeepInfra (meta-llama-3.1-70b)", "DeepInfraLlama31_70B"],
   ["DeepInfra (meta-llama-3.1-8b)", "DeepInfraLlama31_8B"],

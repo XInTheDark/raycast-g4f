@@ -201,12 +201,16 @@
       "type": "dropdown",
       "data": [
         {
-          "title": "ChatGPT (gpt-3.5-turbo)",
-          "value": "GPT35"
+          "title": "Nexra (chatgpt)",
+          "value": "NexraChatGPT"
         },
         {
-          "title": "ChatGPT (gpt-4-32k)",
-          "value": "GPT4"
+          "title": "Nexra (gpt-4o)",
+          "value": "NexraGPT4o"
+        },
+        {
+          "title": "Nexra (gpt-4-32k)",
+          "value": "NexraGPT4"
         },
         {
           "title": "DeepInfra (meta-llama-3.1-405b)",

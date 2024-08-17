@@ -62,8 +62,9 @@ updating manually also allows you to fetch and view the latest changes to the so
 
 | Provider           | Model                                     | Features | Status                  | Speed          | Rating and remarks by extension author                                                      |
 |--------------------|-------------------------------------------|----------|-------------------------|----------------|---------------------------------------------------------------------------------------------|
-| GPT                | gpt-3.5-turbo (default)                   | ▶️       | ![Active][active-badge] | Fast           | 7.5/10, the most reliable and decently performing model but there are some stronger models. |
-| GPT                | gpt-4                                     |          | ![Active][active-badge] | Medium         | 6.5/10, no streaming support but otherwise a great model.                                   |
+| Nexra              | chatgpt (default)                         | ▶️       | ![Active][active-badge] | Very fast      | 7.5/10, the most reliable and decently performing model.                                    |
+| Nexra              | gpt-4o                                    | ▶️       | ![Active][active-badge] | Fast           | 8.5/10, the one and only GPT-4o!                                                            |
+| Nexra              | gpt-4-32k                                 |          | ![Active][active-badge] | Medium         | 6.5/10, no streaming support but otherwise a great model.                                   |
 | DeepInfra          | meta-llama-3.1-405b                       | ▶️       | ![Active][active-badge] | Medium         | 8.5/10, state-of-the-art open model, suitable for complex tasks.                            |
 | DeepInfra          | meta-llama-3.1-70b                        | ▶️       | ![Active][active-badge] | Fast           | 8/10, recent model with large context size.                                                 |
 | DeepInfra          | meta-llama-3.1-8b                         | ▶️       | ![Active][active-badge] | Very fast      | 7.5/10, recent model with large context size.                                               |
