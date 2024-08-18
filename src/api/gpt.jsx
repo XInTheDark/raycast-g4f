@@ -420,6 +420,9 @@ export const chatCompletion = async (chat, options, stream_update = null, status
   } else if (provider === providers.DuckDuckGoProvider) {
     // DuckDuckGo
     response = await providers.getDuckDuckGoResponse(chat, options);
+  } else if (provider === providers.BestIMProvider) {
+    // BestIM
+    response = await providers.getBestIMResponse(chat, options);
   } else if (provider === providers.MetaAIProvider) {
     // Meta AI
     response = await providers.getMetaAIResponse(chat, options);
@@ -490,7 +493,7 @@ export const getChatResponseSync = async (currentChat, query = null) => {
 
 // format response using some heuristics
 export const formatResponse = (response, provider = null) => {
-  if (provider === providers.NexraProvider) {
+  if (provider === providers.NexraProvider || provider === providers.BestIMProvider) {
     // replace escape characters: \n with a real newline, \t with a real tab, etc.
     response = response.replace(/\\n/g, "\n");
     response = response.replace(/\\t/g, "\t");

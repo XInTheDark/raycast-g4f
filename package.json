@@ -297,6 +297,10 @@
           "value": "DuckDuckGo_Mixtral_8x7B"
         },
         {
+          "title": "BestIM (gpt-4o-mini)",
+          "value": "BestIM_GPT4oMini"
+        },
+        {
           "title": "Meta AI (meta-llama-3.1)",
           "value": "MetaAI"
         },
