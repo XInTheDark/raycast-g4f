@@ -1,8 +1,7 @@
-import { format_chat_to_prompt } from "../../classes/message";
-
 export const BestIMProvider = "BestIMProvider";
 
 import fetch from "node-fetch";
+import { format_chat_to_prompt } from "../../classes/message";
 
 const api_url = "https://ai-chats.org/chat/send2/";
 const headers = {
