@@ -21,6 +21,10 @@ export { BlackboxProvider, getBlackboxResponse };
 import { DuckDuckGoProvider, getDuckDuckGoResponse } from "./Providers/duckduckgo";
 export { DuckDuckGoProvider, getDuckDuckGoResponse };
 
+// BestIM module
+import { BestIMProvider, getBestIMResponse } from "./Providers/bestim";
+export { BestIMProvider, getBestIMResponse };
+
 // Meta AI module
 import { MetaAIProvider, getMetaAIResponse } from "./Providers/metaAI";
 export { MetaAIProvider, getMetaAIResponse };
@@ -73,6 +77,7 @@ export const providers_info = {
   DuckDuckGo_Claude3Haiku: { provider: DuckDuckGoProvider, model: "claude-3-haiku-20240307", stream: true, context_tokens: 4096 },
   DuckDuckGo_Llama31_70B: { provider: DuckDuckGoProvider, model: "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo", stream: true, context_tokens: 4096 },
   DuckDuckGo_Mixtral_8x7B: { provider: DuckDuckGoProvider, model: "mistralai/Mixtral-8x7B-Instruct-v0.1", stream: true, context_tokens: 4096 },
+  BestIM_GPT4oMini: { provider: BestIMProvider, model: "", stream: true },
   MetaAI: { provider: MetaAIProvider, model: "", stream: true },
   SambaNovaLlama31_405B: { provider: SambaNovaProvider, model: "llama3-405b", stream: true, context_tokens: 4096 },
   SambaNovaLlama3_70B: { provider: SambaNovaProvider, model: "llama3-70b", stream: true },
@@ -112,6 +117,7 @@ export const chat_providers = [
   ["DuckDuckGo (claude-3-haiku)", "DuckDuckGo_Claude3Haiku"],
   ["DuckDuckGo (meta-llama-3.1-70b)", "DuckDuckGo_Llama31_70B"],
   ["DuckDuckGo (mixtral-8x7b)", "DuckDuckGo_Mixtral_8x7B"],
+  ["BestIM (gpt-4o-mini)", "BestIM_GPT4oMini"],
   ["Meta AI (meta-llama-3.1)", "MetaAI"],
   ["SambaNova (llama-3.1-405b)", "SambaNovaLlama31_405B"],
   ["SambaNova (llama-3-70b)", "SambaNovaLlama3_70B"],
