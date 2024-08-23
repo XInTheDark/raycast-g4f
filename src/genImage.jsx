@@ -37,6 +37,18 @@ const image_providers = {
       samplingMethod: "DPM++ 2M Karras",
     },
   },
+  DeepInfraFlux1Dev: {
+    model: "black-forest-labs/FLUX-1-dev",
+    data: {
+      num_inference_steps: 25,
+    },
+  },
+  DeepInfraFlux1Schnell: {
+    model: "black-forest-labs/FLUX-1-schnell",
+    data: {
+      num_inference_steps: 25,
+    },
+  },
   StableDiffusionLite: {
     model: "stablediffusion-1.5",
   },
@@ -52,6 +64,8 @@ const image_providers = {
 const provider_map = {
   Prodia: provider.Nexra,
   ProdiaStableDiffusion: provider.Nexra,
+  DeepInfraFlux1Dev: provider.DeepInfra,
+  DeepInfraFlux1Schnell: provider.DeepInfra,
   StableDiffusionLite: provider.Nexra,
   StableDiffusionPlus: provider.Nexra,
   Dalle: provider.Nexra,
@@ -220,6 +234,8 @@ export default function genImage() {
         <Form.Dropdown id="provider" defaultValue="Prodia">
           <Form.Dropdown.Item title="Prodia" value="Prodia" />
           <Form.Dropdown.Item title="ProdiaStableDiffusion" value="ProdiaStableDiffusion" />
+          <Form.Dropdown.Item title="DeepInfra FLUX.1 Dev" value="DeepInfraFlux1Dev" />
+          <Form.Dropdown.Item title="DeepInfra FLUX.1 Schnell" value="DeepInfraFlux1Schnell" />
           <Form.Dropdown.Item title="StableDiffusionLite" value="StableDiffusionLite" />
           <Form.Dropdown.Item title="StableDiffusionPlus" value="StableDiffusionPlus" />
           <Form.Dropdown.Item title="DALL-E" value="Dalle" />
@@ -665,6 +681,8 @@ const loadImageOptions = (currentChat) => {
     data.samplingSteps = imageQuality === "Medium" ? 10 : imageQuality === "High" ? 15 : 20;
   } else if (providerString === "ProdiaStableDiffusion") {
     data.samplingSteps = imageQuality === "Medium" ? 20 : imageQuality === "High" ? 25 : 30;
+  } else if (providerString === "DeepInfraFlux1Dev" || providerString === "DeepInfraFlux1Schnell") {
+    data.num_inference_steps = imageQuality === "Medium" ? 25 : imageQuality === "High" ? 40 : 80;
   }
 
   if (negativePrompt) data.negativePrompt = negativePrompt;
