@@ -423,6 +423,9 @@ export const chatCompletion = async (chat, options, stream_update = null, status
   } else if (provider === providers.BestIMProvider) {
     // BestIM
     response = await providers.getBestIMResponse(chat, options);
+  } else if (provider === providers.PizzaGPTProvider) {
+    // PizzaGPT
+    response = await providers.getPizzaGPTResponse(chat, options);
   } else if (provider === providers.MetaAIProvider) {
     // Meta AI
     response = await providers.getMetaAIResponse(chat, options);
