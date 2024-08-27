@@ -301,6 +301,10 @@
           "value": "BestIM_GPT4oMini"
         },
         {
+          "title": "PizzaGPT (gpt-3.5-turbo)",
+          "value": "PizzaGPT"
+        },
+        {
           "title": "Meta AI (meta-llama-3.1)",
           "value": "MetaAI"
         },
