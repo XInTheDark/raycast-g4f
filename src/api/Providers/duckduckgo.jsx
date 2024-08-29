@@ -1,5 +1,3 @@
-export const DuckDuckGoProvider = "DuckDuckGoProvider";
-
 import fetch from "node-fetch";
 import { format_chat_to_prompt } from "../../classes/message";
 import { sleep } from "../../helpers/helper";
@@ -35,71 +33,74 @@ const get_vqd = async () => {
   return response.headers.get("x-vqd-4");
 };
 
-export const getDuckDuckGoResponse = async function* (chat, options, max_retries = 3) {
-  try {
-    let vqd_4;
-    for (let _ = 0; _ < 3; _++) {
-      try {
-        vqd_4 = await get_vqd();
-        break;
-      } catch (e) {
-        // sleep for a while before retrying
-        await sleep(1000);
-      }
-    }
-
-    if (!vqd_4) {
-      throw new Error("Failed to get vqd");
-    }
-
-    // I really don't know how the vqd_4 storage thing works,
-    // so we just format the chat as a single message instead
-    let payload = {
-      model: options.model,
-      messages: [
-        {
-          role: "user",
-          content: format_chat_to_prompt(chat),
-        },
-      ],
-    };
-
-    let _headers = {
-      ...headers,
-      "x-vqd-4": vqd_4,
-    };
-
-    const response = await fetch(chat_url, {
-      method: "POST",
-      headers: _headers,
-      body: JSON.stringify(payload),
-    });
-
-    const reader = response.body;
-    for await (let chunk of reader) {
-      const str = chunk.toString();
-      let lines = str.split("\n");
-      for (let line of lines) {
-        if (line.startsWith("data: ")) {
-          let chunk = line.substring(6);
-          if (chunk.trim() === "[DONE]") return;
-
-          try {
-            let data = JSON.parse(chunk);
-            let delta = data["message"];
-            if (delta) {
-              yield delta;
-            }
-          } catch (e) {} // eslint-disable-line
+export const DuckDuckGoProvider = {
+  name: "DuckDuckGo",
+  generate: async function* (chat, options, { max_retries = 3 }) {
+    try {
+      let vqd_4;
+      for (let _ = 0; _ < 3; _++) {
+        try {
+          vqd_4 = await get_vqd();
+          break;
+        } catch (e) {
+          // sleep for a while before retrying
+          await sleep(1000);
         }
       }
+
+      if (!vqd_4) {
+        throw new Error("Failed to get vqd");
+      }
+
+      // I really don't know how the vqd_4 storage thing works,
+      // so we just format the chat as a single message instead
+      let payload = {
+        model: options.model,
+        messages: [
+          {
+            role: "user",
+            content: format_chat_to_prompt(chat),
+          },
+        ],
+      };
+
+      let _headers = {
+        ...headers,
+        "x-vqd-4": vqd_4,
+      };
+
+      const response = await fetch(chat_url, {
+        method: "POST",
+        headers: _headers,
+        body: JSON.stringify(payload),
+      });
+
+      const reader = response.body;
+      for await (let chunk of reader) {
+        const str = chunk.toString();
+        let lines = str.split("\n");
+        for (let line of lines) {
+          if (line.startsWith("data: ")) {
+            let chunk = line.substring(6);
+            if (chunk.trim() === "[DONE]") return;
+
+            try {
+              let data = JSON.parse(chunk);
+              let delta = data["message"];
+              if (delta) {
+                yield delta;
+              }
+            } catch (e) {} // eslint-disable-line
+          }
+        }
+      }
+    } catch (e) {
+      if (max_retries > 0) {
+        console.log(e, "Retrying...");
+        yield* this.generate(chat, options, { max_retries: max_retries - 1 });
+      } else {
+        throw e;
+      }
     }
-  } catch (e) {
-    if (max_retries > 0) {
-      console.log(e, "Retrying...");
-      yield* getDuckDuckGoResponse(chat, options, max_retries - 1);
-    } else {
-      throw e;
-    }
-  }
+  },
 };
