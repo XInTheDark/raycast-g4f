@@ -50,6 +50,8 @@ export const BlackboxProvider = {
       webSearchMode: true,
       userSystemPrompt: "",
       githubToken: null,
+      mobileClient: false,
+      maxTokens: 4096,
     };
 
     try {
@@ -61,11 +63,41 @@ export const BlackboxProvider = {
       });
 
       const reader = response.body;
+      let search_results = false;
+      let text = "";
       for await (let chunk of reader) {
         chunk = chunk.toString();
 
         if (chunk) {
+          if (!search_results && chunk.includes("$~~~$")) {
+            search_results = true;
+          }
+          text += chunk;
           yield chunk;
+        }
+      }
+
+      // Update 29/8/24: if search results are present, the response is only generated
+      // a little bit. then we need to add "mode": "continue" to the data and send another
+      // request to get the rest of the response.
+      if (search_results) {
+        data.mode = "continue";
+        data.messages.push({ content: text, role: "assistant" });
+
+        yield " ";
+
+        const response = await fetch(api_url, {
+          method: "POST",
+          headers: headers,
+          body: JSON.stringify(data),
+        });
+
+        const reader = response.body;
+        for await (let chunk of reader) {
+          chunk = chunk.toString();
+          if (chunk) {
+            yield chunk;
+          }
         }
       }
     } catch (e) {
