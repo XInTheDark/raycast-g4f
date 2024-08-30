@@ -89,6 +89,6 @@ export const getNexraResponseNoStream = async (chat, options) => {
     body: JSON.stringify(data),
   });
 
-  const json = JSON.parse(await response.text());
+  const json = await response.json();
   return json["gpt"];
 };
