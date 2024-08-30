@@ -74,7 +74,6 @@ export const getNexraResponseStream = async function* (chat, options, max_retrie
 
 export const getNexraResponseNoStream = async (chat, options) => {
   chat = messages_to_json(chat);
-  console.log(chat);
   let data = {
     messages: chat,
     stream: false,
