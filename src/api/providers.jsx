@@ -5,40 +5,17 @@
 import { Form, getPreferenceValues } from "@raycast/api";
 
 /// Provider modules
-// Nexra module
 import { NexraProvider } from "./Providers/nexra";
-
-// DeepInfra module
 import { DeepInfraProvider } from "./Providers/deepinfra";
-
-// Blackbox module
 import { BlackboxProvider } from "./Providers/blackbox";
-
-// DuckDuckGo module
 import { DuckDuckGoProvider } from "./Providers/duckduckgo";
-
-// BestIM module
 import { BestIMProvider } from "./Providers/bestim";
-
-// PizzaGPT module
 import { PizzaGPTProvider } from "./Providers/pizzagpt";
-
-// Meta AI module
 import { MetaAIProvider } from "./Providers/metaAI";
-
-// SambaNova module
 import { SambaNovaProvider } from "./Providers/sambanova";
-
-// Replicate module
 import { ReplicateProvider } from "./Providers/replicate";
-
-// Google Gemini module
 import { GeminiProvider } from "./Providers/google_gemini";
-
-// G4F Local module
 import { G4FLocalProvider } from "./Providers/g4f_local";
-
-// Ollama Local module
 import { OllamaLocalProvider } from "./Providers/ollama_local";
 
 /// All providers info
