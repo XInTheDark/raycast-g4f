@@ -1,5 +1,3 @@
-export const BestIMProvider = "BestIMProvider";
-
 import fetch from "node-fetch";
 import { format_chat_to_prompt } from "../../classes/message";
 
@@ -24,33 +22,36 @@ const headers = {
   TE: "trailers",
 };
 
-export const getBestIMResponse = async function* (chat) {
-  const payload = {
-    type: "chat",
-    messagesHistory: [
-      {
-        content: format_chat_to_prompt(chat),
-        from: "you",
-      },
-    ],
-  };
-  const response = await fetch(api_url, {
-    method: "POST",
-    headers: headers,
-    body: JSON.stringify(payload),
-  });
+export const BestIMProvider = {
+  name: "BestIM",
+  generate: async function* (chat) {
+    const payload = {
+      type: "chat",
+      messagesHistory: [
+        {
+          content: format_chat_to_prompt(chat),
+          from: "you",
+        },
+      ],
+    };
+    const response = await fetch(api_url, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(payload),
+    });
 
-  const reader = response.body;
-  for await (let chunk of reader) {
-    const str = chunk.toString();
-    let lines = str.split("\n");
+    const reader = response.body;
+    for await (let chunk of reader) {
+      const str = chunk.toString();
+      let lines = str.split("\n");
 
-    for (let i = 0; i < lines.length; i++) {
-      let line = lines[i];
-      if (line.startsWith("data: ")) {
-        let chunk = line.substring(6);
-        yield chunk;
+      for (let i = 0; i < lines.length; i++) {
+        let line = lines[i];
+        if (line.startsWith("data: ")) {
+          let chunk = line.substring(6);
+          yield chunk;
+        }
       }
     }
-  }
+  },
 };

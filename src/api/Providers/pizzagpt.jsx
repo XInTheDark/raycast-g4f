@@ -1,5 +1,3 @@
-export const PizzaGPTProvider = "PizzaGPTProvider";
-
 import fetch from "node-fetch";
 import { format_chat_to_prompt } from "../../classes/message";
 
@@ -21,16 +19,19 @@ const headers = {
   "X-Secret": "Marinara",
 };
 
-export const getPizzaGPTResponse = async function (chat) {
-  const payload = {
-    question: format_chat_to_prompt(chat),
-  };
-  const response = await fetch(api_url, {
-    method: "POST",
-    headers: headers,
-    body: JSON.stringify(payload),
-  });
+export const PizzaGPTProvider = {
+  name: "PizzaGPT",
+  generate: async function (chat) {
+    const payload = {
+      question: format_chat_to_prompt(chat),
+    };
+    const response = await fetch(api_url, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(payload),
+    });
 
-  const json = await response.json();
-  return json.answer.content;
+    const json = await response.json();
+    return json.answer.content;
+  },
 };

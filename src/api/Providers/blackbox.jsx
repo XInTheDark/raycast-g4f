@@ -1,5 +1,3 @@
-export const BlackboxProvider = "BlackboxProvider";
-
 import fetch from "node-fetch";
 import { messages_to_json } from "../../classes/message";
 import { randomBytes, randomUUID } from "crypto";
@@ -32,48 +30,83 @@ const uuid4 = function () {
   return randomUUID();
 };
 
-export const getBlackboxResponse = async function* (chat, max_retries = 5) {
-  let random_id = token_hex(16);
-  let random_user_id = uuid4();
-  chat = messages_to_json(chat);
+export const BlackboxProvider = {
+  name: "Blackbox",
+  generate: async function* (chat, options, { max_retries = 5 }) {
+    let random_id = token_hex(16);
+    let random_user_id = uuid4();
+    chat = messages_to_json(chat);
 
-  let data = {
-    messages: chat,
-    id: random_id,
-    userId: random_user_id,
-    codeModelMode: true,
-    agentMode: {},
-    trendingAgentMode: {},
-    isMicMode: false,
-    isChromeExt: false,
-    playgroundMode: false,
-    webSearchMode: true,
-    userSystemPrompt: "",
-    githubToken: null,
-  };
+    let data = {
+      messages: chat,
+      id: random_id,
+      userId: random_user_id,
+      previewToken: null,
+      codeModelMode: true,
+      agentMode: {},
+      trendingAgentMode: {},
+      isMicMode: false,
+      isChromeExt: false,
+      githubToken: null,
+      webSearchMode: true,
+      userSystemPrompt: "",
+      mobileClient: false,
+      maxTokens: 4096,
+    };
 
-  try {
-    // POST
-    const response = await fetch(api_url, {
-      method: "POST",
-      headers: headers,
-      body: JSON.stringify(data),
-    });
+    try {
+      // POST
+      const response = await fetch(api_url, {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify(data),
+      });
 
-    const reader = response.body;
-    for await (let chunk of reader) {
-      chunk = chunk.toString();
+      const reader = response.body;
+      let search_results = false;
+      let text = "";
+      for await (let chunk of reader) {
+        chunk = chunk.toString();
 
-      if (chunk) {
-        yield chunk;
+        if (chunk) {
+          if (!search_results && chunk.includes("$~~~$")) {
+            search_results = true;
+          }
+          text += chunk;
+          yield chunk;
+        }
+      }
+
+      // Update 29/8/24: if search results are present, the response is only generated
+      // a little bit. then we need to add "mode": "continue" to the data and send another
+      // request to get the rest of the response.
+      if (search_results) {
+        data.mode = "continue";
+        data.messages.push({ content: text, role: "assistant" });
+
+        yield " ";
+
+        const response = await fetch(api_url, {
+          method: "POST",
+          headers: headers,
+          body: JSON.stringify(data),
+        });
+
+        const reader = response.body;
+        for await (let chunk of reader) {
+          chunk = chunk.toString();
+          if (chunk) {
+            yield chunk;
+          }
+        }
+      }
+    } catch (e) {
+      if (max_retries > 0) {
+        console.log(e, "Retrying...");
+        yield* this.generate(chat, options, { max_retries: max_retries - 1 });
+      } else {
+        throw e;
       }
     }
-  } catch (e) {
-    if (max_retries > 0) {
-      console.log(e, "Retrying...");
-      yield* getBlackboxResponse(chat, max_retries - 1);
-    } else {
-      throw e;
-    }
-  }
+  },
 };

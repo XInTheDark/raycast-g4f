@@ -1,5 +1,3 @@
-export const GeminiProvider = "GeminiProvider";
-
 import Gemini, { messageToParts } from "gemini-g4f";
 import { getPreferenceValues } from "@raycast/api";
 import fetch from "node-fetch";
@@ -13,47 +11,50 @@ const safetySettings = {
   dangerous: Gemini.SafetyThreshold.BLOCK_NONE,
 };
 
-export const getGoogleGeminiResponse = async (chat, options, stream_update, max_retries = 3) => {
-  let APIKeysStr = getPreferenceValues()["GeminiAPIKeys"];
-  let APIKeys = APIKeysStr.split(",").map((x) => x.trim());
+export const GeminiProvider = {
+  name: "Gemini",
+  generate: async (chat, options, { stream_update = null, max_retries = 3 }) => {
+    let APIKeysStr = getPreferenceValues()["GeminiAPIKeys"];
+    let APIKeys = APIKeysStr.split(",").map((x) => x.trim());
 
-  try {
-    for (const APIKey of APIKeys) {
-      const googleGemini = new Gemini(APIKey, { fetch: fetch });
-      let [formattedChat, query] = await GeminiFormatChat(chat, googleGemini);
+    try {
+      for (const APIKey of APIKeys) {
+        const googleGemini = new Gemini(APIKey, { fetch: fetch });
+        let [formattedChat, query] = await GeminiFormatChat(chat, googleGemini);
 
-      const geminiChat = googleGemini.createChat({
-        model: options.model,
-        messages: formattedChat,
-        maxOutputTokens: 8192, // maximum for v1.5 models
-        temperature: options.temperature * 1.5, // v1.5 models have temperature in [0, 2] so we scale it up
-      });
+        const geminiChat = googleGemini.createChat({
+          model: options.model,
+          messages: formattedChat,
+          maxOutputTokens: 8192, // maximum for v1.5 models
+          temperature: options.temperature * 1.5, // v1.5 models have temperature in [0, 2] so we scale it up
+        });
 
-      // Send message
-      try {
-        let response = "";
-        if (stream_update) {
-          const handler = (chunk) => {
-            response += chunk;
-            stream_update(response);
-          };
-          await geminiChat.ask(query, { stream: handler, safetySettings: safetySettings });
-          return;
-        } else {
-          response = await geminiChat.ask(query, { safetySettings: safetySettings });
-          return response;
-        }
-      } catch (e) {} // eslint-disable-line
+        // Send message
+        try {
+          let response = "";
+          if (stream_update) {
+            const handler = (chunk) => {
+              response += chunk;
+              stream_update(response);
+            };
+            await geminiChat.ask(query, { stream: handler, safetySettings: safetySettings });
+            return;
+          } else {
+            response = await geminiChat.ask(query, { safetySettings: safetySettings });
+            return response;
+          }
+        } catch (e) {} // eslint-disable-line
+      }
+    } catch (e) {
+      // if all API keys fail, we allow a few retries
+      if (max_retries > 0) {
+        console.log(e, "Retrying...");
+        return await this.generate(chat, options, { stream_update, max_retries: max_retries - 1 });
+      } else {
+        throw e;
+      }
     }
-  } catch (e) {
-    // if all API keys fail, we allow a few retries
-    if (max_retries > 0) {
-      console.log(e, "Retrying...");
-      return await getGoogleGeminiResponse(chat, options, stream_update, max_retries - 1);
-    } else {
-      throw e;
-    }
-  }
+  },
 };
 
 // Reformat chat to be in google gemini format

@@ -120,7 +120,7 @@ export default (
       // load provider and model from preferences
       const info = providers.get_provider_info();
       // additional options
-      let options = { ...info, ...providers.provider_options(info.provider) };
+      let options = providers.get_options_from_info(info);
 
       // generate response
       let response = "";
@@ -130,7 +130,7 @@ export default (
       let start = Date.now();
 
       if (!info.stream) {
-        response = await chatCompletion(messages, options);
+        response = await chatCompletion(info, messages, options);
         setMarkdown(response);
 
         elapsed = (Date.now() - start) / 1000;
@@ -152,7 +152,7 @@ export default (
           loadingToast.message = `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`;
         };
 
-        await chatCompletion(messages, options, handler, get_status);
+        await chatCompletion(info, messages, options, handler, get_status);
       }
       setLastResponse(response);
 
@@ -402,49 +402,12 @@ export default (
 //
 // also note that the chat parameter is an array of Message objects, and how it is handled is up to the provider modules.
 // for most providers it is first converted into JSON format before being used.
-export const chatCompletion = async (chat, options, stream_update = null, status = null) => {
-  const provider = options.provider;
+export const chatCompletion = async (info, chat, options, stream_update = null, status = null) => {
+  const provider = info.provider; // provider object
   // additional options
-  options = { ...options, ...providers.provider_options(provider) };
+  options = providers.get_options_from_info(info, options);
 
-  let response;
-  if (provider === providers.NexraProvider) {
-    // Nexra
-    response = await providers.getNexraResponse(chat, options);
-  } else if (provider === providers.DeepInfraProvider) {
-    // DeepInfra
-    response = await providers.getDeepInfraResponse(chat, options);
-  } else if (provider === providers.BlackboxProvider) {
-    // Blackbox
-    response = await providers.getBlackboxResponse(chat);
-  } else if (provider === providers.DuckDuckGoProvider) {
-    // DuckDuckGo
-    response = await providers.getDuckDuckGoResponse(chat, options);
-  } else if (provider === providers.BestIMProvider) {
-    // BestIM
-    response = await providers.getBestIMResponse(chat, options);
-  } else if (provider === providers.PizzaGPTProvider) {
-    // PizzaGPT
-    response = await providers.getPizzaGPTResponse(chat, options);
-  } else if (provider === providers.MetaAIProvider) {
-    // Meta AI
-    response = await providers.getMetaAIResponse(chat, options);
-  } else if (provider === providers.SambaNovaProvider) {
-    // SambaNova
-    response = await providers.getSambaNovaResponse(chat, options);
-  } else if (provider === providers.ReplicateProvider) {
-    // Replicate
-    response = await providers.getReplicateResponse(chat, options);
-  } else if (provider === providers.GeminiProvider) {
-    // Google Gemini
-    response = await providers.getGoogleGeminiResponse(chat, options, stream_update);
-  } else if (provider === providers.G4FLocalProvider) {
-    // G4F Local
-    response = await providers.getG4FLocalResponse(chat, options);
-  } else if (provider === providers.OllamaLocalProvider) {
-    // Ollama Local
-    response = await providers.getOllamaLocalResponse(chat, options);
-  }
+  let response = await providers.generate(provider, chat, options, { stream_update });
 
   // stream = false
   if (typeof response === "string") {
@@ -468,14 +431,14 @@ export const getChatResponse = async (currentChat, query = null, stream_update =
   // load provider and model
   const info = providers.get_provider_info(currentChat.provider);
   // additional options
-  let options = { ...info, ...providers.provider_options(info.provider, currentChat.options) };
+  let options = providers.get_options_from_info(info, currentChat.options);
 
   // format chat
   let chat = pairs_to_messages(currentChat.messages, query);
   chat = truncate_chat(chat, info);
 
   // generate response
-  return await chatCompletion(chat, options, stream_update, status);
+  return await chatCompletion(info, chat, options, stream_update, status);
 };
 
 // generate response using a chat context and a query, while forcing stream = false
@@ -496,7 +459,7 @@ export const getChatResponseSync = async (currentChat, query = null) => {
 
 // format response using some heuristics
 export const formatResponse = (response, provider = null) => {
-  if (provider === providers.NexraProvider || provider === providers.BestIMProvider) {
+  if (provider.name === "Nexra" || provider.name === "BestIM") {
     // replace escape characters: \n with a real newline, \t with a real tab, etc.
     response = response.replace(/\\n/g, "\n");
     response = response.replace(/\\t/g, "\t");
@@ -512,7 +475,7 @@ export const formatResponse = (response, provider = null) => {
     response = response.replace(/<\/sup>/g, "");
   }
 
-  if (provider === providers.BlackboxProvider) {
+  if (provider.name === "Blackbox") {
     // remove version number - example: remove $@$v=v1.13$@$ or $@$v=undefined%@$
     response = response.replace(/\$@\$v=.{1,30}\$@\$/, "");
 
@@ -546,7 +509,7 @@ export const processChunks = async function* (response, provider, status = null)
   let r = "";
   for await (const chunk of await processChunksIncremental(response, provider, status)) {
     // normally we add the chunk to r, but for certain providers, the chunk is already yielded fully
-    if ([providers.NexraProvider].includes(provider)) {
+    if (provider.name === "Nexra") {
       r = chunk;
     } else {
       r += chunk;

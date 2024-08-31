@@ -5,56 +5,21 @@
 import { Form, getPreferenceValues } from "@raycast/api";
 
 /// Provider modules
-// Nexra module
-import { NexraProvider, getNexraResponse } from "./Providers/nexra";
-export { NexraProvider, getNexraResponse };
-
-// DeepInfra module
-import { DeepInfraProvider, getDeepInfraResponse } from "./Providers/deepinfra";
-export { DeepInfraProvider, getDeepInfraResponse };
-
-// Blackbox module
-import { BlackboxProvider, getBlackboxResponse } from "./Providers/blackbox";
-export { BlackboxProvider, getBlackboxResponse };
-
-// DuckDuckGo module
-import { DuckDuckGoProvider, getDuckDuckGoResponse } from "./Providers/duckduckgo";
-export { DuckDuckGoProvider, getDuckDuckGoResponse };
-
-// BestIM module
-import { BestIMProvider, getBestIMResponse } from "./Providers/bestim";
-export { BestIMProvider, getBestIMResponse };
-
-// PizzaGPT module
-import { PizzaGPTProvider, getPizzaGPTResponse } from "./Providers/pizzagpt";
-export { PizzaGPTProvider, getPizzaGPTResponse };
-
-// Meta AI module
-import { MetaAIProvider, getMetaAIResponse } from "./Providers/metaAI";
-export { MetaAIProvider, getMetaAIResponse };
-
-// SambaNova module
-import { SambaNovaProvider, getSambaNovaResponse } from "./Providers/sambanova";
-export { SambaNovaProvider, getSambaNovaResponse };
-
-// Replicate module
-import { ReplicateProvider, getReplicateResponse } from "./Providers/replicate";
-export { ReplicateProvider, getReplicateResponse };
-
-// Google Gemini module
-import { GeminiProvider, getGoogleGeminiResponse } from "./Providers/google_gemini";
-export { GeminiProvider, getGoogleGeminiResponse };
-
-// G4F Local module
-import { G4FLocalProvider, getG4FLocalResponse } from "./Providers/g4f_local";
-export { G4FLocalProvider, getG4FLocalResponse };
-
-// Ollama Local module
-import { OllamaLocalProvider, getOllamaLocalResponse } from "./Providers/ollama_local";
-export { OllamaLocalProvider, getOllamaLocalResponse };
+import { NexraProvider } from "./Providers/nexra";
+import { DeepInfraProvider } from "./Providers/deepinfra";
+import { BlackboxProvider } from "./Providers/blackbox";
+import { DuckDuckGoProvider } from "./Providers/duckduckgo";
+import { BestIMProvider } from "./Providers/bestim";
+import { PizzaGPTProvider } from "./Providers/pizzagpt";
+import { MetaAIProvider } from "./Providers/metaAI";
+import { SambaNovaProvider } from "./Providers/sambanova";
+import { ReplicateProvider } from "./Providers/replicate";
+import { GeminiProvider } from "./Providers/google_gemini";
+import { G4FLocalProvider } from "./Providers/g4f_local";
+import { OllamaLocalProvider } from "./Providers/ollama_local";
 
 /// All providers info
-// { provider internal name, {provider, model, stream, extra options} }
+// { provider internal name, {provider object, model, stream, extra options} }
 // prettier-ignore
 export const providers_info = {
   NexraChatGPT: { provider: NexraProvider, model: "chatgpt", stream: true },
@@ -97,7 +62,7 @@ export const providers_info = {
 };
 
 /// Chat providers (user-friendly names)
-export const chat_providers = [
+export const chat_providers_names = [
   ["Nexra (chatgpt)", "NexraChatGPT"],
   ["Nexra (gpt-4o)", "NexraGPT4o"],
   ["Nexra (gpt-4-32k)", "NexraGPT4"],
@@ -137,7 +102,7 @@ export const chat_providers = [
   ["Ollama Local API", "OllamaLocal"],
 ];
 
-export const ChatProvidersReact = chat_providers.map((x) => {
+export const ChatProvidersReact = chat_providers_names.map((x) => {
   return <Form.Dropdown.Item title={x[0]} value={x[1]} key={x[1]} />;
 });
 
@@ -148,7 +113,7 @@ export const file_supported_providers = [GeminiProvider, DeepInfraProvider];
 export const function_supported_providers = [DeepInfraProvider];
 
 // Additional options
-export const provider_options = (provider, chatOptions = null) => {
+export const additional_provider_options = (provider, chatOptions = null) => {
   let options = {};
   if (chatOptions?.creativity) {
     let temperature = parseFloat(chatOptions.creativity);
@@ -164,6 +129,13 @@ export const provider_options = (provider, chatOptions = null) => {
 // providers that handle the stream update in a custom way (see chatCompletion function)
 export const custom_stream_handled_providers = [GeminiProvider];
 
+/// Main function for generation
+// note that provider is the provider object, not the provider string
+export const generate = async function (provider, chat, options, { stream_update = null, max_retries = 5 }) {
+  return provider.generate(chat, options, { stream_update, max_retries });
+};
+
+// Utilities
 export const default_provider_string = () => {
   return getPreferenceValues()["gptProvider"];
 };
@@ -178,4 +150,16 @@ export const get_provider_string = (provider) => {
 // if providerString is not supplied or is incorrect, implicitly return the default provider
 export const get_provider_info = (providerString) => {
   return providers_info[get_provider_string(providerString)];
+};
+
+// Get options from info
+export const get_options_from_info = (info, chatOptions = {}) => {
+  const provider = info.provider;
+  // we delete the provider key since it's not an option
+  return {
+    ...info,
+    ...chatOptions,
+    ...additional_provider_options(provider, chatOptions),
+    provider: undefined,
+  };
 };

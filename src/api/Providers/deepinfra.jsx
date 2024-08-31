@@ -1,5 +1,3 @@
-export const DeepInfraProvider = "DeepInfraProvider";
-
 import fetch from "node-fetch";
 import fs from "fs";
 
@@ -48,123 +46,6 @@ const max_tokens_overrides = {
   "llava-hf/llava-1.5-7b-hf": 512,
 };
 
-export const getDeepInfraResponse = async function* (chat, options, max_retries = 5) {
-  const model = options.model;
-  const json_chat = DeepInfraFormatChat(chat, model);
-
-  const useWebSearch = getPreferenceValues()["webSearch"] && function_supported_models.includes(model);
-  const useCodeInterpreter = getPreferenceValues()["codeInterpreter"] && function_supported_models.includes(model);
-  const tools = [...(useWebSearch ? [webSearchTool] : []), ...(useCodeInterpreter ? [codeInterpreterTool] : [])];
-
-  let data = {
-    model: model,
-    messages: json_chat,
-    tools: tools,
-    temperature: options.temperature,
-    max_tokens: max_tokens_overrides[model] || 100000,
-    stream: true,
-    headers: headers,
-  };
-
-  try {
-    // POST
-    const response = await fetch(api_url, {
-      method: "POST",
-      headers: headers,
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      throw new Error(`status: ${response.status}, error: ${await response.text()}`);
-    }
-
-    // Implementation taken from gpt4free: g4f/Provider/needs_auth/Openai.py at async def create_async_generator()
-    let first = true;
-
-    const reader = response.body;
-    for await (let chunk of reader) {
-      const str = chunk.toString();
-      let lines = str.split("\n");
-
-      for (let i = 0; i < lines.length; i++) {
-        let line = lines[i];
-        if (line.startsWith("data: ")) {
-          let chunk = line.substring(6);
-          if (chunk.trim() === "[DONE]") return; // trim() is important
-
-          try {
-            let data = JSON.parse(chunk);
-            let delta = data["choices"][0]["delta"];
-
-            // Function calling
-            let tool_calls = delta["tool_calls"];
-            if (tool_calls && tool_calls.length > 0) {
-              let call_name = tool_calls[0]["function"]["name"];
-              let call_args = JSON.parse(tool_calls[0]["function"]["arguments"]);
-              try {
-                call_args = JSON.parse(call_args.toString());
-              } catch (e) {} // eslint-disable-line
-              let call_id = tool_calls[0]["id"];
-
-              console.log("Function call:", call_name, call_args);
-
-              if (call_name === "web_search") {
-                let web_search_query = call_args["query"];
-
-                let webResponse = await getWebResult(web_search_query, { mode: "advanced" });
-                let msg = {
-                  role: "tool",
-                  content: webResponse,
-                  tool_call_id: call_id,
-                };
-                chat.push(msg);
-
-                // Notice how the message is only temporarily added to the chat object,
-                // and thus the web search results are not saved in the chat object.
-                // This is due to difficulty of implementation in the current code base.
-                // TODO: rewrite codebase so this is possible!
-
-                // generate a new request
-                yield* getDeepInfraResponse(chat, options, max_retries);
-                return;
-              } else if (call_name === "run_code") {
-                let code = call_args["code"];
-                let codeResponse = await getCodeInterpreterResult(code);
-                let msg = {
-                  role: "tool",
-                  content: codeResponse,
-                  tool_call_id: call_id,
-                };
-                chat.push(msg);
-                yield* getDeepInfraResponse(chat, options, max_retries);
-                return;
-              }
-            }
-
-            let content = delta["content"];
-            if (content) {
-              if (first) {
-                content = content.trimStart();
-                first = false;
-              }
-              yield content;
-            }
-          } catch (e) {
-            console.log(e);
-          }
-        }
-      }
-    }
-  } catch (e) {
-    if (max_retries > 0) {
-      console.log(e, "Retrying...");
-      yield* getDeepInfraResponse(chat, options, max_retries - 1);
-    } else {
-      throw e;
-    }
-  }
-};
-
 const DeepInfraFormatChat = (chat, model) => {
   if (!file_supported_models.includes(model)) {
     return messages_to_json(chat);
@@ -201,4 +82,124 @@ const DeepInfraFormatChat = (chat, model) => {
     }
     return formattedChat;
   }
+};
+
+export const DeepInfraProvider = {
+  name: "DeepInfra",
+  generate: async function* (chat, options, { max_retries = 5 }) {
+    const model = options.model;
+    const json_chat = DeepInfraFormatChat(chat, model);
+
+    const useWebSearch = getPreferenceValues()["webSearch"] && function_supported_models.includes(model);
+    const useCodeInterpreter = getPreferenceValues()["codeInterpreter"] && function_supported_models.includes(model);
+    const tools = [...(useWebSearch ? [webSearchTool] : []), ...(useCodeInterpreter ? [codeInterpreterTool] : [])];
+
+    let data = {
+      model: model,
+      messages: json_chat,
+      tools: tools,
+      temperature: options.temperature,
+      max_tokens: max_tokens_overrides[model] || 100000,
+      stream: true,
+      headers: headers,
+    };
+
+    try {
+      // POST
+      const response = await fetch(api_url, {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error(`status: ${response.status}, error: ${await response.text()}`);
+      }
+
+      // Implementation taken from gpt4free: g4f/Provider/needs_auth/Openai.py at async def create_async_generator()
+      let first = true;
+
+      const reader = response.body;
+      for await (let chunk of reader) {
+        const str = chunk.toString();
+        let lines = str.split("\n");
+
+        for (let i = 0; i < lines.length; i++) {
+          let line = lines[i];
+          if (line.startsWith("data: ")) {
+            let chunk = line.substring(6);
+            if (chunk.trim() === "[DONE]") return; // trim() is important
+
+            try {
+              let data = JSON.parse(chunk);
+              let delta = data["choices"][0]["delta"];
+
+              // Function calling
+              let tool_calls = delta["tool_calls"];
+              if (tool_calls && tool_calls.length > 0) {
+                let call_name = tool_calls[0]["function"]["name"];
+                let call_args = JSON.parse(tool_calls[0]["function"]["arguments"]);
+                try {
+                  call_args = JSON.parse(call_args.toString());
+                } catch (e) {} // eslint-disable-line
+                let call_id = tool_calls[0]["id"];
+
+                console.log("Function call:", call_name, call_args);
+
+                if (call_name === "web_search") {
+                  let web_search_query = call_args["query"];
+
+                  let webResponse = await getWebResult(web_search_query, { mode: "advanced" });
+                  let msg = {
+                    role: "tool",
+                    content: webResponse,
+                    tool_call_id: call_id,
+                  };
+                  chat.push(msg);
+
+                  // Notice how the message is only temporarily added to the chat object,
+                  // and thus the web search results are not saved in the chat object.
+                  // This is due to difficulty of implementation in the current code base.
+                  // TODO: rewrite codebase so this is possible!
+
+                  // generate a new request
+                  yield* this.generate(chat, options, { max_retries });
+                  return;
+                } else if (call_name === "run_code") {
+                  let code = call_args["code"];
+                  let codeResponse = await getCodeInterpreterResult(code);
+                  let msg = {
+                    role: "tool",
+                    content: codeResponse,
+                    tool_call_id: call_id,
+                  };
+                  chat.push(msg);
+                  yield* this.generate(chat, options, { max_retries });
+                  return;
+                }
+              }
+
+              let content = delta["content"];
+              if (content) {
+                if (first) {
+                  content = content.trimStart();
+                  first = false;
+                }
+                yield content;
+              }
+            } catch (e) {
+              console.log(e);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      if (max_retries > 0) {
+        console.log(e, "Retrying...");
+        yield* this.generate(chat, options, { max_retries: max_retries - 1 });
+      } else {
+        throw e;
+      }
+    }
+  },
 };

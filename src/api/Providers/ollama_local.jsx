@@ -1,8 +1,6 @@
 // This module allows communication and requests to the local Ollama API.
 // Read more here: https://github.com/ollama/ollama/blob/main/docs/api.md
 
-export const OllamaLocalProvider = "OllamaLocalProvider";
-
 import fetch from "node-fetch";
 
 import { Storage } from "../storage";
@@ -17,43 +15,46 @@ const DEFAULT_CTX_SIZE = 2048;
 const DEFAULT_API_URL = "http://localhost:11434";
 
 // main function
-export const getOllamaLocalResponse = async function* (chat, options) {
-  chat = messages_to_json(chat);
-  const model = (await getOllamaModelInfo()).model;
+export const OllamaLocalProvider = {
+  name: "OllamaLocal",
+  generate: async function* (chat, options) {
+    chat = messages_to_json(chat);
+    const model = (await getOllamaModelInfo()).model;
 
-  const api_url = await getOllamaAPIPath();
-  const chat_url = `${api_url}/api/chat`;
+    const api_url = await getOllamaAPIPath();
+    const chat_url = `${api_url}/api/chat`;
 
-  const ctx_size = await getOllamaCtxSize();
+    const ctx_size = await getOllamaCtxSize();
 
-  const response = await fetch(chat_url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: model,
-      stream: options.stream,
-      messages: chat,
-      options: {
-        num_ctx: ctx_size,
-        temperature: parseFloat(options.temperature),
+    const response = await fetch(chat_url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    }),
-  });
+      body: JSON.stringify({
+        model: model,
+        stream: options.stream,
+        messages: chat,
+        options: {
+          num_ctx: ctx_size,
+          temperature: parseFloat(options.temperature),
+        },
+      }),
+    });
 
-  const reader = response.body;
-  for await (let chunk of reader) {
-    const str = chunk.toString();
-    try {
-      const json = JSON.parse(str);
-      if (json["done"]) return;
-      let content = json["message"]["content"];
-      yield content;
-    } catch (e) {
-      console.log(e);
+    const reader = response.body;
+    for await (let chunk of reader) {
+      const str = chunk.toString();
+      try {
+        const json = JSON.parse(str);
+        if (json["done"]) return;
+        let content = json["message"]["content"];
+        yield content;
+      } catch (e) {
+        console.log(e);
+      }
     }
-  }
+  },
 };
 
 /// utilities

@@ -1,8 +1,6 @@
 // This module allows communication and requests to the local G4F API.
 // Read more here: https://github.com/xtekky/gpt4free/blob/main/docs/interference.md
 
-export const G4FLocalProvider = "G4FLocalProvider";
-
 import { exec } from "child_process";
 import fetch from "node-fetch";
 
@@ -25,51 +23,54 @@ const API_URL = "http://localhost:1337/v1/chat/completions";
 const MODELS_URL = "http://localhost:1337/v1/models";
 
 // main function
-export const getG4FLocalResponse = async function* (chat, options) {
-  if (!(await isG4FRunning())) {
-    await startG4F();
-  }
+export const G4FLocalProvider = {
+  name: "G4FLocal",
+  generate: async function* (chat, options) {
+    if (!(await isG4FRunning())) {
+      await startG4F();
+    }
 
-  chat = messages_to_json(chat);
-  const info = await getG4FModelInfo();
-  const model = info.model || DEFAULT_MODEL,
-    provider = info.provider || DEFAULT_PROVIDER;
+    chat = messages_to_json(chat);
+    const info = await getG4FModelInfo();
+    const model = info.model || DEFAULT_MODEL,
+      provider = info.provider || DEFAULT_PROVIDER;
 
-  const response = await fetch(API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: model,
-      provider: provider,
-      stream: options.stream,
-      messages: chat,
-    }),
-  });
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: model,
+        provider: provider,
+        stream: options.stream,
+        messages: chat,
+      }),
+    });
 
-  // Important! we assume that the response is a stream, as this is true for most G4F models.
-  // If in the future this is not the case, we should add separate handling for non-streaming responses.
-  const reader = response.body;
-  for await (let chunk of reader) {
-    const str = chunk.toString();
-    let lines = str.split("\n");
-    for (let i = 0; i < lines.length; i++) {
-      let line = lines[i];
-      if (line.startsWith("data: ")) {
-        let chunk = line.substring(6);
-        if (chunk.trim() === "[DONE]") return; // trim() is important
+    // Important! we assume that the response is a stream, as this is true for most G4F models.
+    // If in the future this is not the case, we should add separate handling for non-streaming responses.
+    const reader = response.body;
+    for await (let chunk of reader) {
+      const str = chunk.toString();
+      let lines = str.split("\n");
+      for (let i = 0; i < lines.length; i++) {
+        let line = lines[i];
+        if (line.startsWith("data: ")) {
+          let chunk = line.substring(6);
+          if (chunk.trim() === "[DONE]") return; // trim() is important
 
-        try {
-          let data = JSON.parse(chunk);
-          let delta = data["choices"][0]["delta"]["content"];
-          if (delta) {
-            yield delta;
-          }
-        } catch (e) {} // eslint-disable-line
+          try {
+            let data = JSON.parse(chunk);
+            let delta = data["choices"][0]["delta"]["content"];
+            if (delta) {
+              yield delta;
+            }
+          } catch (e) {} // eslint-disable-line
+        }
       }
     }
-  }
+  },
 };
 
 /// utilities

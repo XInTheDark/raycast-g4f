@@ -1,5 +1,3 @@
-export const NexraProvider = "NexraProvider";
-
 import fetch from "node-fetch";
 import { messages_to_json } from "../../classes/message";
 
@@ -8,6 +6,17 @@ const api_url_stream = "https://nexra.aryahcr.cc/api/chat/complements";
 const api_url_no_stream = "https://nexra.aryahcr.cc/api/chat/gpt";
 const headers = {
   "Content-Type": "application/json",
+};
+
+export const NexraProvider = {
+  name: "Nexra",
+  generate: async (chat, options) => {
+    if (options.stream) {
+      return getNexraResponseStream(chat, options);
+    } else {
+      return await getNexraResponseNoStream(chat, options);
+    }
+  },
 };
 
 export const getNexraResponseStream = async function* (chat, options, max_retries = 5) {
@@ -79,14 +88,6 @@ export const getNexraResponseNoStream = async (chat, options) => {
     body: JSON.stringify(data),
   });
 
-  const json = JSON.parse(await response.text());
+  const json = await response.json();
   return json["gpt"];
-};
-
-export const getNexraResponse = async (chat, options) => {
-  if (options.stream) {
-    return getNexraResponseStream(chat, options);
-  } else {
-    return await getNexraResponseNoStream(chat, options);
-  }
 };
