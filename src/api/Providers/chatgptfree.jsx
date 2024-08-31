@@ -5,7 +5,7 @@ import { defaultHeaders } from "../../helpers/headers";
 const url = "https://chatgptfree.ai";
 const api_url = "https://chatgptfree.ai/wp-admin/admin-ajax.php";
 
-const cookies = "cookieyes-consent=consentid:dFZzN21ESE1ONW1QSHZxN0g3d2V1SFJBRnh6UzlUaWg,consent:no,action:,necessary:yes,functional:no,analytics:no,performance:no,advertisement:no";
+// const cookies = "cookieyes-consent=consentid:dFZzN21ESE1ONW1QSHZxN0g3d2V1SFJBRnh6UzlUaWg,consent:no,action:,necessary:yes,functional:no,analytics:no,performance:no,advertisement:no";
 
 const headers = {
     ...defaultHeaders,
@@ -21,7 +21,7 @@ const headers = {
     'sec-fetch-mode': 'cors',
     'sec-fetch-site': 'same-origin',
     'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36',
-    'cookie': cookies,
+    // 'cookie': cookies,
 };
 
 export const ChatGPTFreeProvider = {
