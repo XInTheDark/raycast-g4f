@@ -305,6 +305,10 @@
           "value": "PizzaGPT"
         },
         {
+          "title": "ChatGPTFree (gpt-4o-mini)",
+          "value": "ChatGPTFree_GPT4oMini"
+        },
+        {
           "title": "Meta AI (meta-llama-3.1)",
           "value": "MetaAI"
         },

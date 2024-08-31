@@ -11,6 +11,7 @@ import { BlackboxProvider } from "./Providers/blackbox";
 import { DuckDuckGoProvider } from "./Providers/duckduckgo";
 import { BestIMProvider } from "./Providers/bestim";
 import { PizzaGPTProvider } from "./Providers/pizzagpt";
+import { ChatGPTFreeProvider } from "./Providers/chatgptfree";
 import { MetaAIProvider } from "./Providers/metaAI";
 import { SambaNovaProvider } from "./Providers/sambanova";
 import { ReplicateProvider } from "./Providers/replicate";
@@ -48,6 +49,7 @@ export const providers_info = {
   DuckDuckGo_Mixtral_8x7B: { provider: DuckDuckGoProvider, model: "mistralai/Mixtral-8x7B-Instruct-v0.1", stream: true, context_tokens: 4096 },
   BestIM_GPT4oMini: { provider: BestIMProvider, model: "", stream: true },
   PizzaGPT: { provider: PizzaGPTProvider, model: "", stream: false },
+  ChatGPTFree_GPT4oMini: { provider: ChatGPTFreeProvider, model: "", stream: true },
   MetaAI: { provider: MetaAIProvider, model: "", stream: true },
   SambaNovaLlama31_405B: { provider: SambaNovaProvider, model: "llama3-405b", stream: true, context_tokens: 4096 },
   SambaNovaLlama3_70B: { provider: SambaNovaProvider, model: "llama3-70b", stream: true },
@@ -89,6 +91,7 @@ export const chat_providers_names = [
   ["DuckDuckGo (mixtral-8x7b)", "DuckDuckGo_Mixtral_8x7B"],
   ["BestIM (gpt-4o-mini)", "BestIM_GPT4oMini"],
   ["PizzaGPT (gpt-3.5-turbo)", "PizzaGPT"],
+  ["ChatGPTFree (gpt-4o-mini)", "ChatGPTFree_GPT4oMini"],
   ["Meta AI (meta-llama-3.1)", "MetaAI"],
   ["SambaNova (llama-3.1-405b)", "SambaNovaLlama31_405B"],
   ["SambaNova (llama-3-70b)", "SambaNovaLlama3_70B"],
