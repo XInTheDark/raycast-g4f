@@ -27,6 +27,7 @@ import { getAIPresets, getPreset } from "./helpers/presets";
 // Web search module
 import { getWebResult, web_search_enabled } from "./api/tools/web";
 import { webSystemPrompt, systemResponse, webToken, webTokenEnd } from "./api/tools/web";
+import { selfCritiqueSystemPrompt } from "./api/tools/self_critique";
 
 let generationStatus = { stop: false, loading: false };
 let get_status = () => generationStatus.stop;
@@ -236,7 +237,7 @@ export default function Chat({ launchContext }) {
     setCurrentChatData,
     messageID,
     query = null,
-    previousWebSearch = false
+    disabledFeatures = {}
   ) => {
     setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, null, ""); // set response to empty string
 
@@ -275,7 +276,7 @@ export default function Chat({ launchContext }) {
           (i & 15) === 0 &&
           response.includes(webToken) &&
           response.includes(webTokenEnd) &&
-          !previousWebSearch
+          !disabledFeatures?.webSearch
         ) {
           generationStatus.stop = true; // stop generating the current response
           await processWebSearchResponse(currentChatData, setCurrentChatData, messageID, response, query);
@@ -293,7 +294,7 @@ export default function Chat({ launchContext }) {
 
     // Web Search functionality
     // Process web search response again in case streaming is false, or if it was not processed during streaming
-    if (useWebSearch && response.includes(webToken) && !previousWebSearch) {
+    if (useWebSearch && response.includes(webToken) && !disabledFeatures?.webSearch) {
       generationStatus.stop = true;
       await processWebSearchResponse(currentChatData, setCurrentChatData, messageID, response, query);
       return;
@@ -307,10 +308,16 @@ export default function Chat({ launchContext }) {
       `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`
     );
     generationStatus.loading = false;
+    console.log(`Response finished in ${elapsed.toFixed(1)} sec`);
 
     // Smart Chat Naming functionality
     if (getPreferenceValues()["smartChatNaming"] && currentChatData.messages.length <= 2) {
       await processSmartChatNaming(chatData, setChatData, currentChatData, setCurrentChatData);
+    }
+
+    // Self-Critique functionality
+    if (getPreferenceValues()["selfCritique"] && !disabledFeatures?.selfCritique) {
+      await processSelfCritique(currentChatData, setCurrentChatData);
     }
 
     // functions that run periodically
@@ -735,7 +742,7 @@ export default function Chat({ launchContext }) {
     setCurrentChatData(currentChatData); // important to update the UI!
 
     // Note how we don't pass query here because it is already in the chat
-    await updateChatResponse(currentChatData, setCurrentChatData, newMessageID, null, true);
+    await updateChatResponse(currentChatData, setCurrentChatData, newMessageID, null, { webSearch: true });
   };
 
   // Smart Chat Naming functionality
@@ -767,6 +774,40 @@ export default function Chat({ launchContext }) {
     } catch (e) {
       console.log("Smart Chat Naming failed: ", e);
     }
+  };
+
+  // Self Critique functionality
+  const processSelfCritique = async (currentChatData, setCurrentChatData) => {
+    // get the current message prompt
+    let currentPrompt = currentChatData.messages[0].first.content;
+
+    // add new message to chat
+    let newMessagePair = new MessagePair({
+      prompt: selfCritiqueSystemPrompt,
+      visible: false,
+    });
+
+    setCurrentChatData((oldData) => {
+      let newData = structuredClone(oldData);
+      newData.messages.unshift(newMessagePair);
+      return newData;
+    });
+
+    let newMessageID = newMessagePair.id;
+    await updateChatResponse(currentChatData, setCurrentChatData, newMessageID, null, { selfCritique: true });
+
+    setCurrentChatData((oldData) => {
+      let newData = structuredClone(oldData);
+      // change the message pair prompt to current prompt
+      newData.messages[0].first.content = currentPrompt;
+      // remove the previous message
+      newData.messages.splice(1, 1);
+      // set message as visible
+      newData.messages[0].visible = true;
+      return newData;
+    });
+
+    await toast(Toast.Style.Success, "Self-critique finished");
   };
 
   let GPTActionPanel = (props) => {

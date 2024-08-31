@@ -393,6 +393,14 @@
       "default": false
     },
     {
+      "name": "selfCritique",
+      "label": "Enable Self-Critique",
+      "description": "Enable self-critique feature in AI Chat. Allows GPT to improve on its responses.",
+      "required": false,
+      "type": "checkbox",
+      "default": false
+    },
+    {
       "name": "TavilyAPIKeys",
       "title": "Tavily API Keys",
       "description": "Optional. Only used if Web Search is enabled. Multiple keys are supported - separate them with commas.",
