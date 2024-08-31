@@ -153,7 +153,7 @@ export const additional_provider_options = (provider, chatOptions = null) => {
 export const custom_stream_handled_providers = [GeminiProvider];
 
 /// Main function for generation
-// pote that provider is the provider object, not the provider string
+// note that provider is the provider object, not the provider string
 export const generate = async function (provider, chat, options, { stream_update = null, max_retries = 5 }) {
   return provider.generate(chat, options, { stream_update, max_retries });
 };
