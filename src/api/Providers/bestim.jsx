@@ -20,6 +20,8 @@ const headers = {
   "Sec-Fetch-Site": "same-origin",
   Priority: "u=0",
   TE: "trailers",
+  Cookie:
+    "ai-chat-front=1d38ca3a77c409025efec9639084337b; _csrf-front=b5f45dfb9a135dc88dabae2f8cbdbde90574ed8afa45d2931e6d9968cf3f1f9da%3A2%3A%7Bi%3A0%3Bs%3A11%3A%22_csrf-front%22%3Bi%3A1%3Bs%3A32%3A%224tjSi5lj7FpReYG6U80H9ln9SaQLUawb%22%3B%7D; muVyak=JpuXiFvRbVkfSWPYMETjAmhoKdtNwQ; JpuXiFvRbVkfSWPYMETjAmhoKdtNwQ=a71a1519bf1f0d414ddd73f6239f56ff-1725338172-1725338169; muVyak_hits=8",
 };
 
 export const BestIMProvider = {
