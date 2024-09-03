@@ -1,7 +1,7 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "raycast-g4f",
-  "version": "3.2",
+  "version": "3.3",
   "title": "GPT4Free",
   "description": "Use GPT-4 for FREE, on Raycast - no API Key required.",
   "icon": "gpt-icon.png",
