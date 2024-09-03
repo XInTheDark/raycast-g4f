@@ -3,6 +3,7 @@ import {
   ActionPanel,
   Clipboard,
   confirmAlert,
+  Detail,
   Form,
   getPreferenceValues,
   Icon,
@@ -552,33 +553,22 @@ export default function Chat({ launchContext }) {
     );
   };
 
-  const sendToGPT = async (values = null) => {
-    let query = searchText;
-    if (values) {
-      query = values.message;
-    }
-    let files = values?.files ?? [];
+  let ViewResponseComponent = (props) => {
+    const { pop } = useNavigation();
 
-    if (query === "") {
-      toast(Toast.Style.Failure, "Please enter a query");
-      return;
-    }
+    const idx = props.idx;
+    const response = currentChatData.messages[idx].second.content;
 
-    setSearchText("");
-    toast(Toast.Style.Animated, "Response loading");
-
-    let newMessagePair = new MessagePair({ prompt: query, files: files });
-    let newMessageID = newMessagePair.id;
-
-    currentChatData.messages.unshift(newMessagePair);
-    setCurrentChatData(currentChatData); // possibly redundant, put here for safety and consistency
-
-    try {
-      // Note how we don't pass query here because it is already in the chat
-      await updateChatResponse(currentChatData, setCurrentChatData, newMessageID);
-    } catch {
-      await toast(Toast.Style.Failure, "An error occurred");
-    }
+    return (
+      <Detail
+        markdown={response}
+        actions={
+          <ActionPanel>
+            <Action title="Return to Chat" onAction={() => pop()} shortcut={{ modifiers: ["cmd"], key: "f" }} />
+          </ActionPanel>
+        }
+      />
+    );
   };
 
   let ComposeMessageComponent = () => {
@@ -769,6 +759,35 @@ export default function Chat({ launchContext }) {
     }
   };
 
+  const sendToGPT = async (values = null) => {
+    let query = searchText;
+    if (values) {
+      query = values.message;
+    }
+    let files = values?.files ?? [];
+
+    if (query === "") {
+      toast(Toast.Style.Failure, "Please enter a query");
+      return;
+    }
+
+    setSearchText("");
+    toast(Toast.Style.Animated, "Response loading");
+
+    let newMessagePair = new MessagePair({ prompt: query, files: files });
+    let newMessageID = newMessagePair.id;
+
+    currentChatData.messages.unshift(newMessagePair);
+    setCurrentChatData(currentChatData); // possibly redundant, put here for safety and consistency
+
+    try {
+      // Note how we don't pass query here because it is already in the chat
+      await updateChatResponse(currentChatData, setCurrentChatData, newMessageID);
+    } catch {
+      await toast(Toast.Style.Failure, "An error occurred");
+    }
+  };
+
   let GPTActionPanel = (props) => {
     const idx = props.idx ?? 0;
 
@@ -807,6 +826,12 @@ export default function Chat({ launchContext }) {
               await toast(Toast.Style.Success, "Response copied");
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
+          />
+          <Action.Push
+            icon={Icon.Maximize}
+            title="View Response"
+            target={<ViewResponseComponent idx={idx} />}
+            shortcut={{ modifiers: ["cmd"], key: "f" }}
           />
           <Action
             icon={Icon.ArrowClockwise}
