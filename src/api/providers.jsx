@@ -10,6 +10,7 @@ import { DeepInfraProvider } from "./Providers/deepinfra";
 import { BlackboxProvider } from "./Providers/blackbox";
 import { DuckDuckGoProvider } from "./Providers/duckduckgo";
 import { BestIMProvider } from "./Providers/bestim";
+import { RocksProvider } from "./Providers/rocks";
 import { PizzaGPTProvider } from "./Providers/pizzagpt";
 import { MetaAIProvider } from "./Providers/metaAI";
 import { SambaNovaProvider } from "./Providers/sambanova";
@@ -47,6 +48,12 @@ export const providers_info = {
   DuckDuckGo_Llama31_70B: { provider: DuckDuckGoProvider, model: "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo", stream: true, context_tokens: 4096 },
   DuckDuckGo_Mixtral_8x7B: { provider: DuckDuckGoProvider, model: "mistralai/Mixtral-8x7B-Instruct-v0.1", stream: true, context_tokens: 4096 },
   BestIM_GPT4oMini: { provider: BestIMProvider, model: "", stream: true },
+  RocksClaude35Sonnet: { provider: RocksProvider, model: "claude-3-5-sonnet-20240620", stream: true },
+  RocksClaude3Opus: { provider: RocksProvider, model: "claude-3-opus-20240229", stream: true },
+  RocksGPT4o: { provider: RocksProvider, model: "gpt-4o", stream: true },
+  RocksGPT4: { provider: RocksProvider, model: "gpt-4", stream: true },
+  RocksLlama31_405B: { provider: RocksProvider, model: "llama-3.1-405b-turbo", stream: true },
+  RocksLlama31_70B: { provider: RocksProvider, model: "llama-3.1-70b-turbo", stream: true },
   PizzaGPT: { provider: PizzaGPTProvider, model: "", stream: false },
   MetaAI: { provider: MetaAIProvider, model: "", stream: true },
   SambaNovaLlama31_405B: { provider: SambaNovaProvider, model: "llama3-405b", stream: true, context_tokens: 4096 },
@@ -88,6 +95,12 @@ export const chat_providers_names = [
   ["DuckDuckGo (meta-llama-3.1-70b)", "DuckDuckGo_Llama31_70B"],
   ["DuckDuckGo (mixtral-8x7b)", "DuckDuckGo_Mixtral_8x7B"],
   ["BestIM (gpt-4o-mini)", "BestIM_GPT4oMini"],
+  ["Rocks (claude-3.5-sonnet)", "RocksClaude35Sonnet"],
+  ["Rocks (claude-3-opus)", "RocksClaude3Opus"],
+  ["Rocks (gpt-4o)", "RocksGPT4o"],
+  ["Rocks (gpt-4)", "RocksGPT4"],
+  ["Rocks (llama-3.1-405b)", "RocksLlama31_405B"],
+  ["Rocks (llama-3.1-70b)", "RocksLlama31_70B"],
   ["PizzaGPT (gpt-3.5-turbo)", "PizzaGPT"],
   ["Meta AI (meta-llama-3.1)", "MetaAI"],
   ["SambaNova (llama-3.1-405b)", "SambaNovaLlama31_405B"],
