@@ -31,6 +31,7 @@ By using the Extension, you agree to this Policy.
 | Blackbox      | https://www.useblackbox.io/terms, https://www.useblackbox.io/privacy           |
 | DuckDuckGo    | https://duckduckgo.com/aichat/privacy-terms                                    |
 | BestIM        | https://ai-chats.org/privacy/                                                  |
+| Rocks         | https://llmplayground.net/                                                     |
 | PizzaGPT      | https://pizzagpt.it/privacy                                                    |
 | Meta AI       | https://www.facebook.com/legal/ai-terms                                        |
 | SambaNova     | https://sambanova.ai/terms-and-conditions, https://sambanova.ai/privacy-policy |
