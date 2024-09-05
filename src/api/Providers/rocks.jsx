@@ -23,7 +23,7 @@ export const RocksProvider = {
     const payload = {
       messages: format_messages(chat),
       model: options.model,
-      max_tokens: 4096,
+      max_tokens: 10000,
       temperature: parseFloat(options.temperature) ?? 0.7,
       top_p: 0.9,
       stream: true,
@@ -39,42 +39,67 @@ export const RocksProvider = {
     let last_chunk_time = Date.now();
     let first = true;
 
-    const timeout = 2000;
+    const timeout = 3000;
 
-    for await (let chunk of reader) {
-      console.log(Date.now(), last_chunk_time);
-      if (!first && Date.now() - last_chunk_time > timeout) {
-        return;
-      }
-      const str = chunk.toString();
-      let lines = str.split("\n");
-      console.log(lines);
+    while (true) {
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error("Timeout")), timeout);
+      });
 
-      for (let i = 0; i < lines.length; i++) {
-        let line = lines[i];
-        if (line.startsWith("\n")) {
-          continue;
-        }
-        if (line.includes("discord.com/invite/") || line.includes("discord.gg/")) {
-          continue;
-        }
-
-        if (line.startsWith("data: ")) {
-          line = line.substring(6);
-          try {
-            line = JSON.parse(line);
-            let chunk = line.choices[0].delta?.content;
-            if (chunk) {
-              yield chunk;
-              last_chunk_time = Date.now();
-              if (first) {
-                first = false;
+      try {
+        const chunk = await Promise.race([
+          new Promise((resolve) => {
+            reader.once("readable", () => {
+              try {
+                const chunk = reader.read();
+                resolve(chunk);
+              } catch (e) {
+                resolve("");
               }
-            }
-          } catch (e) {
+            });
+          }),
+          timeoutPromise,
+        ]);
+
+        if (!first && Date.now() - last_chunk_time > timeout) {
+          return;
+        }
+
+        if (chunk === null) {
+          return;
+        }
+
+        const str = chunk.toString();
+        let lines = str.split("\n");
+
+        for (let line of lines) {
+          if (line.startsWith("\n") || line.includes("discord.com/invite/") || line.includes("discord.gg/")) {
             continue;
           }
+
+          if (line.startsWith("data: ")) {
+            line = line.substring(6);
+            try {
+              line = JSON.parse(line);
+              let content = line.choices[0].delta?.content;
+              if (content) {
+                yield content;
+                last_chunk_time = Date.now();
+                if (first) {
+                  first = false;
+                }
+              }
+            } catch (e) {
+              continue;
+            }
+          }
         }
+      } catch (e) {
+        if (e.message === "Timeout") {
+          if (!first) return; // Exit if a timeout occurs, i.e. response is complete
+          else continue;
+        }
+        throw e;
       }
     }
   },
