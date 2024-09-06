@@ -342,16 +342,16 @@
           "value": "MetaAI"
         },
         {
-          "title": "SambaNova (llama-3.1-405b)",
+          "title": "SambaNova (meta-llama-3.1-405b)",
           "value": "SambaNovaLlama31_405B"
         },
         {
-          "title": "SambaNova (llama-3-70b)",
-          "value": "SambaNovaLlama3_70B"
+          "title": "SambaNova (meta-llama-3.1-70b)",
+          "value": "SambaNovaLlama31_70B"
         },
         {
-          "title": "SambaNova (llama-3-8b)",
-          "value": "SambaNovaLlama3_8B"
+          "title": "SambaNova (meta-llama-3.1-8b)",
+          "value": "SambaNovaLlama31_8B"
         },
         {
           "title": "Replicate (mixtral-8x7b)",

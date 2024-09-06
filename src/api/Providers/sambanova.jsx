@@ -12,9 +12,9 @@ const headers = {
 };
 
 const env_types = {
-  "llama3-405b": "tp16405b",
-  "llama3-70b": "tp1670b",
-  "llama3-8b": "tp16",
+  "Meta-Llama-3.1-405B-Instruct": "tp16405b",
+  "Meta-Llama-3.1-70B-Instruct": "tp1670b",
+  "Meta-Llama-3.1-8B-Instruct": "tp16",
 };
 
 export const SambaNovaProvider = {
