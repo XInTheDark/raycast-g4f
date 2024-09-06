@@ -53,6 +53,7 @@ export const providers_info = {
   BestIM_GPT4oMini: { provider: BestIMProvider, model: "", stream: true },
   RocksClaude35Sonnet: { provider: RocksProvider, model: "claude-3-5-sonnet-20240620", stream: true },
   RocksClaude3Opus: { provider: RocksProvider, model: "claude-3-opus-20240229", stream: true },
+  RocksChatGPT4oLatest: { provider: RocksProvider, model: "chatgpt-4o-latest", stream: true },
   RocksGPT4o: { provider: RocksProvider, model: "gpt-4o", stream: true },
   RocksGPT4: { provider: RocksProvider, model: "gpt-4", stream: true },
   RocksLlama31_405B: { provider: RocksProvider, model: "llama-3.1-405b-turbo", stream: true },

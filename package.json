@@ -309,6 +309,10 @@
           "value": "RocksClaude3Opus"
         },
         {
+          "title": "Rocks (chatgpt-4o-latest)",
+          "value": "RocksChatGPT4oLatest"
+        },
+        {
           "title": "Rocks (gpt-4o)",
           "value": "RocksGPT4o"
         },
