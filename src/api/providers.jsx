@@ -56,6 +56,7 @@ export const providers_info = {
   RocksChatGPT4oLatest: { provider: RocksProvider, model: "chatgpt-4o-latest", stream: true },
   RocksGPT4o: { provider: RocksProvider, model: "gpt-4o", stream: true },
   RocksGPT4: { provider: RocksProvider, model: "gpt-4", stream: true },
+  RocksWizardLM2_8x22B: { provider: RocksProvider, model: "WizardLM-2-8x22B", stream: true },
   RocksLlama31_405B: { provider: RocksProvider, model: "llama-3.1-405b-turbo", stream: true },
   RocksLlama31_70B: { provider: RocksProvider, model: "llama-3.1-70b-turbo", stream: true },
   PizzaGPT: { provider: PizzaGPTProvider, model: "", stream: false },

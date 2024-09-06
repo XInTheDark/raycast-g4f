@@ -321,6 +321,10 @@
           "value": "RocksGPT4"
         },
         {
+          "title": "Rocks (WizardLM-2-8x22B)",
+          "value": "RocksWizardLM2_8x22B"
+        },
+        {
           "title": "Rocks (llama-3.1-405b)",
           "value": "RocksLlama31_405B"
         },
