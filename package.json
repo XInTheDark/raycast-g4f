@@ -245,6 +245,10 @@
           "value": "DeepInfraMixtral_8x7B"
         },
         {
+          "title": "DeepInfra (Reflection-Llama-3.1-70B)",
+          "value": "DeepInfraReflectionLlama31_70B"
+        },
+        {
           "title": "DeepInfra (Qwen2-72B)",
           "value": "DeepInfraQwen2_72B"
         },

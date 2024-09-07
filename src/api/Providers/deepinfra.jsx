@@ -119,6 +119,10 @@ export const DeepInfraProvider = {
       // Implementation taken from gpt4free: g4f/Provider/needs_auth/Openai.py at async def create_async_generator()
       let first = true;
 
+      // support for the Reflection models
+      let isReflection = model.includes("Reflection-Llama");
+      let reflectionOutput = false;
+
       const reader = response.body;
       for await (let chunk of reader) {
         const str = chunk.toString();
@@ -177,7 +181,7 @@ export const DeepInfraProvider = {
                   yield* this.generate(chat, options, { max_retries });
                   return;
                 }
-              }
+              } // end of function calling
 
               let content = delta["content"];
               if (content) {
@@ -185,6 +189,19 @@ export const DeepInfraProvider = {
                   content = content.trimStart();
                   first = false;
                 }
+
+                if (isReflection) {
+                  if (!reflectionOutput && content.includes("<output>")) {
+                    content = content.replace("<output>", "").trimStart();
+                    reflectionOutput = true;
+                  } else if (reflectionOutput && content.includes("</output>")) {
+                    content = content.replace("</output>", "").trimEnd();
+                  }
+                  if (!reflectionOutput) {
+                    continue;
+                  }
+                }
+
                 yield content;
               }
             } catch (e) {
