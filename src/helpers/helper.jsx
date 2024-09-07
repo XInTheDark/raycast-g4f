@@ -84,6 +84,64 @@ export const tokens_estimate = (str) => {
   return Math.max((words * 4) / 3, chars / 4);
 };
 
+// Truncate a message using the middle-out strategy, given a target context length
+export const truncate_message_middle = (message, contextChars, contextTokens) => {
+  let chars = message.content.length,
+    tokens = tokens_estimate(message.content);
+
+  if ((contextChars && chars <= contextChars) || (contextTokens && tokens <= contextTokens)) {
+    return message;
+  }
+
+  if (contextChars) {
+    contextChars -= 20; // buffer
+    if (contextChars <= 0) {
+      return "";
+    }
+
+    let half = Math.floor(contextChars / 2);
+    return message.content.substring(0, half) + "\n...\n" + message.content.substring(chars - half);
+  } else if (contextTokens) {
+    contextTokens -= 10; // buffer
+    if (contextTokens <= 0) {
+      return "";
+    }
+
+    let half = Math.floor(contextTokens / 2);
+    let words = message.content.split(" ");
+
+    // binary search for both the start and end of the truncated message
+    let start = 0,
+      end = words.length;
+    while (start < end) {
+      let mid = Math.floor((start + end) / 2);
+      let truncated = words.slice(0, mid).join(" ");
+      if (tokens_estimate(truncated) > half) {
+        end = mid;
+      } else {
+        start = mid + 1;
+      }
+    }
+    let firstHalf = words.slice(0, start).join(" ");
+
+    start = end;
+    end = words.length;
+    while (start < end) {
+      let mid = Math.floor((start + end) / 2);
+      let truncated = words.slice(mid).join(" ");
+      if (tokens_estimate(truncated) > half) {
+        start = mid + 1;
+      } else {
+        end = mid;
+      }
+    }
+    let secondHalf = words.slice(start).join(" ");
+    return firstHalf + "\n...\n" + secondHalf;
+  }
+
+  return message.content;
+};
+
 // Given an array of Messages and a provider info, return the
 // longest chat array that fits within the context length
 export const truncate_chat = (chat, providerInfo) => {
@@ -104,10 +162,16 @@ export const truncate_chat = (chat, providerInfo) => {
     totalChars += chars;
     totalTokens += tokens;
 
-    if (contextChars && totalChars > contextChars) {
-      break;
-    }
-    if (contextTokens && totalTokens > contextTokens) {
+    if ((contextChars && totalChars > contextChars) || (contextTokens && totalTokens > contextTokens)) {
+      let truncated = truncate_message_middle(
+        message,
+        contextChars && contextChars - totalChars + chars,
+        contextTokens && contextTokens - totalTokens + tokens
+      );
+      if (message) {
+        message.content = truncated;
+        newChat.unshift(message);
+      }
       break;
     }
 
