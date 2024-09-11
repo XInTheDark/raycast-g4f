@@ -1,14 +1,15 @@
 import fetch from "node-fetch";
-import { messages_to_json } from "../../classes/message";
+import { messages_to_json } from "../../../classes/message";
 
-const api_url = "https://fast.snova.ai/api/completion";
+const api_url = "https://cloud.sambanova.ai/api/completion";
 
 const headers = {
   "Content-Type": "application/json",
   Accept: "text/event-stream",
-  Host: "fast.snova.ai",
-  Origin: "https://fast.snova.ai",
-  Referer: "https://fast.snova.ai/",
+  Host: "cloud.sambanova.ai",
+  Origin: "https://cloud.sambanova.ai",
+  Referer: "https://cloud.sambanova.ai/",
+  Cookie: "access_token=<YOUR_ACCESS_TOKEN>",
 };
 
 const env_types = {

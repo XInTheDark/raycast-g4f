@@ -34,7 +34,6 @@ By using the Extension, you agree to this Policy.
 | Rocks         | https://llmplayground.net/                                                     |
 | PizzaGPT      | https://pizzagpt.it/privacy                                                    |
 | Meta AI       | https://www.facebook.com/legal/ai-terms                                        |
-| SambaNova     | https://sambanova.ai/terms-and-conditions, https://sambanova.ai/privacy-policy |
 | Replicate     | https://replicate.com/terms, https://replicate.com/privacy                     |
 | Google Gemini | https://ai.google.dev/gemini-api/terms, https://developers.google.com/terms    |
 

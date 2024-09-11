@@ -16,7 +16,6 @@ import { BestIMProvider } from "./Providers/bestim";
 import { RocksProvider } from "./Providers/rocks";
 import { PizzaGPTProvider } from "./Providers/pizzagpt";
 import { MetaAIProvider } from "./Providers/metaAI";
-import { SambaNovaProvider } from "./Providers/sambanova";
 import { ReplicateProvider } from "./Providers/replicate";
 import { GeminiProvider } from "./Providers/google_gemini";
 import { G4FLocalProvider } from "./Providers/g4f_local";
@@ -61,9 +60,6 @@ export const providers_info = {
   RocksLlama31_70B: { provider: RocksProvider, model: "llama-3.1-70b-turbo", stream: true },
   PizzaGPT: { provider: PizzaGPTProvider, model: "", stream: false },
   MetaAI: { provider: MetaAIProvider, model: "", stream: true },
-  SambaNovaLlama31_405B: { provider: SambaNovaProvider, model: "Meta-Llama-3.1-405B-Instruct", stream: true, context_tokens: 4096 },
-  SambaNovaLlama31_70B: { provider: SambaNovaProvider, model: "Meta-Llama-3.1-70B-Instruct", stream: true },
-  SambaNovaLlama31_8B: { provider: SambaNovaProvider, model: "Meta-Llama-3.1-8B-Instruct", stream: true },
   ReplicateLlama3_8B: { provider: ReplicateProvider, model: "meta/meta-llama-3-8b-instruct", stream: true },
   ReplicateLlama3_70B: { provider: ReplicateProvider, model: "meta/meta-llama-3-70b-instruct", stream: true },
   ReplicateLlama31_405B: { provider: ReplicateProvider, model: "meta/meta-llama-3.1-405b-instruct", stream: true },

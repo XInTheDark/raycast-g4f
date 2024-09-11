@@ -342,18 +342,6 @@
           "value": "MetaAI"
         },
         {
-          "title": "SambaNova (meta-llama-3.1-405b)",
-          "value": "SambaNovaLlama31_405B"
-        },
-        {
-          "title": "SambaNova (meta-llama-3.1-70b)",
-          "value": "SambaNovaLlama31_70B"
-        },
-        {
-          "title": "SambaNova (meta-llama-3.1-8b)",
-          "value": "SambaNovaLlama31_8B"
-        },
-        {
           "title": "Replicate (mixtral-8x7b)",
           "value": "ReplicateMixtral_8x7B"
         },
