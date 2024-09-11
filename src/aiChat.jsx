@@ -341,14 +341,27 @@ export default function Chat({ launchContext }) {
 
     let chats = chatData.chats;
     let prunedCnt = 0;
+    let prunedChats = {};
 
     for (const chat of chats) {
       let keep = await keepChat(chat);
       if (!keep) {
+        prunedChats[chat.id] = true;
         prunedCnt++;
-        await deleteChat(setChatData, chat.id);
       }
     }
+
+    setChatData((oldData) => {
+      let newChatData = structuredClone(oldData);
+      newChatData.chats = newChatData.chats.filter((chat) => !prunedChats[chat.id]);
+      return newChatData;
+    });
+
+    for (const [id] of Object.entries(prunedChats)) {
+      await Storage.delete(getStorageKey(id));
+    }
+
+    // Note that currentChat should never have been pruned, so we don't need to update it
 
     console.log(`Pruned ${prunedCnt} chats`);
     await Storage.write("lastPruneChatsTime", JSON.stringify(currentTime));
