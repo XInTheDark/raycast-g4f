@@ -59,6 +59,10 @@ const image_providers = {
     model: "dalle",
     data: {},
   },
+  Rocks: {
+    model: "rocks",
+    data: {},
+  },
 };
 
 const provider_map = {
@@ -69,12 +73,14 @@ const provider_map = {
   StableDiffusionLite: provider.Nexra,
   StableDiffusionPlus: provider.Nexra,
   Dalle: provider.Nexra,
+  Rocks: provider.Rocks,
 };
 
 // Default models for each provider
 const default_models = {
   Prodia: "ICantBelieveItsNotPhotography_seco.safetensors [4e7a3dfd]",
   ProdiaStableDiffusion: "neverendingDream_v122.safetensors [f964ceeb]",
+  Rocks: "flux",
 };
 
 const defaultImageProvider = "Prodia";
@@ -239,6 +245,7 @@ export default function genImage() {
           <Form.Dropdown.Item title="StableDiffusionLite" value="StableDiffusionLite" />
           <Form.Dropdown.Item title="StableDiffusionPlus" value="StableDiffusionPlus" />
           <Form.Dropdown.Item title="DALL-E" value="Dalle" />
+          <Form.Dropdown.Item title="Rocks" value="Rocks" />
         </Form.Dropdown>
 
         <Form.Description
@@ -672,6 +679,7 @@ const loadImageOptions = (currentChat) => {
 
   let model = !modelString || modelString === "default" ? default_models[providerString] : modelString;
   if (model) {
+    options.model = model;
     data = { ...data, model: model };
   }
 

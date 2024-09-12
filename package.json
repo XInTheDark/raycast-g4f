@@ -332,7 +332,6 @@
           "title": "Rocks (llama-3.1-70b)",
           "value": "RocksLlama31_70B"
         },
-
         {
           "title": "PizzaGPT (gpt-3.5-turbo)",
           "value": "PizzaGPT"
@@ -470,7 +469,7 @@
   ],
   "dependencies": {
     "@raycast/api": "^1.80.0",
-    "g4f-image": "^1.1.0",
+    "g4f-image": "^1.2.0",
     "gemini-g4f": "^12.3.8",
     "node-fetch": "^3.3.2"
   },
