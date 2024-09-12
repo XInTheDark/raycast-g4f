@@ -21,7 +21,7 @@ installation from source is extremely simple.
 
 1. Clone the repository / download source code from GitHub.
 2. Navigate to the directory, and open a Terminal window at the downloaded folder.
-3. Run `npm ci` to install required dependencies.
+3. Run `npm ci --production` to install required dependencies.
 4. Run `npm run dev` to build and import the extension.
 
 The extension, and its full set of commands, should then show up in your Raycast app.
@@ -40,7 +40,7 @@ Updates" feature in the preferences.
 
 #### Manually
 
-In the command line, run `git pull`, `npm ci` and `npm run build` (in that order).
+In the command line, run `git pull`, `npm ci --production` and `npm run build` (in that order).
 
 You might want to update manually if the automatic update doesn't work (please also open a GitHub issue if this is the
 case);
