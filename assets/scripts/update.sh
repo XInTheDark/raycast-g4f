@@ -50,7 +50,7 @@ cd source_code || exit 1
 echo "Installing dependencies via npm..."
 
 # install dependencies
-$NPM ci || exit 1
+$NPM ci --production || exit 1
 
 # build
 $NPM run build || exit 1
