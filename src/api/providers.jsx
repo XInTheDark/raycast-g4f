@@ -46,6 +46,7 @@ export const providers_info = {
   DeepInfraLlava15_7B: { provider: DeepInfraProvider, model: "llava-hf/llava-1.5-7b-hf", stream: true, context_tokens: 4096 },
   Blackbox: { provider: BlackboxProvider, model: "blackbox", stream: true },
   BlackboxLlama31_405B: { provider: BlackboxProvider, model: "llama-3.1-405b", stream: true },
+  BlackboxLlama31_70B: { provider: BlackboxProvider, model: "llama-3.1-70b", stream: true },
   BlackboxGemini15Flash: { provider: BlackboxProvider, model: "gemini-1.5-flash", stream: true },
   DuckDuckGo_GPT4oMini: { provider: DuckDuckGoProvider, model: "gpt-4o-mini", stream: true, context_tokens: 4096 },
   DuckDuckGo_Claude3Haiku: { provider: DuckDuckGoProvider, model: "claude-3-haiku-20240307", stream: true, context_tokens: 4096 },

@@ -69,6 +69,10 @@ export const BlackboxProvider = {
         body: JSON.stringify(data),
       });
 
+      if (!response.ok) {
+        throw new Error(`status: ${response.status}, error: ${await response.text()}`);
+      }
+
       const reader = response.body;
       let search_results = false;
       let text = "";

@@ -285,6 +285,10 @@
           "value": "BlackboxLlama31_405B"
         },
         {
+          "title": "Blackbox (llama-3.1-70b)",
+          "value": "BlackboxLlama31_70B"
+        },
+        {
           "title": "Blackbox (gemini-1.5-flash)",
           "value": "BlackboxGemini15Flash"
         },
