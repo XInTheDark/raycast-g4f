@@ -281,6 +281,14 @@
           "value": "Blackbox"
         },
         {
+          "title": "Blackbox (llama-3.1-405b)",
+          "value": "BlackboxLlama31_405B"
+        },
+        {
+          "title": "Blackbox (gemini-1.5-flash)",
+          "value": "BlackboxGemini15Flash"
+        },
+        {
           "title": "DuckDuckGo (gpt-4o-mini)",
           "value": "DuckDuckGo_GPT4oMini"
         },

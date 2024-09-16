@@ -30,6 +30,13 @@ const uuid4 = function () {
   return randomUUID();
 };
 
+const trendingAgentModeConfig = {
+  blackbox: {},
+  "llama-3.1-405b": { mode: true, id: "llama-3.1-405b" },
+  "llama-3.1-70b": { mode: true, id: "llama-3.1-70b" },
+  "gemini-1.5-flash": { mode: true, id: "Gemini" },
+};
+
 export const BlackboxProvider = {
   name: "Blackbox",
   generate: async function* (chat, options, { max_retries = 5 }) {
@@ -44,7 +51,7 @@ export const BlackboxProvider = {
       previewToken: null,
       codeModelMode: true,
       agentMode: {},
-      trendingAgentMode: {},
+      trendingAgentMode: trendingAgentModeConfig[options.model] || {},
       isMicMode: false,
       isChromeExt: false,
       githubToken: null,
