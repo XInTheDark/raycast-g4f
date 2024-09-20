@@ -245,8 +245,8 @@
           "value": "DeepInfraMixtral_8x7B"
         },
         {
-          "title": "DeepInfra (Qwen2-72B)",
-          "value": "DeepInfraQwen2_72B"
+          "title": "DeepInfra (Qwen2.5-72B)",
+          "value": "DeepInfraQwen25_72B"
         },
         {
           "title": "DeepInfra (Mistral-7B)",
