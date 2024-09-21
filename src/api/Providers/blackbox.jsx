@@ -58,7 +58,7 @@ export const BlackboxProvider = {
       webSearchMode: true,
       userSystemPrompt: "",
       mobileClient: false,
-      maxTokens: 4096,
+      maxTokens: 100000,
     };
 
     try {
