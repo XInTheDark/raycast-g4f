@@ -35,6 +35,9 @@ const function_supported_models = [
   "Qwen/Qwen2.5-72B-Instruct",
   "meta-llama/Meta-Llama-3-8B-Instruct",
   "meta-llama/Meta-Llama-3-70B-Instruct",
+  "meta-llama/Meta-Llama-3.1-405B-Instruct",
+  "meta-llama/Meta-Llama-3.1-70B-Instruct",
+  "meta-llama/Meta-Llama-3.1-8B-Instruct",
 ];
 
 // Models that support file uploads
