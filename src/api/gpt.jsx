@@ -5,6 +5,7 @@ import {
   Detail,
   Form,
   getSelectedText,
+  getPreferenceValues,
   Icon,
   Keyboard,
   launchCommand,
@@ -40,6 +41,7 @@ export default (
     processPrompt = null,
     allowUploadFiles = false,
     defaultFiles = [],
+    useDefaultLanguage = true,
   } = {}
 ) => {
   // The parameters are documented here:
@@ -72,6 +74,7 @@ export default (
   // Both async and non-async functions are supported - in particular, we just always `await` the function.
   // 10. allowUploadFiles: A boolean to allow uploading files in the Form. If true, a file upload field will be shown.
   // 11. defaultFiles: Files to always include in the prompt. This is an array of file paths.
+  // 12. useDefaultLanguage: A boolean to use the default language. If true, the default language will be used in the response.
 
   /// Init
   const Pages = {
@@ -95,6 +98,7 @@ export default (
     if (generationStatus.loading) return;
     generationStatus.loading = true;
 
+    // Modify the query before sending it to the API
     if (!regenerate) {
       // handle processPrompt
       if (processPrompt) {
@@ -104,6 +108,14 @@ export default (
       // handle files: we combine files (files that the user uploads)
       // with defaultFiles (files that are passed as a parameter and are always included)
       files = [...defaultFiles, ...files];
+
+      // handle default language
+      if (useDefaultLanguage) {
+        let defaultLanguage = getPreferenceValues()["defaultLanguage"];
+        if (defaultLanguage !== "English") {
+          query = `The default language is ${defaultLanguage}. Respond in this language.\n\n${query}`;
+        }
+      }
     }
 
     setLastQuery({ text: query, files: files });
