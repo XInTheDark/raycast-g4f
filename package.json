@@ -721,7 +721,8 @@
           "title": "🇵🇰 Urdu",
           "value": "Urdu"
         }
-      ]
+      ],
+      "default": "English"
     }
   ],
   "dependencies": {
