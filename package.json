@@ -446,7 +446,6 @@
       "description": "Duration of inactivity before chat is deleted.",
       "required": false,
       "type": "dropdown",
-      "default": "Disabled",
       "data": [
         {
           "title": "Disabled",
@@ -476,7 +475,8 @@
           "title": "6 Months",
           "value": "4320"
         }
-      ]
+      ],
+      "default": "0"
     },
     {
       "name": "defaultLanguage",
