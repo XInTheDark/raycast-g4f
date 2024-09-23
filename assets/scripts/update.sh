@@ -8,26 +8,20 @@ fi
 export PATH="/usr/local/bin:$PATH"  # important to use npm executable
 
 # Check that npm is installed, else warn using stderr and exit
-NPM="npm"
+NPM_PATHS=("npm" "/usr/local/bin/npm" "/opt/homebrew/bin/npm")
 
-# Check if `npm -v` returns an error
+for NPM in "${NPM_PATHS[@]}"; do
 if $NPM -v > /dev/null 2>&1; then
-  # If `npm -v` succeeds
-  echo "npm is installed, using NPM=npm"
-else
-  # If `npm -v` returns an error, set NPM to the full path
-  NPM="/usr/local/bin/npm"
-  echo "npm not found, using NPM=/usr/local/bin/npm"
-  if $NPM -v > /dev/null 2>&1; then
-    :
-  else
+    echo "npm is installed, using NPM=$NPM"
+    break
+  fi
+done
+
+if ! $NPM -v > /dev/null 2>&1; then
     echo "NPM executable is not valid!"
     exit 1
   fi
-fi
 
-#npm -v
-#npm config list
 
 REPO_PATH=https://github.com/XInTheDark/raycast-g4f
 
