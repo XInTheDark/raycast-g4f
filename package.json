@@ -379,6 +379,10 @@
         {
           "title": "Ollama Local API",
           "value": "OllamaLocal"
+        },
+        {
+          "title": "Custom OpenAI-compatible API",
+          "value": "CustomOpenAI"
         }
       ],
       "default": "NexraChatGPT"
