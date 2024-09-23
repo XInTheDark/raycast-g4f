@@ -1,4 +1,10 @@
-import { getG4FExecutablePath, getG4FTimeout, DEFAULT_TIMEOUT, getG4FModelsComponent } from "./api/Providers/g4f_local";
+import {
+  getG4FExecutablePath,
+  getG4FTimeout,
+  DEFAULT_TIMEOUT,
+  getG4FModelsComponent,
+  getCustomAPIInfo,
+} from "./api/Providers/g4f_local";
 import { getOllamaAPIPath, getOllamaCtxSize, getOllamaModelsComponent } from "./api/Providers/ollama_local";
 import { Storage } from "./api/storage";
 import { help_action } from "./helpers/helpPage";
@@ -17,12 +23,14 @@ export default function ConfigureCustomAPIs() {
 
   useEffect(() => {
     (async () => {
-      setG4fExePath(await getG4FExecutablePath());
-      setG4fTimeout((await getG4FTimeout()).toString());
-      setG4fModelsComponent(await getG4FModelsComponent());
-      setOllamaAPIPath(await getOllamaAPIPath());
-      setOllamaModelsComponent(await getOllamaModelsComponent());
-      setOllamaCtxSize((await getOllamaCtxSize()).toString());
+      const apiInfo = await getCustomAPIInfo();
+
+      setG4fExePath(await getG4FExecutablePath(apiInfo));
+      setG4fTimeout(await getG4FTimeout(apiInfo));
+      setG4fModelsComponent(await getG4FModelsComponent(apiInfo));
+      setOllamaAPIPath(await getOllamaAPIPath(apiInfo));
+      setOllamaModelsComponent(await getOllamaModelsComponent(apiInfo));
+      setOllamaCtxSize((await getOllamaCtxSize(apiInfo)).toString());
       setRendered(true);
     })();
   }, []);
@@ -34,16 +42,16 @@ export default function ConfigureCustomAPIs() {
           <Action.SubmitForm
             title="Save"
             onSubmit={async (values) => {
-              await Storage.write("g4f_executable", values.g4f_executable);
-              await Storage.write("g4f_timeout", values.g4f_timeout || DEFAULT_TIMEOUT);
-              await Storage.write(
-                "g4f_info",
-                JSON.stringify({ model: values.g4f_model, provider: values.g4f_provider.trim() })
-              );
+              values.g4f_timeout = values.g4f_timeout || DEFAULT_TIMEOUT;
+              values.g4f_info = JSON.stringify({ model: values.g4f_model, provider: values.g4f_provider.trim() });
+              delete values.g4f_model;
+              delete values.g4f_provider;
+              values.ollama_model = JSON.stringify({ model: values.ollama_model });
 
-              await Storage.write("ollama_api", values.ollama_api);
-              await Storage.write("ollama_model", JSON.stringify({ model: values.ollama_model }));
-              await Storage.write("ollama_ctx_size", values.ollama_ctx_size);
+              let info = await getCustomAPIInfo();
+              info = { ...info, ...values };
+
+              await Storage.write("customApiInfo", JSON.stringify(info));
               await showToast(Toast.Style.Success, "Configuration saved");
             }}
           />
@@ -82,7 +90,7 @@ export default function ConfigureCustomAPIs() {
         }}
         onBlur={async (event) => {
           const path = event.target.value;
-          setOllamaModelsComponent(await getOllamaModelsComponent(path));
+          setOllamaModelsComponent(await getOllamaModelsComponent(await getCustomAPIInfo(), path));
         }}
       />
       {ollamaModelsComponent}

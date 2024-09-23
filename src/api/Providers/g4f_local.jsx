@@ -31,7 +31,9 @@ export const G4FLocalProvider = {
     }
 
     chat = messages_to_json(chat);
-    const info = await getG4FModelInfo();
+
+    const apiInfo = await getCustomAPIInfo();
+    const info = await getG4FModelInfo(apiInfo);
     const model = info.model || DEFAULT_MODEL,
       provider = info.provider || DEFAULT_PROVIDER;
 
@@ -99,9 +101,9 @@ const getG4FModels = async () => {
 };
 
 // get available models as dropdown component
-export const getG4FModelsComponent = async () => {
-  const models = await getG4FModels();
-  const info = await getG4FModelInfo();
+export const getG4FModelsComponent = async (apiInfo) => {
+  const models = await getG4FModels(apiInfo);
+  const info = await getG4FModelInfo(apiInfo);
   return (
     <>
       <Form.Dropdown id="g4f_model" title="G4F Model" defaultValue={info.model}>
@@ -119,25 +121,32 @@ export const getG4FModelsComponent = async () => {
   );
 };
 
+// get custom API info from storage
+export const getCustomAPIInfo = async () => {
+  return JSON.parse(await Storage.read("customApiInfo", "{}"));
+};
+
 // get G4F executable path from storage
-export const getG4FExecutablePath = async () => {
-  return await Storage.read("g4f_executable", "g4f");
+export const getG4FExecutablePath = async (apiInfo) => {
+  return apiInfo.g4f_executable || "g4f";
 };
 
 // get the currently selected G4F model and provider from storage
-const getG4FModelInfo = async () => {
-  return JSON.parse(await Storage.read("g4f_info", DEFAULT_INFO));
+const getG4FModelInfo = async (apiInfo) => {
+  return JSON.parse(apiInfo.g4f_info || DEFAULT_INFO);
 };
 
 // get G4F API timeout (in seconds) from storage
-export const getG4FTimeout = async () => {
-  return parseInt(await Storage.read("g4f_timeout", DEFAULT_TIMEOUT)) || parseInt(DEFAULT_TIMEOUT);
+export const getG4FTimeout = async (apiInfo) => {
+  return (apiInfo.g4f_timeout || DEFAULT_TIMEOUT || parseInt(DEFAULT_TIMEOUT)).toString();
 };
 
 // start the G4F API
 const startG4F = async () => {
-  const exe = await getG4FExecutablePath();
-  const timeout_s = await getG4FTimeout();
+  const apiInfo = await getCustomAPIInfo();
+  const exe = await getG4FExecutablePath(apiInfo);
+  const timeout_s = await getG4FTimeout(apiInfo);
+
   const START_COMMAND = `export PATH="/opt/homebrew/bin:$PATH"; ( "${exe}" api ) & sleep ${timeout_s} ; kill -2 $!`;
   const dirPath = getSupportPath();
   try {
