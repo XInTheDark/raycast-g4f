@@ -78,9 +78,31 @@ export const chat_providers_names = preferences
   .find((x) => x.name === "gptProvider")
   .data.map((x) => [x.title, x.value]);
 
-export const ChatProvidersReact = chat_providers_names.map((x) => {
-  return <Form.Dropdown.Item title={x[0]} value={x[1]} key={x[1]} />;
-});
+export const ChatProvidersReact = (() => {
+  // Display custom APIs in a separate section for organization
+  let providers = [],
+    customProviders = [];
+  for (let x of chat_providers_names) {
+    if (x[1] === "G4FLocal" || customProviders.length > 0) {
+      customProviders.push(x);
+    } else {
+      providers.push(x);
+    }
+  }
+
+  return (
+    <>
+      {providers.map((x) => (
+        <Form.Dropdown.Item title={x[0]} value={x[1]} key={x[1]} />
+      ))}
+      <Form.Dropdown.Section title="Custom APIs">
+        {customProviders.map((x) => (
+          <Form.Dropdown.Item title={x[0]} value={x[1]} key={x[1]} />
+        ))}
+      </Form.Dropdown.Section>
+    </>
+  );
+})();
 
 /// Providers that support file uploads
 export const file_supported_providers = [GeminiProvider, DeepInfraProvider];
