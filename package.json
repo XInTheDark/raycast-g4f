@@ -178,9 +178,9 @@
       "mode": "view"
     },
     {
-      "name": "configureLocalAPIs",
-      "title": "Configure Local APIs",
-      "description": "Configure GPT4Free and Ollama Local API settings",
+      "name": "configureCustomAPIs",
+      "title": "Configure Custom APIs",
+      "description": "Configure custom API settings",
       "icon": "box-icon.png",
       "mode": "view"
     },

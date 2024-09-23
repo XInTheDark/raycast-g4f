@@ -6,7 +6,7 @@ import { help_action } from "./helpers/helpPage";
 import { Form, ActionPanel, Action, showToast, Toast } from "@raycast/api";
 import { useState, useEffect } from "react";
 
-export default function ConfigureLocalAPIs() {
+export default function ConfigureCustomAPIs() {
   const [g4fExePath, setG4fExePath] = useState("");
   const [g4fTimeout, setG4fTimeout] = useState("");
   const [g4fModelsComponent, setG4fModelsComponent] = useState(null);
