@@ -20,6 +20,7 @@ import { ReplicateProvider } from "./Providers/replicate";
 import { GeminiProvider } from "./Providers/google_gemini";
 import { G4FLocalProvider } from "./Providers/g4f_local";
 import { OllamaLocalProvider } from "./Providers/ollama_local";
+import { CustomOpenAIProvider } from "./Providers/custom_openai";
 
 /// All providers info
 // { provider internal name, {provider object, model, stream, extra options} }
@@ -70,6 +71,7 @@ export const providers_info = {
   GoogleGemini: { provider: GeminiProvider, model: ["gemini-1.5-pro-exp-0827", "gemini-1.5-pro-exp-0801", "gemini-1.5-flash-exp-0827", "gemini-1.5-flash-latest"], stream: true },
   G4FLocal: { provider: G4FLocalProvider, stream: true },
   OllamaLocal: { provider: OllamaLocalProvider, stream: true },
+  CustomOpenAI: { provider: CustomOpenAIProvider, stream: true },
 };
 
 /// Chat providers (user-friendly names)

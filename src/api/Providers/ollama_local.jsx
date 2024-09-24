@@ -23,7 +23,7 @@ export const OllamaLocalProvider = {
     const apiInfo = await getCustomAPIInfo();
     const model = (await getOllamaModelInfo(apiInfo)).model;
 
-    const api_url = await getOllamaAPIPath(apiInfo);
+    const api_url = await getOllamaApiURL(apiInfo);
     const chat_url = `${api_url}/api/chat`;
 
     const ctx_size = await getOllamaCtxSize(apiInfo);
@@ -64,7 +64,7 @@ export const OllamaLocalProvider = {
 // get available models
 const getOllamaModels = async (path = null) => {
   try {
-    const api_url = path ? path : await getOllamaAPIPath();
+    const api_url = path ? path : await getOllamaApiURL(await getCustomAPIInfo());
     const models_url = `${api_url}/api/tags`;
 
     const response = await fetch(models_url);
@@ -78,7 +78,7 @@ const getOllamaModelInfo = async (apiInfo) => {
   return JSON.parse(apiInfo.ollama_model || DEFAULT_INFO);
 };
 
-export const getOllamaAPIPath = async (apiInfo) => {
+export const getOllamaApiURL = async (apiInfo) => {
   return apiInfo.ollama_api || DEFAULT_API_URL;
 };
 
