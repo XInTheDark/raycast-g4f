@@ -228,4 +228,4 @@ original [gpt4free](https://github.com/xtekky/gpt4free) project (written in Pyth
 
 [active-badge]: https://img.shields.io/badge/Active-brightgreen
 [unknown-badge]: https://img.shields.io/badge/Unknown-grey
-[local-api-help]: https://github.com/XInTheDark/raycast-g4f/wiki/Help-page:-Configure-Local-APIs
+[local-api-help]: https://github.com/XInTheDark/raycast-g4f/wiki/Help-page:-Manage-Custom-APIs

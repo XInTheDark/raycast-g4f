@@ -5,7 +5,7 @@ const helpPages = {
   aiChat: "https://github.com/XInTheDark/raycast-g4f/wiki/Help-page:-AI-Chat",
   customAICommands: "https://github.com/XInTheDark/raycast-g4f/wiki/Help-page:-Custom-AI-Commands",
   genImage: "https://github.com/XInTheDark/raycast-g4f/wiki/Help-page:-Generate-Images",
-  localAPI: "https://github.com/XInTheDark/raycast-g4f/wiki/Help-page:-Configure-Local-APIs",
+  localAPI: "https://github.com/XInTheDark/raycast-g4f/wiki/Help-page:-Manage-Custom-APIs",
   aiPresets: "https://github.com/XInTheDark/raycast-g4f/wiki/Help-page:-AI-Presets",
   default: "https://github.com/XInTheDark/raycast-g4f/blob/main/README.md",
 };
