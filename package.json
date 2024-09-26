@@ -293,6 +293,18 @@
           "value": "BlackboxGemini15Flash"
         },
         {
+          "title": "Blackbox (gpt-4o)",
+          "value": "BlackboxGPT4o"
+        },
+        {
+          "title": "Blackbox (claude-3.5-sonnet)",
+          "value": "BlackboxClaude35Sonnet"
+        },
+        {
+          "title": "Blackbox (gemini-pro)",
+          "value": "BlackboxGeminiPro"
+        },
+        {
           "title": "DuckDuckGo (gpt-4o-mini)",
           "value": "DuckDuckGo_GPT4oMini"
         },

@@ -37,6 +37,12 @@ const trendingAgentModeConfig = {
   "gemini-1.5-flash": { mode: true, id: "Gemini" },
 };
 
+const userSelectedModelConfig = {
+  "gpt-4o": "gpt-4o",
+  "claude-3.5-sonnet": "claude-sonnet-3.5",
+  "gemini-pro": "gemini-pro",
+};
+
 export const BlackboxProvider = {
   name: "Blackbox",
   generate: async function* (chat, options, { max_retries = 5 }) {
@@ -52,6 +58,7 @@ export const BlackboxProvider = {
       codeModelMode: true,
       agentMode: {},
       trendingAgentMode: trendingAgentModeConfig[options.model] || {},
+      userSelectedModel: userSelectedModelConfig[options.model] || undefined,
       isMicMode: false,
       isChromeExt: false,
       githubToken: null,
@@ -59,6 +66,8 @@ export const BlackboxProvider = {
       userSystemPrompt: "",
       mobileClient: false,
       maxTokens: 100000,
+      playgroundTemperature: parseFloat(options.temperature) ?? 0.7,
+      playgroundTopP: 0.9,
     };
 
     try {
