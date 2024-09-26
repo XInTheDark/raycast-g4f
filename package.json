@@ -178,9 +178,9 @@
       "mode": "view"
     },
     {
-      "name": "configureCustomAPIs",
-      "title": "Configure Custom APIs",
-      "description": "Configure custom API settings",
+      "name": "manageCustomAPIs",
+      "title": "Manage Custom APIs",
+      "description": "Manage custom API settings",
       "icon": "box-icon.png",
       "mode": "view"
     },
