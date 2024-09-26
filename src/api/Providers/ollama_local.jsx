@@ -5,6 +5,7 @@ import fetch from "node-fetch";
 
 import { Storage } from "../storage";
 import { messages_to_json } from "../../classes/message";
+import { getCustomAPIInfo } from "./g4f_local";
 
 import { Form } from "@raycast/api";
 
@@ -19,12 +20,13 @@ export const OllamaLocalProvider = {
   name: "OllamaLocal",
   generate: async function* (chat, options) {
     chat = messages_to_json(chat);
-    const model = (await getOllamaModelInfo()).model;
+    const apiInfo = await getCustomAPIInfo();
+    const model = (await getOllamaModelInfo(apiInfo)).model;
 
-    const api_url = await getOllamaAPIPath();
+    const api_url = await getOllamaApiURL(apiInfo);
     const chat_url = `${api_url}/api/chat`;
 
-    const ctx_size = await getOllamaCtxSize();
+    const ctx_size = await getOllamaCtxSize(apiInfo);
 
     const response = await fetch(chat_url, {
       method: "POST",
@@ -62,7 +64,7 @@ export const OllamaLocalProvider = {
 // get available models
 const getOllamaModels = async (path = null) => {
   try {
-    const api_url = path ? path : await getOllamaAPIPath();
+    const api_url = path ? path : await getOllamaApiURL(await getCustomAPIInfo());
     const models_url = `${api_url}/api/tags`;
 
     const response = await fetch(models_url);
@@ -72,18 +74,18 @@ const getOllamaModels = async (path = null) => {
   }
 };
 
-const getOllamaModelInfo = async () => {
-  return JSON.parse(await Storage.read("ollama_model", DEFAULT_INFO));
+const getOllamaModelInfo = async (apiInfo) => {
+  return JSON.parse(apiInfo.ollama_model || DEFAULT_INFO);
 };
 
-export const getOllamaAPIPath = async () => {
-  return await Storage.read("ollama_api", DEFAULT_API_URL);
+export const getOllamaApiURL = async (apiInfo) => {
+  return apiInfo.ollama_api || DEFAULT_API_URL;
 };
 
 // get available models as dropdown component
-export const getOllamaModelsComponent = async (path = null) => {
+export const getOllamaModelsComponent = async (apiInfo, path = null) => {
   const models = await getOllamaModels(path);
-  const defaultModel = (await getOllamaModelInfo()).model;
+  const defaultModel = (await getOllamaModelInfo(apiInfo)).model;
   return (
     <>
       <Form.Dropdown id="ollama_model" title="Ollama Model" defaultValue={defaultModel}>
@@ -95,12 +97,13 @@ export const getOllamaModelsComponent = async (path = null) => {
   );
 };
 
-export const getOllamaCtxSize = async () => {
-  const str = await Storage.read("ollama_ctx_size", DEFAULT_CTX_SIZE.toString());
+export const getOllamaCtxSize = async (apiInfo) => {
+  const str = apiInfo.ollama_ctx_size || DEFAULT_CTX_SIZE.toString();
   let int = parseInt(str);
   if (!int) {
     int = DEFAULT_CTX_SIZE;
-    await Storage.write("ollama_ctx_size", int.toString());
+    apiInfo.ollama_ctx_size = int.toString();
+    await Storage.write("customApiInfo", JSON.stringify(apiInfo));
   }
   return int;
 };

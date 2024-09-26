@@ -178,9 +178,9 @@
       "mode": "view"
     },
     {
-      "name": "configureLocalAPIs",
-      "title": "Configure Local APIs",
-      "description": "Configure GPT4Free and Ollama Local API settings",
+      "name": "manageCustomAPIs",
+      "title": "Manage Custom APIs",
+      "description": "Manage custom API settings",
       "icon": "box-icon.png",
       "mode": "view"
     },
@@ -391,6 +391,10 @@
         {
           "title": "Ollama Local API",
           "value": "OllamaLocal"
+        },
+        {
+          "title": "Custom OpenAI-compatible API",
+          "value": "CustomOpenAI"
         }
       ],
       "default": "NexraChatGPT"
