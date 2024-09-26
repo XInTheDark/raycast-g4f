@@ -201,16 +201,16 @@
       "type": "dropdown",
       "data": [
         {
-          "title": "Nexra (chatgpt)",
-          "value": "NexraChatGPT"
-        },
-        {
           "title": "Nexra (gpt-4o)",
           "value": "NexraGPT4o"
         },
         {
           "title": "Nexra (gpt-4-32k)",
           "value": "NexraGPT4"
+        },
+        {
+          "title": "Nexra (chatgpt)",
+          "value": "NexraChatGPT"
         },
         {
           "title": "Nexra (Bing)",
@@ -397,7 +397,7 @@
           "value": "CustomOpenAI"
         }
       ],
-      "default": "NexraChatGPT"
+      "default": "NexraGPT4o"
     },
     {
       "name": "webSearch",
