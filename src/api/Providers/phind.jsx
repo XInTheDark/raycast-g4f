@@ -58,8 +58,7 @@ export const PhindProvider = {
     }
 
     // get challenge seed
-    const seed = generateChallenge(data, challenge_seeds);
-    data.challenge = seed;
+    data.challenge = generateChallenge(data, challenge_seeds);
 
     // POST
     curl_cmd =
