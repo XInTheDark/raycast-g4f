@@ -381,6 +381,10 @@
           "value": "ReplicateLlama3_8B"
         },
         {
+          "title": "Phind (Phind Instant)",
+          "value": "Phind"
+        },
+        {
           "title": "Google Gemini (requires API Key)",
           "value": "GoogleGemini"
         },
