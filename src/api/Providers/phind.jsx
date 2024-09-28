@@ -1,8 +1,7 @@
 import { exec } from "child_process";
 import util from "util";
-import { fetchToCurl } from "fetch-to-curl";
+import fetchToCurl from "fetch-to-curl";
 import { DEFAULT_HEADERS } from "../../helpers/headers";
-import { Clipboard } from "@raycast/api";
 
 const execPromise = util.promisify(exec);
 
@@ -69,8 +68,6 @@ export const PhindProvider = {
         headers: { ...headers, "Content-Type": "application/json" },
         body: JSON.stringify(data),
       }) + " --silent --no-buffer";
-
-    await Clipboard.copy(curl_cmd);
 
     const ignore_chunks = [
       "<PHIND_WEBRESULTS>",
