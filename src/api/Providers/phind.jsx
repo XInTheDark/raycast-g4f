@@ -2,7 +2,7 @@ import { exec } from "child_process";
 import util from "util";
 import { fetchToCurl } from "fetch-to-curl";
 import { DEFAULT_HEADERS } from "../../helpers/headers";
-import { Clipboard} from "@raycast/api";
+import { Clipboard } from "@raycast/api";
 
 const execPromise = util.promisify(exec);
 
@@ -23,9 +23,9 @@ const headers = {
 
 export const PhindProvider = {
   name: "Phind",
-  generate: async function (chat, options, {stream_update}) {
+  generate: async function (chat, options, { stream_update }) {
     // get challenge seeds
-    let curl_cmd = fetchToCurl(home_url, { method: "GET", headers: headers }) + " --silent";
+    let curl_cmd = fetchToCurl(home_url, { method: "GET", headers: headers });
     const { stdout } = await execPromise(curl_cmd);
     const regex = /<script id="__NEXT_DATA__" type="application\/json">([\s\S]+?)<\/script>/;
     const match = stdout.match(regex);
@@ -34,12 +34,10 @@ export const PhindProvider = {
     if (!challenge_seeds) {
       throw new Error("Could not find challenge seeds");
     }
-    console.log("Challenge seeds:", challenge_seeds);
 
     // prepare data
     let prompt = chat[chat.length - 1].content;
     chat.pop();
-    chat = processChat(chat);
 
     let data = {
       context: "",
@@ -65,19 +63,14 @@ export const PhindProvider = {
     data.challenge = seed;
 
     // POST
-    curl_cmd = fetchToCurl(api_url, {
-      method: "POST",
-      headers: { ...headers, "Content-Type": "application/json" },
-    });
+    curl_cmd =
+      fetchToCurl(api_url, {
+        method: "POST",
+        headers: { ...headers, "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      }) + " --silent --no-buffer";
 
-    let json_data = JSON.stringify(data);
-    // escape single quotes
-    json_data = json_data.replace(/'/g, "\\'");
-    curl_cmd += ` --data '${json_data}' --silent`;
-    console.log("Curl command:", curl_cmd);
     await Clipboard.copy(curl_cmd);
-
-    let new_line = false;
 
     const ignore_chunks = [
       "<PHIND_WEBRESULTS>",
@@ -88,48 +81,60 @@ export const PhindProvider = {
       "<PHIND_SPAN_END>",
     ];
 
-    let response = "";
-    exec(curl_cmd, (error, chunk, stderr) => {
-      chunk = chunk.toString();
-      const lines = chunk.split("\n");
+    return new Promise((resolve, reject) => {
+      let response = "";
+      let new_line = false;
 
-      for (let line of lines) {
-        if (line.startsWith("data: ")) {
-          line = line.substring(6);
-        }
-        else continue;
+      const childProcess = exec(curl_cmd);
 
-        line = line.replace("\r", "");
+      childProcess.stdout.on("data", (chunk) => {
+        chunk = chunk.toString();
+        const lines = chunk.split("\n");
 
-        if (line.startsWith("<PHIND_DONE/>")) {
-          return;
-        }
-        if (line.startsWith("<PHIND_BACKEND_ERROR>")) {
-          throw new Error();
-        }
+        for (let line of lines) {
+          if (line.startsWith("data: ")) {
+            line = line.substring(6);
+          } else continue;
 
-        let is_ignore = false;
-        for (let ignore of ignore_chunks) {
-          if (line.startsWith(ignore)) {
-            is_ignore = true;
+          line = line.replace("\r", "");
+
+          if (line.startsWith("<PHIND_DONE/>")) {
+            return;
           }
-        }
+          if (line.startsWith("<PHIND_BACKEND_ERROR>")) {
+            throw new Error();
+          }
 
-        if (is_ignore) {
-          continue;
-        }
+          let is_ignore = false;
+          for (let ignore of ignore_chunks) {
+            if (line.startsWith(ignore)) {
+              is_ignore = true;
+            }
+          }
 
-        if (line) {
-          response += line;
-        } else if (new_line) {
-          response += "\n";
-          new_line = false;
-        } else {
-          new_line = true;
-        }
+          if (is_ignore) {
+            continue;
+          }
 
-        stream_update(response);
-      }
+          if (line) {
+            response += line;
+          } else if (new_line) {
+            response += "\n";
+            new_line = false;
+          } else {
+            new_line = true;
+          }
+
+          stream_update(response);
+        }
+      });
+
+      childProcess.on("exit", (code) => {
+        if (code !== 0) {
+          reject(new Error("Failed to generate response"));
+        }
+        resolve(true);
+      });
     });
   },
 };
@@ -224,13 +229,4 @@ function getChatHistory(messages) {
   });
 
   return history;
-}
-
-function processChat(chat) {
-  // escape all single quotes in messages
-  chat.forEach((message) => {
-    message.content = message.content.replace(`'`, `\\'`);
-    message.content = `$'${message.content}'`;
-  });
-  return chat;
 }
