@@ -1,5 +1,10 @@
-import fetch from "node-fetch";
+import { exec } from "child_process";
+import util from "util";
+import { fetchToCurl } from "fetch-to-curl";
 import { DEFAULT_HEADERS } from "../../helpers/headers";
+import { Clipboard} from "@raycast/api";
+
+const execPromise = util.promisify(exec);
 
 const url = "https://www.phind.com";
 const home_url = "https://www.phind.com/search?home=true";
@@ -18,13 +23,12 @@ const headers = {
 
 export const PhindProvider = {
   name: "Phind",
-  generate: async function* (chat) {
+  generate: async function (chat, options, {stream_update}) {
     // get challenge seeds
-    let response = await fetch(home_url, { method: "GET", headers: headers });
-    let text = await response.text();
-    console.log(text);
-    const regex = /<script id="__NEXT_DATA__" type="application\/json">([sS]+?)<\/script>/;
-    const match = text.match(regex);
+    let curl_cmd = fetchToCurl(home_url, { method: "GET", headers: headers }) + " --silent";
+    const { stdout } = await execPromise(curl_cmd);
+    const regex = /<script id="__NEXT_DATA__" type="application\/json">([\s\S]+?)<\/script>/;
+    const match = stdout.match(regex);
     const _data = JSON.parse(match[1]);
     const challenge_seeds = _data.props?.pageProps?.challengeSeeds;
     if (!challenge_seeds) {
@@ -35,6 +39,7 @@ export const PhindProvider = {
     // prepare data
     let prompt = chat[chat.length - 1].content;
     chat.pop();
+    chat = processChat(chat);
 
     let data = {
       context: "",
@@ -60,13 +65,18 @@ export const PhindProvider = {
     data.challenge = seed;
 
     // POST
-    response = await fetch(api_url, {
+    curl_cmd = fetchToCurl(api_url, {
       method: "POST",
       headers: { ...headers, "Content-Type": "application/json" },
-      body: JSON.stringify(data),
     });
 
-    const reader = response.body;
+    let json_data = JSON.stringify(data);
+    // escape single quotes
+    json_data = json_data.replace(/'/g, "\\'");
+    curl_cmd += ` --data '${json_data}' --silent`;
+    console.log("Curl command:", curl_cmd);
+    await Clipboard.copy(curl_cmd);
+
     let new_line = false;
 
     const ignore_chunks = [
@@ -78,33 +88,49 @@ export const PhindProvider = {
       "<PHIND_SPAN_END>",
     ];
 
-    for await (let chunk of reader) {
+    let response = "";
+    exec(curl_cmd, (error, chunk, stderr) => {
       chunk = chunk.toString();
       const lines = chunk.split("\n");
 
       for (let line of lines) {
+        if (line.startsWith("data: ")) {
+          line = line.substring(6);
+        }
+        else continue;
+
+        line = line.replace("\r", "");
+
         if (line.startsWith("<PHIND_DONE/>")) {
           return;
         }
         if (line.startsWith("<PHIND_BACKEND_ERROR>")) {
-          throw new Error("Phind error: " + (await response.text()));
+          throw new Error();
         }
+
+        let is_ignore = false;
         for (let ignore of ignore_chunks) {
           if (line.startsWith(ignore)) {
-            continue;
+            is_ignore = true;
           }
         }
 
+        if (is_ignore) {
+          continue;
+        }
+
         if (line) {
-          yield line;
+          response += line;
         } else if (new_line) {
-          yield "\n";
+          response += "\n";
           new_line = false;
         } else {
           new_line = true;
         }
+
+        stream_update(response);
       }
-    }
+    });
   },
 };
 
@@ -198,4 +224,13 @@ function getChatHistory(messages) {
   });
 
   return history;
+}
+
+function processChat(chat) {
+  // escape all single quotes in messages
+  chat.forEach((message) => {
+    message.content = message.content.replace(`'`, `\\'`);
+    message.content = `$'${message.content}'`;
+  });
+  return chat;
 }

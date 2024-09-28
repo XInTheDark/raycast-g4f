@@ -132,7 +132,7 @@ export const additional_provider_options = (provider, chatOptions = null) => {
 
 // Additional properties
 // providers that handle the stream update in a custom way (see chatCompletion function)
-export const custom_stream_handled_providers = [GeminiProvider];
+export const custom_stream_handled_providers = [GeminiProvider, PhindProvider];
 
 /// Main function for generation
 // note that provider is the provider object, not the provider string
