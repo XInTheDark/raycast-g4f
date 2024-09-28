@@ -492,7 +492,12 @@ export const formatResponse = (response, provider = null) => {
     response = response.replace(/\$@\$v=.{1,30}\$@\$/, "");
 
     // remove sources - the chunk of text starting with $~~~$[ and ending with ]$~~~$
-    response = response.replace(/\$~~~\$\[[^]*]\$~~~\$/, "");
+    // as well as everything before it
+    const regex = /\$~~~\$\[[^]*]\$~~~\$/;
+    let match = response.match(regex);
+    if (match) {
+      response = response.substring(match.index + match[0].length);
+    }
   }
 
   return response;
