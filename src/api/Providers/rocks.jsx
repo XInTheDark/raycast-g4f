@@ -39,7 +39,7 @@ export const RocksProvider = {
     let last_chunk_time = Date.now();
     let first = true;
 
-    const timeout = 3000;
+    const timeout = 4000;
 
     while (true) {
       const timeoutPromise = new Promise((_, reject) => {
