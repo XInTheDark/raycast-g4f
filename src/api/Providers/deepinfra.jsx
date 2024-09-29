@@ -41,7 +41,7 @@ const function_supported_models = [
 ];
 
 // Models that support file uploads
-const file_supported_models = ["llava-hf/llava-1.5-7b-hf"];
+const file_supported_models = ["llava-hf/llava-1.5-7b-hf", "meta-llama/Llama-3.2-90B-Vision-Instruct"];
 
 // max_tokens parameter overrides - some models have short context lengths
 const max_tokens_overrides = {
@@ -100,11 +100,10 @@ export const DeepInfraProvider = {
     let data = {
       model: model,
       messages: json_chat,
-      tools: tools,
+      tools: tools.length > 0 ? tools : undefined,
       temperature: options.temperature,
       max_tokens: max_tokens_overrides[model] || 100000,
       stream: true,
-      headers: headers,
     };
 
     try {
