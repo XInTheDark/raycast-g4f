@@ -7,9 +7,12 @@
 import { getPreferenceValues, LocalStorage } from "@raycast/api";
 import { getSupportPath } from "../helpers/helper";
 import fs from "fs";
+import { throttle } from "../helpers/throttle";
 
 const not_found = (x) => x === undefined || x === null;
 const found = (x) => !not_found(x);
+
+const THROTTLE_INTERVAL = 1000;
 
 export const Storage = {
   // whether to enable persistent/combined storage
@@ -127,19 +130,20 @@ export const Storage = {
 
   // combined write function
   // first write to local storage function only, and then add key to sync cache to add to file storage later
-  write: async (key, value) => {
+  write: throttle(async (key, value) => {
     if (typeof value !== "string") {
       // value must be a string. To avoid crashes we serialize it, but log a warning.
       value = JSON.stringify(value);
       console.log(`Storage API: Warning: value for key ${key} is not a string`);
     }
 
+    console.log(`Writing key: ${key} to local storage`);
     await Storage.localStorage_write(key, value);
     if (Storage.persistent) {
       await Storage.add_to_sync_cache(key);
       await Storage.run_sync();
     }
-  },
+  }, THROTTLE_INTERVAL),
 
   // combined read function - read from local storage, fallback to file storage.
   // also writes the default value to local storage if it is provided and key is not found
