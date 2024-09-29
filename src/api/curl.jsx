@@ -22,7 +22,7 @@ export const curlRequest = (url, options, cb) => {
     const childProcess = exec(curl_cmd);
 
     childProcess.stdout.on("data", (chunk) => {
-      chunk = chunk.toString();
+      chunk = chunk.toString().replace(/\r/g, "\n");
       cb(chunk);
     });
 
