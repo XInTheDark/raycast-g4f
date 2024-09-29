@@ -357,6 +357,10 @@
           "value": "RocksLlama31_70B"
         },
         {
+          "title": "ChatgptFree (gpt-4o-mini)",
+          "value": "ChatgptFree"
+        },
+        {
           "title": "PizzaGPT (gpt-3.5-turbo)",
           "value": "PizzaGPT"
         },

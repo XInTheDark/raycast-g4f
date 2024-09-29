@@ -87,8 +87,6 @@ export const PhindProvider = {
             line = line.substring(6);
           } else continue;
 
-          line = line.replace("\r", "");
-
           if (line.startsWith("<PHIND_DONE/>")) {
             return;
           }

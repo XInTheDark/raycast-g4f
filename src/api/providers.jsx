@@ -14,6 +14,7 @@ import { BlackboxProvider } from "./Providers/blackbox";
 import { DuckDuckGoProvider } from "./Providers/duckduckgo";
 import { BestIMProvider } from "./Providers/bestim";
 import { RocksProvider } from "./Providers/rocks";
+import { ChatgptFreeProvider } from "./Providers/chatgptfree";
 import { PizzaGPTProvider } from "./Providers/pizzagpt";
 import { MetaAIProvider } from "./Providers/metaAI";
 import { ReplicateProvider } from "./Providers/replicate";
@@ -66,6 +67,7 @@ export const providers_info = {
   RocksWizardLM2_8x22B: { provider: RocksProvider, model: "WizardLM-2-8x22B", stream: true },
   RocksLlama31_405B: { provider: RocksProvider, model: "llama-3.1-405b-turbo", stream: true },
   RocksLlama31_70B: { provider: RocksProvider, model: "llama-3.1-70b-turbo", stream: true },
+  ChatgptFree: { provider: ChatgptFreeProvider, model: "", stream: true },
   PizzaGPT: { provider: PizzaGPTProvider, model: "", stream: false },
   MetaAI: { provider: MetaAIProvider, model: "", stream: true },
   ReplicateLlama3_8B: { provider: ReplicateProvider, model: "meta/meta-llama-3-8b-instruct", stream: true },
@@ -78,6 +80,10 @@ export const providers_info = {
   OllamaLocal: { provider: OllamaLocalProvider, stream: true },
   CustomOpenAI: { provider: CustomOpenAIProvider, stream: true },
 };
+
+// Additional properties
+// Providers that handle the stream update in a custom way (see chatCompletion function)
+export const custom_stream_handled_providers = [GeminiProvider, PhindProvider, ChatgptFreeProvider];
 
 /// Chat providers (user-friendly names)
 // fetched from package.json for consistency and to avoid duplicate code
@@ -129,10 +135,6 @@ export const additional_provider_options = (provider, chatOptions = null) => {
   }
   return options;
 };
-
-// Additional properties
-// providers that handle the stream update in a custom way (see chatCompletion function)
-export const custom_stream_handled_providers = [GeminiProvider, PhindProvider];
 
 /// Main function for generation
 // note that provider is the provider object, not the provider string
