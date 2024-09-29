@@ -34,6 +34,7 @@ export const providers_info = {
   NexraBing: { provider: NexraProvider, model: "Bing", stream: true },
   NexraLlama31: { provider: NexraProvider, model: "llama-3.1", stream: true },
   NexraGeminiPro: { provider: NexraProvider, model: "gemini-pro", stream: true },
+  DeepInfraLlama32_90B_Vision: { provider: DeepInfraProvider, model: "meta-llama/Llama-3.2-90B-Vision-Instruct", stream: true },
   DeepInfraLlama31_70B: { provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3.1-70B-Instruct", stream: true },
   DeepInfraLlama31_8B: { provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3.1-8B-Instruct", stream: true },
   DeepInfraLlama31_405B: { provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3.1-405B-Instruct", stream: true },
