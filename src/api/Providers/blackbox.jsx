@@ -50,10 +50,10 @@ export const BlackboxProvider = {
     let random_user_id = uuid4();
     chat = messages_to_json(chat);
 
-    // special fix for Claude 3.5 Sonnet and Gemini Pro (29/9/24):
-    // It seems that Blackbox *reverses* the order of messages in the chat, only for these models.
+    // special fix for Claude 3.5 Sonnet (29/9/24):
+    // It seems that Blackbox *reverses* the order of messages in the chat, only for this model.
     // This could be fixed soon, so I'll need to check this again in the future. (TODO)
-    if (["claude-3.5-sonnet", "gemini-pro"].includes(options.model)) {
+    if (["claude-3.5-sonnet"].includes(options.model)) {
       chat = chat.reverse();
     }
 
