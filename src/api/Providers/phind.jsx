@@ -1,9 +1,5 @@
-import { exec } from "child_process";
-import util from "util";
-import fetchToCurl from "fetch-to-curl";
+import { curlRequest } from "../curl";
 import { DEFAULT_HEADERS } from "../../helpers/headers";
-
-const execPromise = util.promisify(exec);
 
 const url = "https://www.phind.com";
 const home_url = "https://www.phind.com/search?home=true";
@@ -24,8 +20,10 @@ export const PhindProvider = {
   name: "Phind",
   generate: async function (chat, options, { stream_update }) {
     // get challenge seeds
-    let curl_cmd = fetchToCurl(home_url, { method: "GET", headers: headers });
-    const { stdout } = await execPromise(curl_cmd);
+    let stdout = "";
+    await curlRequest(home_url, { method: "GET", headers: headers }, (chunk) => {
+      stdout += chunk;
+    });
     const regex = /<script id="__NEXT_DATA__" type="application\/json">([\s\S]+?)<\/script>/;
     const match = stdout.match(regex);
     const _data = JSON.parse(match[1]);
@@ -33,6 +31,7 @@ export const PhindProvider = {
     if (!challenge_seeds) {
       throw new Error("Could not find challenge seeds");
     }
+    stdout = null;
 
     // prepare data
     let prompt = chat[chat.length - 1].content;
@@ -60,14 +59,6 @@ export const PhindProvider = {
     // get challenge seed
     data.challenge = generateChallenge(data, challenge_seeds);
 
-    // POST
-    curl_cmd =
-      fetchToCurl(api_url, {
-        method: "POST",
-        headers: { ...headers, "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      }) + " --silent --no-buffer";
-
     const ignore_chunks = [
       "<PHIND_WEBRESULTS>",
       "<PHIND_FOLLOWUP>",
@@ -77,14 +68,18 @@ export const PhindProvider = {
       "<PHIND_SPAN_END>",
     ];
 
-    return new Promise((resolve, reject) => {
-      let response = "";
-      let new_line = false;
+    let response = "";
+    let new_line = false;
 
-      const childProcess = exec(curl_cmd);
-
-      childProcess.stdout.on("data", (chunk) => {
-        chunk = chunk.toString();
+    // POST
+    await curlRequest(
+      api_url,
+      {
+        method: "POST",
+        headers: { ...headers, "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      },
+      (chunk) => {
         const lines = chunk.split("\n");
 
         for (let line of lines) {
@@ -123,15 +118,8 @@ export const PhindProvider = {
 
           stream_update(response);
         }
-      });
-
-      childProcess.on("exit", (code) => {
-        if (code !== 0) {
-          reject(new Error("Failed to generate response"));
-        }
-        resolve(true);
-      });
-    });
+      }
+    );
   },
 };
 
