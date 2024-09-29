@@ -5,6 +5,7 @@
 Homepage · [Privacy Policy](Privacy.md)
 
 ## Screenshots
+
 <img src=https://github.com/user-attachments/assets/1085b901-c72f-4bd9-9a37-473057e95393 width=400 alt="1">
 <img src=https://github.com/user-attachments/assets/fb74f124-f1ac-4957-928e-363394ac0c3b width=400 alt="2">
 <img src=https://github.com/user-attachments/assets/cf425e1a-8eaa-49d1-af31-e5fe8c6702db width=400 alt="3">
@@ -27,6 +28,7 @@ installation from source is extremely simple.
 The extension, and its full set of commands, should then show up in your Raycast app.
 
 #### Troubleshooting
+
 Please open an issue if any unexpected problems occur during installation.
 
 ### Updating
@@ -88,18 +90,19 @@ updating manually also allows you to fetch and view the latest changes to the so
 | Blackbox                     | gpt-4o                                  | ▶️       | ![Active][active-badge]   | Very fast      | 7.5/10                                                                                      |
 | Blackbox                     | claude-3.5-sonnet                       | ▶️       | ![Active][active-badge]   | Fast           | 8.5/10                                                                                      |
 | Blackbox                     | gemini-pro                              | ▶️       | ![Active][active-badge]   | Fast           | 8/10                                                                                        |
-| DuckDuckGo                   | gpt-4o-mini                             | ▶️       | ![Active][active-badge]   | Very fast      | 8/10, authentic GPT-4o-mini model with strong privacy.                                      |
+| DuckDuckGo                   | gpt-4o-mini                             | ▶️       | ![Active][active-badge]   | Extremely fast | 8/10, authentic GPT-4o-mini model with strong privacy.                                      |
 | DuckDuckGo                   | claude-3-haiku                          | ▶️️      | ![Active][active-badge]   | Extremely fast | 7/10                                                                                        |
 | DuckDuckGo                   | meta-llama-3.1-70b                      | ▶️️      | ![Active][active-badge]   | Very fast      | 7.5/10                                                                                      |
 | DuckDuckGo                   | mixtral-8x7b                            | ▶️️      | ![Active][active-badge]   | Extremely fast | 7.5/10                                                                                      |
 | BestIM                       | gpt-4o-mini                             | ▶️       | ![Unknown][unknown-badge] | Extremely fast | 8.5/10                                                                                      |
-| PizzaGPT                     | gpt-3.5-turbo                           |          | ![Active][active-badge]   | Extremely fast | 6.5/10                                                                                      |
 | Rocks                        | claude-3.5-sonnet                       | ▶️       | ![Active][active-badge]   | Fast           | 8.5/10                                                                                      |
 | Rocks                        | claude-3-opus                           | ▶️       | ![Active][active-badge]   | Fast           | 8/10                                                                                        |
 | Rocks                        | gpt-4o                                  | ▶️       | ![Active][active-badge]   | Fast           | 7.5/10                                                                                      |
 | Rocks                        | gpt-4                                   | ▶️       | ![Active][active-badge]   | Fast           | 7.5/10                                                                                      |
 | Rocks                        | llama-3.1-405b                          | ▶️       | ![Active][active-badge]   | Fast           | 7.5/10                                                                                      |
 | Rocks                        | llama-3.1-70b                           | ▶️       | ![Active][active-badge]   | Very Fast      | 7/10                                                                                        |
+| ChatgptFree                  | gpt-4o-mini                             | ▶️       | ![Active][active-badge]   | Extremely fast | 8.5/10                                                                                      |
+| PizzaGPT                     | gpt-3.5-turbo                           |          | ![Active][active-badge]   | Extremely fast | 6.5/10                                                                                      |
 | Meta AI                      | meta-llama-3.1                          | ▶️       | ![Active][active-badge]   | Medium         | 7/10, recent model with internet access.                                                    |
 | Replicate                    | mixtral-8x7b                            | ▶️       | ![Active][active-badge]   | Medium         | ?/10                                                                                        |
 | Replicate                    | meta-llama-3.1-405b                     | ▶️       | ![Active][active-badge]   | Medium         | ?/10                                                                                        |
@@ -171,10 +174,11 @@ This will back up a copy of this data to files on your computer. Useful for savi
 
 ### Code Interpreter (BETA)
 
-Allows GPT to execute Python code locally. The model has been instructed to strictly only produce safe code, 
+Allows GPT to execute Python code locally. The model has been instructed to strictly only produce safe code,
 but use at your own risk!
 
-Only models with function calling capabilities support this feature. Currently, this includes only selected DeepInfra models.
+Only models with function calling capabilities support this feature. Currently, this includes only selected DeepInfra
+models.
 
 ---
 
@@ -228,5 +232,7 @@ original [gpt4free](https://github.com/xtekky/gpt4free) project (written in Pyth
 
 
 [active-badge]: https://img.shields.io/badge/Active-brightgreen
+
 [unknown-badge]: https://img.shields.io/badge/Unknown-grey
+
 [local-api-help]: https://github.com/XInTheDark/raycast-g4f/wiki/Help-page:-Manage-Custom-APIs
