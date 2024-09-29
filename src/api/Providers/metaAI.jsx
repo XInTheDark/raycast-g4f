@@ -2,33 +2,13 @@ import fetch from "node-fetch";
 import { randomUUID } from "crypto";
 import { format_chat_to_prompt } from "../../classes/message";
 import { sleep } from "../../helpers/helper";
+import { DEFAULT_HEADERS } from "../../helpers/headers";
 
 // Implementation ported from gpt4free MetaAI provider.
 
 const url = "https://graph.meta.ai/graphql?locale=user";
 const cookies_url = "https://www.meta.ai/";
 const access_token_url = "https://www.meta.ai/api/graphql";
-const defaultHeaders = {
-  accept: "*/*",
-  "accept-encoding": "gzip, deflate",
-  "accept-language": "en-US",
-  referer: "",
-  "sec-ch-ua": '"Google Chrome";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
-  "sec-ch-ua-arch": '"x86"',
-  "sec-ch-ua-bitness": '"64"',
-  "sec-ch-ua-full-version": '"123.0.6312.122"',
-  "sec-ch-ua-full-version-list":
-    '"Google Chrome";v="123.0.6312.122", "Not:A-Brand";v="8.0.0.0", "Chromium";v="123.0.6312.122"',
-  "sec-ch-ua-mobile": "?0",
-  "sec-ch-ua-model": '""',
-  "sec-ch-ua-platform": '"Windows"',
-  "sec-ch-ua-platform-version": '"15.0.0"',
-  "sec-fetch-dest": "empty",
-  "sec-fetch-mode": "cors",
-  "sec-fetch-site": "same-origin",
-  "user-agent":
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
-};
 
 const generateOfflineThreadingId = () => {
   const randomValue = Math.floor(Math.random() * (1 << 22));
@@ -65,7 +45,7 @@ export const MetaAIProvider = {
     let cookies = null;
 
     const updateCookies = async () => {
-      const response = await fetch(cookies_url, { method: "GET", headers: defaultHeaders });
+      const response = await fetch(cookies_url, { method: "GET", headers: DEFAULT_HEADERS });
       const text = await response.text();
       cookies = {
         _js_datr: extractValue(text, "_js_datr"),
@@ -88,7 +68,7 @@ export const MetaAIProvider = {
         doc_id: "7604648749596940",
       };
       const headers = {
-        ...defaultHeaders,
+        ...DEFAULT_HEADERS,
         "x-fb-friendly-name": "useAbraAcceptTOSForTempUserMutation",
         "x-fb-lsd": lsd,
         "x-asbd-id": "129477",
@@ -112,7 +92,7 @@ export const MetaAIProvider = {
       await sleep(500); // sleep for a bit to avoid rate limits
 
       const headers = {
-        ...defaultHeaders,
+        ...DEFAULT_HEADERS,
         "content-type": "application/x-www-form-urlencoded",
         cookie: formatCookies(cookies),
         origin: "https://www.meta.ai",
@@ -204,7 +184,7 @@ export const MetaAIProvider = {
 
     const fetchSources = async (fetchId) => {
       const headers = {
-        ...defaultHeaders,
+        ...DEFAULT_HEADERS,
         authority: "graph.meta.ai",
         "x-fb-friendly-name": "AbraSearchPluginDialogQuery",
       };

@@ -24,18 +24,19 @@ By using the Extension, you agree to this Policy.
 
 **4. Third-Party Providers**
 
-| Provider      | Link to Terms                                                                  |
-|---------------|--------------------------------------------------------------------------------|
-| Nexra         | https://nexra.aryahcr.cc/terms                                                 |
-| DeepInfra     | https://deepinfra.com/terms, https://deepinfra.com/privacy                     |
-| Blackbox      | https://www.useblackbox.io/terms, https://www.useblackbox.io/privacy           |
-| DuckDuckGo    | https://duckduckgo.com/aichat/privacy-terms                                    |
-| BestIM        | https://ai-chats.org/privacy/                                                  |
-| Rocks         | https://llmplayground.net/                                                     |
-| PizzaGPT      | https://pizzagpt.it/privacy                                                    |
-| Meta AI       | https://www.facebook.com/legal/ai-terms                                        |
-| Replicate     | https://replicate.com/terms, https://replicate.com/privacy                     |
-| Google Gemini | https://ai.google.dev/gemini-api/terms, https://developers.google.com/terms    |
+| Provider      | Link to Terms                                                               |
+|---------------|-----------------------------------------------------------------------------|
+| Nexra         | https://nexra.aryahcr.cc/terms                                              |
+| DeepInfra     | https://deepinfra.com/terms, https://deepinfra.com/privacy                  |
+| Blackbox      | https://www.useblackbox.io/terms, https://www.useblackbox.io/privacy        |
+| DuckDuckGo    | https://duckduckgo.com/aichat/privacy-terms                                 |
+| BestIM        | https://ai-chats.org/privacy/                                               |
+| Rocks         | https://llmplayground.net/                                                  |
+| PizzaGPT      | https://pizzagpt.it/privacy                                                 |
+| Meta AI       | https://www.facebook.com/legal/ai-terms                                     |
+| Replicate     | https://replicate.com/terms, https://replicate.com/privacy                  |
+| Phind         | https://www.phind.com/terms, https://www.phind.com/privacy                  |
+| Google Gemini | https://ai.google.dev/gemini-api/terms, https://developers.google.com/terms |
 
 **5. Data Security**
 

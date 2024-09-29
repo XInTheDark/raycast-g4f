@@ -381,6 +381,10 @@
           "value": "ReplicateLlama3_8B"
         },
         {
+          "title": "Phind (Phind Instant)",
+          "value": "Phind"
+        },
+        {
           "title": "Google Gemini (requires API Key)",
           "value": "GoogleGemini"
         },
@@ -743,6 +747,7 @@
   ],
   "dependencies": {
     "@raycast/api": "^1.80.0",
+    "fetch-to-curl": "^0.6.0",
     "g4f-image": "^1.2.0",
     "gemini-g4f": "^12.3.8",
     "node-fetch": "^3.3.2"

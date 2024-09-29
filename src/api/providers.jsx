@@ -17,6 +17,7 @@ import { RocksProvider } from "./Providers/rocks";
 import { PizzaGPTProvider } from "./Providers/pizzagpt";
 import { MetaAIProvider } from "./Providers/metaAI";
 import { ReplicateProvider } from "./Providers/replicate";
+import { PhindProvider } from "./Providers/phind";
 import { GeminiProvider } from "./Providers/google_gemini";
 import { G4FLocalProvider } from "./Providers/g4f_local";
 import { OllamaLocalProvider } from "./Providers/ollama_local";
@@ -71,6 +72,7 @@ export const providers_info = {
   ReplicateLlama3_70B: { provider: ReplicateProvider, model: "meta/meta-llama-3-70b-instruct", stream: true },
   ReplicateLlama31_405B: { provider: ReplicateProvider, model: "meta/meta-llama-3.1-405b-instruct", stream: true },
   ReplicateMixtral_8x7B: { provider: ReplicateProvider, model: "mistralai/mixtral-8x7b-instruct-v0.1", stream: true },
+  Phind: { provider: PhindProvider, model: "", stream: true },
   GoogleGemini: { provider: GeminiProvider, model: ["gemini-1.5-pro-002","gemini-1.5-flash-002", "gemini-1.5-flash-latest"], stream: true },
   G4FLocal: { provider: G4FLocalProvider, stream: true },
   OllamaLocal: { provider: OllamaLocalProvider, stream: true },
@@ -130,7 +132,7 @@ export const additional_provider_options = (provider, chatOptions = null) => {
 
 // Additional properties
 // providers that handle the stream update in a custom way (see chatCompletion function)
-export const custom_stream_handled_providers = [GeminiProvider];
+export const custom_stream_handled_providers = [GeminiProvider, PhindProvider];
 
 /// Main function for generation
 // note that provider is the provider object, not the provider string
