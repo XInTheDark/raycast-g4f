@@ -50,6 +50,11 @@ export const BlackboxProvider = {
     let random_user_id = uuid4();
     chat = messages_to_json(chat);
 
+    // special fix for Claude 3.5 Sonnet (29/9/24):
+    // It seems that Blackbox *reverses* the order of messages in the chat, only for this model.
+    // This could be fixed soon, so I'll need to check this again in the future. (TODO)
+    chat = chat.reverse();
+
     let data = {
       messages: chat,
       id: random_id,
@@ -63,7 +68,7 @@ export const BlackboxProvider = {
       isChromeExt: false,
       githubToken: null,
       webSearchMode: true,
-      userSystemPrompt: "",
+      userSystemPrompt: null,
       mobileClient: false,
       maxTokens: 100000,
       playgroundTemperature: parseFloat(options.temperature) ?? 0.7,
