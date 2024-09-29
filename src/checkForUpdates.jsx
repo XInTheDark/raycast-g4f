@@ -1,6 +1,6 @@
-import { confirmAlert, Detail, Icon } from "@raycast/api";
+import { Action, ActionPanel, confirmAlert, Detail, Icon } from "@raycast/api";
 
-import { get_version, fetch_github_latest_version, is_up_to_date, download_and_install_update } from "./helpers/update";
+import { get_version, fetch_github_latest_release, is_up_to_date, download_and_install_update } from "./helpers/update";
 import { useEffect, useState } from "react";
 
 export default function CheckForUpdates() {
@@ -14,14 +14,17 @@ export default function CheckForUpdates() {
       if (fetched) return;
       fetched = true;
 
-      // get latest version from github
-      const latest_version = await fetch_github_latest_version();
+      // get latest release from github
+      const release = await fetch_github_latest_release();
+      const latest_version = release.version;
       setMarkdown((prev) => `${prev}\n\n## Latest raycast-g4f version: ${latest_version}`);
 
       if (is_up_to_date(version, latest_version)) {
-        setMarkdown((prev) => `${prev}\n\n# raycast-g4f is up to date!`);
+        setMarkdown((prev) => `${prev}\n\n## raycast-g4f is up to date!`);
       } else {
         setMarkdown((prev) => `${prev}\n\n## Update available!`);
+        setMarkdown((prev) => `${prev}\n\n### Release Notes:\n\n${release.body}`);
+
         await confirmAlert({
           title: `Update available: version ${latest_version}`,
           message: "Would you like to update now?",
@@ -44,5 +47,20 @@ export default function CheckForUpdates() {
     })();
   }, []);
 
-  return <Detail markdown={markdown} />;
+  return (
+    <Detail
+      markdown={markdown}
+      actions={
+        <ActionPanel>
+          <Action
+            title={"Install update"}
+            icon={Icon.Download}
+            onAction={async () => {
+              await download_and_install_update(setMarkdown);
+            }}
+          ></Action>
+        </ActionPanel>
+      }
+    ></Detail>
+  );
 }

@@ -19,7 +19,7 @@ export const get_version = () => {
   return version;
 };
 
-export const fetch_github_latest_version = async function () {
+export const fetch_github_latest_release = async function () {
   let toast = await showToast(Toast.Style.Animated, "Checking for updates...");
   const response = await fetch(LATEST_VER_URL, { method: "GET" });
   const data = await response.json();
@@ -30,7 +30,13 @@ export const fetch_github_latest_version = async function () {
       "Failed to fetch latest version from GitHub - the API could be down, or you could have reached a rate limit."
     );
   }
-  return parse_version_from_github(tag_name);
+
+  const release_body = data.body || "";
+
+  return {
+    version: parse_version_from_github(tag_name),
+    body: release_body,
+  };
 };
 
 const parse_version_from_github = (tag_name) => {
@@ -38,10 +44,7 @@ const parse_version_from_github = (tag_name) => {
 };
 
 export const is_up_to_date = (current = null, latest = null) => {
-  if (!current && !latest) {
-    current = get_version();
-    latest = fetch_github_latest_version();
-  } else if (!current || !latest) {
+  if (!current || !latest) {
     throw new Error("Invalid parameters provided to is_up_to_date()");
   }
 
@@ -77,7 +80,6 @@ export const download_and_install_update = async (setMarkdown = null) => {
       popToRoot();
     } else {
       showToast(Toast.Style.Failure, "Update failed");
-      throw new Error("Update failed");
     }
   });
 };
@@ -101,7 +103,7 @@ export const autoCheckForUpdates = async () => {
   await Storage.localStorage_write("lastCheckForUpdates", now);
 
   const version = get_version();
-  const latest_version = await fetch_github_latest_version();
+  const latest_version = (await fetch_github_latest_release()).version;
   if (is_up_to_date(version, latest_version)) return;
 
   await confirmAlert({
