@@ -43,6 +43,20 @@ const userSelectedModelConfig = {
   "gemini-pro": "gemini-pro",
 };
 
+const paramOverrides = {
+  "gpt-4o": {
+    maxTokens: 4096,
+    playgroundTemperature: null,
+    playgroundTopP: null,
+  },
+  "claude-3.5-sonnet": {
+    maxTokens: 8192,
+  },
+  "gemini-pro": {
+    maxTokens: 8192,
+  },
+};
+
 export const BlackboxProvider = {
   name: "Blackbox",
   generate: async function* (chat, options, { max_retries = 5 }) {
@@ -68,6 +82,7 @@ export const BlackboxProvider = {
       maxTokens: 100000,
       playgroundTemperature: parseFloat(options.temperature) ?? 0.7,
       playgroundTopP: 0.9,
+      ...paramOverrides[options.model],
     };
 
     try {
