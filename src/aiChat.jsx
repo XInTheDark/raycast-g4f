@@ -251,6 +251,8 @@ export default function Chat({ launchContext }) {
     let start = Date.now();
     let response = "";
 
+    let loadingToast = await toast(Toast.Style.Animated, "Response loading");
+
     if (!info.stream) {
       response = await getChatResponse(currentChatData, query);
       setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, null, response);
@@ -259,7 +261,6 @@ export default function Chat({ launchContext }) {
       chars = response.length;
       charPerSec = (chars / elapsed).toFixed(1);
     } else {
-      let loadingToast = await toast(Toast.Style.Animated, "Response loading");
       generationStatus = { stop: false, loading: true };
       let i = 0;
 
@@ -785,7 +786,6 @@ export default function Chat({ launchContext }) {
     }
 
     setSearchText("");
-    toast(Toast.Style.Animated, "Response loading");
 
     let newMessagePair = new MessagePair({ prompt: query, files: files });
     let newMessageID = newMessagePair.id;
