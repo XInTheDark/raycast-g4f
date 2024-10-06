@@ -453,14 +453,6 @@
       "default": false
     },
     {
-      "name": "TavilyAPIKeys",
-      "title": "Tavily API Keys",
-      "description": "Optional. Only used if Web Search is enabled. Multiple keys are supported - separate them with commas.",
-      "required": false,
-      "type": "password",
-      "default": ""
-    },
-    {
       "name": "GeminiAPIKeys",
       "title": "Google Gemini API Keys",
       "description": "Optional. Only used if Gemini provider is selected. Multiple keys are supported - separate them with commas.",
@@ -755,6 +747,7 @@
   ],
   "dependencies": {
     "@raycast/api": "^1.80.0",
+    "duck-duck-scrape": "^2.2.5",
     "fetch-to-curl": "^0.6.0",
     "g4f-image": "^1.2.0",
     "gemini-g4f": "^12.3.8",

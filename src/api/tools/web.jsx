@@ -1,6 +1,7 @@
 import { getPreferenceValues, Toast, showToast } from "@raycast/api";
-import fetch from "node-fetch";
 import * as providers from "../providers";
+
+import * as DDG from "duck-duck-scrape";
 
 export const webToken = "<|web_search|>",
   webTokenEnd = "<|end_web_search|>";
@@ -61,63 +62,31 @@ export const webSearchTool = {
   },
 };
 
-export const getWebResult = async (query, { mode = "basic" } = {}) => {
+export const getWebResult = async (query) => {
   console.log("Web search query:", query);
-  if (!query) return "No results found.";
-  let APIKeysStr = getPreferenceValues()["TavilyAPIKeys"];
-  let APIKeys = APIKeysStr.split(",").map((x) => x.trim());
 
-  // Tavily requires query to be minimum 5 characters. We pad with spaces if it's less.
-  if (query.length < 5) {
-    query = query.padEnd(5, " ");
+  try {
+    const searchResults = await DDG.search(query, {
+      safeSearch: DDG.SafeSearchType.OFF,
+    });
+    return processWebResults(searchResults.results);
+  } catch (e) {
+    await showToast(Toast.Style.Failure, "Web search failed");
+    return "No results found.";
   }
-
-  for (const APIKey of APIKeys) {
-    const api_url = "https://api.tavily.com/search";
-    let data = {
-      api_key: APIKey,
-      query: query,
-      max_results: mode === "basic" ? 4 : 8,
-      search_depth: "advanced",
-    };
-
-    let responseJson;
-    try {
-      // POST
-      const response = await fetch(api_url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      responseJson = await response.json();
-    } catch (e) {
-      continue;
-    }
-
-    if (!responseJson || !responseJson["results"]) continue;
-
-    return processWebResults(responseJson["results"]);
-  }
-
-  // no valid API key
-  await showToast(Toast.Style.Failure, "No valid Tavily API key found");
-  return "No results found.";
 };
 
 // Wrapper for returning web results in a readable format
-export const processWebResults = (results) => {
+export const processWebResults = (results, maxResults = 15) => {
   // Handle undefined results
-  if (!results) {
+  if (!results || results.length === 0) {
     return "No results found.";
   }
 
   let answer = "";
-  for (let i = 0; i < results.length; i++) {
+  for (let i = 0; i < Math.min(results.length, maxResults); i++) {
     let x = results[i];
-    let rst = `${i + 1}.\nURL: ${x["url"]}\nTitle: ${x["title"]}\nContent: ${x["content"]}\n\n`;
+    let rst = `${i + 1}.\nURL: ${x["url"]}\nTitle: ${x["title"]}\nContent: ${x["description"]}\n\n`;
     answer += rst;
   }
   return answer;
