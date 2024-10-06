@@ -151,7 +151,7 @@ export const DeepInfraProvider = {
                 if (call_name === "web_search") {
                   let web_search_query = call_args["query"];
 
-                  let webResponse = await getWebResult(web_search_query, { mode: "advanced" });
+                  let webResponse = await getWebResult(web_search_query);
                   let msg = {
                     role: "tool",
                     content: webResponse,

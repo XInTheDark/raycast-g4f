@@ -144,18 +144,8 @@ separate them with commas in the preferences.
 
 ### Web Search
 
-Let GPT decide to search the web for information if it does not have enough knowledge or context.
-
-- **How to enable**: Go to the extension preferences and check the "Enable Web Search" box.
-- **Setting up**: An API Key is required to use this feature. You can get one *completely for free*:
-
-1. Go to https://app.tavily.com
-2. Sign in with a Google/GitHub account.
-3. Copy the API Key and paste it into the corresponding box in the extension preferences.
-
-The rate limit for the web search feature is around 500 requests per month (as of the time of writing).
-This should be enough for most users, but similarly you can also create multiple API Keys with different accounts;
-separate them with commas in the preferences.
+Let GPT decide to search the web for information if it does not have enough knowledge or context. Uses DuckDuckGo
+search, fast and free.
 
 ### Smart Chat Naming
 
