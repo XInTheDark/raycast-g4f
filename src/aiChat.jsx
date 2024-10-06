@@ -609,13 +609,15 @@ export default function Chat({ launchContext }) {
     );
   };
 
-  let EditLastMessageComponent = () => {
+  let EditMessageComponent = (props) => {
     if (currentChatData.messages.length === 0) {
       toast(Toast.Style.Failure, "No messages in chat");
       return;
     }
 
-    const lastMessage = currentChatData.messages[0].first.content;
+    const idx = props.idx;
+    const message = currentChatData.messages[idx].first.content;
+
     const { pop } = useNavigation();
 
     return (
@@ -624,25 +626,32 @@ export default function Chat({ launchContext }) {
           <ActionPanel>
             <Action.SubmitForm
               title="Edit Message"
-              onSubmit={(values) => {
+              onSubmit={async (values) => {
                 pop();
 
-                currentChatData.messages[0].first.content = values.message;
-                currentChatData.messages[0].second.content = "";
-                currentChatData.messages[0].finished = false;
+                currentChatData.messages[idx].first.content = values.message;
+                currentChatData.messages[idx].second.content = "";
+                currentChatData.messages[idx].finished = false;
 
                 setCurrentChatData(currentChatData); // important to update the UI!
 
-                let messageID = currentChatData.messages[0].id;
-                updateChatResponse(currentChatData, setCurrentChatData, messageID).then(() => {
-                  return;
-                }); // Note how we don't pass query here because it is already in the chat
+                let messageID = currentChatData.messages[idx].id;
+
+                // instead of passing the full currentChatData, we only pass the messages
+                // before, and including, the message we want to update. This is because chatCompletion takes
+                // the last message as the query.
+                let newChatData = structuredClone(currentChatData);
+
+                // slice from the back, i.e. keep the messages [idx, end], since messages data is in reverse order
+                newChatData.messages = currentChatData.messages.slice(idx);
+
+                await updateChatResponse(newChatData, setCurrentChatData, messageID); // Note how we don't pass query here because it is already in the chat
               }}
             />
           </ActionPanel>
         }
       >
-        <Form.TextArea id="message" title="Message" defaultValue={lastMessage} />
+        <Form.TextArea id="message" title="Message" defaultValue={message} />
       </Form>
     );
   };
@@ -731,7 +740,7 @@ export default function Chat({ launchContext }) {
     if (!query) query = currentChatData.messages[0].first.content;
     let newQuery = query + webResponse;
 
-    // remove latest message and insert new one (similar to EditLastMessage)
+    // remove latest message and insert new one
     currentChatData.messages.shift();
     currentChatData.messages.unshift(new MessagePair({ prompt: newQuery }));
     let newMessageID = currentChatData.messages[0].id;
@@ -890,8 +899,8 @@ export default function Chat({ launchContext }) {
           />
           <Action.Push
             icon={Icon.TextCursor}
-            title="Edit Last Message"
-            target={<EditLastMessageComponent />}
+            title="Edit Message"
+            target={<EditMessageComponent idx={idx} />}
             shortcut={{ modifiers: ["cmd", "shift"], key: "e" }}
           />
           <Action
