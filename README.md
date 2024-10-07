@@ -42,7 +42,7 @@ Updates" feature in the preferences.
 
 #### Manually
 
-In the command line, run `git pull`, `npm ci --production` and `npm run build` (in that order).
+In the command line, run `git pull`, `npm ci --production` and `npm run dev` (in that order).
 
 You might want to update manually if the automatic update doesn't work (please also open a GitHub issue if this is the
 case);

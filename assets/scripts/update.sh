@@ -47,7 +47,7 @@ echo "Installing dependencies via npm..."
 $NPM ci --production || exit 1
 
 # build
-$NPM run build || exit 1
+$NPM run dev || exit 1
 
 echo "Installation success!"
 exit 0
