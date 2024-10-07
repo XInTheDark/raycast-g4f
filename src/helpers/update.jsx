@@ -55,7 +55,6 @@ export const download_and_install_update = async (setMarkdown = null) => {
   if (!setMarkdown) setMarkdown = () => {}; // eslint-disable-line
 
   await showToast(Toast.Style.Animated, "Downloading update...", "This may take a short while");
-  let has_error = false;
   let dirPath = getSupportPath();
   console.log("Running update in support path: " + dirPath);
 
@@ -63,24 +62,24 @@ export const download_and_install_update = async (setMarkdown = null) => {
   read_update_sh(dirPath);
 
   // execute the update script
-  exec("sh update.sh", { cwd: dirPath }, (error, stdout, stderr) => {
-    if (error) {
-      setMarkdown((prev) => `${prev}\n\n#@ Update failed!\nError: ${error}`);
-      has_error = true;
-    }
-    if (stderr) {
-      setMarkdown((prev) => `${prev}\n\n### Error log: \n${stderr}`);
-    }
-    if (stdout) {
-      setMarkdown((prev) => `${prev}\n\n### Log:\n${stdout}`);
-    }
-    if (!has_error) {
+  const childProcess = exec("sh update.sh", { cwd: dirPath });
+
+  childProcess.stdout.on("data", (stdout) => {
+    setMarkdown((prev) => `${prev}\n\n### Log:\n${stdout}`);
+    console.log(stdout);
+    // check for the "DEV" or "DONE" string to determine if the update was successful
+    if (stdout.trim() === "DEV" || stdout.trim() === "DONE") {
       setMarkdown((prev) => `${prev}\n\n# Update successful!`);
       showToast(Toast.Style.Success, "Update successful");
       popToRoot();
-    } else {
-      showToast(Toast.Style.Failure, "Update failed");
     }
+  });
+  childProcess.stderr.on("data", (stderr) => {
+    setMarkdown((prev) => `${prev}\n\n### Error log: \n${stderr}`);
+  });
+  childProcess.on("error", (error) => {
+    setMarkdown((prev) => `${prev}\n\n#@ Update failed!\nError: ${error}`);
+    showToast(Toast.Style.Failure, "Update failed");
   });
 };
 
