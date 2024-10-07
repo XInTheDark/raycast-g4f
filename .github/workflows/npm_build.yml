@@ -28,5 +28,3 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
-      - name: Dev
-        run: npm run dev
