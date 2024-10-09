@@ -46,8 +46,8 @@ const userSelectedModelConfig = {
 const paramOverrides = {
   "gpt-4o": {
     maxTokens: 4096,
-    playgroundTemperature: null,
-    playgroundTopP: null,
+    // playgroundTemperature: null,
+    // playgroundTopP: null,
   },
   "claude-3.5-sonnet": {
     maxTokens: 8192,
