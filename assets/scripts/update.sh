@@ -7,7 +7,7 @@ then
     exit
 fi
 
-export PATH="/usr/local/bin:$PATH"  # important to use npm executable
+export PATH="/usr/local/bin:/opt/homebrew/bin:$PATH"  # important to use npm executable
 
 # Check that npm is installed, else warn using stderr and exit
 NPM_PATHS=("npm" "/usr/local/bin/npm" "/opt/homebrew/bin/npm")
@@ -58,6 +58,8 @@ sleep 0.5
 $NPM run dev &
 sleep 60
 kill $!
+# also kill the ray process if it's still running
+killall ray
 
 echo "DONE"
 
