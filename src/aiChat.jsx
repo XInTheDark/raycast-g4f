@@ -708,8 +708,20 @@ export default function Chat({ launchContext }) {
                   let newChatData = structuredClone(oldData);
                   newChatData.name = values.chatName;
                   newChatData.provider = values.provider;
-                  newChatData.systemPrompt = values.systemPrompt;
                   newChatData.options = { creativity: values.creativity };
+
+                  // Update system prompt
+                  if (
+                    newChatData.systemPrompt !== values.systemPrompt &&
+                    newChatData.messages[newChatData.messages.length - 1]?.visible === false
+                  ) {
+                    newChatData.messages[newChatData.messages.length - 1] = starting_messages(
+                      values.systemPrompt,
+                      values.provider
+                    )[0];
+                  }
+                  newChatData.systemPrompt = values.systemPrompt;
+
                   return newChatData;
                 });
 
