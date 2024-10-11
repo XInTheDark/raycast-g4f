@@ -783,7 +783,7 @@ export default function Chat({ launchContext }) {
         messages: [new MessagePair({ prompt: newQuery })],
         provider: currentChatData.provider,
       });
-      newChatName = newChatName.trim();
+      newChatName = newChatName.trim().substring(0, 200).replace(/\n/g, " ");
 
       // Rename chat
       if (newChatName) {
