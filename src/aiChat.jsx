@@ -112,23 +112,18 @@ export default function Chat({ launchContext }) {
     await Storage.write(getStorageKey(id), JSON.stringify(chat));
   };
 
-  // change a property of a chat
-  // we only update whatever object is passed
-  const changeChatProperty = (setChatData, setCurrentChatData, property, value) => {
-    if (setChatData) {
-      setChatData((oldData) => {
-        let newChatData = structuredClone(oldData);
-        getChatFromChatData(chatData.currentChat, newChatData)[property] = value;
-        return newChatData;
-      });
-    }
-    if (setCurrentChatData) {
-      setCurrentChatData((oldData) => {
-        let newChatData = structuredClone(oldData);
-        newChatData[property] = value;
-        return newChatData;
-      });
-    }
+  // change a property of a data object.
+  // if func is provided, it is applied to the object before setting the property
+  const changeProperty = (setData, property, value, func = null) => {
+    setData((oldData) => {
+      let newData = structuredClone(oldData);
+      if (!func) {
+        newData[property] = value;
+      } else {
+        func(newData)[property] = value;
+      }
+      return newData;
+    });
   };
 
   // get chat from storage
@@ -144,6 +139,8 @@ export default function Chat({ launchContext }) {
       }
     }
   };
+
+  const getCurrentChatFromChatData = (data) => getChatFromChatData(data.currentChat, data);
 
   // the lite version of the chat, stored in chatData
   const to_lite_chat_data = (chat) => {
@@ -681,7 +678,7 @@ export default function Chat({ launchContext }) {
                 setCurrentChatData((oldData) => {
                   let newChatData = structuredClone(oldData);
                   newChatData.name = values.chatName;
-                  changeChatProperty(setChatData, null, "name", values.chatName);
+                  changeProperty(setChatData, "name", values.chatName, getCurrentChatFromChatData);
                   newChatData.provider = values.provider;
                   newChatData.options = { creativity: values.creativity };
 
@@ -762,7 +759,8 @@ export default function Chat({ launchContext }) {
 
       // Rename chat
       if (newChatName) {
-        changeChatProperty(setChatData, setCurrentChatData, "name", newChatName);
+        changeProperty(setChatData, "name", newChatName, getCurrentChatFromChatData);
+        changeProperty(setCurrentChatData, "name", newChatName);
       }
     } catch (e) {
       console.log("Smart Chat Naming failed: ", e);
@@ -927,7 +925,7 @@ export default function Chat({ launchContext }) {
             onAction={async () => {
               setChatData((oldData) => {
                 let newChatData = structuredClone(oldData);
-                let chat = getChatFromChatData(newChatData.currentChat, newChatData);
+                let chat = getCurrentChatFromChatData(newChatData);
                 chat.pinned = !chat.pinned;
 
                 toast(Toast.Style.Success, chat.pinned ? "Chat pinned" : "Chat unpinned");
@@ -980,19 +978,10 @@ export default function Chat({ launchContext }) {
             icon={Icon.ArrowDown}
             title="Next Chat"
             onAction={() => {
-              let chatIdx = 0;
-              for (let i = 0; i < chatData.chats.length; i++) {
-                if (chatData.chats[i].id === chatData.currentChat) {
-                  chatIdx = i;
-                  break;
-                }
-              }
+              let chatIdx = chatData.chats.findIndex((chat) => chat.id === chatData.currentChat);
               if (chatIdx === chatData.chats.length - 1) toast(Toast.Style.Failure, "No chats after current");
               else {
-                setChatData((oldData) => ({
-                  ...oldData,
-                  currentChat: chatData.chats[chatIdx + 1].id,
-                }));
+                changeProperty(setChatData, "currentChat", chatData.chats[chatIdx + 1].id);
               }
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "arrowDown" }}
@@ -1001,19 +990,10 @@ export default function Chat({ launchContext }) {
             icon={Icon.ArrowUp}
             title="Previous Chat"
             onAction={() => {
-              let chatIdx = 0;
-              for (let i = 0; i < chatData.chats.length; i++) {
-                if (chatData.chats[i].id === chatData.currentChat) {
-                  chatIdx = i;
-                  break;
-                }
-              }
+              let chatIdx = chatData.chats.findIndex((chat) => chat.id === chatData.currentChat);
               if (chatIdx === 0) toast(Toast.Style.Failure, "No chats before current");
               else {
-                setChatData((oldData) => ({
-                  ...oldData,
-                  currentChat: chatData.chats[chatIdx - 1].id,
-                }));
+                changeProperty(setChatData, "currentChat", chatData.chats[chatIdx - 1].id);
               }
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "arrowUp" }}
@@ -1157,10 +1137,7 @@ export default function Chat({ launchContext }) {
         <List.Dropdown
           tooltip="Your Chats"
           onChange={(newChatID) => {
-            setChatData((oldData) => ({
-              ...oldData,
-              currentChat: newChatID,
-            }));
+            changeProperty(setChatData, "currentChat", newChatID);
           }}
           value={chatData.currentChat}
         >
