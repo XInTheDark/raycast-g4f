@@ -678,6 +678,7 @@ export default function Chat({ launchContext }) {
                 setCurrentChatData((oldData) => {
                   let newChatData = structuredClone(oldData);
                   newChatData.name = values.chatName;
+                  changeChatProperty(setChatData, null, "name", values.chatName);
                   newChatData.provider = values.provider;
                   newChatData.options = { creativity: values.creativity };
 
