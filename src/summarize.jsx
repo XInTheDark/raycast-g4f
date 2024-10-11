@@ -6,5 +6,6 @@ export default function Summarize(props) {
     showFormText: "Text",
     useSelected: true,
     allowUploadFiles: true,
+    useDefaultLanguage: true,
   });
 }

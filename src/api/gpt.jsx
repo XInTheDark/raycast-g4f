@@ -41,7 +41,7 @@ export default (
     processPrompt = null,
     allowUploadFiles = false,
     defaultFiles = [],
-    useDefaultLanguage = true,
+    useDefaultLanguage = false,
   } = {}
 ) => {
   // The parameters are documented here:

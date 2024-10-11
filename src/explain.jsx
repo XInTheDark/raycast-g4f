@@ -6,5 +6,6 @@ export default function Explain(props) {
     showFormText: "Text",
     useSelected: true,
     allowUploadFiles: true,
+    useDefaultLanguage: true,
   });
 }
