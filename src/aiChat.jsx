@@ -656,7 +656,7 @@ export default function Chat({ launchContext }) {
     );
   };
 
-  let RenameChatComponent = () => {
+  let ChatSettingsComponent = () => {
     const { pop } = useNavigation();
 
     return (
@@ -664,36 +664,7 @@ export default function Chat({ launchContext }) {
         actions={
           <ActionPanel>
             <Action.SubmitForm
-              title="Rename Chat"
-              onSubmit={(values) => {
-                pop();
-
-                // Check input length
-                if (values.chatName.length > 1000) {
-                  toast(Toast.Style.Failure, "Chat name is too long");
-                  return;
-                }
-
-                changeChatProperty(setChatData, setCurrentChatData, "name", values.chatName);
-              }}
-            />
-          </ActionPanel>
-        }
-      >
-        <Form.TextField id="chatName" title="Chat Name" defaultValue={currentChatData.name} />
-      </Form>
-    );
-  };
-
-  let EditChatComponent = () => {
-    const { pop } = useNavigation();
-
-    return (
-      <Form
-        actions={
-          <ActionPanel>
-            <Action.SubmitForm
-              title="Edit Chat Settings"
+              title="Save"
               onSubmit={(values) => {
                 pop();
 
@@ -946,12 +917,6 @@ export default function Chat({ launchContext }) {
             }}
             shortcut={{ modifiers: ["shift"], key: "delete" }}
           />
-          <Action.Push
-            icon={Icon.Pencil}
-            title="Rename Chat"
-            target={<RenameChatComponent />}
-            shortcut={{ modifiers: ["cmd", "shift"], key: "m" }}
-          />
           <Action
             icon={Icon.Tack}
             title="Pin Chat"
@@ -968,9 +933,9 @@ export default function Chat({ launchContext }) {
             shortcut={{ modifiers: ["cmd", "shift"], key: "p" }}
           />
           <Action.Push
-            icon={Icon.Switch}
-            title="Edit Chat Settings"
-            target={<EditChatComponent />}
+            icon={Icon.Gear}
+            title="Chat Settings"
+            target={<ChatSettingsComponent />}
             shortcut={{ modifiers: ["cmd", "shift"], key: "o" }}
           />
           <Action
