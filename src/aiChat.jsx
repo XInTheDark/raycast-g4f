@@ -675,6 +675,9 @@ export default function Chat({ launchContext }) {
                   values.systemPrompt = preset.systemPrompt;
                 }
 
+                // Limit chat name to 200 characters
+                values.chatName = values.chatName.substring(0, 200);
+
                 setCurrentChatData((oldData) => {
                   let newChatData = structuredClone(oldData);
                   newChatData.name = values.chatName;
