@@ -15,7 +15,7 @@ import {
 import { useEffect, useState } from "react";
 
 import { Storage } from "./api/storage";
-import { current_datetime, formatDate, removePrefix } from "./helpers/helper";
+import { current_datetime, formatDate, removePrefix, objToArray } from "./helpers/helper";
 import { help_action, help_action_panel } from "./helpers/helpPage";
 import { autoCheckForUpdates } from "./helpers/update";
 
@@ -54,9 +54,10 @@ export default function Chat({ launchContext }) {
 
   // add chat to chatData
   const addChat = (setChatData, chat) => {
+    const lite_chat = to_lite_chat_data(chat);
     setChatData((oldData) => {
       let newChatData = structuredClone(oldData);
-      newChatData.chats.push(to_lite_chat_data(chat));
+      Object.assign(newChatData.chats, lite_chat);
       return newChatData;
     });
   };
@@ -76,28 +77,30 @@ export default function Chat({ launchContext }) {
   const deleteChat = async (setChatData, id) => {
     await Storage.delete(getStorageKey(id));
 
-    let chatIdx = chatData.chats.findIndex((chat) => chat.id === id);
+    const chats = objToArray(chatData.chats);
+
+    let chatIdx = chats.findIndex((chat) => chat.id === id);
     if (chatIdx === -1) return;
     if (chatData.chats.length === 1) {
       await clear_chats_data(setChatData, setCurrentChatData);
       return;
     }
 
-    if (chatIdx === chatData.chats.length - 1) {
+    if (chatIdx === chats.length - 1) {
       setChatData((oldData) => {
         let newChatData = structuredClone(oldData);
-        newChatData.chats.splice(chatIdx);
+        delete newChatData.chats[id];
         if (id === newChatData.currentChat) {
-          newChatData.currentChat = newChatData.chats[chatIdx - 1].id;
+          newChatData.currentChat = chats[chatIdx - 1].id;
         }
         return newChatData;
       });
     } else {
       setChatData((oldData) => {
         let newChatData = structuredClone(oldData);
-        newChatData.chats.splice(chatIdx, 1);
+        delete newChatData.chats[id];
         if (id === newChatData.currentChat) {
-          newChatData.currentChat = newChatData.chats[chatIdx].id;
+          newChatData.currentChat = chats[chatIdx].id;
         }
         return newChatData;
       });
@@ -112,23 +115,18 @@ export default function Chat({ launchContext }) {
     await Storage.write(getStorageKey(id), JSON.stringify(chat));
   };
 
-  // change a property of a chat
-  // we only update whatever object is passed
-  const changeChatProperty = (setChatData, setCurrentChatData, property, value) => {
-    if (setChatData) {
-      setChatData((oldData) => {
-        let newChatData = structuredClone(oldData);
-        getChatFromChatData(chatData.currentChat, newChatData)[property] = value;
-        return newChatData;
-      });
-    }
-    if (setCurrentChatData) {
-      setCurrentChatData((oldData) => {
-        let newChatData = structuredClone(oldData);
-        newChatData[property] = value;
-        return newChatData;
-      });
-    }
+  // change a property of a data object.
+  // if func is provided, it is applied to the object before setting the property
+  const changeChatProperty = (setData, property, value, func = null) => {
+    setData((oldData) => {
+      let newData = structuredClone(oldData);
+      if (!func) {
+        newData[property] = value;
+      } else {
+        func(newData)[property] = value;
+      }
+      return newData;
+    });
   };
 
   // get chat from storage
@@ -138,19 +136,18 @@ export default function Chat({ launchContext }) {
 
   // get chat from chatData (lite version)
   const getChatFromChatData = (target, data = chatData) => {
-    for (const chat of data.chats) {
-      if (chat.id === target) {
-        return chat;
-      }
-    }
+    console.log(target);
+    return data.chats[target];
   };
 
   // the lite version of the chat, stored in chatData
   const to_lite_chat_data = (chat) => {
     return {
-      name: chat.name,
-      creationDate: chat.creationDate,
-      id: chat.id,
+      [chat.id]: {
+        name: chat.name,
+        creationDate: chat.creationDate,
+        id: chat.id,
+      },
     };
   };
 
@@ -162,7 +159,7 @@ export default function Chat({ launchContext }) {
     let newChat = chat_data({});
     setChatData({
       currentChat: newChat.id,
-      chats: [],
+      chats: {},
     });
     await addChatAsCurrent(setChatData, setCurrentChatData, newChat);
     setCurrentChatData(newChat);
@@ -231,6 +228,8 @@ export default function Chat({ launchContext }) {
       return newChatData;
     });
   };
+
+  const currentChatFunc = (data) => getChatFromChatData(chatData.currentChat, data);
 
   const updateChatResponse = async (
     currentChatData,
@@ -340,7 +339,7 @@ export default function Chat({ launchContext }) {
       return currentTime - lastMessageTime < pruneChatsLimit;
     };
 
-    let chats = chatData.chats;
+    let chats = objToArray(chatData.chats);
     let prunedCnt = 0;
     let prunedChats = {};
 
@@ -354,7 +353,9 @@ export default function Chat({ launchContext }) {
 
     setChatData((oldData) => {
       let newChatData = structuredClone(oldData);
-      newChatData.chats = newChatData.chats.filter((chat) => !prunedChats[chat.id]);
+      for (const [id] of Object.entries(prunedChats)) {
+        delete newChatData.chats[id];
+      }
       return newChatData;
     });
 
@@ -681,7 +682,7 @@ export default function Chat({ launchContext }) {
                 setCurrentChatData((oldData) => {
                   let newChatData = structuredClone(oldData);
                   newChatData.name = values.chatName;
-                  changeChatProperty(setChatData, null, "name", values.chatName);
+                  changeChatProperty(setChatData, "name", values.chatName, currentChatFunc);
                   newChatData.provider = values.provider;
                   newChatData.options = { creativity: values.creativity };
 
@@ -762,7 +763,8 @@ export default function Chat({ launchContext }) {
 
       // Rename chat
       if (newChatName) {
-        changeChatProperty(setChatData, setCurrentChatData, "name", newChatName);
+        changeChatProperty(setChatData, "name", newChatName, currentChatFunc);
+        changeChatProperty(setCurrentChatData, "name", newChatName);
       }
     } catch (e) {
       console.log("Smart Chat Naming failed: ", e);
@@ -927,7 +929,7 @@ export default function Chat({ launchContext }) {
             onAction={async () => {
               setChatData((oldData) => {
                 let newChatData = structuredClone(oldData);
-                let chat = getChatFromChatData(newChatData.currentChat, newChatData);
+                let chat = currentChatFunc(newChatData);
                 chat.pinned = !chat.pinned;
 
                 toast(Toast.Style.Success, chat.pinned ? "Chat pinned" : "Chat unpinned");
@@ -980,19 +982,11 @@ export default function Chat({ launchContext }) {
             icon={Icon.ArrowDown}
             title="Next Chat"
             onAction={() => {
-              let chatIdx = 0;
-              for (let i = 0; i < chatData.chats.length; i++) {
-                if (chatData.chats[i].id === chatData.currentChat) {
-                  chatIdx = i;
-                  break;
-                }
-              }
+              const chats = objToArray(chatData.chats);
+              let chatIdx = chats.findIndex((chat) => chat.id === chatData.currentChat);
               if (chatIdx === chatData.chats.length - 1) toast(Toast.Style.Failure, "No chats after current");
               else {
-                setChatData((oldData) => ({
-                  ...oldData,
-                  currentChat: chatData.chats[chatIdx + 1].id,
-                }));
+                changeChatProperty(setChatData, "currentChat", chats[chatIdx + 1].id);
               }
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "arrowDown" }}
@@ -1001,19 +995,11 @@ export default function Chat({ launchContext }) {
             icon={Icon.ArrowUp}
             title="Previous Chat"
             onAction={() => {
-              let chatIdx = 0;
-              for (let i = 0; i < chatData.chats.length; i++) {
-                if (chatData.chats[i].id === chatData.currentChat) {
-                  chatIdx = i;
-                  break;
-                }
-              }
+              const chats = objToArray(chatData.chats);
+              let chatIdx = chats.findIndex((chat) => chat.id === chatData.currentChat);
               if (chatIdx === 0) toast(Toast.Style.Failure, "No chats before current");
               else {
-                setChatData((oldData) => ({
-                  ...oldData,
-                  currentChat: chatData.chats[chatIdx - 1].id,
-                }));
+                changeChatProperty(setChatData, "currentChat", chats[chatIdx - 1].id);
               }
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "arrowUp" }}
@@ -1157,10 +1143,7 @@ export default function Chat({ launchContext }) {
         <List.Dropdown
           tooltip="Your Chats"
           onChange={(newChatID) => {
-            setChatData((oldData) => ({
-              ...oldData,
-              currentChat: newChatID,
-            }));
+            changeChatProperty(setChatData, "currentChat", newChatID);
           }}
           value={chatData.currentChat}
         >
@@ -1212,13 +1195,15 @@ const isChatEmpty = (chat) => {
   return true;
 };
 
-const to_list_dropdown_items = (chats) => {
+const to_list_dropdown_items = (chatsObj) => {
+  let chats = objToArray(chatsObj);
   let pinned = [],
     unpinned = [];
   for (const chat of chats) {
     if (chat.pinned) pinned.push(chat);
     else unpinned.push(chat);
   }
+
   return (
     <>
       <List.Dropdown.Section title="Pinned">
