@@ -241,8 +241,8 @@
           "value": "DeepInfraLlama31_8B"
         },
         {
-          "title": "DeepInfra (Mixtral-8x22B)",
-          "value": "DeepInfraMixtral_8x22B"
+          "title": "DeepInfra (WizardLM-2-8x22B)",
+          "value": "DeepInfraWizardLM2_8x22B"
         },
         {
           "title": "DeepInfra (Mixtral-8x7B)",
@@ -271,14 +271,6 @@
         {
           "title": "DeepInfra (gemma-2-27b)",
           "value": "DeepInfraGemma2_27B"
-        },
-        {
-          "title": "DeepInfra (WizardLM-2-8x22B)",
-          "value": "DeepInfraWizardLM2_8x22B"
-        },
-        {
-          "title": "DeepInfra (llava-1.5-7b)",
-          "value": "DeepInfraLlava15_7B"
         },
         {
           "title": "Blackbox (custom-model)",
