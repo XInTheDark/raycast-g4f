@@ -564,11 +564,14 @@ export default function Chat({ launchContext }) {
     );
   };
 
-  let ViewResponseComponent = (props) => {
+  let ViewResponseComponent = ({ idx }) => {
     const { pop } = useNavigation();
 
-    const idx = props.idx;
-    const response = currentChatData.messages[idx].second.content;
+    const [response, setResponse] = useState(currentChatData.messages[idx].second.content);
+
+    useEffect(() => {
+      setResponse(currentChatData.messages[idx].second.content);
+    }, [currentChatData]);
 
     return (
       <Detail
@@ -606,13 +609,12 @@ export default function Chat({ launchContext }) {
     );
   };
 
-  let EditMessageComponent = (props) => {
+  let EditMessageComponent = ({ idx }) => {
     if (currentChatData.messages.length === 0) {
       toast(Toast.Style.Failure, "No messages in chat");
       return;
     }
 
-    const idx = props.idx;
     const message = currentChatData.messages[idx].first.content;
 
     const { pop } = useNavigation();
@@ -795,9 +797,7 @@ export default function Chat({ launchContext }) {
     }
   };
 
-  let GPTActionPanel = (props) => {
-    const idx = props.idx ?? 0;
-
+  let GPTActionPanel = ({ idx = 0 }) => {
     return (
       <ActionPanel>
         <Action
