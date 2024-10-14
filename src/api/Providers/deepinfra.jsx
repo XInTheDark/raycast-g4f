@@ -41,12 +41,11 @@ const function_supported_models = [
 ];
 
 // Models that support file uploads
-const file_supported_models = ["llava-hf/llava-1.5-7b-hf", "meta-llama/Llama-3.2-90B-Vision-Instruct"];
+const file_supported_models = ["meta-llama/Llama-3.2-90B-Vision-Instruct", "meta-llama/Llama-3.2-11B-Vision-Instruct"];
 
 // max_tokens parameter overrides - some models have short context lengths
 const max_tokens_overrides = {
   "google/gemma-2-27b-it": 512,
-  "llava-hf/llava-1.5-7b-hf": 512,
 };
 
 const DeepInfraFormatChat = (chat, model) => {
