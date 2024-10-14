@@ -941,6 +941,19 @@ export default function Chat({ launchContext }) {
             shortcut={{ modifiers: ["cmd", "shift"], key: "o" }}
           />
           <Action
+            icon={Icon.Duplicate}
+            title="Duplicate Chat"
+            onAction={async () => {
+              let newChat = structuredClone(currentChatData);
+              newChat.id = Date.now().toString();
+              newChat.name = `Copy of ${newChat.name}`;
+              newChat.creationDate = new Date();
+              await addChatAsCurrent(setChatData, setCurrentChatData, newChat);
+              await toast(Toast.Style.Success, "Chat duplicated");
+            }}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "d" }}
+          />
+          <Action
             icon={Icon.Download}
             title="Export Chat"
             onAction={async () => {
