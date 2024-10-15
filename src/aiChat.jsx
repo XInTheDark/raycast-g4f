@@ -564,14 +564,8 @@ export default function Chat({ launchContext }) {
     );
   };
 
-  let ViewResponseComponent = ({ idx }) => {
+  let ViewResponseComponent = ({ response }) => {
     const { pop } = useNavigation();
-
-    const [response, setResponse] = useState(currentChatData.messages[idx].second.content);
-
-    useEffect(() => {
-      setResponse(currentChatData.messages[idx].second.content);
-    }, [currentChatData]);
 
     return (
       <Detail
@@ -837,7 +831,7 @@ export default function Chat({ launchContext }) {
           <Action.Push
             icon={Icon.Maximize}
             title="View Response"
-            target={<ViewResponseComponent idx={idx} />}
+            target={<ViewResponseComponent response={currentChatData?.messages[idx]?.second?.content} />}
             shortcut={{ modifiers: ["cmd"], key: "f" }}
           />
           <Action
