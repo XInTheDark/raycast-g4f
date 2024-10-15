@@ -614,6 +614,7 @@ export default function Chat({ launchContext }) {
 
     const idx = props.idx;
     const message = currentChatData.messages[idx].first.content;
+    const files = currentChatData.messages[idx].files;
 
     const { pop } = useNavigation();
 
@@ -628,6 +629,7 @@ export default function Chat({ launchContext }) {
 
                 currentChatData.messages[idx].first.content = values.message;
                 currentChatData.messages[idx].second.content = "";
+                currentChatData.messages[idx].files = values.files;
                 currentChatData.messages[idx].finished = false;
 
                 setCurrentChatData(currentChatData); // important to update the UI!
@@ -648,7 +650,8 @@ export default function Chat({ launchContext }) {
           </ActionPanel>
         }
       >
-        <Form.TextArea id="message" title="Message" defaultValue={message} />
+        <Form.TextArea title="Message" id="message" defaultValue={message} />
+        <Form.FilePicker title="Upload Files" id="files" defaultValue={files} />
       </Form>
     );
   };
