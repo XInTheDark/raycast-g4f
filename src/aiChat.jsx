@@ -15,6 +15,8 @@ import {
 import { useEffect, useState } from "react";
 
 import { Storage } from "./api/storage";
+import { watch } from "node:fs/promises";
+
 import { current_datetime, formatDate, removePrefix } from "./helpers/helper";
 import { help_action, help_action_panel } from "./helpers/helpPage";
 import { autoCheckForUpdates } from "./helpers/update";
@@ -29,7 +31,7 @@ import { getAIPresets, getPreset } from "./helpers/presets";
 import { getWebResult, web_search_enabled } from "./api/tools/web";
 import { webSystemPrompt, systemResponse, webToken, webTokenEnd } from "./api/tools/web";
 
-let generationStatus = { stop: false, loading: false };
+let generationStatus = { stop: false, loading: false, updateCurrentResponse: false };
 let get_status = () => generationStatus.stop;
 
 export default function Chat({ launchContext }) {
@@ -258,7 +260,7 @@ export default function Chat({ launchContext }) {
       chars = response.length;
       charPerSec = (chars / elapsed).toFixed(1);
     } else {
-      generationStatus = { stop: false, loading: true };
+      generationStatus = { stop: false, loading: true, updateCurrentResponse: false };
       let i = 0;
 
       const handler = async (new_message) => {
@@ -266,6 +268,10 @@ export default function Chat({ launchContext }) {
         response = new_message;
         response = formatResponse(response, info.provider);
         setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, null, response);
+
+        if (generationStatus.updateCurrentResponse) {
+          await Storage.fileStorage_write("updateCurrentResponse", response);
+        }
 
         // Web Search functionality
         // We check the response every few chunks so we can possibly exit early
@@ -305,7 +311,7 @@ export default function Chat({ launchContext }) {
       "Response finished",
       `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`
     );
-    generationStatus.loading = false;
+    generationStatus = { stop: false, loading: false, updateCurrentResponse: false };
 
     // Smart Chat Naming functionality
     if (getPreferenceValues()["smartChatNaming"] && currentChatData.messages.length <= 2) {
@@ -564,11 +570,30 @@ export default function Chat({ launchContext }) {
     );
   };
 
-  let ViewResponseComponent = (props) => {
+  let ViewResponseComponent = ({ idx }) => {
     const { pop } = useNavigation();
 
-    const idx = props.idx;
-    const response = currentChatData.messages[idx].second.content;
+    const [response, setResponse] = useState(currentChatData.messages[idx].second.content);
+
+    useEffect(() => {
+      (async () => {
+        await Storage.fileStorage_write("updateCurrentResponse", "");
+      })();
+    }, []);
+
+    generationStatus.updateCurrentResponse = true;
+
+    const path = Storage.fileStoragePath("updateCurrentResponse");
+
+    (async () => {
+      const watcher = watch(path, { persistent: false });
+      for await (const event of watcher) {
+        if (event.eventType === "change") {
+          let response = await Storage.fileStorage_read("updateCurrentResponse");
+          setResponse(response);
+        }
+      }
+    })();
 
     return (
       <Detail
@@ -606,13 +631,12 @@ export default function Chat({ launchContext }) {
     );
   };
 
-  let EditMessageComponent = (props) => {
+  let EditMessageComponent = ({ idx }) => {
     if (currentChatData.messages.length === 0) {
       toast(Toast.Style.Failure, "No messages in chat");
       return;
     }
 
-    const idx = props.idx;
     const message = currentChatData.messages[idx].first.content;
     const files = currentChatData.messages[idx].files;
 
@@ -798,9 +822,7 @@ export default function Chat({ launchContext }) {
     }
   };
 
-  let GPTActionPanel = (props) => {
-    const idx = props.idx ?? 0;
-
+  let GPTActionPanel = ({ idx = 0 }) => {
     return (
       <ActionPanel>
         <Action
