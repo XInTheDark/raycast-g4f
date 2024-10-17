@@ -129,7 +129,7 @@ export const format_chat_to_prompt = (chat, model = null) => {
 // - read files if any, and add them to the message. (unless the provider doesn't want us to include files)
 // - remove the files property
 
-export const messages_to_json = (chat, {readFiles = true} = {}) => {
+export const messages_to_json = (chat, { readFiles = true } = {}) => {
   let json = [];
 
   for (let i = 0; i < chat.length; i++) {
