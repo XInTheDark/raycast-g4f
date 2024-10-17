@@ -140,7 +140,7 @@ export const messages_to_json = (chat, { readFiles = true } = {}) => {
       for (const file of msg.files) {
         // read text
         let text = fs.readFileSync(file, "utf8");
-        text = `---\n${file}\n\n${text}`;
+        text = `---\nFile: ${file}\n\n${text}`;
 
         // push as new message
         json.push({ role: "user", content: text });
