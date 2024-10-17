@@ -213,18 +213,16 @@ export default function Chat({ launchContext }) {
     currentChatData,
     setCurrentChatData,
     messageID,
-    query = null,
-    response = null,
-    finished = null
+    { query, response, finished }
   ) => {
     setCurrentChatData((oldData) => {
       let newChatData = structuredClone(oldData);
       let messages = newChatData.messages;
       for (let i = 0; i < messages.length; i++) {
         if (messages[i].id === messageID) {
-          if (query !== null) messages[i].first.content = query;
-          if (response !== null) messages[i].second.content = response;
-          if (finished !== null) messages[i].finished = finished;
+          if (query !== undefined) messages[i].first.content = query;
+          if (response !== undefined) messages[i].second.content = response;
+          if (finished !== undefined) messages[i].finished = finished;
         }
       }
       return newChatData;
@@ -238,7 +236,7 @@ export default function Chat({ launchContext }) {
     query = null,
     previousWebSearch = false
   ) => {
-    setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, null, ""); // set response to empty string
+    setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, { response: "" }); // set response to empty string
 
     const info = providers.get_provider_info(currentChatData.provider);
 
@@ -254,7 +252,7 @@ export default function Chat({ launchContext }) {
 
     if (!info.stream) {
       response = await getChatResponse(currentChatData, query);
-      setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, null, response);
+      setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, { response: response });
 
       elapsed = (Date.now() - start) / 1000;
       chars = response.length;
@@ -267,7 +265,7 @@ export default function Chat({ launchContext }) {
         i++;
         response = new_message;
         response = formatResponse(response, info.provider);
-        setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, null, response);
+        setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, { response: response });
 
         if (generationStatus.updateCurrentResponse) {
           // See ViewResponseComponent for more details
@@ -305,7 +303,7 @@ export default function Chat({ launchContext }) {
       return;
     }
 
-    setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, null, null, true);
+    setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, { finished: true });
 
     await toast(
       Toast.Style.Success,
@@ -747,7 +745,7 @@ export default function Chat({ launchContext }) {
 
   // Web Search functionality
   const processWebSearchResponse = async (currentChatData, setCurrentChatData, messageID, response, query) => {
-    setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, null, null, false);
+    setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, { finished: false });
     await toast(Toast.Style.Animated, "Searching web");
     // get everything AFTER webToken and BEFORE webTokenEnd
     let webQuery = response.includes(webTokenEnd)
