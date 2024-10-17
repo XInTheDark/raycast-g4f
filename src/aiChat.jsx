@@ -15,6 +15,8 @@ import {
 import { useEffect, useState } from "react";
 
 import { Storage } from "./api/storage";
+import { watch } from "node:fs/promises";
+
 import { current_datetime, formatDate, removePrefix } from "./helpers/helper";
 import { help_action, help_action_panel } from "./helpers/helpPage";
 import { autoCheckForUpdates } from "./helpers/update";
@@ -29,7 +31,7 @@ import { getAIPresets, getPreset } from "./helpers/presets";
 import { getWebResult, web_search_enabled } from "./api/tools/web";
 import { webSystemPrompt, systemResponse, webToken, webTokenEnd } from "./api/tools/web";
 
-let generationStatus = { stop: false, loading: false };
+let generationStatus = { stop: false, loading: false, updateCurrentResponse: false };
 let get_status = () => generationStatus.stop;
 
 export default function Chat({ launchContext }) {
@@ -207,22 +209,15 @@ export default function Chat({ launchContext }) {
     return messages;
   };
 
-  const setCurrentChatMessage = (
-    currentChatData,
-    setCurrentChatData,
-    messageID,
-    query = null,
-    response = null,
-    finished = null
-  ) => {
+  const setCurrentChatMessage = (currentChatData, setCurrentChatData, messageID, { query, response, finished }) => {
     setCurrentChatData((oldData) => {
       let newChatData = structuredClone(oldData);
       let messages = newChatData.messages;
       for (let i = 0; i < messages.length; i++) {
         if (messages[i].id === messageID) {
-          if (query !== null) messages[i].first.content = query;
-          if (response !== null) messages[i].second.content = response;
-          if (finished !== null) messages[i].finished = finished;
+          if (query !== undefined) messages[i].first.content = query;
+          if (response !== undefined) messages[i].second.content = response;
+          if (finished !== undefined) messages[i].finished = finished;
         }
       }
       return newChatData;
@@ -236,7 +231,7 @@ export default function Chat({ launchContext }) {
     query = null,
     previousWebSearch = false
   ) => {
-    setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, null, ""); // set response to empty string
+    setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, { response: "" }); // set response to empty string
 
     const info = providers.get_provider_info(currentChatData.provider);
 
@@ -252,20 +247,25 @@ export default function Chat({ launchContext }) {
 
     if (!info.stream) {
       response = await getChatResponse(currentChatData, query);
-      setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, null, response);
+      setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, { response: response });
 
       elapsed = (Date.now() - start) / 1000;
       chars = response.length;
       charPerSec = (chars / elapsed).toFixed(1);
     } else {
-      generationStatus = { stop: false, loading: true };
+      generationStatus = { stop: false, loading: true, updateCurrentResponse: false };
       let i = 0;
 
       const handler = async (new_message) => {
         i++;
         response = new_message;
         response = formatResponse(response, info.provider);
-        setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, null, response);
+        setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, { response: response });
+
+        if (generationStatus.updateCurrentResponse) {
+          // See ViewResponseComponent for more details
+          await Storage.fileStorage_write("updateCurrentResponse", response);
+        }
 
         // Web Search functionality
         // We check the response every few chunks so we can possibly exit early
@@ -298,14 +298,14 @@ export default function Chat({ launchContext }) {
       return;
     }
 
-    setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, null, null, true);
+    setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, { finished: true });
 
     await toast(
       Toast.Style.Success,
       "Response finished",
       `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`
     );
-    generationStatus.loading = false;
+    generationStatus = { stop: false, loading: false, updateCurrentResponse: false };
 
     // Smart Chat Naming functionality
     if (getPreferenceValues()["smartChatNaming"] && currentChatData.messages.length <= 2) {
@@ -564,11 +564,39 @@ export default function Chat({ launchContext }) {
     );
   };
 
-  let ViewResponseComponent = (props) => {
+  let ViewResponseComponent = ({ idx }) => {
     const { pop } = useNavigation();
 
-    const idx = props.idx;
-    const response = currentChatData.messages[idx].second.content;
+    const [response, setResponse] = useState(currentChatData.messages[idx].second.content);
+
+    // The key thing here is that this pushed view (via Action.Push) is a sibling component, NOT a child,
+    // so it does not automatically rerender upon a value change. So when the response streams, the view doesn't update.
+    // Since we can't control the parent component (that's managed by Raycast), we need to instead write changes
+    // to a file and then read from there.
+    // We only do this if View Response is active, which ensures that performance during normal usage is not impacted.
+
+    if (!currentChatData.messages[idx].finished) {
+      // don't stream if the response is finished
+      useEffect(() => {
+        (async () => {
+          await Storage.fileStorage_write("updateCurrentResponse", "");
+        })();
+      }, []);
+
+      generationStatus.updateCurrentResponse = true;
+
+      const path = Storage.fileStoragePath("updateCurrentResponse");
+
+      (async () => {
+        const watcher = watch(path, { persistent: false });
+        for await (const event of watcher) {
+          if (event.eventType === "change") {
+            let response = await Storage.fileStorage_read("updateCurrentResponse");
+            setResponse(response);
+          }
+        }
+      })();
+    }
 
     return (
       <Detail
@@ -606,13 +634,12 @@ export default function Chat({ launchContext }) {
     );
   };
 
-  let EditMessageComponent = (props) => {
+  let EditMessageComponent = ({ idx }) => {
     if (currentChatData.messages.length === 0) {
       toast(Toast.Style.Failure, "No messages in chat");
       return;
     }
 
-    const idx = props.idx;
     const message = currentChatData.messages[idx].first.content;
     const files = currentChatData.messages[idx].files;
 
@@ -713,7 +740,7 @@ export default function Chat({ launchContext }) {
 
   // Web Search functionality
   const processWebSearchResponse = async (currentChatData, setCurrentChatData, messageID, response, query) => {
-    setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, null, null, false);
+    setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, { finished: false });
     await toast(Toast.Style.Animated, "Searching web");
     // get everything AFTER webToken and BEFORE webTokenEnd
     let webQuery = response.includes(webTokenEnd)
@@ -798,9 +825,7 @@ export default function Chat({ launchContext }) {
     }
   };
 
-  let GPTActionPanel = (props) => {
-    const idx = props.idx ?? 0;
-
+  let GPTActionPanel = ({ idx = 0 }) => {
     return (
       <ActionPanel>
         <Action
