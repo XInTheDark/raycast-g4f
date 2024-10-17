@@ -144,7 +144,7 @@ export const messages_to_json = (chat, { readFiles = true } = {}) => {
 
         // push as new message
         json.push({ role: "user", content: text });
-        json.push({ role: "assistant", content: "" });
+        json.push({ role: "assistant", content: "[system: file uploaded]" });
       }
     }
 
