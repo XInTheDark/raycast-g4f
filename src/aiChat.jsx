@@ -270,6 +270,7 @@ export default function Chat({ launchContext }) {
         setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, null, response);
 
         if (generationStatus.updateCurrentResponse) {
+          // See ViewResponseComponent for more details
           await Storage.fileStorage_write("updateCurrentResponse", response);
         }
 
@@ -574,6 +575,12 @@ export default function Chat({ launchContext }) {
     const { pop } = useNavigation();
 
     const [response, setResponse] = useState(currentChatData.messages[idx].second.content);
+
+    // The key thing here is that this pushed view (via Action.Push) is a sibling component, NOT a child,
+    // so it does not automatically rerender upon a value change. So when the response streams, the view doesn't update.
+    // Since we can't control the parent component (that's managed by Raycast), we need to instead write changes
+    // to a file and then read from there.
+    // We only do this if View Response is active, which ensures that performance during normal usage is not impacted.
 
     useEffect(() => {
       (async () => {
