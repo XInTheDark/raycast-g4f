@@ -209,12 +209,7 @@ export default function Chat({ launchContext }) {
     return messages;
   };
 
-  const setCurrentChatMessage = (
-    currentChatData,
-    setCurrentChatData,
-    messageID,
-    { query, response, finished }
-  ) => {
+  const setCurrentChatMessage = (currentChatData, setCurrentChatData, messageID, { query, response, finished }) => {
     setCurrentChatData((oldData) => {
       let newChatData = structuredClone(oldData);
       let messages = newChatData.messages;
