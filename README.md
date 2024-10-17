@@ -102,7 +102,7 @@ updating manually also allows you to fetch and view the latest changes to the so
 | Rocks                        | llama-3.1-405b                          | ▶️       | ![Active][active-badge]     | Fast           | 7.5/10                                                                                      |
 | Rocks                        | llama-3.1-70b                           | ▶️       | ![Active][active-badge]     | Very Fast      | 7/10                                                                                        |
 | ChatgptFree                  | gpt-4o-mini                             | ▶️       | ![Active][active-badge]     | Extremely fast | 8.5/10                                                                                      |
-| PizzaGPT                     | gpt-3.5-turbo                           |          | ![Active][active-badge]     | Extremely fast | 6.5/10                                                                                      |
+| PizzaGPT                     | gpt-4o-mini                             |          | ![Active][active-badge]     | Extremely fast | 7.5/10                                                                                      |
 | Meta AI                      | meta-llama-3.1                          | ▶️       | ![Active][active-badge]     | Medium         | 7/10, recent model with internet access.                                                    |
 | Replicate                    | mixtral-8x7b                            | ▶️       | ![Active][active-badge]     | Medium         | ?/10                                                                                        |
 | Replicate                    | meta-llama-3.1-405b                     | ▶️       | ![Active][active-badge]     | Medium         | ?/10                                                                                        |
@@ -117,6 +117,7 @@ updating manually also allows you to fetch and view the latest changes to the so
 ▶️ - Supports streaming.
 
 📄 - Supports file upload.
+**Note**: By default, all providers support basic file upload functionality for text-based files, like .txt, .md, etc.
 
 *¹: Supports images only.*
 
