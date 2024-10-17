@@ -582,25 +582,28 @@ export default function Chat({ launchContext }) {
     // to a file and then read from there.
     // We only do this if View Response is active, which ensures that performance during normal usage is not impacted.
 
-    useEffect(() => {
+    if (!currentChatData.messages[idx].finished) {
+      // don't stream if the response is finished
+      useEffect(() => {
+        (async () => {
+          await Storage.fileStorage_write("updateCurrentResponse", "");
+        })();
+      }, []);
+
+      generationStatus.updateCurrentResponse = true;
+
+      const path = Storage.fileStoragePath("updateCurrentResponse");
+
       (async () => {
-        await Storage.fileStorage_write("updateCurrentResponse", "");
-      })();
-    }, []);
-
-    generationStatus.updateCurrentResponse = true;
-
-    const path = Storage.fileStoragePath("updateCurrentResponse");
-
-    (async () => {
-      const watcher = watch(path, { persistent: false });
-      for await (const event of watcher) {
-        if (event.eventType === "change") {
-          let response = await Storage.fileStorage_read("updateCurrentResponse");
-          setResponse(response);
+        const watcher = watch(path, { persistent: false });
+        for await (const event of watcher) {
+          if (event.eventType === "change") {
+            let response = await Storage.fileStorage_read("updateCurrentResponse");
+            setResponse(response);
+          }
         }
-      }
-    })();
+      })();
+    }
 
     return (
       <Detail
