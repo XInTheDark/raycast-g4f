@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-import { format_chat_to_prompt, messages_to_json } from "../../classes/message";
+import { format_chat_to_prompt } from "../../classes/message";
 
 // Implementation ported from gpt4free Replicate provider.
 
@@ -13,7 +13,6 @@ export const ReplicateProvider = {
   name: "Replicate",
   generate: async function* (chat, options, { max_retries = 10 }) {
     const model = options.model;
-    chat = messages_to_json(chat);
 
     let data = {
       stream: true,

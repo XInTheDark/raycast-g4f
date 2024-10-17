@@ -9,6 +9,8 @@
 //
 // Note how we currently don't have a Chat class, and instead we just use an array of messages.
 
+import fs from "fs";
+
 export class Message {
   constructor({ role = "", content = "", files = [] } = {}) {
     this.role = role;
@@ -88,6 +90,8 @@ export const pairs_to_messages = (pairs, query = null) => {
 
 // Format an array of Messages into a single string
 export const format_chat_to_prompt = (chat, model = null) => {
+  chat = messages_to_json(chat);
+
   model = model?.toLowerCase() || "";
   let prompt = "";
 
@@ -120,11 +124,30 @@ export const format_chat_to_prompt = (chat, model = null) => {
 
 // Format an array of Messages (NOT pairs) into a simple JSON array consisting of role and content,
 // and occasionally other properties (e.g. tool call info). this is used in many OpenAI-based APIs.
-// Currently, the only modification is to remove the files property.
-export const messages_to_json = (chat) => {
+//
+// Modifications:
+// - read files if any, and add them to the message. (unless the provider doesn't want us to include files)
+// - remove the files property
+
+export const messages_to_json = (chat, { readFiles = true } = {}) => {
   let json = [];
+
   for (let i = 0; i < chat.length; i++) {
     let msg = structuredClone(chat[i]);
+
+    if (readFiles && msg.files && msg.files.length > 0) {
+      console.assert(msg.role === "user", "Only user messages can have files");
+      for (const file of msg.files) {
+        // read text
+        let text = fs.readFileSync(file, "utf8");
+        text = `---\nFile: ${file}\n\n${text}`;
+
+        // push as new message
+        json.push({ role: "user", content: text });
+        json.push({ role: "assistant", content: "[system: file uploaded]" });
+      }
+    }
+
     delete msg.files;
     json.push(msg);
   }
