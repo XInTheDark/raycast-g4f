@@ -101,7 +101,18 @@ export const has_native_web_search = (provider) => {
 };
 
 // Check if web search should be enabled.
-// Providers that support function calling should handle web search separately
-export const web_search_enabled = (provider = null, allowed = ["auto", "always"]) => {
-  return allowed.includes(getPreferenceValues()["webSearch"]) && !has_native_web_search(provider);
+// If called in AI commands, we return a boolean - whether to use web search or not.
+// Otherwise, we return a string - the mode of web search.
+// Note: providers that support function calling should handle web search separately
+export const web_search_mode = (type, provider = null) => {
+  const pref = getPreferenceValues()["webSearch"];
+  if (type === "gpt") {
+    // AI commands
+    return ["hybrid", "always"].includes(pref) && !has_native_web_search(provider);
+  } else if (type === "chat") {
+    // AI Chat
+    return pref === "hybrid" ? "auto" : pref;
+  } else {
+    return pref;
+  }
 };

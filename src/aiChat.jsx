@@ -28,7 +28,7 @@ import * as providers from "./api/providers";
 import { getAIPresets, getPreset } from "./helpers/presets";
 
 // Web search module
-import { formatWebResult, getWebResult, has_native_web_search } from "./api/tools/web";
+import { formatWebResult, getWebResult, has_native_web_search, web_search_mode } from "./api/tools/web";
 import { webSystemPrompt, systemResponse, webToken, webTokenEnd } from "./api/tools/web";
 
 let generationStatus = { stop: false, loading: false, updateCurrentResponse: false };
@@ -174,7 +174,7 @@ export default function Chat({ launchContext }) {
     provider = providers.default_provider_string(),
     systemPrompt = "",
     messages = [],
-    options = { creativity: "0.7", webSearch: getPreferenceValues()["webSearch"] },
+    options = { creativity: "0.7", webSearch: web_search_mode("chat") },
   }) => {
     return {
       name: name,
@@ -531,7 +531,7 @@ export default function Chat({ launchContext }) {
         </Form.Dropdown>
 
         <Form.Description title="Web Search" text="Allow GPT to search the web for information." />
-        <Form.Dropdown id="webSearch" defaultValue={chat?.options?.webSearch ?? getPreferenceValues()["webSearch"]}>
+        <Form.Dropdown id="webSearch" defaultValue={chat?.options?.webSearch ?? web_search_mode("chat")}>
           <Form.Dropdown.Item title="Disabled" value="off" />
           <Form.Dropdown.Item title="Automatic" value="auto" />
           <Form.Dropdown.Item title="Always" value="always" />

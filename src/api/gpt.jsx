@@ -24,7 +24,7 @@ import { autoCheckForUpdates } from "../helpers/update";
 import { Message, pairs_to_messages } from "../classes/message";
 
 import { truncate_chat } from "../helpers/helper";
-import { formatWebResult, getWebResult, systemResponse, web_search_enabled, webSystemPrompt } from "./tools/web";
+import { formatWebResult, getWebResult, systemResponse, web_search_mode, webSystemPrompt } from "./tools/web";
 
 let generationStatus = { stop: false, loading: false };
 let get_status = () => generationStatus.stop;
@@ -128,7 +128,7 @@ export default (
       }
 
       // handle web search - if set to "always", we will include web search results in the prompt
-      if (allowWebSearch && web_search_enabled(info.provider, ["always"])) {
+      if (allowWebSearch && web_search_mode("gpt", info.provider)) {
         // push system prompt
         messages = [
           new Message({ role: "user", content: webSystemPrompt }),
