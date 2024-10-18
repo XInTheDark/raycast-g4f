@@ -43,6 +43,7 @@ export default (
     allowUploadFiles = false,
     defaultFiles = [],
     useDefaultLanguage = false,
+    allowWebSearch = true,
   } = {}
 ) => {
   // The parameters are documented here:
@@ -76,6 +77,7 @@ export default (
   // 10. allowUploadFiles: A boolean to allow uploading files in the Form. If true, a file upload field will be shown.
   // 11. defaultFiles: Files to always include in the prompt. This is an array of file paths.
   // 12. useDefaultLanguage: A boolean to use the default language. If true, the default language will be used in the response.
+  // 13. allowWebSearch: A boolean to allow web search. If false, we will never make a web search. Otherwise, the extension preferences are followed.
 
   /// Init
   const Pages = {
@@ -126,7 +128,7 @@ export default (
       }
 
       // handle web search - if set to "always", we will include web search results in the prompt
-      if (web_search_enabled(info.provider, ["always"])) {
+      if (allowWebSearch && web_search_enabled(info.provider, ["always"])) {
         // push system prompt
         messages = [
           new Message({ role: "user", content: webSystemPrompt }),

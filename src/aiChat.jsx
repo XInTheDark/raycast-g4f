@@ -193,7 +193,7 @@ export default function Chat({ launchContext }) {
     provider = provider instanceof Object ? provider : providers.get_provider_info(provider).provider;
 
     // Web Search system prompt
-    if (!has_native_web_search(provider) && ["auto", "always"].includes(webSearch)) {
+    if (webSearch === "always" || (webSearch === "auto" && !has_native_web_search(provider))) {
       systemPrompt += "\n\n" + webSystemPrompt;
     }
 
@@ -245,7 +245,12 @@ export default function Chat({ launchContext }) {
 
     const info = providers.get_provider_info(currentChatData.provider);
 
-    const webSearchMode = has_native_web_search(info.provider) ? "off" : currentChatData.options.webSearch;
+    const webSearchMode =
+      currentChatData.options.webSearch === "auto"
+        ? has_native_web_search(info.provider)
+          ? "off"
+          : "auto"
+        : currentChatData.options.webSearch;
 
     let elapsed = 0.001,
       chars,
@@ -256,7 +261,8 @@ export default function Chat({ launchContext }) {
     let loadingToast = await toast(Toast.Style.Animated, "Response loading");
 
     // Handle web search - if always enabled, we get the web search results
-    if (webSearchMode === "always") {
+    if (webSearchMode === "always" && features.webSearch) {
+      query = query ?? currentChatData.messages[0].first.content;
       await processWebSearchResponse(currentChatData, setCurrentChatData, messageID, null, query);
       return;
     }

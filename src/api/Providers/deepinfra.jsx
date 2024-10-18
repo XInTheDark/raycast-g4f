@@ -92,7 +92,7 @@ export const DeepInfraProvider = {
     const model = options.model;
     const json_chat = DeepInfraFormatChat(chat, model);
 
-    const useWebSearch = web_search_enabled() && function_supported_models.includes(model);
+    const useWebSearch = options.webSearch === "auto" && function_supported_models.includes(model);
     const useCodeInterpreter = getPreferenceValues()["codeInterpreter"] && function_supported_models.includes(model);
     const tools = [...(useWebSearch ? [webSearchTool] : []), ...(useCodeInterpreter ? [codeInterpreterTool] : [])];
 
