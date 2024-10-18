@@ -43,7 +43,7 @@ export default (
     allowUploadFiles = false,
     defaultFiles = [],
     useDefaultLanguage = false,
-    allowWebSearch = true,
+    allowWebSearch = false,
   } = {}
 ) => {
   // The parameters are documented here:
