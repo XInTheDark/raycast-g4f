@@ -410,7 +410,7 @@
     {
       "name": "webSearch",
       "title": "Web Search",
-      "description": "Add web search capabilities to GPT.",
+      "description": "Allow GPT to search the web for information.",
       "required": false,
       "type": "dropdown",
       "data": [

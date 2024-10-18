@@ -93,13 +93,15 @@ export const processWebResults = (results, maxResults = 15) => {
 };
 
 export const formatWebResult = (webResponse, webQuery = null) => {
-  return `\n\n<|web_search_results|> ${webQuery && `for "${webQuery}`}":\n\n` + webResponse;
+  return `\n\n<|web_search_results|> ${webQuery ? `for "${webQuery}` : ""}":\n\n` + webResponse;
+};
+
+export const has_native_web_search = (provider) => {
+  return providers.function_supported_providers.includes(provider);
 };
 
 // Check if web search should be enabled.
 // Providers that support function calling should handle web search separately
 export const web_search_enabled = (provider = null, allowed = ["auto", "always"]) => {
-  return (
-    allowed.includes(getPreferenceValues()["webSearch"]) && !providers.function_supported_providers.includes(provider)
-  );
+  return allowed.includes(getPreferenceValues()["webSearch"]) && !has_native_web_search(provider);
 };

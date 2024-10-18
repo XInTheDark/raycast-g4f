@@ -1,9 +1,10 @@
 import { Storage } from "../api/storage";
 
 export class AIPreset {
-  constructor({ name = "", provider = undefined, creativity = undefined, systemPrompt = "" }) {
+  constructor({ name = "", provider = undefined, webSearch = "off", creativity = "0.7", systemPrompt = "" }) {
     this.name = name;
     this.provider = provider;
+    this.webSearch = webSearch;
     this.creativity = creativity;
     this.systemPrompt = systemPrompt;
   }
@@ -19,7 +20,9 @@ export const setAIPresets = async (presets) => {
 };
 
 export const getSubtitle = (preset) => {
-  return `Provider: ${preset.provider} | ${preset.systemPrompt.slice(0, 50)}`;
+  return `Provider: ${preset.provider} | ${
+    preset.webSearch !== "off" ? `Web Search: ${preset.webSearch} |` : ""
+  } ${preset.systemPrompt.slice(0, 50)}`;
 };
 
 export const getPreset = (presets, name) => {

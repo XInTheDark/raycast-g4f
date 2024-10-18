@@ -28,7 +28,7 @@ import * as providers from "./api/providers";
 import { getAIPresets, getPreset } from "./helpers/presets";
 
 // Web search module
-import { formatWebResult, getWebResult, web_search_enabled } from "./api/tools/web";
+import { formatWebResult, getWebResult, has_native_web_search } from "./api/tools/web";
 import { webSystemPrompt, systemResponse, webToken, webTokenEnd } from "./api/tools/web";
 
 let generationStatus = { stop: false, loading: false, updateCurrentResponse: false };
@@ -174,7 +174,7 @@ export default function Chat({ launchContext }) {
     provider = providers.default_provider_string(),
     systemPrompt = "",
     messages = [],
-    options = {},
+    options = { creativity: "0.7", webSearch: getPreferenceValues()["webSearch"] },
   }) => {
     return {
       name: name,
@@ -182,18 +182,18 @@ export default function Chat({ launchContext }) {
       id: id,
       provider: provider,
       systemPrompt: systemPrompt,
-      messages: messages?.length ? messages : starting_messages(systemPrompt, provider),
+      messages: [...messages, ...starting_messages({ systemPrompt, provider, webSearch: options.webSearch })],
       options: options,
     };
   };
 
-  const starting_messages = (systemPrompt = "", provider = null) => {
+  const starting_messages = ({ systemPrompt = "", provider = null, webSearch = "off" } = {}) => {
     let messages = [];
 
-    provider = providers.get_provider_info(provider).provider;
+    provider = provider instanceof Object ? provider : providers.get_provider_info(provider).provider;
 
     // Web Search system prompt
-    if (web_search_enabled(provider)) {
+    if (!has_native_web_search(provider) && ["auto", "always"].includes(webSearch)) {
       systemPrompt += "\n\n" + webSystemPrompt;
     }
 
@@ -207,6 +207,15 @@ export default function Chat({ launchContext }) {
       );
     }
     return messages;
+  };
+
+  const updateStartingMessages = (chatData, options) => {
+    const newMessages = starting_messages(options);
+
+    while (chatData.messages.length > 0 && !chatData.messages[chatData.messages.length - 1].visible) {
+      chatData.messages.pop();
+    }
+    chatData.messages.push(...newMessages);
   };
 
   const setCurrentChatMessage = (currentChatData, setCurrentChatData, messageID, { query, response, finished }) => {
@@ -229,13 +238,14 @@ export default function Chat({ launchContext }) {
     setCurrentChatData,
     messageID,
     query = null,
-    previousWebSearch = false
+    features = { webSearch: true }
   ) => {
+    console.log(currentChatData);
     setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, { response: "" }); // set response to empty string
 
     const info = providers.get_provider_info(currentChatData.provider);
 
-    const useWebSearch = web_search_enabled(info.provider);
+    const webSearchMode = has_native_web_search(info.provider) ? "off" : currentChatData.options.webSearch;
 
     let elapsed = 0.001,
       chars,
@@ -244,6 +254,12 @@ export default function Chat({ launchContext }) {
     let response = "";
 
     let loadingToast = await toast(Toast.Style.Animated, "Response loading");
+
+    // Handle web search - if always enabled, we get the web search results
+    if (webSearchMode === "always") {
+      await processWebSearchResponse(currentChatData, setCurrentChatData, messageID, null, query);
+      return;
+    }
 
     if (!info.stream) {
       response = await getChatResponse(currentChatData, query);
@@ -270,11 +286,11 @@ export default function Chat({ launchContext }) {
         // Web Search functionality
         // We check the response every few chunks so we can possibly exit early
         if (
-          useWebSearch &&
+          webSearchMode === "auto" &&
+          features.webSearch &&
           (i & 15) === 0 &&
           response.includes(webToken) &&
-          response.includes(webTokenEnd) &&
-          !previousWebSearch
+          response.includes(webTokenEnd)
         ) {
           generationStatus.stop = true; // stop generating the current response
           await processWebSearchResponse(currentChatData, setCurrentChatData, messageID, response, query);
@@ -292,7 +308,7 @@ export default function Chat({ launchContext }) {
 
     // Web Search functionality
     // Process web search response again in case streaming is false, or if it was not processed during streaming
-    if (useWebSearch && response.includes(webToken) && !previousWebSearch) {
+    if (webSearchMode === "auto" && features.webSearch && response.includes(webToken)) {
       generationStatus.stop = true;
       await processWebSearchResponse(currentChatData, setCurrentChatData, messageID, response, query);
       return;
@@ -509,11 +525,18 @@ export default function Chat({ launchContext }) {
           {providers.ChatProvidersReact}
         </Form.Dropdown>
 
+        <Form.Description title="Web Search" text="Allow GPT to search the web for information." />
+        <Form.Dropdown id="webSearch" defaultValue={chat?.options?.webSearch ?? getPreferenceValues()["webSearch"]}>
+          <Form.Dropdown.Item title="Disabled" value="off" />
+          <Form.Dropdown.Item title="Automatic" value="auto" />
+          <Form.Dropdown.Item title="Always" value="always" />
+        </Form.Dropdown>
+
         <Form.Description
           title="Creativity"
           text="Technical tasks like coding require less creativity, while open-ended ones require more."
         />
-        <Form.Dropdown id="creativity" defaultValue={chat?.options?.creativity || "0.7"}>
+        <Form.Dropdown id="creativity" defaultValue={chat?.options?.creativity ?? "0.7"}>
           <Form.Dropdown.Item title="None" value="0.0" />
           <Form.Dropdown.Item title="Low" value="0.3" />
           <Form.Dropdown.Item title="Medium" value="0.5" />
@@ -542,6 +565,7 @@ export default function Chat({ launchContext }) {
                 if (values.preset) {
                   let preset = getPreset(AIPresets, values.preset);
                   values.provider = preset.provider;
+                  values.webSearch = preset.webSearch;
                   values.creativity = preset.creativity;
                   values.systemPrompt = preset.systemPrompt;
                 }
@@ -550,7 +574,7 @@ export default function Chat({ launchContext }) {
                   name: values.chatName,
                   provider: values.provider,
                   systemPrompt: values.systemPrompt,
-                  options: { creativity: values.creativity },
+                  options: { creativity: values.creativity, webSearch: values.webSearch },
                 });
 
                 await addChatAsCurrent(setChatData, setCurrentChatData, newChat);
@@ -710,18 +734,19 @@ export default function Chat({ launchContext }) {
                   newChatData.name = values.chatName;
                   changeProperty(setChatData, "name", values.chatName, getCurrentChatFromChatData);
                   newChatData.provider = values.provider;
-                  newChatData.options = { creativity: values.creativity };
 
                   // Update system prompt
                   if (
-                    newChatData.systemPrompt !== values.systemPrompt &&
-                    newChatData.messages[newChatData.messages.length - 1]?.visible === false
+                    newChatData.systemPrompt !== values.systemPrompt ||
+                    newChatData.options.webSearch !== values.webSearch
                   ) {
-                    newChatData.messages[newChatData.messages.length - 1] = starting_messages(
-                      values.systemPrompt,
-                      values.provider
-                    )[0];
+                    updateStartingMessages(newChatData, {
+                      systemPrompt: values.systemPrompt,
+                      provider: values.provider,
+                      webSearch: values.webSearch,
+                    });
                   }
+                  newChatData.options = { creativity: values.creativity, webSearch: values.webSearch };
                   newChatData.systemPrompt = values.systemPrompt;
 
                   return newChatData;
@@ -742,10 +767,12 @@ export default function Chat({ launchContext }) {
   const processWebSearchResponse = async (currentChatData, setCurrentChatData, messageID, response, query) => {
     setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, { finished: false });
     await toast(Toast.Style.Animated, "Searching web");
-    // get everything AFTER webToken and BEFORE webTokenEnd
-    let webQuery = response.includes(webTokenEnd)
-      ? response.substring(response.indexOf(webToken) + webToken.length, response.indexOf(webTokenEnd)).trim()
-      : response.substring(response.indexOf(webToken) + webToken.length).trim();
+    let webQuery = response
+      ? // get everything AFTER webToken and BEFORE webTokenEnd
+        response.includes(webTokenEnd)
+        ? response.substring(response.indexOf(webToken) + webToken.length, response.indexOf(webTokenEnd)).trim()
+        : response.substring(response.indexOf(webToken) + webToken.length).trim()
+      : query.substring(0, 400);
     let webResponse = await getWebResult(webQuery);
     webResponse = formatWebResult(webResponse, webQuery);
 
@@ -762,7 +789,7 @@ export default function Chat({ launchContext }) {
     setCurrentChatData(currentChatData); // important to update the UI!
 
     // Note how we don't pass query here because it is already in the chat
-    await updateChatResponse(currentChatData, setCurrentChatData, newMessageID, null, true);
+    await updateChatResponse(currentChatData, setCurrentChatData, newMessageID, null, { webSearch: false });
   };
 
   // Smart Chat Naming functionality
