@@ -2,7 +2,7 @@ import fetch from "node-fetch";
 import fs from "fs";
 
 import { messages_to_json } from "../../classes/message";
-import { getWebResult, webSearchTool } from "../tools/web";
+import { getWebResult, web_search_enabled, webSearchTool } from "../tools/web";
 import { codeInterpreterTool, getCodeInterpreterResult } from "../tools/code";
 import { getPreferenceValues } from "@raycast/api";
 
@@ -92,7 +92,7 @@ export const DeepInfraProvider = {
     const model = options.model;
     const json_chat = DeepInfraFormatChat(chat, model);
 
-    const useWebSearch = getPreferenceValues()["webSearch"] && function_supported_models.includes(model);
+    const useWebSearch = web_search_enabled() && function_supported_models.includes(model);
     const useCodeInterpreter = getPreferenceValues()["codeInterpreter"] && function_supported_models.includes(model);
     const tools = [...(useWebSearch ? [webSearchTool] : []), ...(useCodeInterpreter ? [codeInterpreterTool] : [])];
 

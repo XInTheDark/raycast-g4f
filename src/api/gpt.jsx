@@ -24,6 +24,7 @@ import { autoCheckForUpdates } from "../helpers/update";
 import { Message, pairs_to_messages } from "../classes/message";
 
 import { truncate_chat } from "../helpers/helper";
+import { formatWebResult, getWebResult, systemResponse, web_search_enabled, webSystemPrompt } from "./tools/web";
 
 let generationStatus = { stop: false, loading: false };
 let get_status = () => generationStatus.stop;
@@ -98,6 +99,13 @@ export default (
     if (generationStatus.loading) return;
     generationStatus.loading = true;
 
+    // load provider and model from preferences
+    const info = providers.get_provider_info();
+    // additional options
+    let options = providers.get_options_from_info(info);
+
+    let messages = [];
+
     // Modify the query before sending it to the API
     if (!regenerate) {
       // handle processPrompt
@@ -116,6 +124,20 @@ export default (
           query = `The default language is ${defaultLanguage}. Respond in this language.\n\n${query}`;
         }
       }
+
+      // handle web search - if set to "always", we will include web search results in the prompt
+      if (web_search_enabled(info.provider, ["always"])) {
+        // push system prompt
+        messages = [
+          new Message({ role: "user", content: webSystemPrompt }),
+          new Message({ role: "assistant", content: systemResponse }),
+          ...messages,
+        ];
+
+        // get web search results
+        let webResults = await getWebResult(query);
+        query = query + formatWebResult(webResults, query);
+      }
     }
 
     setLastQuery({ text: query, files: files });
@@ -128,11 +150,7 @@ export default (
 
     try {
       console.log(query);
-      const messages = [new Message({ role: "user", content: query, files: files })];
-      // load provider and model from preferences
-      const info = providers.get_provider_info();
-      // additional options
-      let options = providers.get_options_from_info(info);
+      messages = [...messages, new Message({ role: "user", content: query, files: files })];
 
       // generate response
       let response = "";
