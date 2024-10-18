@@ -1,6 +1,17 @@
 import { AIPreset, getAIPresets, getSubtitle, setAIPresets } from "./helpers/presets";
 import { useEffect, useState } from "react";
-import { Form, List, Action, ActionPanel, Icon, useNavigation, confirmAlert, showToast, Toast } from "@raycast/api";
+import {
+  Form,
+  List,
+  Action,
+  ActionPanel,
+  Icon,
+  useNavigation,
+  confirmAlert,
+  showToast,
+  Toast,
+  getPreferenceValues,
+} from "@raycast/api";
 import { help_action } from "./helpers/helpPage";
 import * as providers from "./api/providers";
 
@@ -27,7 +38,12 @@ export default function ManageAIPresets() {
     const idx = props.idx ?? 0;
     const newPreset = props.newPreset || false;
     let preset = newPreset
-      ? new AIPreset({ name: "New Preset", provider: providers.default_provider_string(), creativity: "0.7" })
+      ? new AIPreset({
+          name: "New Preset",
+          provider: providers.default_provider_string(),
+          webSearch: getPreferenceValues()["webSearch"],
+          creativity: "0.7",
+        })
       : presets[idx];
 
     return (
@@ -49,6 +65,7 @@ export default function ManageAIPresets() {
 
                 preset.name = values.name;
                 preset.provider = values.provider;
+                preset.webSearch = values.webSearch;
                 preset.creativity = values.creativity;
                 preset.systemPrompt = values.systemPrompt;
 
@@ -69,6 +86,13 @@ export default function ManageAIPresets() {
         <Form.Description title="Provider" text="The provider and model used for this chat." />
         <Form.Dropdown id="provider" defaultValue={preset.provider}>
           {providers.ChatProvidersReact}
+        </Form.Dropdown>
+
+        <Form.Description title="Web Search" text="Allow GPT to search the web for information." />
+        <Form.Dropdown id="webSearch" defaultValue={preset.webSearch}>
+          <Form.Dropdown.Item title="Disabled" value="off" />
+          <Form.Dropdown.Item title="Automatic" value="auto" />
+          <Form.Dropdown.Item title="Always" value="always" />
         </Form.Dropdown>
 
         <Form.Description

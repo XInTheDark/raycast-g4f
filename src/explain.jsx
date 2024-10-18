@@ -7,5 +7,6 @@ export default function Explain(props) {
     useSelected: true,
     allowUploadFiles: true,
     useDefaultLanguage: true,
+    webSearchMode: "auto",
   });
 }
