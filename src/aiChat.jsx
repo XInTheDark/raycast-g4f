@@ -240,7 +240,6 @@ export default function Chat({ launchContext }) {
     query = null,
     features = { webSearch: true }
   ) => {
-    console.log(currentChatData);
     setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, { response: "" }); // set response to empty string
 
     const info = providers.get_provider_info(currentChatData.provider);
