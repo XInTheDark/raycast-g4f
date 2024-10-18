@@ -108,10 +108,10 @@ export const web_search_mode = (type, provider = null) => {
   const pref = getPreferenceValues()["webSearch"];
   if (type === "gpt") {
     // AI commands
-    return ["hybrid", "always"].includes(pref) && !has_native_web_search(provider);
+    return ["balanced", "always"].includes(pref) && !has_native_web_search(provider);
   } else if (type === "chat") {
     // AI Chat
-    return pref === "hybrid" ? "auto" : pref;
+    return pref === "balanced" ? "auto" : pref;
   } else {
     return pref;
   }

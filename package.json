@@ -423,8 +423,8 @@
           "value": "auto"
         },
         {
-          "title": "Hybrid",
-          "value": "hybrid"
+          "title": "Balanced",
+          "value": "balanced"
         },
         {
           "title": "Always",
