@@ -6,7 +6,7 @@ const api_url = "https://www.pizzagpt.it/api/chatx-completion";
 
 const headers = {
   Accept: "application/json",
-  "Accept-Encoding": "gzip, deflate, br, zstd",
+  "Accept-Encoding": "gzip, deflate, br",
   "Accept-Language": "en-US,en;q=0.9",
   "Content-Type": "application/json",
   Origin: url,
