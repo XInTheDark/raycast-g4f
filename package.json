@@ -409,15 +409,33 @@
     },
     {
       "name": "webSearch",
-      "title": "Features",
-      "label": "Enable Web Search",
-      "description": "Add web search capabilities to GPT. Available in AI Chat.",
+      "title": "Web Search",
+      "description": "Allow GPT to search the web for information.",
       "required": false,
-      "type": "checkbox",
-      "default": false
+      "type": "dropdown",
+      "data": [
+        {
+          "title": "Disabled",
+          "value": "off"
+        },
+        {
+          "title": "Automatic",
+          "value": "auto"
+        },
+        {
+          "title": "Balanced",
+          "value": "balanced"
+        },
+        {
+          "title": "Always",
+          "value": "always"
+        }
+      ],
+      "default": "off"
     },
     {
       "name": "smartChatNaming",
+      "title": "Features",
       "label": "Enable Smart Chat Naming",
       "description": "Automatically rename chat sessions based on the messages you send.",
       "required": false,

@@ -37,6 +37,7 @@ export default function CustomAICommands() {
               onSubmit={async (values) => {
                 command.name = values.name;
                 command.prompt = values.prompt;
+                command.options.webSearch = values.webSearch;
                 command.options.allowUploadFiles = values.allowUploadFiles;
 
                 if (newCommand) {
@@ -58,11 +59,20 @@ export default function CustomAICommands() {
           title=""
           text="In the prompt, you can use dynamic placeholders like {input}, {clipboard} or {date}. Learn more by selecting the Help action."
         />
+
+        <Form.Separator />
+
+        <Form.Checkbox
+          id="webSearch"
+          title="Options"
+          label="Enable Web Search"
+          defaultValue={command.options?.webSearch}
+        />
         <Form.Checkbox
           id="allowUploadFiles"
-          title="Options"
           label="Allow File Uploads"
           info="Only certain providers support file uploads, please refer to the README for more info"
+          defaultValue={command.options?.allowUploadFiles}
         />
       </Form>
     );
@@ -120,6 +130,7 @@ export default function CustomAICommands() {
         useSelected: true,
         allowUploadFiles: command.options?.allowUploadFiles,
         processPrompt: command.processPromptFunction(),
+        webSearchMode: command.options?.webSearch ? "always" : "off",
       }
     );
   };

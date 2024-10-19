@@ -147,6 +147,25 @@ separate them with commas in the preferences.
 Let GPT decide to search the web for information if it does not have enough knowledge or context. Uses DuckDuckGo
 search, fast and free.
 
+#### Usage
+
+Enabling web search is fast and easy. Go to the extension preferences, and the "Web Search" option will be available.
+There are 4 options:
+
+- Disabled (default)
+- Automatic: Enable Web Search only in AI Chat. GPT will automatically decide when to use it.
+- Balanced: Use Web Search in every query for AI commands¹, and automatically in AI Chat. This is basically an extension
+  of the "Automatic" option.
+- Always: Always use Web Search for every query, both in AI Chat and in commands¹.
+
+*¹: Commands that support Web Search are: Ask AI, Ask About Selected Text, Explain. Other commands will not use Web
+Search.*
+
+Web Search is also available in the following commands:
+- Custom AI Commands: You can enable Web Search for each command individually.
+- AI Chat: You can enable Web Search for each chat individually.
+- AI Presets: You can enable Web Search for each preset individually.
+
 ### Smart Chat Naming
 
 Let GPT automatically come up with a name for the current chat session after you send the first message. For example,

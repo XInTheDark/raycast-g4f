@@ -64,6 +64,7 @@ export const webSearchTool = {
 
 export const getWebResult = async (query) => {
   console.log("Web search query:", query);
+  await showToast(Toast.Style.Animated, "Searching the web");
 
   try {
     const searchResults = await DDG.search(query, {
@@ -92,8 +93,27 @@ export const processWebResults = (results, maxResults = 15) => {
   return answer;
 };
 
+export const formatWebResult = (webResponse, webQuery = null) => {
+  return `\n\n<|web_search_results|> ${webQuery ? `for "${webQuery}` : ""}":\n\n` + webResponse;
+};
+
+export const has_native_web_search = (provider) => {
+  return providers.function_supported_providers.includes(provider);
+};
+
 // Check if web search should be enabled.
-// Providers that support function calling should handle web search separately
-export const web_search_enabled = (provider) => {
-  return getPreferenceValues()["webSearch"] && !providers.function_supported_providers.includes(provider);
+// If called in AI commands, we return a boolean - whether to use web search or not.
+// Otherwise, we return a string - the mode of web search.
+// Note: providers that support function calling should handle web search separately
+export const web_search_mode = (type, provider = null) => {
+  const pref = getPreferenceValues()["webSearch"];
+  if (type === "gpt") {
+    // AI commands
+    return ["balanced", "always"].includes(pref) && !has_native_web_search(provider);
+  } else if (type === "chat") {
+    // AI Chat
+    return pref === "balanced" ? "auto" : pref;
+  } else {
+    return pref;
+  }
 };
