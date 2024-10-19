@@ -836,8 +836,7 @@ export default function Chat({ launchContext }) {
     }
     let files = values?.files ?? [];
 
-    if (query === "") {
-      toast(Toast.Style.Failure, "Please enter a query");
+    if (query === "" && files.length === 0) {
       return;
     }
 

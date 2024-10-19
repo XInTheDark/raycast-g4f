@@ -20,7 +20,7 @@ export const get_version = () => {
 };
 
 export const fetch_github_latest_release = async function () {
-  let toast = await showToast(Toast.Style.Animated, "Checking for updates...");
+  let toast = await showToast(Toast.Style.Animated, "Checking for updates");
   const response = await fetch(LATEST_VER_URL, { method: "GET" });
   const data = await response.json();
   const tag_name = data.tag_name;
@@ -54,7 +54,7 @@ export const is_up_to_date = (current = null, latest = null) => {
 export const download_and_install_update = async (setMarkdown = null) => {
   if (!setMarkdown) setMarkdown = () => {}; // eslint-disable-line
 
-  await showToast(Toast.Style.Animated, "Downloading update...", "This may take a short while");
+  await showToast(Toast.Style.Animated, "Downloading update", "This may take a short while");
   let dirPath = getSupportPath();
   console.log("Running update in support path: " + dirPath);
 

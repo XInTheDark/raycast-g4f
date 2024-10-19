@@ -200,7 +200,7 @@ export default (
     } catch (e) {
       console.log(e);
       setMarkdown(
-        "## Could not access GPT.\n\nThis may be because GPT has decided that your prompt did not comply with its regulations. Please try another prompt, and if it still does not work, create an issue on GitHub."
+        "## Could not access GPT.\n\nPlease try another prompt, and if it still does not work, try switching to another provider. Please create an issue on GitHub."
       );
       await showToast({
         style: Toast.Style.Failure,

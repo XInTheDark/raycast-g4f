@@ -55,11 +55,11 @@ export default function ManageAIPresets() {
               onSubmit={async (values) => {
                 // Ensure no empty/duplicate names
                 if (preset.name === "") {
-                  await showToast(Toast.Style.Failure, "Preset name cannot be empty.");
+                  await showToast(Toast.Style.Failure, "Preset name cannot be empty");
                   return;
                 }
                 if ((newPreset || preset.name !== values.name) && presets.map((x) => x.name).includes(values.name)) {
-                  await showToast(Toast.Style.Failure, "Preset name already exists.");
+                  await showToast(Toast.Style.Failure, "Preset name already exists");
                   return;
                 }
 

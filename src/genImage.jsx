@@ -187,7 +187,7 @@ export default function genImage() {
         getChat(chatData.currentChat, newChatData.chats).messages.shift();
         return newChatData;
       });
-      await toast(Toast.Style.Failure, "GPT cannot process this prompt.");
+      await toast(Toast.Style.Failure, "GPT cannot process this prompt");
     }
   };
 
@@ -306,7 +306,6 @@ export default function genImage() {
           title="Generate Image"
           onAction={async () => {
             if (searchText === "") {
-              await toast(Toast.Style.Failure, "Please enter a prompt");
               return;
             }
 
