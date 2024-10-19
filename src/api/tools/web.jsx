@@ -64,6 +64,7 @@ export const webSearchTool = {
 
 export const getWebResult = async (query) => {
   console.log("Web search query:", query);
+  await showToast(Toast.Style.Animated, "Searching the web");
 
   try {
     const searchResults = await DDG.search(query, {

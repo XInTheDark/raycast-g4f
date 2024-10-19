@@ -771,7 +771,7 @@ export default function Chat({ launchContext }) {
   // Web Search functionality
   const processWebSearchResponse = async (currentChatData, setCurrentChatData, messageID, response, query) => {
     setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, { finished: false });
-    await toast(Toast.Style.Animated, "Searching web");
+
     let webQuery = response
       ? // get everything AFTER webToken and BEFORE webTokenEnd
         response.includes(webTokenEnd)
