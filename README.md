@@ -161,6 +161,11 @@ There are 4 options:
 *¹: Commands that support Web Search are: Ask AI, Ask About Selected Text, Explain. Other commands will not use Web
 Search.*
 
+Web Search is also available in the following commands:
+- Custom AI Commands: You can enable Web Search for each command individually.
+- AI Chat: You can enable Web Search for each chat individually.
+- AI Presets: You can enable Web Search for each preset individually.
+
 ### Smart Chat Naming
 
 Let GPT automatically come up with a name for the current chat session after you send the first message. For example,
