@@ -692,25 +692,7 @@ export default function Chat({ launchContext }) {
               title="Edit Message"
               onSubmit={async (values) => {
                 pop();
-
-                currentChatData.messages[idx].first.content = values.message;
-                currentChatData.messages[idx].second.content = "";
-                currentChatData.messages[idx].files = values.files;
-                currentChatData.messages[idx].finished = false;
-
-                setCurrentChatData(currentChatData); // important to update the UI!
-
-                let messageID = currentChatData.messages[idx].id;
-
-                // instead of passing the full currentChatData, we only pass the messages
-                // before, and including, the message we want to update. This is because chatCompletion takes
-                // the last message as the query.
-                let newChatData = structuredClone(currentChatData);
-
-                // slice from the back, i.e. keep the messages [idx, end], since messages data is in reverse order
-                newChatData.messages = currentChatData.messages.slice(idx);
-
-                await updateChatResponse(newChatData, setCurrentChatData, messageID); // Note how we don't pass query here because it is already in the chat
+                await regenerateResponse(currentChatData, idx, values.message, values.files);
               }}
             />
           </ActionPanel>
@@ -720,6 +702,28 @@ export default function Chat({ launchContext }) {
         <Form.FilePicker title="Upload Files" id="files" defaultValue={files} />
       </Form>
     );
+  };
+
+  let regenerateResponse = async (currentChatData, idx, newMessage = null, newFiles = null) => {
+    if (newMessage) currentChatData.messages[idx].first.content = newMessage;
+    if (newFiles) currentChatData.messages[idx].files = newFiles;
+
+    currentChatData.messages[idx].second.content = "";
+    currentChatData.messages[idx].finished = false;
+
+    setCurrentChatData(currentChatData); // important to update the UI!
+
+    let messageID = currentChatData.messages[idx].id;
+
+    // instead of passing the full currentChatData, we only pass the messages
+    // before, and including, the message we want to update. This is because chatCompletion takes
+    // the last message as the query.
+    let newChatData = structuredClone(currentChatData);
+
+    // slice from the back, i.e. keep the messages [idx, end], since messages data is in reverse order
+    newChatData.messages = currentChatData.messages.slice(idx);
+
+    await updateChatResponse(newChatData, setCurrentChatData, messageID); // Note how we don't pass query here because it is already in the chat
   };
 
   let ChatSettingsComponent = () => {
@@ -911,7 +915,7 @@ export default function Chat({ launchContext }) {
           />
           <Action
             icon={Icon.ArrowClockwise}
-            title="Regenerate Last Message"
+            title="Regenerate Response"
             onAction={async () => {
               if (currentChatData.messages.length === 0) {
                 await toast(Toast.Style.Failure, "No messages in chat");
@@ -927,7 +931,7 @@ export default function Chat({ launchContext }) {
                   message: "Response is still loading. Are you sure you want to regenerate it?",
                   icon: Icon.ArrowClockwise,
                   primaryAction: {
-                    title: "Regenerate Message",
+                    title: "Regenerate Response",
                     onAction: () => {
                       userConfirmed = true;
                     },
@@ -941,13 +945,7 @@ export default function Chat({ launchContext }) {
                 }
               }
 
-              currentChatData.messages[0].second.content = "";
-              currentChatData.messages[0].finished = false;
-              setCurrentChatData(currentChatData);
-
-              let messageID = currentChatData.messages[0].id;
-              // Note how we don't pass the prompt here because it is already in the chat
-              await updateChatResponse(currentChatData, setCurrentChatData, messageID);
+              await regenerateResponse(currentChatData, idx);
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "r" }}
           />
