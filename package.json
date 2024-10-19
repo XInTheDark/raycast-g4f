@@ -245,6 +245,10 @@
           "value": "DeepInfraLlama31_8B"
         },
         {
+          "title": "DeepInfra (llama-3.1-nemotron-70b)",
+          "value": "DeepInfraLlama31Nemotron70B"
+        },
+        {
           "title": "DeepInfra (WizardLM-2-8x22B)",
           "value": "DeepInfraWizardLM2_8x22B"
         },

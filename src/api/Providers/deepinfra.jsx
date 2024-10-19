@@ -38,6 +38,7 @@ const function_supported_models = [
   "meta-llama/Meta-Llama-3.1-405B-Instruct",
   "meta-llama/Meta-Llama-3.1-70B-Instruct",
   "meta-llama/Meta-Llama-3.1-8B-Instruct",
+  "nvidia/Llama-3.1-Nemotron-70B-Instruct",
 ];
 
 // Models that support file uploads

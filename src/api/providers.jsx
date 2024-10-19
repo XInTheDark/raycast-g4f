@@ -48,6 +48,7 @@ export const providers_info = {
   DeepInfraLlama3_70B: { provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3-70B-Instruct", stream: true, context_tokens: 8000 },
   DeepInfraOpenChat36_8B: { provider: DeepInfraProvider, model: "openchat/openchat-3.6-8b", stream: true, context_tokens: 8000 },
   DeepInfraGemma2_27B: { provider: DeepInfraProvider, model: "google/gemma-2-27b-it", stream: true, context_tokens: 4096 },
+  DeepInfraLlama31Nemotron70B: { provider: DeepInfraProvider, model: "nvidia/Llama-3.1-Nemotron-70B-Instruct", stream: true },
   Blackbox: { provider: BlackboxProvider, model: "blackbox", stream: true },
   BlackboxLlama31_405B: { provider: BlackboxProvider, model: "llama-3.1-405b", stream: true },
   BlackboxLlama31_70B: { provider: BlackboxProvider, model: "llama-3.1-70b", stream: true },
