@@ -276,6 +276,7 @@ export default function Chat({ launchContext }) {
     } else {
       generationStatus = { stop: false, loading: true, updateCurrentResponse: false };
       let i = 0;
+      let lastChunkTime = Date.now();
 
       const handler = async (new_message) => {
         i++;
@@ -285,7 +286,11 @@ export default function Chat({ launchContext }) {
 
         if (generationStatus.updateCurrentResponse) {
           // See ViewResponseComponent for more details
-          await Storage.fileStorage_write("updateCurrentResponse", response);
+          // We throttle the updates to prevent excessive file I/O
+          if (Date.now() - lastChunkTime > 300) {
+            await Storage.fileStorage_write("updateCurrentResponse", response);
+            lastChunkTime = Date.now();
+          }
         }
 
         // Web Search functionality
@@ -317,6 +322,11 @@ export default function Chat({ launchContext }) {
       generationStatus.stop = true;
       await processWebSearchResponse(currentChatData, setCurrentChatData, messageID, response, query);
       return;
+    }
+
+    if (generationStatus.updateCurrentResponse) {
+      // Write the final response to file
+      await Storage.fileStorage_write("updateCurrentResponse", response);
     }
 
     setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, { finished: true });
