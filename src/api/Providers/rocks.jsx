@@ -4,7 +4,7 @@ const api_url = "https://api.airforce/chat/completions";
 
 const headers = {
   Accept: "application/json",
-  "Accept-Encoding": "gzip, deflate, br, zstd",
+  "Accept-Encoding": "gzip, deflate, br",
   "Accept-Language": "en-US,en;q=0.9",
   Authorization: "Bearer missing api key",
   Origin: "https://llmplayground.net",

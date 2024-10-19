@@ -82,10 +82,6 @@ export const providers_info = {
   CustomOpenAI: { provider: CustomOpenAIProvider, stream: true },
 };
 
-// Additional properties
-// Providers that handle the stream update in a custom way (see chatCompletion function)
-export const custom_stream_handled_providers = [GeminiProvider, PhindProvider, ChatgptFreeProvider];
-
 /// Chat providers (user-friendly names)
 // fetched from package.json for consistency and to avoid duplicate code
 export const chat_providers_names = preferences

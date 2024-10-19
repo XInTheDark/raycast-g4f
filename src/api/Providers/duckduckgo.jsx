@@ -13,7 +13,7 @@ const headers = {
   "User-Agent": user_agent,
   Accept: "text/event-stream",
   "Accept-Language": "en-US,en;q=0.5",
-  "Accept-Encoding": "gzip, deflate, br, zstd",
+  "Accept-Encoding": "gzip, deflate, br",
   Referer: referer,
   "Content-Type": "application/json",
   Origin: origin,

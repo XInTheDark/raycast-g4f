@@ -13,6 +13,7 @@ const safetySettings = {
 
 export const GeminiProvider = {
   name: "Gemini",
+  customStream: true,
   generate: async (chat, options, { stream_update = null, max_retries = 3 }) => {
     let APIKeysStr = getPreferenceValues()["GeminiAPIKeys"];
     let APIKeys = APIKeysStr.split(",").map((x) => x.trim());

@@ -94,7 +94,7 @@ updating manually also allows you to fetch and view the latest changes to the so
 | DuckDuckGo                   | claude-3-haiku                          | ▶️️      | ![Active][active-badge]     | Extremely fast | 7/10                                                                                        |
 | DuckDuckGo                   | meta-llama-3.1-70b                      | ▶️️      | ![Active][active-badge]     | Very fast      | 7.5/10                                                                                      |
 | DuckDuckGo                   | mixtral-8x7b                            | ▶️️      | ![Active][active-badge]     | Extremely fast | 7.5/10                                                                                      |
-| BestIM                       | gpt-4o-mini                             | ▶️       | ![Unknown][unknown-badge]   | Extremely fast | 8.5/10                                                                                      |
+| BestIM                       | gpt-4o-mini                             | ▶️       | ![Inactive][inactive-badge] | Extremely fast | 8.5/10                                                                                      |
 | Rocks                        | claude-3.5-sonnet                       | ▶️       | ![Active][active-badge]     | Fast           | 8.5/10                                                                                      |
 | Rocks                        | claude-3-opus                           | ▶️       | ![Active][active-badge]     | Fast           | 8/10                                                                                        |
 | Rocks                        | gpt-4o                                  | ▶️       | ![Active][active-badge]     | Fast           | 7.5/10                                                                                      |
@@ -162,6 +162,7 @@ There are 4 options:
 Search.*
 
 Web Search is also available in the following commands:
+
 - Custom AI Commands: You can enable Web Search for each command individually.
 - AI Chat: You can enable Web Search for each chat individually.
 - AI Presets: You can enable Web Search for each preset individually.

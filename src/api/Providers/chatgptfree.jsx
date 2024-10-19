@@ -24,6 +24,7 @@ const headers = {
 
 export const ChatgptFreeProvider = {
   name: "ChatGPTFree",
+  customStream: true,
   generate: async function (chat, options, { stream_update }) {
     // get nonce
     let _nonce;

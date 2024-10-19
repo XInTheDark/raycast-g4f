@@ -450,7 +450,7 @@ export const chatCompletion = async (info, chat, options, stream_update = null, 
   }
 
   // streaming related handling
-  if (providers.custom_stream_handled_providers.includes(provider)) return; // handled in the provider
+  if (provider.customStream) return; // handled in the provider
   if (stream_update) {
     await processStream(response, provider, stream_update, status);
     return;

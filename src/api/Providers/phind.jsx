@@ -19,6 +19,7 @@ const headers = {
 
 export const PhindProvider = {
   name: "Phind",
+  customStream: true,
   generate: async function (chat, options, { stream_update }) {
     // get challenge seeds
     let stdout = "";
