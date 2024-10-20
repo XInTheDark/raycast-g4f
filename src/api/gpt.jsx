@@ -492,7 +492,8 @@ export const getChatResponseSync = async (currentChat, query = null) => {
 
 // format response using some heuristics
 export const formatResponse = (response, provider = null) => {
-  if (provider.name === "Nexra" || provider.name === "BestIM") {
+  // eslint-disable-next-line no-constant-condition
+  if (false && (provider.name === "Nexra" || provider.name === "BestIM")) {
     // replace escape characters: \n with a real newline, \t with a real tab, etc.
     response = response.replace(/\\n/g, "\n");
     response = response.replace(/\\t/g, "\t");
