@@ -60,11 +60,11 @@ export const getNexraResponseStream = async function* (chat, options, max_retrie
           break; // this goes on to next iteration of while loop
         }
 
-        if (chunkJson["finish"]) break;
         // if (chunkJson["error"]) throw new Error();
 
         let chunk = chunkJson["message"];
-        yield chunk; // note that this is the full response, not just incremental updates!
+        if (chunk) yield chunk; // note that this is the full response, not just incremental updates!
+        if (chunkJson["finish"]) break;
       }
     }
   } catch (e) {

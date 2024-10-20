@@ -25,6 +25,7 @@ import { Message, pairs_to_messages } from "../classes/message";
 
 import { truncate_chat } from "../helpers/helper";
 import { formatWebResult, getWebResult, systemResponse, web_search_mode, webSystemPrompt } from "./tools/web";
+import { NexraProvider } from "./Providers/nexra";
 
 let generationStatus = { stop: false, loading: false };
 let get_status = () => generationStatus.stop;
@@ -548,7 +549,7 @@ export const processChunks = async function* (response, provider, status = null)
   let r = "";
   for await (const chunk of await processChunksIncremental(response, provider, status)) {
     // normally we add the chunk to r, but for certain providers, the chunk is already yielded fully
-    if (provider.name === "Nexra") {
+    if (provider === NexraProvider) {
       r = chunk;
     } else {
       r += chunk;
