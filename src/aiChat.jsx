@@ -528,7 +528,10 @@ export default function Chat({ launchContext }) {
         <Form.TextField id="chatName" defaultValue={chat?.name ?? `New Chat ${current_datetime()}`} />
 
         <Form.Description title="AI Preset" text="The preset will override the options below." />
-        <Form.Dropdown id="preset" defaultValue="">
+        <Form.Dropdown
+          id="preset"
+          defaultValue={chat !== null ? "" : AIPresets.find((preset) => preset.isDefault === true)?.name ?? ""}
+        >
           {[
             <Form.Dropdown.Item title="" value="" key="" />,
             ...AIPresets.map((x) => <Form.Dropdown.Item title={x.name} key={x.name} value={x.name} />),
@@ -745,8 +748,8 @@ export default function Chat({ launchContext }) {
                   values.systemPrompt = preset.systemPrompt;
                 }
 
-                // Limit chat name to 200 characters
-                values.chatName = values.chatName.substring(0, 200);
+                // Limit chat name to 100 characters
+                values.chatName = values.chatName.substring(0, 100);
 
                 setCurrentChatData((oldData) => {
                   let newChatData = structuredClone(oldData);
@@ -831,7 +834,7 @@ export default function Chat({ launchContext }) {
         messages: [new MessagePair({ prompt: newQuery })],
         provider: currentChatData.provider,
       });
-      newChatName = newChatName.trim().substring(0, 200).replace(/\n/g, " ");
+      newChatName = newChatName.trim().substring(0, 80).replace(/\n/g, " ");
 
       // Rename chat
       if (newChatName) {

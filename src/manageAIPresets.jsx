@@ -43,6 +43,7 @@ export default function ManageAIPresets() {
           provider: providers.default_provider_string(),
           webSearch: getPreferenceValues()["webSearch"],
           creativity: "0.7",
+          isDefault: false,
         })
       : presets[idx];
 
@@ -68,6 +69,7 @@ export default function ManageAIPresets() {
                 preset.webSearch = values.webSearch;
                 preset.creativity = values.creativity;
                 preset.systemPrompt = values.systemPrompt;
+                preset.isDefault = values.isDefault;
 
                 if (newPreset) {
                   setPresets([...presets, preset]);
@@ -109,6 +111,8 @@ export default function ManageAIPresets() {
 
         <Form.Description title="System Prompt" text="This prompt will be sent to GPT to start the conversation." />
         <Form.TextArea id="systemPrompt" defaultValue={preset.systemPrompt} />
+
+        <Form.Checkbox id="isDefault" label="Set as Default" defaultValue={preset.isDefault} />
       </Form>
     );
   };

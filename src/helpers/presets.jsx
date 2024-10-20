@@ -1,12 +1,20 @@
 import { Storage } from "../api/storage";
 
 export class AIPreset {
-  constructor({ name = "", provider = undefined, webSearch = "off", creativity = "0.7", systemPrompt = "" }) {
+  constructor({
+    name = "",
+    provider = undefined,
+    webSearch = "off",
+    creativity = "0.7",
+    systemPrompt = "",
+    isDefault = false,
+  }) {
     this.name = name;
     this.provider = provider;
     this.webSearch = webSearch;
     this.creativity = creativity;
     this.systemPrompt = systemPrompt;
+    this.isDefault = isDefault;
   }
 }
 
