@@ -45,6 +45,14 @@ export const CustomOpenAIProvider = {
       let lines = str.split("\n");
 
       for (let line of lines) {
+        // Although this is not technically OpenAI compatible, we handle the
+        // APIs that return chunks starting with "data: " as well.
+        if (line.startsWith("data: ")) {
+          line = line.substring(6);
+        }
+        if (!line) continue;
+        if (line.slice(0, 6) === "[DONE]") return;
+
         try {
           let json = JSON.parse(line);
           let chunk = json["choices"][0]["delta"] ?? json["choices"][0]["message"];
