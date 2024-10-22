@@ -452,7 +452,7 @@
       "description": "Automatically check for updates from the official GitHub source.",
       "required": false,
       "type": "checkbox",
-      "default": false
+      "default": true
     },
     {
       "name": "persistentStorage",
