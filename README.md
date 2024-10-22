@@ -20,7 +20,8 @@ Homepage · [Privacy Policy](Privacy.md)
 This extension is currently not available on the Raycast Extension store, but
 installation from source is extremely simple.
 
-1. Clone the repository / download source code from GitHub.
+1. Download the source code from [the latest release](https://github.com/XInTheDark/raycast-g4f/releases/latest), or
+   clone the repository.
 2. Navigate to the directory, and open a Terminal window at the downloaded folder.
 3. Run `npm ci --production` to install required dependencies.
 4. Run `npm run dev` to build and import the extension.
