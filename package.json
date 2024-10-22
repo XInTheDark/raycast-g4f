@@ -132,7 +132,7 @@
       "name": "translate",
       "title": "Translate",
       "description": "Translate text to another language",
-      "icon": "synonym-icon.png",
+      "icon": "translate-icon.png",
       "mode": "view"
     },
     {
