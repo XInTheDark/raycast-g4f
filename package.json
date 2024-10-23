@@ -133,7 +133,17 @@
       "title": "Translate",
       "description": "Translate text to another language",
       "icon": "translate-icon.png",
-      "mode": "view"
+      "mode": "view",
+      "preferences": [
+        {
+          "name": "translateUseDefaultLanguage",
+          "label": "Always Use Default Language",
+          "description": "Always translate to the default language, skipping the language selection form.",
+          "required": false,
+          "type": "checkbox",
+          "default": false
+        }
+      ]
     },
     {
       "name": "improve",
