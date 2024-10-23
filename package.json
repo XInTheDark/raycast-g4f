@@ -93,6 +93,13 @@
       "mode": "view"
     },
     {
+      "name": "format",
+      "title": "Format Text",
+      "description": "Fix formatting of text",
+      "icon": "grammar-icon.png",
+      "mode": "view"
+    },
+    {
       "name": "friendly",
       "title": "Change Tone to Friendly",
       "description": "Change tone of text to friendly",
