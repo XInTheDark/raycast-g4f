@@ -4,7 +4,6 @@ import { Storage } from "./api/storage";
 import { useEffect, useState } from "react";
 
 import { preferences } from "../package.json";
-import { getPreset } from "./helpers/presets";
 
 const languages = preferences.find((x) => x.name === "defaultLanguage").data.map((x) => [x.title, x.value]);
 
