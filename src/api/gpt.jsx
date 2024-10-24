@@ -24,6 +24,7 @@ import { autoCheckForUpdates } from "../helpers/update";
 import { Message, pairs_to_messages } from "../classes/message";
 
 import { truncate_chat } from "../helpers/helper";
+import { plainTextMarkdown } from "../helpers/markdown";
 import { formatWebResult, getWebResult, systemResponse, web_search_mode, webSystemPrompt } from "./tools/web";
 import { NexraProvider } from "./Providers/nexra";
 
@@ -45,6 +46,7 @@ export default (
     defaultFiles = [],
     useDefaultLanguage = false,
     webSearchMode = "off",
+    displayPlainText = false,
   } = {}
 ) => {
   // The parameters are documented here:
@@ -80,6 +82,7 @@ export default (
   // 12. useDefaultLanguage: A boolean to use the default language. If true, the default language will be used in the response.
   // 13. webSearchMode: A string to allow web search. If "always", we will always search.
   // Otherwise, if "auto", the extension preferences are followed.
+  // 14. displayPlainText: A boolean to display the response as plain text. If true, we attempt to convert the markdown to plain text.
 
   /// Init
   const Pages = {
@@ -87,11 +90,19 @@ export default (
     Detail: 1,
   };
   const [page, setPage] = useState(Pages.Detail);
-  const [markdown, setMarkdown] = useState("");
+  const [markdown, _setMarkdown] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [selectedState, setSelected] = useState("");
   const [lastQuery, setLastQuery] = useState({ text: "", files: [] });
   const [lastResponse, setLastResponse] = useState("");
+
+  const setMarkdown = (text) => {
+    if (displayPlainText) {
+      _setMarkdown(plainTextMarkdown(text));
+    } else {
+      _setMarkdown(text);
+    }
+  };
 
   // Init parameters
   let { query: argQuery } = props.arguments ?? {};
