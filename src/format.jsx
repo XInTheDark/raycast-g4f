@@ -6,5 +6,6 @@ export default function Format(props) {
     useSelected: true,
     showFormText: "Text",
     allowPaste: true,
+    displayPlainText: true,
   });
 }

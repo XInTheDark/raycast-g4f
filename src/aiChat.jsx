@@ -20,6 +20,7 @@ import { watch } from "node:fs/promises";
 import { current_datetime, formatDate, removePrefix } from "./helpers/helper";
 import { help_action, help_action_panel } from "./helpers/helpPage";
 import { autoCheckForUpdates } from "./helpers/update";
+import { plainTextMarkdown } from "./helpers/markdown";
 
 import { MessagePair, format_chat_to_prompt, pairs_to_messages } from "./classes/message";
 
@@ -606,10 +607,12 @@ export default function Chat({ launchContext }) {
     );
   };
 
-  let ViewResponseComponent = ({ idx }) => {
+  let ViewResponseComponent = ({ idx, cb = null }) => {
     const { pop } = useNavigation();
 
-    const [response, setResponse] = useState(currentChatData.messages[idx].second.content);
+    let initial = currentChatData.messages[idx].second.content;
+    if (cb) initial = cb(initial); // cb is used to modify the response before displaying it
+    const [response, setResponse] = useState(initial);
 
     // The key thing here is that this pushed view (via Action.Push) is a sibling component, NOT a child,
     // so it does not automatically rerender upon a value change. So when the response streams, the view doesn't update.
@@ -634,6 +637,7 @@ export default function Chat({ launchContext }) {
         for await (const event of watcher) {
           if (event.eventType === "change") {
             let response = await Storage.fileStorage_read("updateCurrentResponse");
+            if (cb) response = cb(response);
             setResponse(response);
           }
         }
@@ -915,6 +919,12 @@ export default function Chat({ launchContext }) {
             title="View Response"
             target={<ViewResponseComponent idx={idx} />}
             shortcut={{ modifiers: ["cmd"], key: "f" }}
+          />
+          <Action.Push
+            icon={Icon.Maximize}
+            title="View as Plain Text"
+            target={<ViewResponseComponent idx={idx} cb={plainTextMarkdown} />}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "f" }}
           />
           <Action
             icon={Icon.ArrowClockwise}
