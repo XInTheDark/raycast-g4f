@@ -555,16 +555,38 @@ export const processChunksIncremental = async function* (response, provider, sta
 };
 
 // instead of yielding incrementally, this function yields the entire response each time.
+// this allows us to perform more complex operations on the response, such as adding a cursor icon.
 // hence, when using the function, we will do `response = chunk` instead of `response += chunk`
 export const processChunks = async function* (response, provider, status = null) {
   let r = "";
+
+  // Experimental feature: Show a cursor icon while loading the response
+  const useCursorIcon = getPreferenceValues()["useCursorIcon"];
+  const cursorIcon = "●"; // const cursorIcon = "▋";
+
   for await (const chunk of await processChunksIncremental(response, provider, status)) {
+    if (useCursorIcon && r[r.length - 1] === cursorIcon) {
+      // remove cursor icon if enabled
+      r = r.slice(0, -1);
+    }
+
     // normally we add the chunk to r, but for certain providers, the chunk is already yielded fully
     if (provider === NexraProvider) {
       r = chunk;
     } else {
       r += chunk;
     }
+
+    if (useCursorIcon) {
+      r += cursorIcon;
+    }
+
+    yield r;
+  }
+
+  if (useCursorIcon && r[r.length - 1] === cursorIcon) {
+    // remove cursor icon after response is finished
+    r = r.slice(0, -1);
     yield r;
   }
 };

@@ -185,6 +185,10 @@ Enable more persistent storage of the extension's data, like AI Chat data or Cus
 This will back up a copy of this data to files on your computer. Useful for saving large amounts of data.
 *Note: With this option off, your data is already well preserved. Do not enable this if you have sensitive data.*
 
+### Enable Cursor Icon
+
+Show a cursor icon when the response is loading - cosmetic option only.
+
 ### Code Interpreter (BETA)
 
 Allows GPT to execute Python code locally. The model has been instructed to strictly only produce safe code,
