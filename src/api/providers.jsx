@@ -118,6 +118,13 @@ export const ChatProvidersReact = (() => {
 /// Providers that support file uploads
 export const file_supported_providers = [GeminiProvider, DeepInfraProvider];
 
+/// Provider strings that support image uploads
+export const image_supported_provider_strings = [
+  "GoogleGemini",
+  "DeepInfraLlama32_90B_Vision",
+  "DeepInfraLlama32_11B_Vision",
+];
+
 /// Providers that support function calling
 export const function_supported_providers = [DeepInfraProvider];
 

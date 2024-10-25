@@ -1178,6 +1178,7 @@ export default function Chat({ launchContext }) {
               files: launchContext.query.files,
             }),
           ],
+          provider: launchContext.provider,
         });
         addChatAsCurrent(setChatData, setCurrentChatData, newChat);
       }

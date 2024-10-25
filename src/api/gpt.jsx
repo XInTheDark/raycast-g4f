@@ -47,6 +47,7 @@ export default (
     useDefaultLanguage = false,
     webSearchMode = "off",
     displayPlainText = false,
+    allowedProviders = null,
   } = {}
 ) => {
   // The parameters are documented here:
@@ -83,6 +84,7 @@ export default (
   // 13. webSearchMode: A string to allow web search. If "always", we will always search.
   // Otherwise, if "auto", the extension preferences are followed.
   // 14. displayPlainText: A boolean to display the response as plain text. If true, we attempt to convert the markdown to plain text.
+  // 15. allowedProviders: An array of allowed provider strings. If provided, only the providers in the array will be used.
 
   /// Init
   const Pages = {
@@ -95,6 +97,7 @@ export default (
   const [selectedState, setSelected] = useState("");
   const [lastQuery, setLastQuery] = useState({ text: "", files: [] });
   const [lastResponse, setLastResponse] = useState("");
+  const [providerString, setProviderString] = useState(""); // global variable since it may be used outside the main function
 
   const setMarkdown = (text) => {
     if (displayPlainText) {
@@ -114,8 +117,13 @@ export default (
     if (generationStatus.loading) return;
     generationStatus.loading = true;
 
-    // load provider and model from preferences
-    const info = providers.get_provider_info();
+    // load provider and model
+    const providerString =
+      !allowedProviders || allowedProviders.includes(providers.default_provider_string())
+        ? providers.default_provider_string()
+        : allowedProviders[0];
+    setProviderString(providerString);
+    const info = providers.get_provider_info(providerString);
     // additional options
     let options = providers.get_options_from_info(info);
 
@@ -344,7 +352,7 @@ export default (
                 await launchCommand({
                   name: "aiChat",
                   type: LaunchType.UserInitiated,
-                  context: { query: lastQuery, response: lastResponse, creationName: "" },
+                  context: { query: lastQuery, response: lastResponse, provider: providerString },
                 });
               }}
             />
