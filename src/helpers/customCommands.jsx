@@ -1,5 +1,7 @@
 import { Storage } from "../api/storage";
+
 import { Clipboard } from "@raycast/api";
+import { getBrowserTab } from "./browser";
 
 export class CustomCommand {
   constructor({ name = "", prompt = "", id = Date.now().toString(), options = {} }) {
@@ -61,6 +63,9 @@ export class CustomCommand {
       case "day":
         // e.g. Monday
         processed = new Date().toLocaleDateString([], { weekday: "long" });
+        break;
+      case "browser-tab":
+        processed = await getBrowserTab();
         break;
       default:
         processed = t;
