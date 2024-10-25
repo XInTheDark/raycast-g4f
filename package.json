@@ -65,6 +65,22 @@
       ]
     },
     {
+      "name": "askAboutBrowserTab",
+      "title": "Ask About Browser Tab",
+      "description": "Ask GPT about browser tab",
+      "icon": "screen-icon.png",
+      "mode": "view",
+      "arguments": [
+        {
+          "name": "query",
+          "placeholder": "Query",
+          "type": "text",
+          "required": false
+        }
+      ],
+      "disabledByDefault": true
+    },
+    {
       "name": "continue",
       "title": "Continue Text",
       "description": "Generate completion of text",
