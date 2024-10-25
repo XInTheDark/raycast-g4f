@@ -562,12 +562,12 @@ export const processChunks = async function* (response, provider, status = null)
 
   // Experimental feature: Show a cursor icon while loading the response
   const useCursorIcon = getPreferenceValues()["useCursorIcon"];
-  const cursorIcon = "●"; // const cursorIcon = "▋";
+  const cursorIcon = " ●"; // const cursorIcon = "▋";
 
   for await (const chunk of await processChunksIncremental(response, provider, status)) {
-    if (useCursorIcon && r[r.length - 1] === cursorIcon) {
+    if (useCursorIcon) {
       // remove cursor icon if enabled
-      r = r.slice(0, -1);
+      r = r.slice(0, -cursorIcon.length);
     }
 
     // normally we add the chunk to r, but for certain providers, the chunk is already yielded fully
@@ -584,9 +584,9 @@ export const processChunks = async function* (response, provider, status = null)
     yield r;
   }
 
-  if (useCursorIcon && r[r.length - 1] === cursorIcon) {
+  if (useCursorIcon) {
     // remove cursor icon after response is finished
-    r = r.slice(0, -1);
+    r = r.slice(0, -cursorIcon.length);
     yield r;
   }
 };
