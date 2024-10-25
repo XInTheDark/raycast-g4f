@@ -18,6 +18,8 @@ import { useEffect, useState } from "react";
 
 import * as providers from "./providers";
 
+import throttle from "lodash.throttle";
+
 import { help_action } from "../helpers/helpPage";
 import { autoCheckForUpdates } from "../helpers/update";
 
@@ -193,7 +195,7 @@ export default (
         let loadingToast = await showToast(Toast.Style.Animated, "Response loading");
         generationStatus.stop = false;
 
-        const handler = (new_message) => {
+        const _handler = (new_message) => {
           response = new_message;
           response = formatResponse(response, info.provider);
           setMarkdown(response);
@@ -205,7 +207,11 @@ export default (
           loadingToast.message = `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`;
         };
 
+        const handler = throttle(_handler, 100);
+
         await chatCompletion(info, messages, options, handler, get_status);
+
+        handler.flush();
       }
       setLastResponse(response);
 

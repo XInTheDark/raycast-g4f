@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 
 import { Storage } from "./api/storage";
 import { watch } from "node:fs/promises";
+import throttle from "lodash.throttle";
 
 import { current_datetime, formatDate, removePrefix } from "./helpers/helper";
 import { help_action, help_action_panel } from "./helpers/helpPage";
@@ -267,6 +268,9 @@ export default function Chat({ launchContext }) {
       return;
     }
 
+    // Init other variables
+    const devMode = getPreferenceValues()["devMode"];
+
     if (!info.stream) {
       response = await getChatResponse(currentChatData, query);
       setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, { response: response });
@@ -279,7 +283,7 @@ export default function Chat({ launchContext }) {
       let i = 0;
       let lastChunkTime = Date.now();
 
-      const handler = async (new_message) => {
+      const _handler = async (new_message) => {
         i++;
         response = new_message;
         response = formatResponse(response, info.provider);
@@ -294,12 +298,16 @@ export default function Chat({ launchContext }) {
           }
         }
 
+        if (devMode && i % 1 === 0) {
+          console.log(process.memoryUsage());
+        }
+
         // Web Search functionality
         // We check the response every few chunks so we can possibly exit early
         if (
           webSearchMode === "auto" &&
           features.webSearch &&
-          (i & 15) === 0 &&
+          (i & 7) === 0 &&
           response.includes(webToken) &&
           response.includes(webTokenEnd)
         ) {
@@ -314,12 +322,17 @@ export default function Chat({ launchContext }) {
         loadingToast.message = `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`;
       };
 
+      const handler = throttle(_handler, 100);
+
       await getChatResponse(currentChatData, query, handler, get_status);
+
+      handler.flush();
     }
 
     // Web Search functionality
     // Process web search response again in case streaming is false, or if it was not processed during streaming
-    if (webSearchMode === "auto" && features.webSearch && response.includes(webToken)) {
+    // Prevent double processing by checking that generationStatus.stop is false
+    if (webSearchMode === "auto" && features.webSearch && !generationStatus.stop && response.includes(webToken)) {
       generationStatus.stop = true;
       await processWebSearchResponse(currentChatData, setCurrentChatData, messageID, response, query);
       return;
@@ -808,14 +821,15 @@ export default function Chat({ launchContext }) {
     let newQuery = query + webResponse;
 
     // remove latest message and insert new one
-    currentChatData.messages.shift();
-    currentChatData.messages.unshift(new MessagePair({ prompt: newQuery }));
-    let newMessageID = currentChatData.messages[0].id;
+    let newChatData = structuredClone(currentChatData);
+    newChatData.messages.shift();
+    newChatData.messages.unshift(new MessagePair({ prompt: newQuery }));
+    let newMessageID = newChatData.messages[0].id;
 
-    setCurrentChatData(currentChatData); // important to update the UI!
+    setCurrentChatData(newChatData); // important to update the UI!
 
     // Note how we don't pass query here because it is already in the chat
-    await updateChatResponse(currentChatData, setCurrentChatData, newMessageID, null, { webSearch: false });
+    await updateChatResponse(newChatData, setCurrentChatData, newMessageID, null, { webSearch: false });
   };
 
   // Smart Chat Naming functionality

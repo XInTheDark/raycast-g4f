@@ -512,6 +512,14 @@
       "default": false
     },
     {
+      "name": "devMode",
+      "label": "Enable Developer Mode",
+      "description": "Enable developer mode for more extensive logging. Do not enable this.",
+      "required": false,
+      "type": "checkbox",
+      "default": false
+    },
+    {
       "name": "GeminiAPIKeys",
       "title": "Google Gemini API Keys",
       "description": "Optional. Only used if Gemini provider is selected. Multiple keys are supported - separate them with commas.",
@@ -810,6 +818,7 @@
     "fetch-to-curl": "^0.6.0",
     "g4f-image": "^1.2.0",
     "gemini-g4f": "^12.3.9",
+    "lodash.throttle": "^4.1.1",
     "node-fetch": "^3.3.2"
   },
   "devDependencies": {
