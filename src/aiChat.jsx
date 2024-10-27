@@ -281,7 +281,6 @@ export default function Chat({ launchContext }) {
     } else {
       generationStatus = { stop: false, loading: true, updateCurrentResponse: false };
       let i = 0;
-      let lastChunkTime = Date.now();
 
       const _handler = async (new_message) => {
         i++;
@@ -290,12 +289,7 @@ export default function Chat({ launchContext }) {
         setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, { response: response });
 
         if (generationStatus.updateCurrentResponse) {
-          // See ViewResponseComponent for more details
-          // We throttle the updates to prevent excessive file I/O
-          if (Date.now() - lastChunkTime > 300) {
-            await Storage.fileStorage_write("updateCurrentResponse", response);
-            lastChunkTime = Date.now();
-          }
+          await _file_handler();
         }
 
         if (devMode && i % 1 === 0) {
@@ -322,11 +316,20 @@ export default function Chat({ launchContext }) {
         loadingToast.message = `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`;
       };
 
+      const _file_handler = throttle(async () => {
+        await Storage.fileStorage_write("updateCurrentResponse", response);
+      }, 300); // See ViewResponseComponent for more details
+
       const handler = throttle(_handler, 100);
 
+      // Get response
       await getChatResponse(currentChatData, query, handler, get_status);
 
-      handler.flush();
+      await handler.flush();
+
+      if (generationStatus.updateCurrentResponse) {
+        await _file_handler.flush();
+      }
     }
 
     // Web Search functionality
@@ -336,11 +339,6 @@ export default function Chat({ launchContext }) {
       generationStatus.stop = true;
       await processWebSearchResponse(currentChatData, setCurrentChatData, messageID, response, query);
       return;
-    }
-
-    if (generationStatus.updateCurrentResponse) {
-      // Write the final response to file
-      await Storage.fileStorage_write("updateCurrentResponse", response);
     }
 
     setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, { finished: true });
