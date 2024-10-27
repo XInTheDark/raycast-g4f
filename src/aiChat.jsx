@@ -1261,7 +1261,7 @@ export default function Chat({ launchContext }) {
           if (x.visible)
             return (
               <List.Item
-                title={x.first.content}
+                title={x.first.content.substring(0, 50)} // limit to 50 characters
                 subtitle={formatDate(x.creationDate)}
                 detail={
                   <List.Item.Detail
