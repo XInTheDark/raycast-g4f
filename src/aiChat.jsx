@@ -840,7 +840,8 @@ export default function Chat({ launchContext }) {
       }
 
       // Format chat using default wrapper
-      let formatted_chat = format_chat_to_prompt(pairs_to_messages(newChat.messages), null);
+      let formatted_chat = format_chat_to_prompt(pairs_to_messages(newChat.messages));
+      formatted_chat = formatted_chat.substring(0, 4000) + "..."; // limit to 4000 characters
       let newQuery =
         "Below is a conversation between the user and the assistant. Give a concise name for this chat. " +
         "Output ONLY the name of the chat (WITHOUT quotes) and NOTHING else.\n\n" +

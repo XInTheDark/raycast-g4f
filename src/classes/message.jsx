@@ -89,7 +89,9 @@ export const pairs_to_messages = (pairs, query = null) => {
 };
 
 // Format an array of Messages into a single string
-export const format_chat_to_prompt = (chat, model = null) => {
+// model: Model string
+// assistant: Whether to include the additional "Assistant:" prompt
+export const format_chat_to_prompt = (chat, { model = null, assistant = true } = {}) => {
   chat = messages_to_json(chat);
 
   model = model?.toLowerCase() || "";
@@ -101,7 +103,7 @@ export const format_chat_to_prompt = (chat, model = null) => {
       prompt += `<|start_header_id|>${chat[i].role}<|end_header_id|>`;
       prompt += `\n${chat[i].content}<|eot_id|>`;
     }
-    prompt += "<|start_header_id|>assistant<|end_header_id|>";
+    if (assistant) prompt += "<|start_header_id|>assistant<|end_header_id|>";
   } else if (model.includes("mixtral")) {
     // <s> [INST] Prompt [/INST] answer</s> [INST] Follow-up instruction [/INST]
     for (let i = 0; i < chat.length; i++) {
@@ -116,7 +118,7 @@ export const format_chat_to_prompt = (chat, model = null) => {
     for (let i = 0; i < chat.length; i++) {
       prompt += capitalize(chat[i].role) + ": " + chat[i].content + "\n";
     }
-    prompt += "Assistant:";
+    if (assistant) prompt += "Assistant:";
   }
 
   return prompt;

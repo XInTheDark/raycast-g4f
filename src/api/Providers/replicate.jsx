@@ -17,7 +17,7 @@ export const ReplicateProvider = {
     let data = {
       stream: true,
       input: {
-        prompt: format_chat_to_prompt(chat, model),
+        prompt: format_chat_to_prompt(chat, { model: model }),
         max_tokens: model.includes("meta-llama-3") ? 512 : null, // respected by meta-llama-3
         max_new_tokens: model.includes("mixtral") ? 1024 : null, // respected by mixtral-8x7b
         temperature: options.temperature,

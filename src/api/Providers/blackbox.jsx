@@ -62,9 +62,20 @@ export const BlackboxProvider = {
   generate: async function* (chat, options, { max_retries = 5 }) {
     let random_id = token_hex(16);
     let random_user_id = uuid4();
-    chat = ["claude-3.5-sonnet"].includes(options.model)
-      ? chat
-      : [{ role: "user", content: format_chat_to_prompt(chat) }];
+
+    // The chat is truncated to ~4 messages by the provider, so we reformat it
+    // to at most 3 messages, with the last message being the prompt.
+    let prompt = chat.pop().content; // remove last message
+    if (chat.length > 0) {
+      console.assert(chat.length > 1);
+      console.assert(chat[chat.length - 1].role === "assistant");
+      const last_assistant_message = chat.pop().content; // remove last assistant message
+      chat = [
+        { role: "user", content: format_chat_to_prompt(chat, { assistant: false }) },
+        { role: "assistant", content: last_assistant_message },
+      ];
+    }
+    chat.push({ role: "user", content: prompt });
 
     let data = {
       messages: chat,
