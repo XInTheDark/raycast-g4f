@@ -584,12 +584,8 @@ export const processChunks = async function* (response, provider, status = null)
       r = r.slice(0, -cursorIcon.length);
     }
 
-    // normally we add the chunk to r, but for certain providers, the chunk is already yielded fully
-    if (provider === NexraProvider) {
-      r = chunk;
-    } else {
-      r += chunk;
-    }
+    // add the chunk
+    r += chunk;
 
     if (useCursorIcon) {
       r += cursorIcon;

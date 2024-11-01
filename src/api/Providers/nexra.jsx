@@ -10,16 +10,17 @@ const headers = {
 
 export const NexraProvider = {
   name: "Nexra",
-  generate: async (chat, options) => {
+  customStream: true,
+  generate: async (chat, options, { stream_update }) => {
     if (options.stream) {
-      return getNexraResponseStream(chat, options);
+      return getNexraResponseStream(chat, options, stream_update);
     } else {
       return await getNexraResponseNoStream(chat, options);
     }
   },
 };
 
-export const getNexraResponseStream = async function* (chat, options, max_retries = 5) {
+export const getNexraResponseStream = async function (chat, options, stream_update, max_retries = 5) {
   if (["Bing"].includes(options.model)) {
     chat = [{ role: "user", content: format_chat_to_prompt(chat) }];
   } else {
@@ -63,14 +64,17 @@ export const getNexraResponseStream = async function* (chat, options, max_retrie
         // if (chunkJson["error"]) throw new Error();
 
         let chunk = chunkJson["message"];
-        if (chunk) yield chunk; // note that this is the full response, not just incremental updates!
+        if (chunk) {
+          // note that the chunk from the API is the full response, not incremental updates!
+          stream_update(chunk);
+        }
         if (chunkJson["finish"]) break;
       }
     }
   } catch (e) {
     if (max_retries > 0) {
       console.log(e, "Retrying...");
-      yield* getNexraResponseStream(chat, options, max_retries - 1);
+      return await getNexraResponseStream(chat, options, stream_update, max_retries - 1);
     } else {
       throw e;
     }
