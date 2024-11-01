@@ -28,7 +28,6 @@ import { Message, pairs_to_messages } from "../classes/message";
 import { truncate_chat } from "../helpers/helper";
 import { plainTextMarkdown } from "../helpers/markdown";
 import { getFormattedWebResult, systemResponse, web_search_mode, webSystemPrompt } from "./tools/web";
-import { NexraProvider } from "./Providers/nexra";
 
 let generationStatus = { stop: false, loading: false };
 let get_status = () => generationStatus.stop;

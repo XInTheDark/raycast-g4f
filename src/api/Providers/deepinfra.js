@@ -2,7 +2,7 @@ import fetch from "node-fetch";
 import fs from "fs";
 
 import { messages_to_json } from "../../classes/message";
-import { getWebResult, web_search_mode, webSearchTool } from "../tools/web";
+import { getWebResult, webSearchTool } from "../tools/web";
 import { codeInterpreterTool, getCodeInterpreterResult } from "../tools/code";
 import { getPreferenceValues } from "@raycast/api";
 
