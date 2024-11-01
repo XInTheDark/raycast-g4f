@@ -3,8 +3,8 @@
 
 import fetch from "node-fetch";
 
-import { Storage } from "../storage";
-import { messages_to_json } from "../../classes/message";
+import { Storage } from "../../storage";
+import { messages_to_json } from "../../../classes/message";
 import { getCustomAPIInfo } from "./g4f_local";
 
 import { Form } from "@raycast/api";

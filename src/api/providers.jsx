@@ -20,9 +20,9 @@ import { MetaAIProvider } from "./Providers/metaAI";
 import { ReplicateProvider } from "./Providers/replicate";
 import { PhindProvider } from "./Providers/phind";
 import { GeminiProvider } from "./Providers/google_gemini";
-import { G4FLocalProvider } from "./Providers/g4f_local";
-import { OllamaLocalProvider } from "./Providers/ollama_local";
-import { CustomOpenAIProvider } from "./Providers/custom_openai";
+import { G4FLocalProvider } from "./Providers/special/g4f_local";
+import { OllamaLocalProvider } from "./Providers/special/ollama_local";
+import { CustomOpenAIProvider } from "./Providers/special/custom_openai";
 
 /// All providers info
 // { provider internal name, {provider object, model, stream, extra options} }

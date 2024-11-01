@@ -4,12 +4,12 @@
 import { exec } from "child_process";
 import fetch from "node-fetch";
 
-import { Storage } from "../storage";
-import { messages_to_json } from "../../classes/message";
-import { sleep } from "../../helpers/helper";
+import { Storage } from "../../storage";
+import { messages_to_json } from "../../../classes/message";
+import { sleep } from "../../../helpers/helper";
 
 import { Form } from "@raycast/api";
-import { getSupportPath } from "../../helpers/helper";
+import { getSupportPath } from "../../../helpers/helper";
 
 // constants
 const DEFAULT_MODEL = "meta-ai";
