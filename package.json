@@ -817,7 +817,7 @@
     "duck-duck-scrape": "^2.2.5",
     "fetch-to-curl": "^0.6.0",
     "g4f-image": "^1.2.0",
-    "gemini-g4f": "^12.3.9",
+    "gemini-g4f": "^12.3.10-beta.1",
     "lodash.throttle": "^4.1.1",
     "node-fetch": "^3.3.2"
   },
