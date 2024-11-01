@@ -2,8 +2,6 @@ import fetch from "node-fetch";
 import fs from "fs";
 
 import { messages_to_json } from "../../classes/message";
-import { getWebResult, webSearchTool } from "../tools/web";
-import { codeInterpreterTool, getCodeInterpreterResult } from "../tools/code";
 import { getPreferenceValues } from "@raycast/api";
 
 // Implementation ported from gpt4free DeepInfra provider.
@@ -95,6 +93,15 @@ export const DeepInfraProvider = {
 
     const useWebSearch = options.webSearch === "auto" && function_supported_models.includes(model);
     const useCodeInterpreter = getPreferenceValues()["codeInterpreter"] && function_supported_models.includes(model);
+
+    // Dynamically import tools if needed
+    let getWebResult, webSearchTool, codeInterpreterTool, getCodeInterpreterResult;
+    if (useWebSearch) {
+      ({ getWebResult, webSearchTool } = await import("../tools/web"));
+    }
+    if (useCodeInterpreter) {
+      ({ getCodeInterpreterResult, codeInterpreterTool } = await import("../tools/code"));
+    }
     const tools = [...(useWebSearch ? [webSearchTool] : []), ...(useCodeInterpreter ? [codeInterpreterTool] : [])];
 
     let data = {
