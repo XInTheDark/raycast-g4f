@@ -1,8 +1,11 @@
-import { AIPreset, getAIPresets, getSubtitle, setAIPresets } from "./helpers/presets";
-import { useEffect, useState } from "react";
 import { Form, List, Action, ActionPanel, Icon, useNavigation, confirmAlert, showToast, Toast } from "@raycast/api";
+import { useEffect, useState } from "react";
+
 import { help_action } from "./helpers/helpPage";
+import { AIPreset, getAIPresets, getSubtitle, setAIPresets } from "./helpers/presets";
+
 import * as providers from "./api/providers";
+import { ChatProvidersReact } from "./api/providers_react";
 import { Preferences } from "./api/preferences";
 
 export default function ManageAIPresets() {
@@ -77,7 +80,7 @@ export default function ManageAIPresets() {
         <Form.TextField id="name" title="Name" defaultValue={preset.name} />
         <Form.Description title="Provider" text="The provider and model used for this chat." />
         <Form.Dropdown id="provider" defaultValue={preset.provider}>
-          {providers.ChatProvidersReact}
+          {ChatProvidersReact}
         </Form.Dropdown>
 
         <Form.Description title="Web Search" text="Allow GPT to search the web for information." />

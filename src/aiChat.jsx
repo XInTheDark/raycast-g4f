@@ -28,6 +28,8 @@ import { MessagePair, format_chat_to_prompt, pairs_to_messages } from "./classes
 
 import { formatResponse, getChatResponse, getChatResponseSync } from "./api/gpt";
 import * as providers from "./api/providers";
+import { ChatProvidersReact } from "./api/providers_react";
+
 import { getAIPresets, getPreset } from "./helpers/presets";
 
 // Web search module
@@ -470,7 +472,7 @@ export default function Chat({ launchContext }) {
         <Form.TextArea id="chatText" title="Chat Transcript" />
         <Form.Description title="Provider" text="The provider and model used for this chat." />
         <Form.Dropdown id="provider" defaultValue={providers.default_provider_string()}>
-          {providers.ChatProvidersReact}
+          {ChatProvidersReact}
         </Form.Dropdown>
       </Form>
     );
@@ -553,7 +555,7 @@ export default function Chat({ launchContext }) {
 
         <Form.Description title="Provider" text="The provider and model used for this chat." />
         <Form.Dropdown id="provider" defaultValue={chat?.provider || providers.default_provider_string()}>
-          {providers.ChatProvidersReact}
+          {ChatProvidersReact}
         </Form.Dropdown>
 
         <Form.Description title="Web Search" text="Allow GPT to search the web for information." />
