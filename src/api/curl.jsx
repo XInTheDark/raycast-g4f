@@ -13,7 +13,7 @@
 // 4. REQUIREMENT: The `curl` command must be available in the system PATH.
 
 import { exec } from "child_process";
-import fetchToCurl from "fetch-to-curl";
+import { fetchToCurl } from "fetch-to-curl";
 
 export const curlRequest = (url, options, cb) => {
   const curl_cmd = fetchToCurl(url, options) + " --silent --no-buffer";
