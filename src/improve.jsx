@@ -1,4 +1,4 @@
-import useGPT from "./api/gpt";
+import useGPT from "./api/gpt.jsx";
 
 export default function Improve(props) {
   return useGPT(props, {

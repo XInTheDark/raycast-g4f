@@ -1,6 +1,6 @@
-import { curlRequest } from "../curl";
-import { DEFAULT_HEADERS } from "../../helpers/headers";
-import { messages_to_json } from "../../classes/message";
+import { curlRequest } from "../curl.js";
+import { DEFAULT_HEADERS } from "../../helpers/headers.js";
+import { messages_to_json } from "../../classes/message.js";
 
 const url = "https://www.phind.com";
 const home_url = "https://www.phind.com/search?home=true";

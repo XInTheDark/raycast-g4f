@@ -5,11 +5,11 @@ import { exec } from "child_process";
 
 import { popToRoot, showToast, Toast, confirmAlert, Icon } from "@raycast/api";
 
-import { Storage } from "../api/storage";
-import { Preferences } from "../api/preferences";
+import { Storage } from "../api/storage.js";
+import { Preferences } from "../api/preferences.js";
 
 import fs from "fs";
-import { getAssetsPath, getSupportPath } from "./helper";
+import { getAssetsPath, getSupportPath } from "./helper.js";
 
 // Some notes:
 // 1. The update function asserts that each release is versioned in the form "vX.Y" or "vX.Y.Z",

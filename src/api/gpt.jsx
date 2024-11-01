@@ -15,18 +15,18 @@ import {
 } from "@raycast/api";
 import { useEffect, useState } from "react";
 
-import * as providers from "./providers";
+import * as providers from "./providers.js";
 
 import throttle from "lodash.throttle";
 
-import { help_action } from "../helpers/helpPage";
-import { autoCheckForUpdates } from "../helpers/update";
+import { help_action } from "../helpers/helpPage.jsx";
+import { autoCheckForUpdates } from "../helpers/update.jsx";
 
-import { Message, pairs_to_messages } from "../classes/message";
-import { Preferences } from "./preferences";
+import { Message, pairs_to_messages } from "../classes/message.js";
+import { Preferences } from "./preferences.js";
 
-import { truncate_chat } from "../helpers/helper";
-import { plainTextMarkdown } from "../helpers/markdown";
+import { truncate_chat } from "../helpers/helper.js";
+import { plainTextMarkdown } from "../helpers/markdown.js";
 import { getFormattedWebResult, systemResponse, web_search_mode, webSystemPrompt } from "./tools/web";
 
 let generationStatus = { stop: false, loading: false };

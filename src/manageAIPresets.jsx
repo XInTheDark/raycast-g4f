@@ -1,12 +1,12 @@
 import { Form, List, Action, ActionPanel, Icon, useNavigation, confirmAlert, showToast, Toast } from "@raycast/api";
 import { useEffect, useState } from "react";
 
-import { help_action } from "./helpers/helpPage";
-import { AIPreset, getAIPresets, getSubtitle, setAIPresets } from "./helpers/presets";
+import { help_action } from "./helpers/helpPage.jsx";
+import { AIPreset, getAIPresets, getSubtitle, setAIPresets } from "./helpers/presets.jsx";
 
-import * as providers from "./api/providers";
-import { ChatProvidersReact } from "./api/providers_react";
-import { Preferences } from "./api/preferences";
+import * as providers from "./api/providers.js";
+import { ChatProvidersReact } from "./api/providers_react.jsx";
+import { Preferences } from "./api/preferences.js";
 
 export default function ManageAIPresets() {
   let [presets, setPresets] = useState(null);

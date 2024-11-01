@@ -13,24 +13,24 @@ import {
 } from "@raycast/api";
 import { useEffect, useState } from "react";
 
-import { Storage } from "./api/storage";
-import { Preferences } from "./api/preferences";
+import { Storage } from "./api/storage.js";
+import { Preferences } from "./api/preferences.js";
 
 import { watch } from "node:fs/promises";
 import throttle from "lodash.throttle";
 
-import { current_datetime, formatDate, removePrefix } from "./helpers/helper";
-import { help_action, help_action_panel } from "./helpers/helpPage";
-import { autoCheckForUpdates } from "./helpers/update";
-import { plainTextMarkdown } from "./helpers/markdown";
+import { current_datetime, formatDate, removePrefix } from "./helpers/helper.js";
+import { help_action, help_action_panel } from "./helpers/helpPage.jsx";
+import { autoCheckForUpdates } from "./helpers/update.jsx";
+import { plainTextMarkdown } from "./helpers/markdown.js";
 
-import { MessagePair, format_chat_to_prompt, pairs_to_messages } from "./classes/message";
+import { MessagePair, format_chat_to_prompt, pairs_to_messages } from "./classes/message.js";
 
-import { formatResponse, getChatResponse, getChatResponseSync } from "./api/gpt";
-import * as providers from "./api/providers";
-import { ChatProvidersReact } from "./api/providers_react";
+import { formatResponse, getChatResponse, getChatResponseSync } from "./api/gpt.jsx";
+import * as providers from "./api/providers.js";
+import { ChatProvidersReact } from "./api/providers_react.jsx";
 
-import { getAIPresets, getPreset } from "./helpers/presets";
+import { getAIPresets, getPreset } from "./helpers/presets.jsx";
 
 // Web search module
 import { getFormattedWebResult, has_native_web_search, web_search_mode } from "./api/tools/web";

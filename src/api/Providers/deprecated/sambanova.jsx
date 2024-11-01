@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-import { messages_to_json } from "../../../classes/message";
+import { messages_to_json } from "../../../classes/message.js";
 
 const api_url = "https://cloud.sambanova.ai/api/completion";
 

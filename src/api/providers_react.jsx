@@ -1,5 +1,5 @@
 import { Form } from "@raycast/api";
-import { chat_providers_names } from "./providers";
+import { chat_providers_names } from "./providers.js";
 
 export const ChatProvidersReact = (() => {
   // Display custom APIs in a separate section for organization

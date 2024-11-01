@@ -5,9 +5,9 @@
 // Thus, only use it when you really need to persist data across sessions. Otherwise, use local storage.
 
 import { LocalStorage } from "@raycast/api";
-import { Preferences } from "./preferences";
+import { Preferences } from "./preferences.js";
 
-import { getSupportPath } from "../helpers/helper";
+import { getSupportPath } from "../helpers/helper.js";
 import fs from "fs";
 
 const not_found = (x) => x === undefined || x === null;

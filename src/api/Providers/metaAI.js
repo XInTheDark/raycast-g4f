@@ -1,8 +1,8 @@
 import fetch from "node-fetch";
 import { randomUUID } from "crypto";
-import { format_chat_to_prompt } from "../../classes/message";
-import { sleep } from "../../helpers/helper";
-import { DEFAULT_HEADERS } from "../../helpers/headers";
+import { format_chat_to_prompt } from "../../classes/message.js";
+import { sleep } from "../../helpers/helper.js";
+import { DEFAULT_HEADERS } from "../../helpers/headers.js";
 
 // Implementation ported from gpt4free MetaAI provider.
 

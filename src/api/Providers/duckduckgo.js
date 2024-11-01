@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
-import { format_chat_to_prompt } from "../../classes/message";
-import { sleep } from "../../helpers/helper";
+import { format_chat_to_prompt } from "../../classes/message.js";
+import { sleep } from "../../helpers/helper.js";
 
 const status_url = "https://duckduckgo.com/duckchat/v1/status";
 const chat_url = "https://duckduckgo.com/duckchat/v1/chat";

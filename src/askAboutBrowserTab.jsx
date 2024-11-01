@@ -1,4 +1,4 @@
-import useGPT from "./api/gpt";
+import useGPT from "./api/gpt.jsx";
 import { getBrowserTab } from "./helpers/browser";
 
 export default function AskAboutBrowserTab(props) {

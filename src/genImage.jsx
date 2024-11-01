@@ -15,9 +15,9 @@ import { useEffect, useState } from "react";
 import fs from "fs";
 import fetch from "node-fetch";
 
-import { Storage } from "./api/storage";
-import { formatDate, getSupportPath } from "./helpers/helper";
-import { help_action } from "./helpers/helpPage";
+import { Storage } from "./api/storage.js";
+import { formatDate, getSupportPath } from "./helpers/helper.js";
+import { help_action } from "./helpers/helpPage.jsx";
 
 import { provider, generate } from "g4f-image";
 

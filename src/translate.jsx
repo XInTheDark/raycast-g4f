@@ -1,10 +1,10 @@
-import useGPT from "./api/gpt";
+import useGPT from "./api/gpt.jsx";
 
 import { Form } from "@raycast/api";
 import { useEffect, useState } from "react";
 
-import { Storage } from "./api/storage";
-import { Preferences } from "./api/preferences";
+import { Storage } from "./api/storage.js";
+import { Preferences } from "./api/preferences.js";
 
 import { preferences } from "../package.json";
 

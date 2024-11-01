@@ -8,8 +8,8 @@ import {
 import { getOllamaApiURL, getOllamaCtxSize, getOllamaModelsComponent } from "./api/Providers/special/ollama_local";
 import { getCustomOpenAiInfo } from "./api/Providers/special/custom_openai";
 
-import { Storage } from "./api/storage";
-import { help_action } from "./helpers/helpPage";
+import { Storage } from "./api/storage.js";
+import { help_action } from "./helpers/helpPage.jsx";
 
 import { Form, ActionPanel, Action, showToast, Toast } from "@raycast/api";
 import { useState, useEffect } from "react";

@@ -1,6 +1,6 @@
-import { curlRequest } from "../curl";
-import { format_chat_to_prompt } from "../../classes/message";
-import { DEFAULT_HEADERS } from "../../helpers/headers";
+import { curlRequest } from "../curl.js";
+import { format_chat_to_prompt } from "../../classes/message.js";
+import { DEFAULT_HEADERS } from "../../helpers/headers.js";
 
 const url = "https://chatgptfree.ai";
 const api_url = "https://chatgptfree.ai/wp-admin/admin-ajax.php";

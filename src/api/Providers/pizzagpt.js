@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-import { format_chat_to_prompt } from "../../classes/message";
+import { format_chat_to_prompt } from "../../classes/message.js";
 
 const url = "https://www.pizzagpt.it";
 const api_url = "https://www.pizzagpt.it/api/chatx-completion";

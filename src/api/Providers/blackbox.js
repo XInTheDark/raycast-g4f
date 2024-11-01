@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-import { format_chat_to_prompt } from "../../classes/message";
+import { format_chat_to_prompt } from "../../classes/message.js";
 import { randomBytes, randomUUID } from "crypto";
 
 // Implementation ported from gpt4free Blackbox provider.

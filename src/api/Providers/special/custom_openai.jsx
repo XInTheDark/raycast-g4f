@@ -1,6 +1,6 @@
 import { getCustomAPIInfo } from "./g4f_local";
 
-import { messages_to_json } from "../../../classes/message";
+import { messages_to_json } from "../../../classes/message.js";
 import fetch from "node-fetch";
 
 const DEFAULT_API_URL = "https://api.openai.com/v1/chat/completions";

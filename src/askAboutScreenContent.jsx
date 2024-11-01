@@ -1,8 +1,8 @@
 import { closeMainWindow, launchCommand, LaunchType } from "@raycast/api";
 import util from "util";
 import { exec } from "child_process";
-import { getAssetsPath } from "./helpers/helper";
-import { image_supported_provider_strings } from "./api/providers";
+import { getAssetsPath } from "./helpers/helper.js";
+import { image_supported_provider_strings } from "./api/providers.js";
 
 // Note how this command is a very special case: it is a "no-view" type command,
 // which means it does not return any UI view, and instead calls askAI to handle the rendering.

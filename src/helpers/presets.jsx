@@ -1,4 +1,4 @@
-import { Storage } from "../api/storage";
+import { Storage } from "../api/storage.js";
 
 export class AIPreset {
   constructor({

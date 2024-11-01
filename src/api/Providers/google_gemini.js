@@ -2,7 +2,7 @@ import Gemini, { messageToParts } from "gemini-g4f";
 import fetch from "node-fetch";
 
 import fs from "fs";
-import { Preferences } from "../preferences";
+import { Preferences } from "../preferences.js";
 
 // By default, we set the most lenient safety settings
 const safetySettings = {

@@ -1,8 +1,8 @@
 import { Toast, showToast } from "@raycast/api";
-import * as providers from "../providers";
+import * as providers from "../providers.js";
 
 import * as DDG from "duck-duck-scrape";
-import { Preferences } from "../preferences";
+import { Preferences } from "../preferences.js";
 
 export const webToken = "<|web_search|>",
   webTokenEnd = "<|end_web_search|>";

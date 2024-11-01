@@ -2,27 +2,27 @@
 /// It provides functions to communicate directly with each provider,
 /// as well as predefined info for each provider.
 
-import { Preferences } from "./preferences";
+import { Preferences } from "./preferences.js";
 
 /// For user-friendly names
 import { preferences } from "../../package.json";
 
 /// Provider modules
-import { NexraProvider } from "./Providers/nexra";
-import { DeepInfraProvider } from "./Providers/deepinfra";
-import { BlackboxProvider } from "./Providers/blackbox";
-import { DuckDuckGoProvider } from "./Providers/duckduckgo";
-import { BestIMProvider } from "./Providers/bestim";
-import { RocksProvider } from "./Providers/rocks";
-import { ChatgptFreeProvider } from "./Providers/chatgptfree";
-import { PizzaGPTProvider } from "./Providers/pizzagpt";
-import { MetaAIProvider } from "./Providers/metaAI";
-import { ReplicateProvider } from "./Providers/replicate";
-import { PhindProvider } from "./Providers/phind";
-import { GeminiProvider } from "./Providers/google_gemini";
-import { G4FLocalProvider } from "./Providers/special/g4f_local";
-import { OllamaLocalProvider } from "./Providers/special/ollama_local";
-import { CustomOpenAIProvider } from "./Providers/special/custom_openai";
+import { NexraProvider } from "./Providers/nexra.js";
+import { DeepInfraProvider } from "./Providers/deepinfra.js";
+import { BlackboxProvider } from "./Providers/blackbox.js";
+import { DuckDuckGoProvider } from "./Providers/duckduckgo.js";
+import { BestIMProvider } from "./Providers/bestim.js";
+import { RocksProvider } from "./Providers/rocks.js";
+import { ChatgptFreeProvider } from "./Providers/chatgptfree.js";
+import { PizzaGPTProvider } from "./Providers/pizzagpt.js";
+import { MetaAIProvider } from "./Providers/metaAI.js";
+import { ReplicateProvider } from "./Providers/replicate.js";
+import { PhindProvider } from "./Providers/phind.js";
+import { GeminiProvider } from "./Providers/google_gemini.js";
+import { G4FLocalProvider } from "./Providers/special/g4f_local.jsx";
+import { OllamaLocalProvider } from "./Providers/special/ollama_local.jsx";
+import { CustomOpenAIProvider } from "./Providers/special/custom_openai.jsx";
 
 /// All providers info
 // { provider internal name, {provider object, model, stream, extra options} }

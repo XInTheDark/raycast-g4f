@@ -1,8 +1,8 @@
 import fetch from "node-fetch";
 import fs from "fs";
 
-import { messages_to_json } from "../../classes/message";
-import { Preferences } from "../preferences";
+import { messages_to_json } from "../../classes/message.js";
+import { Preferences } from "../preferences.js";
 
 // Implementation ported from gpt4free DeepInfra provider.
 
@@ -97,10 +97,10 @@ export const DeepInfraProvider = {
     // Dynamically import tools if needed
     let getWebResult, webSearchTool, codeInterpreterTool, getCodeInterpreterResult;
     if (useWebSearch) {
-      ({ getWebResult, webSearchTool } = await import("../tools/web"));
+      ({ getWebResult, webSearchTool } = await import("../tools/web.jsx"));
     }
     if (useCodeInterpreter) {
-      ({ getCodeInterpreterResult, codeInterpreterTool } = await import("../tools/code"));
+      ({ getCodeInterpreterResult, codeInterpreterTool } = await import("../tools/code.jsx"));
     }
     const tools = [...(useWebSearch ? [webSearchTool] : []), ...(useCodeInterpreter ? [codeInterpreterTool] : [])];
 

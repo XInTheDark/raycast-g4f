@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-import { format_chat_to_prompt, messages_to_json } from "../../classes/message";
+import { format_chat_to_prompt, messages_to_json } from "../../classes/message.js";
 
 // Reference: https://nexra.aryahcr.cc/documentation/chatgpt/en (under ChatGPT v2)
 const api_url_stream = "https://nexra.aryahcr.cc/api/chat/complements";

@@ -1,6 +1,11 @@
 import { Action, ActionPanel, confirmAlert, Detail, Icon } from "@raycast/api";
 
-import { get_version, fetch_github_latest_release, is_up_to_date, download_and_install_update } from "./helpers/update";
+import {
+  get_version,
+  fetch_github_latest_release,
+  is_up_to_date,
+  download_and_install_update,
+} from "./helpers/update.jsx";
 import { useEffect, useState } from "react";
 
 export default function CheckForUpdates() {

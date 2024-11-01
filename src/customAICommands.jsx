@@ -1,8 +1,8 @@
-import { CustomCommand, getCustomCommands, setCustomCommands } from "./helpers/customCommands";
+import { CustomCommand, getCustomCommands, setCustomCommands } from "./helpers/customCommands.jsx";
 import { useEffect, useState } from "react";
 import { Form, List, Action, ActionPanel, Icon, useNavigation, confirmAlert } from "@raycast/api";
-import useGPT from "./api/gpt";
-import { help_action } from "./helpers/helpPage";
+import useGPT from "./api/gpt.jsx";
+import { help_action } from "./helpers/helpPage.jsx";
 
 export default function CustomAICommands() {
   let [commands, setCommands] = useState(null);

@@ -1,7 +1,7 @@
-import { Storage } from "../api/storage";
+import { Storage } from "../api/storage.js";
 
 import { Clipboard } from "@raycast/api";
-import { getBrowserTab } from "./browser";
+import { getBrowserTab } from "./browser.jsx";
 
 export class CustomCommand {
   constructor({ name = "", prompt = "", id = Date.now().toString(), options = {} }) {
