@@ -30,7 +30,7 @@ import * as providers from "./api/providers";
 import { getAIPresets, getPreset } from "./helpers/presets";
 
 // Web search module
-import { formatWebResult, getWebResult, has_native_web_search, web_search_mode } from "./api/tools/web";
+import { getFormattedWebResult, has_native_web_search, web_search_mode } from "./api/tools/web";
 import { webSystemPrompt, systemResponse, webToken, webTokenEnd } from "./api/tools/web";
 
 let generationStatus = { stop: false, loading: false, updateCurrentResponse: false };
@@ -810,8 +810,7 @@ export default function Chat({ launchContext }) {
         ? response.substring(response.indexOf(webToken) + webToken.length, response.indexOf(webTokenEnd)).trim()
         : response.substring(response.indexOf(webToken) + webToken.length).trim()
       : query.substring(0, 400);
-    let webResponse = await getWebResult(webQuery);
-    webResponse = formatWebResult(webResponse, webQuery);
+    let webResponse = await getFormattedWebResult(webQuery);
 
     // Append web search results to the last user message
     // special case: If e.g. the message was edited, query is not passed as a parameter, so it is null

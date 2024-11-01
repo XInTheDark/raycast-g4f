@@ -97,6 +97,15 @@ export const formatWebResult = (webResponse, webQuery = null) => {
   return `\n\n<|web_search_results|> ${webQuery ? `for "${webQuery}` : ""}":\n\n` + webResponse;
 };
 
+// Get the formatted web search result. This should be used over getWebResult in most cases
+// as it truncates long queries and formats the result.
+export const getFormattedWebResult = async (query) => {
+  query = query.substring(0, 400); // Limit query length to 400 characters
+
+  const webResponse = await getWebResult(query);
+  return formatWebResult(webResponse, query);
+};
+
 export const has_native_web_search = (provider) => {
   return providers.function_supported_providers.includes(provider);
 };

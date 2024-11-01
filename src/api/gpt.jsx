@@ -27,7 +27,7 @@ import { Message, pairs_to_messages } from "../classes/message";
 
 import { truncate_chat } from "../helpers/helper";
 import { plainTextMarkdown } from "../helpers/markdown";
-import { formatWebResult, getWebResult, systemResponse, web_search_mode, webSystemPrompt } from "./tools/web";
+import { getFormattedWebResult, systemResponse, web_search_mode, webSystemPrompt } from "./tools/web";
 import { NexraProvider } from "./Providers/nexra";
 
 let generationStatus = { stop: false, loading: false };
@@ -160,8 +160,8 @@ export default (
         ];
 
         // get web search results
-        let webResults = await getWebResult(query);
-        query = query + formatWebResult(webResults, query);
+        let webResults = await getFormattedWebResult(query);
+        query = query + webResults;
       }
     }
 
