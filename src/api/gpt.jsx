@@ -5,7 +5,6 @@ import {
   Detail,
   Form,
   getSelectedText,
-  getPreferenceValues,
   Icon,
   Keyboard,
   launchCommand,
@@ -24,6 +23,7 @@ import { help_action } from "../helpers/helpPage";
 import { autoCheckForUpdates } from "../helpers/update";
 
 import { Message, pairs_to_messages } from "../classes/message";
+import { Preferences } from "./preferences";
 
 import { truncate_chat } from "../helpers/helper";
 import { plainTextMarkdown } from "../helpers/markdown";
@@ -143,7 +143,7 @@ export default (
 
       // handle default language
       if (useDefaultLanguage) {
-        let defaultLanguage = getPreferenceValues()["defaultLanguage"];
+        let defaultLanguage = Preferences["defaultLanguage"];
         if (defaultLanguage !== "English") {
           query = `The default language is ${defaultLanguage}. Respond in this language.\n\n${query}`;
         }
@@ -574,7 +574,7 @@ export const processChunks = async function* (response, provider, status = null)
   let r = "";
 
   // Experimental feature: Show a cursor icon while loading the response
-  const useCursorIcon = getPreferenceValues()["useCursorIcon"];
+  const useCursorIcon = Preferences["useCursorIcon"];
   const cursorIcon = " ●"; // const cursorIcon = "▋";
 
   for await (const chunk of await processChunksIncremental(response, provider, status)) {

@@ -4,7 +4,9 @@
 // Note that persistent storage is not always the best option as file I/O is relatively expensive.
 // Thus, only use it when you really need to persist data across sessions. Otherwise, use local storage.
 
-import { getPreferenceValues, LocalStorage } from "@raycast/api";
+import { LocalStorage } from "@raycast/api";
+import { Preferences } from "./preferences";
+
 import { getSupportPath } from "../helpers/helper";
 import fs from "fs";
 
@@ -13,7 +15,7 @@ const found = (x) => !not_found(x);
 
 export const Storage = {
   // whether to enable persistent/combined storage
-  persistent: getPreferenceValues()["persistentStorage"] || false,
+  persistent: Preferences["persistentStorage"] || false,
 
   /// Local storage functions - these provide quicker access that is not critical to persist
 

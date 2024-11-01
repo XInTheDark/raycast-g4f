@@ -1,7 +1,10 @@
 import useGPT from "./api/gpt";
-import { Form, getPreferenceValues } from "@raycast/api";
-import { Storage } from "./api/storage";
+
+import { Form } from "@raycast/api";
 import { useEffect, useState } from "react";
+
+import { Storage } from "./api/storage";
+import { Preferences } from "./api/preferences";
 
 import { preferences } from "../package.json";
 
@@ -27,7 +30,7 @@ export default function Translate(props) {
     })();
   }, [language]);
 
-  const useDefaultLanguage = getPreferenceValues()["translateUseDefaultLanguage"];
+  const useDefaultLanguage = Preferences["translateUseDefaultLanguage"];
 
   return useGPT(props, {
     useSelected: true,
@@ -41,7 +44,7 @@ export default function Translate(props) {
       </Form.Dropdown>,
     ],
     processPrompt: ({ query, values }) => {
-      const language = useDefaultLanguage ? getPreferenceValues()["defaultLanguage"] : values.language;
+      const language = useDefaultLanguage ? Preferences["defaultLanguage"] : values.language;
       return (
         `Translate the following text to ${language}. ONLY return the translated text and nothing else.` +
         `\n\n${query}`

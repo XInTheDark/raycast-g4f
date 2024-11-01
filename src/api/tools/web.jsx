@@ -1,7 +1,8 @@
-import { getPreferenceValues, Toast, showToast } from "@raycast/api";
+import { Toast, showToast } from "@raycast/api";
 import * as providers from "../providers";
 
 import * as DDG from "duck-duck-scrape";
+import { Preferences } from "../preferences";
 
 export const webToken = "<|web_search|>",
   webTokenEnd = "<|end_web_search|>";
@@ -115,7 +116,7 @@ export const has_native_web_search = (provider) => {
 // Otherwise, we return a string - the mode of web search.
 // Note: providers that support function calling should handle web search separately
 export const web_search_mode = (type, provider = null) => {
-  const pref = getPreferenceValues()["webSearch"];
+  const pref = Preferences["webSearch"];
   if (type === "gpt") {
     // AI commands
     return ["balanced", "always"].includes(pref) && !has_native_web_search(provider);

@@ -2,7 +2,8 @@
 /// It provides functions to communicate directly with each provider,
 /// as well as predefined info for each provider.
 
-import { Form, getPreferenceValues } from "@raycast/api";
+import { Form } from "@raycast/api";
+import { Preferences } from "./preferences";
 
 /// For user-friendly names
 import { preferences } from "../../package.json";
@@ -149,7 +150,7 @@ export const generate = async function (provider, chat, options, { stream_update
 
 // Utilities
 export const default_provider_string = () => {
-  return getPreferenceValues()["gptProvider"];
+  return Preferences["gptProvider"];
 };
 
 // Parse provider string

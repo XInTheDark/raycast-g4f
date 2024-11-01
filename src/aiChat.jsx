@@ -5,7 +5,6 @@ import {
   confirmAlert,
   Detail,
   Form,
-  getPreferenceValues,
   Icon,
   List,
   showToast,
@@ -15,6 +14,8 @@ import {
 import { useEffect, useState } from "react";
 
 import { Storage } from "./api/storage";
+import { Preferences } from "./api/preferences";
+
 import { watch } from "node:fs/promises";
 import throttle from "lodash.throttle";
 
@@ -269,7 +270,7 @@ export default function Chat({ launchContext }) {
     }
 
     // Init other variables
-    const devMode = getPreferenceValues()["devMode"];
+    const devMode = Preferences["devMode"];
 
     if (!info.stream) {
       response = await getChatResponse(currentChatData, query);
@@ -351,7 +352,7 @@ export default function Chat({ launchContext }) {
     generationStatus = { stop: false, loading: false, updateCurrentResponse: false };
 
     // Smart Chat Naming functionality
-    if (getPreferenceValues()["smartChatNaming"] && currentChatData.messages.length <= 2) {
+    if (Preferences["smartChatNaming"] && currentChatData.messages.length <= 2) {
       await processSmartChatNaming(chatData, setChatData, currentChatData, setCurrentChatData);
     }
 
@@ -367,7 +368,7 @@ export default function Chat({ launchContext }) {
     const currentTime = Date.now();
     if (currentTime - lastPruneTime < pruneChatsInterval) return;
 
-    let pruneChatsLimit = getPreferenceValues()["inactiveDuration"];
+    let pruneChatsLimit = Preferences["inactiveDuration"];
     pruneChatsLimit = Number(pruneChatsLimit) * 60 * 60 * 1000; // convert hours to ms
     if (pruneChatsLimit === 0) return;
 

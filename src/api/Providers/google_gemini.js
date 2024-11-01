@@ -1,7 +1,8 @@
 import Gemini, { messageToParts } from "gemini-g4f";
-import { getPreferenceValues } from "@raycast/api";
 import fetch from "node-fetch";
+
 import fs from "fs";
+import { Preferences } from "../preferences";
 
 // By default, we set the most lenient safety settings
 const safetySettings = {
@@ -15,7 +16,7 @@ export const GeminiProvider = {
   name: "Gemini",
   customStream: true,
   generate: async (chat, options, { stream_update = null, max_retries = 3 }) => {
-    let APIKeysStr = getPreferenceValues()["GeminiAPIKeys"];
+    let APIKeysStr = Preferences["GeminiAPIKeys"];
     let APIKeys = APIKeysStr.split(",").map((x) => x.trim());
 
     try {

@@ -1,8 +1,13 @@
 import { version } from "../../package.json";
+
 import fetch from "node-fetch";
 import { exec } from "child_process";
-import { popToRoot, showToast, Toast, confirmAlert, Icon, getPreferenceValues } from "@raycast/api";
+
+import { popToRoot, showToast, Toast, confirmAlert, Icon } from "@raycast/api";
+
 import { Storage } from "../api/storage";
+import { Preferences } from "../api/preferences";
+
 import fs from "fs";
 import { getAssetsPath, getSupportPath } from "./helper";
 
@@ -94,7 +99,7 @@ const read_update_sh = (dir) => {
 };
 
 export const autoCheckForUpdates = async () => {
-  if (!getPreferenceValues()["autoCheckForUpdates"]) return;
+  if (!Preferences["autoCheckForUpdates"]) return;
 
   const now = Date.now();
   const last = await Storage.localStorage_read("lastCheckForUpdates", now);

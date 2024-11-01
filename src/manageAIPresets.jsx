@@ -1,19 +1,9 @@
 import { AIPreset, getAIPresets, getSubtitle, setAIPresets } from "./helpers/presets";
 import { useEffect, useState } from "react";
-import {
-  Form,
-  List,
-  Action,
-  ActionPanel,
-  Icon,
-  useNavigation,
-  confirmAlert,
-  showToast,
-  Toast,
-  getPreferenceValues,
-} from "@raycast/api";
+import { Form, List, Action, ActionPanel, Icon, useNavigation, confirmAlert, showToast, Toast } from "@raycast/api";
 import { help_action } from "./helpers/helpPage";
 import * as providers from "./api/providers";
+import { Preferences } from "./api/preferences";
 
 export default function ManageAIPresets() {
   let [presets, setPresets] = useState(null);
@@ -41,7 +31,7 @@ export default function ManageAIPresets() {
       ? new AIPreset({
           name: "New Preset",
           provider: providers.default_provider_string(),
-          webSearch: getPreferenceValues()["webSearch"],
+          webSearch: Preferences["webSearch"],
           creativity: "0.7",
           isDefault: false,
         })
