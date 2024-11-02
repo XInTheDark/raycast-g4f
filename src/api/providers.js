@@ -63,7 +63,7 @@ export const providers_info = {
   DuckDuckGo_Llama31_70B: { provider: DuckDuckGoProvider, model: "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo", stream: true, context_tokens: 4096 },
   DuckDuckGo_Mixtral_8x7B: { provider: DuckDuckGoProvider, model: "mistralai/Mixtral-8x7B-Instruct-v0.1", stream: true, context_tokens: 4096 },
   BestIM_GPT4oMini: { provider: BestIMProvider, model: "", stream: true },
-  RocksClaude35Sonnet: { provider: RocksProvider, model: "claude-3-5-sonnet-20240620", stream: true },
+  RocksClaude35Sonnet: { provider: RocksProvider, model: "claude-3-5-sonnet-20241022", stream: true },
   RocksClaude3Opus: { provider: RocksProvider, model: "claude-3-opus-20240229", stream: true },
   RocksChatGPT4oLatest: { provider: RocksProvider, model: "chatgpt-4o-latest", stream: true },
   RocksGPT4o: { provider: RocksProvider, model: "gpt-4o", stream: true },
