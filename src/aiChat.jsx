@@ -135,7 +135,13 @@ export default function Chat({ launchContext }) {
 
   // get chat from storage
   const getChat = async (target) => {
-    return JSON.parse(await Storage.read(getStorageKey(target), JSON.stringify(chat_data({}))));
+    try {
+      return JSON.parse(await Storage.read(getStorageKey(target), JSON.stringify(chat_data({}))));
+    } catch (e) {
+      console.log(e);
+      await toast(Toast.Style.Failure, "Failed to load chat");
+      return chat_data({});
+    }
   };
 
   // get chat from chatData (lite version)
@@ -1173,12 +1179,31 @@ export default function Chat({ launchContext }) {
   useEffect(() => {
     (async () => {
       // initialise chatData
-      const storedChatData = await Storage.read("chatData");
-      if (storedChatData) {
-        let newData = JSON.parse(storedChatData);
-        setChatData(structuredClone(newData));
-      } else {
-        await clear_chats_data(setChatData, setCurrentChatData);
+      try {
+        const storedChatData = await Storage.read("chatData");
+        if (storedChatData) {
+          let newData = JSON.parse(storedChatData);
+          setChatData(structuredClone(newData));
+        } else {
+          await clear_chats_data(setChatData, setCurrentChatData);
+        }
+      } catch (e) {
+        console.log("Error reading chat data: ", e);
+        await confirmAlert({
+          title: "Failed to read chat data",
+          message: "An error occurred while reading chat data. Do you want to clear the data?",
+          icon: Icon.Warning,
+          primaryAction: {
+            title: "Clear Chat Data",
+            style: Action.Style.Destructive,
+            onAction: async () => {
+              await clear_chats_data(setChatData, setCurrentChatData);
+            },
+          },
+          dismissAction: {
+            title: "Cancel",
+          },
+        });
       }
 
       if (launchContext?.query) {

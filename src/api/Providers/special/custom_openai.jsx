@@ -47,6 +47,7 @@ export const CustomOpenAIProvider = {
       for (let line of lines) {
         // Although this is not technically OpenAI compatible, we handle the
         // APIs that return chunks starting with "data: " as well.
+        console.log(line);
         if (line.startsWith("data: ")) {
           line = line.substring(6);
         }
