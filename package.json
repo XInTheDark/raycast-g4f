@@ -398,6 +398,14 @@
           "value": "ChatgptFree"
         },
         {
+          "title": "AI4Chat (gpt-4)",
+          "value": "AI4Chat"
+        },
+        {
+          "title": "DarkAI (gpt-4o)",
+          "value": "DarkAI"
+        },
+        {
           "title": "PizzaGPT (gpt-4o-mini)",
           "value": "PizzaGPT"
         },
