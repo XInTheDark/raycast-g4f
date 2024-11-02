@@ -6,6 +6,5 @@ export default function AskAboutSelectedText(props) {
     useSelected: true,
     requireQuery: true,
     showFormText: "Query",
-    webSearchMode: "auto",
   });
 }
