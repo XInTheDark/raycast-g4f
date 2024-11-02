@@ -15,6 +15,8 @@ import { DuckDuckGoProvider } from "./Providers/duckduckgo.js";
 import { BestIMProvider } from "./Providers/bestim.js";
 import { RocksProvider } from "./Providers/rocks.js";
 import { ChatgptFreeProvider } from "./Providers/chatgptfree.js";
+import { AI4ChatProvider } from "./Providers/ai4chat.js";
+import { DarkAIProvider } from "./Providers/darkai.js";
 import { PizzaGPTProvider } from "./Providers/pizzagpt.js";
 import { MetaAIProvider } from "./Providers/metaAI.js";
 import { ReplicateProvider } from "./Providers/replicate.js";
@@ -70,6 +72,8 @@ export const providers_info = {
   RocksLlama31_405B: { provider: RocksProvider, model: "llama-3.1-405b-turbo", stream: true },
   RocksLlama31_70B: { provider: RocksProvider, model: "llama-3.1-70b-turbo", stream: true },
   ChatgptFree: { provider: ChatgptFreeProvider, model: "", stream: true },
+  AI4Chat: { provider: AI4ChatProvider, model: "", stream: false, context_tokens: 4096 },
+  DarkAI: { provider: DarkAIProvider, model: "gpt-4o", stream: true },
   PizzaGPT: { provider: PizzaGPTProvider, model: "", stream: false },
   MetaAI: { provider: MetaAIProvider, model: "", stream: true },
   ReplicateLlama3_8B: { provider: ReplicateProvider, model: "meta/meta-llama-3-8b-instruct", stream: true },
