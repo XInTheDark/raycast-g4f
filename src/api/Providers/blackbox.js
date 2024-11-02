@@ -95,6 +95,7 @@ export const BlackboxProvider = {
       maxTokens: 100000,
       playgroundTemperature: parseFloat(options.temperature) ?? 0.7,
       playgroundTopP: 0.9,
+      validated: "69783381-2ce4-4dbd-ac78-35e9063feabc",
       ...paramOverrides[options.model],
     };
 

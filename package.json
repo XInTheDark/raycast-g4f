@@ -827,7 +827,8 @@
     "g4f-image": "^1.2.0",
     "gemini-g4f": "^12.3.10-beta.1",
     "lodash.throttle": "^4.1.1",
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^3.3.2",
+    "untruncate-json": "^0.0.1"
   },
   "devDependencies": {
     "@raycast/eslint-config": "1.0.5",

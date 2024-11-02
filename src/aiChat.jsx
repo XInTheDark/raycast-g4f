@@ -23,6 +23,7 @@ import { current_datetime, formatDate, removePrefix } from "./helpers/helper.js"
 import { help_action, help_action_panel } from "./helpers/helpPage.jsx";
 import { autoCheckForUpdates } from "./helpers/update.jsx";
 import { plainTextMarkdown } from "./helpers/markdown.js";
+import { confirmClearData, tryRecoverJSON } from "./helpers/aiChatHelper.jsx";
 
 import { MessagePair, format_chat_to_prompt, pairs_to_messages } from "./classes/message.js";
 
@@ -135,12 +136,27 @@ export default function Chat({ launchContext }) {
 
   // get chat from storage
   const getChat = async (target) => {
+    const data = await Storage.read(getStorageKey(target), JSON.stringify(chat_data({})));
     try {
-      return JSON.parse(await Storage.read(getStorageKey(target), JSON.stringify(chat_data({}))));
+      return JSON.parse(data);
     } catch (e) {
-      console.log(e);
-      await toast(Toast.Style.Failure, "Failed to load chat");
-      return chat_data({});
+      console.log("Error reading current chat data:", e);
+
+      let newData = {};
+      await confirmClearData({
+        key: "current chat data",
+        action: async () => {
+          newData = chat_data({});
+        },
+        message: "Do you want to clear the data or attempt to recover it?",
+        title: "Clear Data",
+        dismissTitle: "Recover",
+        dismissAction: async () => {
+          newData = await tryRecoverJSON(data);
+        },
+      });
+
+      return newData;
     }
   };
 
@@ -183,18 +199,18 @@ export default function Chat({ launchContext }) {
     creationDate = new Date(),
     id = Date.now().toString(), // toString() is important because Raycast expects a string for value
     provider = providers.default_provider_string(),
+    options = { creativity: "0.7", webSearch: web_search_mode("chat") },
     systemPrompt = "",
     messages = [],
-    options = { creativity: "0.7", webSearch: web_search_mode("chat") },
   }) => {
     return {
       name: name,
       creationDate: creationDate,
       id: id,
       provider: provider,
+      options: options,
       systemPrompt: systemPrompt,
       messages: [...messages, ...starting_messages({ systemPrompt, provider, webSearch: options.webSearch })],
-      options: options,
     };
   };
 
@@ -1179,8 +1195,8 @@ export default function Chat({ launchContext }) {
   useEffect(() => {
     (async () => {
       // initialise chatData
+      const storedChatData = await Storage.read("chatData");
       try {
-        const storedChatData = await Storage.read("chatData");
         if (storedChatData) {
           let newData = JSON.parse(storedChatData);
           setChatData(structuredClone(newData));
@@ -1189,19 +1205,17 @@ export default function Chat({ launchContext }) {
         }
       } catch (e) {
         console.log("Error reading chat data: ", e);
-        await confirmAlert({
-          title: "Failed to read chat data",
-          message: "An error occurred while reading chat data. Do you want to clear the data?",
-          icon: Icon.Warning,
-          primaryAction: {
-            title: "Clear Chat Data",
-            style: Action.Style.Destructive,
-            onAction: async () => {
-              await clear_chats_data(setChatData, setCurrentChatData);
-            },
+        await confirmClearData({
+          key: "chat data",
+          action: async () => {
+            await clear_chats_data(setChatData, setCurrentChatData);
           },
-          dismissAction: {
-            title: "Cancel",
+          message: "Do you want to clear the data or attempt to recover it?",
+          title: "Clear Data",
+          dismissTitle: "Recover",
+          dismissAction: async () => {
+            const data = await tryRecoverJSON(storedChatData);
+            if (data) setChatData(data);
           },
         });
       }
