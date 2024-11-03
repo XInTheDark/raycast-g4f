@@ -71,6 +71,11 @@ export default function Chat({ launchContext }) {
 
   // add chat to chatData and set it as the current chat
   const addChatAsCurrent = (setChatData, setCurrentChatData, chat) => {
+    // Validate that the chat ID is unique; otherwise, we generate a new one
+    if (chatData.chats.findIndex((_chat) => _chat.id === chat.id) !== -1) {
+      chat.id = Date.now().toString();
+    }
+
     addChat(setChatData, chat);
     setChatData((oldData) => {
       let newChatData = structuredClone(oldData);
@@ -453,27 +458,6 @@ export default function Chat({ launchContext }) {
     console.log(`Pruned ${prunedCnt} stored chats`);
   };
 
-  const exportChat = (chat) => {
-    let str = "";
-    for (let i = chat.messages.length - 1; i >= 0; i--) {
-      let message = chat.messages[i];
-      let prompt = message.first.content,
-        answer = message.second.content;
-      let visible = message.visible ?? true,
-        visibleToken = visible ? "" : "<|invisible_token|>";
-      let time = new Date(message.creationDate).getTime();
-      str += `<|start_message_token|>${visibleToken}${time}<|end_message_token|>\n`;
-      if (prompt) {
-        str += `<|start_prompt_token|>\n${prompt}\n<|end_prompt_token|>\n`;
-      }
-      if (answer) {
-        str += `<|start_response_token|>\n${answer}\n<|end_response_token|>\n`;
-      }
-      str += "\n";
-    }
-    return str;
-  };
-
   let ImportChatComponent = () => {
     const { pop } = useNavigation();
 
@@ -484,75 +468,24 @@ export default function Chat({ launchContext }) {
             <Action.SubmitForm
               title="Import Chat"
               onSubmit={async (values) => {
+                let data;
+                try {
+                  data = JSON.parse(values.data);
+                  await addChatAsCurrent(setChatData, setCurrentChatData, data);
+                  await toast(Toast.Style.Success, "Chat imported");
+                } catch (e) {
+                  await toast(Toast.Style.Failure, "Failed to read chat data", e.message);
+                }
+
                 pop();
-                await processImportChat(values.chatText, chatData, setChatData, values.provider);
               }}
             />
           </ActionPanel>
         }
       >
-        <Form.TextArea id="chatText" title="Chat Transcript" />
-        <Form.Description title="Provider" text="The provider and model used for this chat." />
-        <Form.Dropdown id="provider" defaultValue={providers.default_provider_string()}>
-          {ChatProvidersReact}
-        </Form.Dropdown>
+        <Form.TextArea id="data" title="Chat Data" />
       </Form>
     );
-  };
-
-  const processImportChat = async (str, chatData, setChatData, provider) => {
-    let lines = str.split("\n");
-    let messages = [];
-    let currentMessage = null;
-    let currentState = null;
-
-    for (let i = 0; i < lines.length; i++) {
-      let line = lines[i];
-      if (line.startsWith("<|start_message_token|>")) {
-        if (currentMessage) {
-          messages.unshift(currentMessage);
-        }
-        currentMessage = new MessagePair();
-
-        if (line.includes("<|invisible_token|>")) {
-          currentMessage.visible = false;
-          line = line.replace("<|invisible_token|>", "");
-        }
-
-        let time = Number(line.replace("<|start_message_token|>", "").replace("<|end_message_token|>", ""));
-        currentMessage.creationDate = new Date(time);
-        currentMessage.id = time;
-        currentMessage.finished = true;
-      } else if (line.startsWith("<|start_prompt_token|>")) {
-        currentState = "prompt";
-      } else if (line.startsWith("<|end_prompt_token|>") || line.startsWith("<|end_response_token|>")) {
-        currentState = null;
-      } else if (line.startsWith("<|start_response_token|>")) {
-        currentState = "response";
-      } else {
-        if (!currentMessage) continue; // this shouldn't happen unless chat transcript is malformed
-        if (!line) line = "\n";
-        if (currentState === "prompt") {
-          currentMessage.first.content += line + "\n";
-        } else if (currentState === "response") {
-          currentMessage.second.content += line + "\n";
-        }
-      }
-    }
-
-    if (currentMessage) {
-      messages.unshift(currentMessage);
-    }
-
-    let newChat = chat_data({
-      name: `Imported at ${current_datetime()}`,
-      provider: provider,
-      messages: messages,
-    });
-
-    await addChatAsCurrent(setChatData, setCurrentChatData, newChat);
-
-    await toast(Toast.Style.Success, "Chat imported");
   };
 
   let EditChatForm = (chat = null) => {
@@ -1079,9 +1012,9 @@ export default function Chat({ launchContext }) {
                 return;
               }
 
-              let transcript = exportChat(currentChatData);
-              await Clipboard.copy(transcript);
-              await toast(Toast.Style.Success, "Chat transcript copied");
+              let data = JSON.stringify(currentChatData);
+              await Clipboard.copy(data);
+              await toast(Toast.Style.Success, "Chat data copied");
             }}
           />
         </ActionPanel.Section>
