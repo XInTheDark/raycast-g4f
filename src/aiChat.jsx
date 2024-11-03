@@ -9,7 +9,7 @@ import {
   List,
   showToast,
   Toast,
-  useNavigation
+  useNavigation,
 } from "@raycast/api";
 import { useEffect, useMemo, useState } from "react";
 
@@ -41,7 +41,7 @@ import {
   web_search_mode,
   webSystemPrompt,
   webToken,
-  webTokenEnd
+  webTokenEnd,
 } from "./api/tools/web";
 
 let generationStatus = { stop: false, loading: false, updateCurrentResponse: false };
@@ -1213,6 +1213,9 @@ export default function Chat({ launchContext }) {
 
   const [searchText, setSearchText] = useState("");
 
+  // Memoize the chat dropdown items
+  const chatDropdownItems = useMemo(() => to_list_dropdown_items(chatData), [chatData?.chats]);
+
   return chatData === null ? (
     <List searchText={searchText} onSearchTextChange={setSearchText}>
       <List.EmptyView icon={Icon.SpeechBubble} title="Ask GPT Anything..." actions={help_action_panel("aiChat")} />
@@ -1231,7 +1234,7 @@ export default function Chat({ launchContext }) {
           }}
           value={chatData.currentChat}
         >
-          {to_list_dropdown_items(chatData.chats)}
+          {chatDropdownItems}
         </List.Dropdown>
       }
     >
@@ -1280,16 +1283,13 @@ const isChatEmpty = (chat) => {
 };
 
 const reorderChatsWithSections = (chats) => {
-  // usememo on this
-  return useMemo(() => {
-    let pinned = [],
-      unpinned = [];
-    for (const chat of chats) {
-      if (chat.pinned) pinned.push(chat);
-      else unpinned.push(chat);
-    }
-    return { pinned, unpinned };
-  }, [chats]);
+  let pinned = [],
+    unpinned = [];
+  for (const chat of chats) {
+    if (chat.pinned) pinned.push(chat);
+    else unpinned.push(chat);
+  }
+  return { pinned, unpinned };
 };
 
 const reorderChats = (chats) => {
@@ -1297,8 +1297,8 @@ const reorderChats = (chats) => {
   return [...pinned, ...unpinned];
 };
 
-const to_list_dropdown_items = (chats) => {
-  const { pinned, unpinned } = reorderChatsWithSections(chats);
+const to_list_dropdown_items = (chatData) => {
+  const { pinned, unpinned } = reorderChatsWithSections(chatData?.chats || []);
   return (
     <>
       <List.Dropdown.Section title="Pinned">
