@@ -9,9 +9,9 @@ import {
   List,
   showToast,
   Toast,
-  useNavigation,
+  useNavigation
 } from "@raycast/api";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Storage } from "./api/storage.js";
 import { Preferences } from "./api/preferences.js";
@@ -25,7 +25,7 @@ import { autoCheckForUpdates } from "./helpers/update.jsx";
 import { plainTextMarkdown } from "./helpers/markdown.js";
 import { confirmClearData, tryRecoverJSON } from "./helpers/aiChatHelper.jsx";
 
-import { MessagePair, format_chat_to_prompt, pairs_to_messages } from "./classes/message.js";
+import { format_chat_to_prompt, MessagePair, pairs_to_messages } from "./classes/message.js";
 
 import { formatResponse, getChatResponse, getChatResponseSync } from "./api/gpt.jsx";
 import * as providers from "./api/providers.js";
@@ -34,8 +34,15 @@ import { ChatProvidersReact } from "./api/providers_react.jsx";
 import { getAIPresets, getPreset } from "./helpers/presets.jsx";
 
 // Web search module
-import { getFormattedWebResult, has_native_web_search, web_search_mode } from "./api/tools/web";
-import { webSystemPrompt, systemResponse, webToken, webTokenEnd } from "./api/tools/web";
+import {
+  getFormattedWebResult,
+  has_native_web_search,
+  systemResponse,
+  web_search_mode,
+  webSystemPrompt,
+  webToken,
+  webTokenEnd
+} from "./api/tools/web";
 
 let generationStatus = { stop: false, loading: false, updateCurrentResponse: false };
 let get_status = () => generationStatus.stop;
@@ -976,7 +983,9 @@ export default function Chat({ launchContext }) {
               setChatData((oldData) => {
                 let newChatData = structuredClone(oldData);
                 let chat = getCurrentChatFromChatData(newChatData);
+
                 chat.pinned = !chat.pinned;
+                newChatData.chats = reorderChats(newChatData.chats);
 
                 toast(Toast.Style.Success, chat.pinned ? "Chat pinned" : "Chat unpinned");
                 return newChatData;
@@ -1270,13 +1279,26 @@ const isChatEmpty = (chat) => {
   return true;
 };
 
+const reorderChatsWithSections = (chats) => {
+  // usememo on this
+  return useMemo(() => {
+    let pinned = [],
+      unpinned = [];
+    for (const chat of chats) {
+      if (chat.pinned) pinned.push(chat);
+      else unpinned.push(chat);
+    }
+    return { pinned, unpinned };
+  }, [chats]);
+};
+
+const reorderChats = (chats) => {
+  let { pinned, unpinned } = reorderChatsWithSections(chats);
+  return [...pinned, ...unpinned];
+};
+
 const to_list_dropdown_items = (chats) => {
-  let pinned = [],
-    unpinned = [];
-  for (const chat of chats) {
-    if (chat.pinned) pinned.push(chat);
-    else unpinned.push(chat);
-  }
+  const { pinned, unpinned } = reorderChatsWithSections(chats);
   return (
     <>
       <List.Dropdown.Section title="Pinned">
