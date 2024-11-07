@@ -178,7 +178,7 @@ export const BlackboxProvider = {
 const initValidatedToken = async ({ forceUpdate = false } = {}) => {
   let validatedToken = await Storage.read("providers/blackbox/validatedToken", defaultValidatedToken);
   const lastUpdateTime = parseInt(await Storage.read("providers/blackbox/lastUpdateTime", "0"));
-  if (forceUpdate || Date.now() - lastUpdateTime > 1000 * 60 * 60 * 24) {
+  if (forceUpdate || Date.now() - lastUpdateTime > 1000 * 60 * 60 * 24 * 5) {
     try {
       // dynamic import
       const { getBlackboxValidatedToken } = await import("#root/src/api/Providers/dev/blackbox/blackbox_engineer.js");
