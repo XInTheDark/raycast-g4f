@@ -6,6 +6,10 @@
   "description": "Use GPT-4 for FREE, on Raycast - no API Key required.",
   "icon": "gpt-icon.png",
   "author": "muzhen_gaming",
+  "type": "module",
+  "imports": {
+    "#root/*.js": "./*.js"
+  },
   "categories": [
     "Productivity",
     "Developer Tools"
@@ -836,6 +840,7 @@
     "@types/react": "^18.3.3",
     "eslint": "^7.32.0",
     "prettier": "^2.8.8",
+    "puppeteer-core": "^23.7.0",
     "react": "^18.3.1",
     "typescript": "^5.5.4"
   },
