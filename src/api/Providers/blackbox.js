@@ -184,7 +184,7 @@ const initValidatedToken = async ({ forceUpdate = false } = {}) => {
       const { getBlackboxValidatedToken } = await import("#root/src/api/Providers/dev/blackbox/blackbox_engineer.js");
       validatedToken = await getBlackboxValidatedToken();
       await Storage.write("providers/blackbox/validatedToken", validatedToken);
-      await Storage.write("providers/blackbox/lastUpdateTime", Date.now());
+      await Storage.write("providers/blackbox/lastUpdateTime", Date.now().toString());
     } catch (e) {
       console.log("Failed to update validated token", e);
     }
