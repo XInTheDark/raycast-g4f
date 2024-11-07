@@ -1,6 +1,7 @@
 import fetch from "node-fetch";
 import { format_chat_to_prompt } from "../../classes/message.js";
 import { randomBytes, randomUUID } from "crypto";
+import { Storage } from "../storage.js";
 
 // Implementation ported from gpt4free Blackbox provider.
 
@@ -57,6 +58,8 @@ const paramOverrides = {
   },
 };
 
+const defaultValidatedToken = "00f37b34-a166-4efb-bce5-1312d87f2f94";
+
 export const BlackboxProvider = {
   name: "Blackbox",
   generate: async function* (chat, options, { max_retries = 5 }) {
@@ -77,6 +80,9 @@ export const BlackboxProvider = {
     }
     chat.push({ role: "user", content: prompt });
 
+    // init validated token
+    let validatedToken = await initValidatedToken();
+
     let data = {
       messages: chat,
       id: random_id,
@@ -95,7 +101,7 @@ export const BlackboxProvider = {
       maxTokens: 100000,
       playgroundTemperature: parseFloat(options.temperature) ?? 0.7,
       playgroundTopP: 0.9,
-      validated: "69783381-2ce4-4dbd-ac78-35e9063feabc",
+      validated: validatedToken,
       ...paramOverrides[options.model],
     };
 
@@ -122,6 +128,15 @@ export const BlackboxProvider = {
             search_results = true;
           }
           text += chunk;
+
+          // Update 7/11/24: if not validated properly, blackbox now returns an advertisement instead
+          // of the actual response. if we detect such a message, we attempt to revalidate the token.
+          if (max_retries > 0 && (chunk.includes("BLACKBOX.AI") || chunk.includes("https://www.blackbox.ai"))) {
+            await initValidatedToken({ forceUpdate: true });
+            yield* this.generate(chat, options, { max_retries: max_retries - 3 });
+            return;
+          }
+
           yield chunk;
         }
       }
@@ -158,4 +173,21 @@ export const BlackboxProvider = {
       }
     }
   },
+};
+
+const initValidatedToken = async ({ forceUpdate = false } = {}) => {
+  let validatedToken = await Storage.read("providers/blackbox/validatedToken", defaultValidatedToken);
+  const lastUpdateTime = parseInt(await Storage.read("providers/blackbox/lastUpdateTime", "0"));
+  if (forceUpdate || Date.now() - lastUpdateTime > 1000 * 60 * 60 * 24) {
+    try {
+      // dynamic import
+      const { getBlackboxValidatedToken } = await import("#root/src/api/Providers/dev/blackbox/blackbox_engineer.js");
+      validatedToken = await getBlackboxValidatedToken();
+      await Storage.write("providers/blackbox/validatedToken", validatedToken);
+      await Storage.write("providers/blackbox/lastUpdateTime", Date.now());
+    } catch (e) {
+      console.log("Failed to update validated token", e);
+    }
+  }
+  return validatedToken;
 };
