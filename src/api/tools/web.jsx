@@ -4,28 +4,28 @@ import * as providers from "../providers.js";
 import { ddgsRequest } from "#root/src/api/tools/ddgs.js";
 import { Preferences } from "../preferences.js";
 
-export const webToken = "<|web_search|>",
-  webTokenEnd = "<|end_web_search|>";
-export const webSystemPrompt =
-  "You are given access to make searches on the Internet. The format for making a search" +
-  " is: 1. The user sends a message. 2. You will decide whether to make a search. If you choose to make a search, you will " +
-  "output a single message, containing the word <|web_search|> (EXACTLY AS IT IS GIVEN TO YOU), followed by ONLY your web search query. " +
-  "After outputting your search query, you MUST output the token <|end_web_search|> (EXACTLY AS IT IS GIVEN TO YOU) to denote the end of the search query. " +
-  "Keep your search query concise as there is a 400 characters limit.\n" +
-  "The system will then append the web search results at the end of the user message, starting with the token <|web_search_results|>. " +
-  "Take note that the user CANNOT ACCESS the content under <|web_search_results|> - YOU should incorporate these results into your response. " +
-  "Additionally, If the token <|web_search_results|> is present in the user's message, then you MUST NOT request another web search.\n\n" +
-  "IMPORTANT! You should choose to search the web ONLY if ANY of the following circumstances are met:\n" +
-  "1. User is asking about current events or something that requires real-time information (news, sports scores, 'latest' information, etc.)\n" +
-  "2. User is asking about some term you are unfamiliar with (e.g. if it's a little-known term, if it's a person you don't know well, etc.)\n" +
-  "3. User is asking about anything that involves numerical facts (e.g. distances between places, population count, sizes, date and time, etc.)\n" +
-  "4. User explicitly asks you to search or provide links to references.\n" +
-  "If the user's query does NOT require a web search, YOU MUST NEVER run one for no reason.\n" +
-  "However, NEVER refuse to search the web if the user asks you to provide such information.\n\n" +
-  "When using web search results, you are encouraged to cite references where appropriate, using inline links in standard markdown format.\n" +
-  "You are also allowed to make use of web search results from previous messages, if they are STRONGLY RELEVANT to the current message.\n\n" +
-  "When you are not running a web search, respond completely as per normal - there is NO NEED to mention that you're not searching. \n" +
-  "Do your best to be informative. However, you MUST NOT make up any information. If you think you might not know something, search for it.\n";
+export const webToken = "<web_search>",
+  webTokenEnd = "</web_search>",
+  webResultsToken = "<web_search_results>";
+
+export const webSystemPrompt = `You are given access to make searches on the Internet. The format for making a search is:
+1. After the user sends a message, you will decide whether to make a search. If you choose to make a search, you will output a single message, starting with the word ${webToken}, followed by ONLY your web search query. After your search query, you must output the token ${webTokenEnd} to denote the end of the search query. Keep your search query concise.
+2. The system will then append the web search results at the end of the user message, starting with the token ${webResultsToken}. Take note that the user CANNOT SEE the content after ${webResultsToken} - YOU should use these results appropriately to improve your response. Additionally, If the web search results are already present in the user's message, then you MUST NOT request another web search.
+
+IMPORTANT! You should choose to search the web ONLY if ANY of the following circumstances are met:
+1. User is asking about current events or something that requires real-time information (news, sports scores, 'latest' information, etc.)
+2. User is asking about some term you are unfamiliar with (e.g. if it's a little-known term, if it's a person you don't know well, etc.)
+3. User is asking about anything that involves numerical facts (e.g. distances between places, population count, sizes, date and time, etc.)
+4. User explicitly asks you to search or provide links to references.
+If the user's query does NOT require a web search, YOU MUST NEVER run one for no reason. However, you must not refuse to search the web if the user asks you to do so.
+If you are highly unsure about whether to make a search (e.g. if the user's query is vague or if you think you are unfamiliar with the query to a certain extent), you may directly ask the user for clarification.
+
+When using web search results, you are encouraged to cite references where appropriate, using inline links in standard markdown format.
+You are also allowed to make use of web search results from previous messages, if they are STRONGLY RELEVANT to the current message.
+
+When you are not running a web search, respond completely as per normal - there is NO NEED to mention that you're not searching. 
+Remember that you MUST NOT make up any false information.`;
+
 export const systemResponse = "Understood. I will strictly follow these instructions in this conversation.";
 
 // shorter version of the web search prompt, optimised for function calling
@@ -93,13 +93,13 @@ export const processWebResults = (results, maxResults = 15) => {
 };
 
 export const formatWebResult = (webResponse, webQuery = null) => {
-  return `\n\n<|web_search_results|> ${webQuery ? `for "${webQuery}` : ""}":\n\n` + webResponse;
+  return `\n\n${webResultsToken} ${webQuery ? `for "${webQuery}` : ""}":\n\n` + webResponse;
 };
 
 // Get the formatted web search result. This should be used over getWebResult in most cases
 // as it truncates long queries and formats the result.
 export const getFormattedWebResult = async (query) => {
-  query = query.substring(0, 400); // Limit query length to 400 characters
+  query = query.trim().substring(0, 400); // Limit query length to 400 characters
 
   const webResponse = await getWebResult(query);
   return formatWebResult(webResponse, query);
