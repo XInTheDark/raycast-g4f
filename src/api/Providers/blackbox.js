@@ -58,7 +58,9 @@ const paramOverrides = {
   },
 };
 
-const defaultValidatedToken = Buffer.from("MDBmMzdiMzQtYTE2Ni00ZWZiLWJjZTUtMTMxMmQ4N2YyZjk0", "base64").toString("utf-8");
+const defaultValidatedToken = Buffer.from("MDBmMzdiMzQtYTE2Ni00ZWZiLWJjZTUtMTMxMmQ4N2YyZjk0", "base64").toString(
+  "utf-8"
+);
 
 export const BlackboxProvider = {
   name: "Blackbox",

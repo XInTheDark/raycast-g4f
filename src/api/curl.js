@@ -2,36 +2,30 @@
 // It is designed to be compatible with the existing node-fetch request format.
 // The specification is as follows:
 // 1. There is one command available in this interface: `curlRequest`.
-// 2. The `curlRequest` function takes the following arguments: `url`, `options`, and `cb`.
+// 2. The `curlRequest` function takes the following arguments: `url`, `options`.
 // `url` and `options` are the same as in the node-fetch request format.
-// `cb` is a callback function that is called upon each chunk of data received, as follows:
-// cb(chunk: string) => void
-// The `cb` function can do whatever it wants with the chunk of data, such as printing it
-// or updating the response in a UI.
-// 3. The `curlRequest` function returns a promise that resolves when the request is complete,
-// or rejects if there is an error.
+// 3. The `curlRequest` function returns an async generator that yields the response body in chunks.
+// It may throw an error if the request fails (curl exits with a non-zero status code).
 // 4. REQUIREMENT: The `curl` command must be available in the system PATH.
 
 import { exec } from "child_process";
 import { fetchToCurl } from "fetch-to-curl";
 
-export const curlRequest = (url, options, cb) => {
+export async function* curlRequest(url, options) {
   const curl_cmd = fetchToCurl(url, options) + " --silent --no-buffer";
 
-  return new Promise((resolve, reject) => {
-    const childProcess = exec(curl_cmd);
+  const childProcess = exec(curl_cmd);
 
-    childProcess.stdout.on("data", (chunk) => {
-      chunk = chunk.toString().replace(/\r/g, "\n");
-      cb(chunk);
-    });
+  for await (const chunk of childProcess.stdout) {
+    yield chunk.toString().replace(/\r/g, "\n");
+  }
 
-    childProcess.on("exit", (code) => {
-      if (code === 0) {
-        resolve();
-      } else {
-        reject(new Error(`curl exited with code ${code}`));
-      }
-    });
+  const exitCode = await new Promise((resolve, reject) => {
+    childProcess.on("exit", resolve);
+    childProcess.on("error", reject);
   });
-};
+
+  if (exitCode !== 0) {
+    throw new Error(`curl exited with code ${exitCode}`);
+  }
+}
