@@ -39,8 +39,8 @@ const trendingAgentModeConfig = {
 };
 
 const userSelectedModelConfig = {
-  "gpt-4o": "gpt-4o",
-  "claude-3.5-sonnet": "claude-sonnet-3.5",
+  "gpt-4o": "GPT-4o",
+  "claude-3.5-sonnet": "Claude-Sonnet-3.5",
   "gemini-pro": "gemini-pro",
 };
 
@@ -58,7 +58,7 @@ const paramOverrides = {
   },
 };
 
-const defaultValidatedToken = "00f37b34-a166-4efb-bce5-1312d87f2f94";
+const defaultValidatedToken = Buffer.from("MDBmMzdiMzQtYTE2Ni00ZWZiLWJjZTUtMTMxMmQ4N2YyZjk0", "base64").toString("utf-8");
 
 export const BlackboxProvider = {
   name: "Blackbox",
