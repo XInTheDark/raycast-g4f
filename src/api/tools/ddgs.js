@@ -4,15 +4,15 @@
 
 import { exec } from "child_process";
 import { DEFAULT_ENV } from "#root/src/helpers/env.js";
-import { getSupportPath } from "#root/src/helpers/helper.js";
+import { escapeString, getSupportPath } from "#root/src/helpers/helper.js";
 import fs from "fs";
 
 // Return an array of the search results.
 // Each result is of the form: {title, href, body}
 export async function ddgsRequest(query, { maxResults = 15 } = {}) {
-  query = encodeURIComponent(query);
+  query = escapeString(query);
 
-  const ddgs_cmd = `ddgs text -k "${query}" -s off -m ${maxResults} -o json -f "ddgs_results"`;
+  const ddgs_cmd = `ddgs text -k '${query}' -s off -m ${maxResults} -o json -f "ddgs_results"`;
   const cwd = getSupportPath();
 
   const childProcess = exec(ddgs_cmd, {
