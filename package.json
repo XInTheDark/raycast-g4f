@@ -826,7 +826,6 @@
   ],
   "dependencies": {
     "@raycast/api": "^1.80.0",
-    "duck-duck-scrape": "^2.2.5",
     "fetch-to-curl": "^0.6.0",
     "g4f-image": "^1.2.0",
     "gemini-g4f": "^12.3.10-beta.1",

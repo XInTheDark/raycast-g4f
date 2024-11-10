@@ -190,3 +190,12 @@ export const current_datetime = () => {
     second: "2-digit",
   });
 };
+
+export const escapeString = (str) => {
+  // https://github.com/leoek/fetch-to-curl/blob/092db367955f80280d458c1e5af144e9b0f42114/src/main.js#L89C10-L89C37
+  return str.replace(/'/g, `'\\''`);
+};
+
+export const escapeObject = (obj) => {
+  return escapeString(JSON.stringify(obj));
+};
