@@ -24,21 +24,16 @@ const headers = {
 
 export const ChatgptFreeProvider = {
   name: "ChatGPTFree",
-  customStream: true,
-  generate: async function (chat, options, { stream_update }) {
+  generate: async function* (chat) {
     // get nonce
     let _nonce;
     let _response = "";
-    await curlRequest(
-      `${url}/`,
-      {
-        method: "GET",
-        headers: headers,
-      },
-      (response) => {
-        _response += response;
-      }
-    );
+    for await (const chunk of curlRequest(`${url}/`, {
+      method: "GET",
+      headers: headers,
+    })) {
+      _response += chunk;
+    }
 
     let result = _response.match(/data-nonce="(.*?)"/);
     if (result) {
@@ -62,51 +57,44 @@ export const ChatgptFreeProvider = {
     const body = new URLSearchParams(data).toString();
     const request_url = `${api_url}?${body}`;
 
-    let response = "";
     let buffer = "";
     let ended = false;
 
-    await curlRequest(
-      request_url,
-      {
-        method: "POST",
-        headers: headers,
-      },
-      (chunk) => {
-        if (ended) return;
+    for await (const chunk of curlRequest(request_url, {
+      method: "POST",
+      headers: headers,
+    })) {
+      if (ended) return;
 
-        let lines = chunk.split("\n");
-        for (let line of lines) {
-          line = line.trim();
-          if (line.startsWith("data: ")) {
-            line = line.substring(6);
-            if (line === "[DONE]") {
-              ended = true;
-              return;
-            }
-            try {
-              let json = JSON.parse(line);
-              let content = json["choices"][0]["delta"]?.content;
-              if (content) {
-                response += content;
-                stream_update(response);
-              }
-            } catch {
-              // ignore
-            }
-          } else if (line) {
-            buffer += line;
+      let lines = chunk.split("\n");
+      for (let line of lines) {
+        line = line.trim();
+        if (line.startsWith("data: ")) {
+          line = line.substring(6);
+          if (line === "[DONE]") {
+            ended = true;
+            return;
           }
+          try {
+            let json = JSON.parse(line);
+            let content = json["choices"][0]["delta"]?.content;
+            if (content) {
+              yield content;
+            }
+          } catch {
+            // ignore
+          }
+        } else if (line) {
+          buffer += line;
         }
       }
-    );
+    }
 
     if (buffer) {
       try {
         let json = JSON.parse(buffer);
         if (json?.data) {
-          response += json.data;
-          stream_update(response);
+          yield json.data;
         }
       } catch {
         // ignore

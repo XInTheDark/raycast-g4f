@@ -23,9 +23,10 @@ export const PhindProvider = {
   generate: async function (chat, options, { stream_update }) {
     // get challenge seeds
     let stdout = "";
-    await curlRequest(home_url, { method: "GET", headers: headers }, (chunk) => {
+    for await (const chunk of curlRequest(home_url, { method: "GET", headers: headers })) {
       stdout += chunk;
-    });
+    }
+
     const regex = /<script id="__NEXT_DATA__" type="application\/json">([\s\S]+?)<\/script>/;
     const match = stdout.match(regex);
     const _data = JSON.parse(match[1]);
@@ -75,52 +76,48 @@ export const PhindProvider = {
     let new_line = false;
 
     // POST
-    await curlRequest(
-      api_url,
-      {
-        method: "POST",
-        headers: { ...headers, "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      },
-      (chunk) => {
-        const lines = chunk.split("\n");
+    for await (let chunk of curlRequest(api_url, {
+      method: "POST",
+      headers: { ...headers, "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    })) {
+      const lines = chunk.split("\n");
 
-        for (let line of lines) {
-          if (line.startsWith("data: ")) {
-            line = line.substring(6);
-          } else continue;
+      for (let line of lines) {
+        if (line.startsWith("data: ")) {
+          line = line.substring(6);
+        } else continue;
 
-          if (line.startsWith("<PHIND_DONE/>")) {
-            return;
-          }
-          if (line.startsWith("<PHIND_BACKEND_ERROR>")) {
-            throw new Error();
-          }
-
-          let is_ignore = false;
-          for (let ignore of ignore_chunks) {
-            if (line.startsWith(ignore)) {
-              is_ignore = true;
-            }
-          }
-
-          if (is_ignore) {
-            continue;
-          }
-
-          if (line) {
-            response += line;
-          } else if (new_line) {
-            response += "\n";
-            new_line = false;
-          } else {
-            new_line = true;
-          }
-
-          stream_update(response);
+        if (line.startsWith("<PHIND_DONE/>")) {
+          return;
         }
+        if (line.startsWith("<PHIND_BACKEND_ERROR>")) {
+          throw new Error();
+        }
+
+        let is_ignore = false;
+        for (let ignore of ignore_chunks) {
+          if (line.startsWith(ignore)) {
+            is_ignore = true;
+          }
+        }
+
+        if (is_ignore) {
+          continue;
+        }
+
+        if (line) {
+          response += line;
+        } else if (new_line) {
+          response += "\n";
+          new_line = false;
+        } else {
+          new_line = true;
+        }
+
+        stream_update(response);
       }
-    );
+    }
   },
 };
 

@@ -26,8 +26,7 @@ const headers = {
 
 export const BestIMProvider = {
   name: "BestIM",
-  customStream: true,
-  generate: async function (chat, options, { stream_update }) {
+  generate: async function* (chat) {
     const payload = {
       type: "chat",
       messagesHistory: [
@@ -38,28 +37,21 @@ export const BestIMProvider = {
       ],
     };
 
-    let response = "";
+    for await (const _chunk of curlRequest(api_url, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(payload),
+    })) {
+      const str = _chunk.toString();
+      let lines = str.split("\n");
 
-    await curlRequest(
-      api_url,
-      {
-        method: "POST",
-        headers: headers,
-        body: JSON.stringify(payload),
-      },
-      (_chunk) => {
-        const str = _chunk.toString();
-        let lines = str.split("\n");
-
-        for (let i = 0; i < lines.length; i++) {
-          let line = lines[i];
-          if (line.startsWith("data: ")) {
-            let chunk = line.substring(6);
-            response += chunk;
-            stream_update(response);
-          }
+      for (let i = 0; i < lines.length; i++) {
+        let line = lines[i];
+        if (line.startsWith("data: ")) {
+          let chunk = line.substring(6);
+          yield chunk;
         }
       }
-    );
+    }
   },
 };
