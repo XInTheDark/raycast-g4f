@@ -54,15 +54,13 @@ export const ChatgptFreeProvider = {
       chatbot_identity: "shortcode",
     };
 
-    const body = new URLSearchParams(data).toString();
-    const request_url = `${api_url}?${body}`;
-
     let buffer = "";
     let ended = false;
 
-    for await (const chunk of curlRequest(request_url, {
+    for await (const chunk of curlRequest(api_url, {
       method: "POST",
       headers: headers,
+      body: new URLSearchParams(data).toString(),
     })) {
       if (ended) return;
 
