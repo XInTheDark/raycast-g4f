@@ -1,5 +1,13 @@
-import puppeteer from "puppeteer-core";
 import fetch from "node-fetch";
+
+let puppeteer;
+(async () => {
+  try {
+    puppeteer = await import("puppeteer-core");
+  } catch (e) {
+    console.log("Module not found", e);
+  }
+})();
 
 const get_js_files = async (url) => {
   const browser = await puppeteer.launch({
