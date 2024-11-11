@@ -9,7 +9,7 @@ import {
   showInFinder,
   showToast,
   Toast,
-  useNavigation
+  useNavigation,
 } from "@raycast/api";
 import { useEffect, useState } from "react";
 import fs from "fs";
@@ -40,6 +40,9 @@ const image_providers = {
   },
   NexraFlux: {
     model: "flux",
+  },
+  NexraMidjourney: {
+    model: "midjourney",
   },
   DeepInfraFlux1Dev: {
     model: "black-forest-labs/FLUX-1-dev",
@@ -73,6 +76,7 @@ const provider_map = {
   Prodia: provider.Nexra,
   ProdiaStableDiffusion: provider.Nexra,
   NexraFlux: provider.Nexra,
+  NexraMidjourney: provider.Nexra,
   DeepInfraFlux1Dev: provider.DeepInfra,
   DeepInfraFlux1Schnell: provider.DeepInfra,
   StableDiffusionLite: provider.Nexra,
@@ -157,7 +161,7 @@ export default function genImage() {
 
     try {
       const [provider, options] = loadImageOptions(currentChat);
-      const base64Image = await generate(query, provider, options, { fetch: fetch, debug: Preferences["devMode"]});
+      const base64Image = await generate(query, provider, options, { fetch: fetch, debug: Preferences["devMode"] });
 
       // save image
       let imagePath = "";
@@ -246,6 +250,7 @@ export default function genImage() {
           <Form.Dropdown.Item title="Prodia" value="Prodia" />
           <Form.Dropdown.Item title="ProdiaStableDiffusion" value="ProdiaStableDiffusion" />
           <Form.Dropdown.Item title="Nexra FLUX" value="NexraFlux" />
+          <Form.Dropdown.Item title="Nexra Midjourney" value="NexraMidjourney" />
           <Form.Dropdown.Item title="DeepInfra FLUX.1 Dev" value="DeepInfraFlux1Dev" />
           <Form.Dropdown.Item title="DeepInfra FLUX.1 Schnell" value="DeepInfraFlux1Schnell" />
           <Form.Dropdown.Item title="StableDiffusionLite" value="StableDiffusionLite" />
