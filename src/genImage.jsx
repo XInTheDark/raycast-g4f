@@ -89,7 +89,7 @@ const provider_map = {
 const default_models = {
   Prodia: "ICantBelieveItsNotPhotography_seco.safetensors [4e7a3dfd]",
   ProdiaStableDiffusion: "neverendingDream_v122.safetensors [f964ceeb]",
-  Rocks: "flux",
+  Rocks: "flux-4o",
 };
 
 const defaultImageProvider = "Prodia";
