@@ -298,6 +298,10 @@
           "value": "DeepInfraQwen25_72B"
         },
         {
+          "title": "DeepInfra (Qwen2.5-Coder-32B)",
+          "value": "DeepInfraQwen25Coder_32B"
+        },
+        {
           "title": "Blackbox (custom-model)",
           "value": "Blackbox"
         },
