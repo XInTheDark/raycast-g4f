@@ -290,10 +290,6 @@
           "value": "DeepInfraWizardLM2_8x22B"
         },
         {
-          "title": "DeepInfra (Mixtral-8x7B)",
-          "value": "DeepInfraMixtral_8x7B"
-        },
-        {
           "title": "DeepInfra (Qwen2.5-72B)",
           "value": "DeepInfraQwen25_72B"
         },
