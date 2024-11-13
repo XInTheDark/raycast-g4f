@@ -9,7 +9,7 @@ import { messages_to_json } from "../../../classes/message.js";
 import { sleep } from "../../../helpers/helper.js";
 
 import { Form } from "@raycast/api";
-import { getSupportPath } from "../../../helpers/helper.js";
+import { getSupportPath } from "../../../helpers/extension_helper.js";
 
 // constants
 const DEFAULT_MODEL = "meta-ai";

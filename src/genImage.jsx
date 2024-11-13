@@ -17,7 +17,8 @@ import fetch from "node-fetch";
 
 import { Storage } from "./api/storage.js";
 import { Preferences } from "./api/preferences.js";
-import { formatDate, getSupportPath } from "./helpers/helper.js";
+import { formatDate } from "./helpers/helper.js";
+import { getSupportPath } from "./helpers/extension_helper.js";
 import { help_action } from "./helpers/helpPage.jsx";
 
 import { provider, generate } from "g4f-image";

@@ -1,4 +1,4 @@
-import { environment } from "@raycast/api";
+/// Helper file with no dependencies
 
 export const formatDate = (dateToCheckISO) => {
   // Calculate the date difference between the current date and the date to check
@@ -62,14 +62,6 @@ export const removeSuffix = (str, suffix) => {
     return str.substring(0, str.length - suffix.length);
   }
   return str;
-};
-
-export const getSupportPath = () => {
-  return environment.supportPath;
-};
-
-export const getAssetsPath = () => {
-  return environment.assetsPath;
 };
 
 export const sleep = async (ms) => {

@@ -1,7 +1,7 @@
 import { closeMainWindow, launchCommand, LaunchType } from "@raycast/api";
 import util from "util";
 import { exec } from "child_process";
-import { getAssetsPath } from "./helpers/helper.js";
+import { getAssetsPath } from "./helpers/extension_helper.js";
 import { image_supported_provider_strings } from "./api/providers.js";
 
 // Note how this command is a very special case: it is a "no-view" type command,
