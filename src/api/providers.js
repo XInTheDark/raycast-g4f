@@ -4,9 +4,6 @@
 
 import { Preferences } from "./preferences.js";
 
-/// For user-friendly names
-import { preferences } from "../../package.json";
-
 /// Provider modules
 import { NexraProvider } from "./Providers/nexra.js";
 import { DeepInfraProvider } from "./Providers/deepinfra.js";
@@ -80,12 +77,6 @@ export const providers_info = {
   OllamaLocal: { provider: OllamaLocalProvider, stream: true },
   CustomOpenAI: { provider: CustomOpenAIProvider, stream: true },
 };
-
-/// Chat providers (user-friendly names)
-// fetched from package.json for consistency and to avoid duplicate code
-export const chat_providers_names = preferences
-  .find((x) => x.name === "gptProvider")
-  .data.map((x) => [x.title, x.value]);
 
 /// Providers that support file uploads
 export const file_supported_providers = [GeminiProvider, DeepInfraProvider];
