@@ -290,32 +290,12 @@
           "value": "DeepInfraWizardLM2_8x22B"
         },
         {
-          "title": "DeepInfra (Mixtral-8x7B)",
-          "value": "DeepInfraMixtral_8x7B"
-        },
-        {
           "title": "DeepInfra (Qwen2.5-72B)",
           "value": "DeepInfraQwen25_72B"
         },
         {
-          "title": "DeepInfra (Mistral-7B)",
-          "value": "DeepInfraMistral_7B"
-        },
-        {
-          "title": "DeepInfra (openchat-3.6-8b)",
-          "value": "DeepInfraOpenChat36_8B"
-        },
-        {
-          "title": "DeepInfra (meta-llama-3-70b)",
-          "value": "DeepInfraLlama3_70B"
-        },
-        {
-          "title": "DeepInfra (meta-llama-3-8b)",
-          "value": "DeepInfraLlama3_8B"
-        },
-        {
-          "title": "DeepInfra (gemma-2-27b)",
-          "value": "DeepInfraGemma2_27B"
+          "title": "DeepInfra (Qwen2.5-Coder-32B)",
+          "value": "DeepInfraQwen25Coder_32B"
         },
         {
           "title": "Blackbox (custom-model)",
