@@ -19,9 +19,9 @@ import { MetaAIProvider } from "./Providers/metaAI.js";
 import { ReplicateProvider } from "./Providers/replicate.js";
 import { PhindProvider } from "./Providers/phind.js";
 import { GeminiProvider } from "./Providers/google_gemini.js";
-import { G4FLocalProvider } from "./Providers/special/g4f_local.jsx";
-import { OllamaLocalProvider } from "./Providers/special/ollama_local.jsx";
-import { CustomOpenAIProvider } from "./Providers/special/custom_openai.jsx";
+
+/// Special providers
+import { special_providers_info } from "./providers_special.js";
 
 /// All providers info
 // { provider internal name, {provider object, model, stream, extra options} }
@@ -73,9 +73,7 @@ export const providers_info = {
   ReplicateMixtral_8x7B: { provider: ReplicateProvider, model: "mistralai/mixtral-8x7b-instruct-v0.1", stream: true },
   Phind: { provider: PhindProvider, model: "", stream: true },
   GoogleGemini: { provider: GeminiProvider, model: ["gemini-1.5-pro-002","gemini-1.5-flash-002", "gemini-1.5-flash-latest"], stream: true },
-  G4FLocal: { provider: G4FLocalProvider, stream: true },
-  OllamaLocal: { provider: OllamaLocalProvider, stream: true },
-  CustomOpenAI: { provider: CustomOpenAIProvider, stream: true },
+  ...special_providers_info,
 };
 
 /// Providers that support file uploads
