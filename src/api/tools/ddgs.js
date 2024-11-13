@@ -12,7 +12,7 @@ import fs from "fs";
 export async function ddgsRequest(query, { maxResults = 15 } = {}) {
   query = escapeString(query);
 
-  const ddgs_cmd = `ddgs text -k '${query}' -s off -m ${maxResults} -o json -f "ddgs_results"`;
+  const ddgs_cmd = `ddgs text -k '${query}' -s off -m ${maxResults} -o "ddgs_results.json"`;
   const cwd = getSupportPath();
 
   const childProcess = exec(ddgs_cmd, {
