@@ -16,7 +16,9 @@ import fs from "fs";
 import fetch from "node-fetch";
 
 import { Storage } from "./api/storage.js";
-import { formatDate, getSupportPath } from "./helpers/helper.js";
+import { Preferences } from "./api/preferences.js";
+import { formatDate } from "./helpers/helper.js";
+import { getSupportPath } from "./helpers/extension_helper.js";
 import { help_action } from "./helpers/helpPage.jsx";
 
 import { provider, generate } from "g4f-image";
@@ -36,6 +38,12 @@ const image_providers = {
       cfgScale: 20,
       samplingMethod: "DPM++ 2M Karras",
     },
+  },
+  NexraFlux: {
+    model: "flux",
+  },
+  NexraMidjourney: {
+    model: "midjourney",
   },
   DeepInfraFlux1Dev: {
     model: "black-forest-labs/FLUX-1-dev",
@@ -68,6 +76,8 @@ const image_providers = {
 const provider_map = {
   Prodia: provider.Nexra,
   ProdiaStableDiffusion: provider.Nexra,
+  NexraFlux: provider.Nexra,
+  NexraMidjourney: provider.Nexra,
   DeepInfraFlux1Dev: provider.DeepInfra,
   DeepInfraFlux1Schnell: provider.DeepInfra,
   StableDiffusionLite: provider.Nexra,
@@ -80,7 +90,7 @@ const provider_map = {
 const default_models = {
   Prodia: "ICantBelieveItsNotPhotography_seco.safetensors [4e7a3dfd]",
   ProdiaStableDiffusion: "neverendingDream_v122.safetensors [f964ceeb]",
-  Rocks: "flux",
+  Rocks: "flux-4o",
 };
 
 const defaultImageProvider = "Prodia";
@@ -152,7 +162,7 @@ export default function genImage() {
 
     try {
       const [provider, options] = loadImageOptions(currentChat);
-      const base64Image = await generate(query, provider, options, { fetch: fetch });
+      const base64Image = await generate(query, provider, options, { fetch: fetch, debug: Preferences["devMode"] });
 
       // save image
       let imagePath = "";
@@ -240,6 +250,8 @@ export default function genImage() {
         <Form.Dropdown id="provider" defaultValue="Prodia">
           <Form.Dropdown.Item title="Prodia" value="Prodia" />
           <Form.Dropdown.Item title="ProdiaStableDiffusion" value="ProdiaStableDiffusion" />
+          <Form.Dropdown.Item title="Nexra FLUX" value="NexraFlux" />
+          <Form.Dropdown.Item title="Nexra Midjourney" value="NexraMidjourney" />
           <Form.Dropdown.Item title="DeepInfra FLUX.1 Dev" value="DeepInfraFlux1Dev" />
           <Form.Dropdown.Item title="DeepInfra FLUX.1 Schnell" value="DeepInfraFlux1Schnell" />
           <Form.Dropdown.Item title="StableDiffusionLite" value="StableDiffusionLite" />
@@ -678,7 +690,6 @@ const loadImageOptions = (currentChat) => {
 
   let model = !modelString || modelString === "default" ? default_models[providerString] : modelString;
   if (model) {
-    options.model = model;
     data = { ...data, model: model };
   }
 

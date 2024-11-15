@@ -1,1 +1,1 @@
-duckduckgo-search>6.3.4
+duckduckgo-search>=6.3.5

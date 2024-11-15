@@ -7,7 +7,7 @@
 import { LocalStorage } from "@raycast/api";
 import { Preferences } from "./preferences.js";
 
-import { getSupportPath } from "../helpers/helper.js";
+import { getSupportPath } from "../helpers/extension_helper.js";
 import fs from "fs";
 
 const not_found = (x) => x === undefined || x === null;

@@ -80,13 +80,8 @@ updating manually also allows you to fetch and view the latest changes to the so
 | DeepInfra                    | meta-llama-3.1-8b                       | ▶️       | ![Active][active-badge]     | Very fast      | 7.5/10, recent model with large context size.                                               |
 | DeepInfra                    | llama-3.1-nemotron-70b                  | ▶️       | ![Active][active-badge]     | Fast           | 8/10                                                                                        |
 | DeepInfra                    | WizardLM-2-8x22B                        | ▶️       | ![Active][active-badge]     | Medium         | 7/10                                                                                        |
-| DeepInfra                    | Mixtral-8x7B                            | ▶️       | ![Active][active-badge]     | Very fast      | 7/10                                                                                        |
 | DeepInfra                    | Qwen2.5-72B                             | ▶️       | ![Active][active-badge]     | Medium         | 7.5/10                                                                                      |
-| DeepInfra                    | Mistral-7B                              | ▶️       | ![Active][active-badge]     | Very fast      | 6.5/10                                                                                      |
-| DeepInfra                    | openchat-3.6-8b                         | ▶️       | ![Active][active-badge]     | Very fast      | 7/10                                                                                        |
-| DeepInfra                    | meta-llama-3-70b                        | ▶️       | ![Active][active-badge]     | Medium         | 7/10                                                                                        |
-| DeepInfra                    | meta-llama-3-8b                         | ▶️       | ![Active][active-badge]     | Very fast      | 6/10                                                                                        |
-| DeepInfra                    | gemma-2-27b                             | ▶️       | ![Active][active-badge]     | Very fast      | 6.5/10                                                                                      |
+| DeepInfra                    | Qwen2.5-Coder-32B                       | ▶️       | ![Active][active-badge]     | Fast           | 7/10                                                                                        |
 | Blackbox                     | custom model                            | ▶️       | ![Active][active-badge]     | Fast           | 7.5/10, very fast generation with built-in web search ability, but is optimized for coding. |
 | Blackbox                     | llama-3.1-405b                          | ▶️       | ![Active][active-badge]     | Fast           | 8.5/10                                                                                      |
 | Blackbox                     | llama-3.1-70b                           | ▶️       | ![Active][active-badge]     | Very fast      | 8/10                                                                                        |
@@ -218,15 +213,31 @@ models.
 
 ### How does this extension compare to the paid Raycast AI?
 
-- First and foremost, raycast-g4f is completely free! I strongly believe that such AI features, especially in an awesome
+- raycast-g4f is completely free! I strongly believe that such AI features, especially in an awesome
   productivity tool like Raycast, shouldn't be locked behind a paywall.
-- UI-wise, the biggest difference is probably the chat GUI. Because the developer API that Raycast provides is limited,
-  it's not possible to replicate the Raycast AI interface exactly. The GUI used in my extension is really intuitive
-  however, and it's also used by a lot of AI extensions on raycast.
-- Regarding the models available, and the AI quality: Raycast AI definitely has more model options - after all, money
-  talks ;) But please rest assured that the quality of AI responses in my extension is by no means subpar! Some models
-  available are gpt-3.5-turbo, gpt-4 (authentic!), Google Gemini, as well as large & capable open-source models like
-  Llama 3.1 and Mixtral-8x22B. If you still doubt it, I'd encourage you to give the extension a try! :-)
+- Raycast AI definitely has more model options, but the quality of AI in this extension is, in my opinion, comparable.
+  Some models available here are gpt-4, gpt-4o, Claude 3.5 Sonnet and Google Gemini, as well as capable open-source
+  models like Llama 3.1. If you still doubt it, I'd encourage you to give the extension a try! :)
+
+### Why is the UI worse than Raycast AI?
+
+- Because the developer API that Raycast provides is limited, it's not possible to replicate the Raycast AI interface
+  exactly.
+  The components I can use are very simple, and a lot of the features in built-in Raycast commands are not available to
+  extension developers.
+- However, I've spent a lot of effort trying to make the UI really intuitive, and I'm always open to feedback on how to
+  improve it!
+
+### The extension isn't working! (e.g. I sent a message but there is no response)
+
+- Sometimes third party providers can be slow or unresponsive. If you're experiencing this issue, please try again in a
+  few minutes; or if the problem persists, please try switching to another provider.
+- If you've tried various providers and the issue still persists, please open an issue on GitHub!
+
+### How do I contribute to the extension?
+
+- I welcome all contributions! If you have an idea for a new feature, or if you've found a bug, please open an issue.
+- If you'd like to contribute code, please open a pull request, and I'll make sure to review it as soon as possible.
 
 ---
 

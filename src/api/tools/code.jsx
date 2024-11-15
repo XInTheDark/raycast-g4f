@@ -1,6 +1,6 @@
 import { exec } from "child_process";
 import fs from "fs";
-import { getSupportPath } from "../../helpers/helper.js";
+import { getSupportPath } from "../../helpers/extension_helper.js";
 
 export const codeInterpreterPrompt = `
 # Function calling: run_code

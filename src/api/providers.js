@@ -4,9 +4,6 @@
 
 import { Preferences } from "./preferences.js";
 
-/// For user-friendly names
-import { preferences } from "../../package.json";
-
 /// Provider modules
 import { NexraProvider } from "./Providers/nexra.js";
 import { DeepInfraProvider } from "./Providers/deepinfra.js";
@@ -22,9 +19,9 @@ import { MetaAIProvider } from "./Providers/metaAI.js";
 import { ReplicateProvider } from "./Providers/replicate.js";
 import { PhindProvider } from "./Providers/phind.js";
 import { GeminiProvider } from "./Providers/google_gemini.js";
-import { G4FLocalProvider } from "./Providers/special/g4f_local.jsx";
-import { OllamaLocalProvider } from "./Providers/special/ollama_local.jsx";
-import { CustomOpenAIProvider } from "./Providers/special/custom_openai.jsx";
+
+/// Special providers
+import { special_providers_info } from "./providers_special.js";
 
 /// All providers info
 // { provider internal name, {provider object, model, stream, extra options} }
@@ -38,18 +35,12 @@ export const providers_info = {
   NexraGeminiPro: { provider: NexraProvider, model: "gemini-pro", stream: true },
   DeepInfraLlama32_90B_Vision: { provider: DeepInfraProvider, model: "meta-llama/Llama-3.2-90B-Vision-Instruct", stream: true, context_tokens: 8000 },
   DeepInfraLlama32_11B_Vision: { provider: DeepInfraProvider, model: "meta-llama/Llama-3.2-11B-Vision-Instruct", stream: true },
-  DeepInfraLlama31_70B: { provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3.1-70B-Instruct", stream: true },
+  DeepInfraLlama31_70B: { provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo", stream: true },
   DeepInfraLlama31_8B: { provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3.1-8B-Instruct", stream: true },
   DeepInfraLlama31_405B: { provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3.1-405B-Instruct", stream: true },
-  DeepInfraMixtral_8x22B: { provider: DeepInfraProvider, model: "mistralai/Mixtral-8x22B-Instruct-v0.1", stream: true },
-  DeepInfraMixtral_8x7B: { provider: DeepInfraProvider, model: "mistralai/Mixtral-8x7B-Instruct-v0.1", stream: true },
   DeepInfraQwen25_72B: { provider: DeepInfraProvider, model: "Qwen/Qwen2.5-72B-Instruct", stream: true },
-  DeepInfraMistral_7B: { provider: DeepInfraProvider, model: "mistralai/Mistral-7B-Instruct-v0.3", stream: true },
+  DeepInfraQwen25Coder_32B: { provider: DeepInfraProvider, model: "Qwen/Qwen2.5-Coder-32B-Instruct", stream: true },
   DeepInfraWizardLM2_8x22B: { provider: DeepInfraProvider, model: "microsoft/WizardLM-2-8x22B", stream: true },
-  DeepInfraLlama3_8B: { provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3-8B-Instruct", stream: true, context_tokens: 8000 },
-  DeepInfraLlama3_70B: { provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3-70B-Instruct", stream: true, context_tokens: 8000 },
-  DeepInfraOpenChat36_8B: { provider: DeepInfraProvider, model: "openchat/openchat-3.6-8b", stream: true, context_tokens: 8000 },
-  DeepInfraGemma2_27B: { provider: DeepInfraProvider, model: "google/gemma-2-27b-it", stream: true, context_tokens: 4096 },
   DeepInfraLlama31Nemotron70B: { provider: DeepInfraProvider, model: "nvidia/Llama-3.1-Nemotron-70B-Instruct", stream: true },
   Blackbox: { provider: BlackboxProvider, model: "blackbox", stream: true },
   BlackboxLlama31_405B: { provider: BlackboxProvider, model: "llama-3.1-405b", stream: true },
@@ -82,16 +73,8 @@ export const providers_info = {
   ReplicateMixtral_8x7B: { provider: ReplicateProvider, model: "mistralai/mixtral-8x7b-instruct-v0.1", stream: true },
   Phind: { provider: PhindProvider, model: "", stream: true },
   GoogleGemini: { provider: GeminiProvider, model: ["gemini-1.5-pro-002","gemini-1.5-flash-002", "gemini-1.5-flash-latest"], stream: true },
-  G4FLocal: { provider: G4FLocalProvider, stream: true },
-  OllamaLocal: { provider: OllamaLocalProvider, stream: true },
-  CustomOpenAI: { provider: CustomOpenAIProvider, stream: true },
+  ...special_providers_info,
 };
-
-/// Chat providers (user-friendly names)
-// fetched from package.json for consistency and to avoid duplicate code
-export const chat_providers_names = preferences
-  .find((x) => x.name === "gptProvider")
-  .data.map((x) => [x.title, x.value]);
 
 /// Providers that support file uploads
 export const file_supported_providers = [GeminiProvider, DeepInfraProvider];

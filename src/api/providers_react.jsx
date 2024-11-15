@@ -1,5 +1,11 @@
 import { Form } from "@raycast/api";
-import { chat_providers_names } from "./providers.js";
+
+/// For user-friendly names
+import { preferences } from "../../package.json";
+
+/// Chat providers (user-friendly names)
+// fetched from package.json for consistency and to avoid duplicate code
+const chat_providers_names = preferences.find((x) => x.name === "gptProvider").data.map((x) => [x.title, x.value]);
 
 export const ChatProvidersReact = (() => {
   // Display custom APIs in a separate section for organization

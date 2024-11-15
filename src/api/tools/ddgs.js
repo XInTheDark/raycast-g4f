@@ -4,7 +4,8 @@
 
 import { exec } from "child_process";
 import { DEFAULT_ENV } from "#root/src/helpers/env.js";
-import { escapeString, getSupportPath } from "#root/src/helpers/helper.js";
+import { escapeString } from "#root/src/helpers/helper.js";
+import { getSupportPath } from "#root/src/helpers/extension_helper.js";
 import fs from "fs";
 
 // Return an array of the search results.
@@ -12,7 +13,7 @@ import fs from "fs";
 export async function ddgsRequest(query, { maxResults = 15 } = {}) {
   query = escapeString(query);
 
-  const ddgs_cmd = `ddgs text -k '${query}' -s off -m ${maxResults} -o json -f "ddgs_results"`;
+  const ddgs_cmd = `ddgs text -k '${query}' -s off -m ${maxResults} -o "ddgs_results.json"`;
   const cwd = getSupportPath();
 
   const childProcess = exec(ddgs_cmd, {
@@ -31,6 +32,9 @@ export async function ddgsRequest(query, { maxResults = 15 } = {}) {
 
   let results = fs.readFileSync(`${cwd}/ddgs_results.json`, "utf8");
   results = JSON.parse(results);
+
+  // clean up the file
+  fs.writeFileSync(`${cwd}/ddgs_results.json`, "");
 
   return results;
 }
