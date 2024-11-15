@@ -33,5 +33,8 @@ export async function ddgsRequest(query, { maxResults = 15 } = {}) {
   let results = fs.readFileSync(`${cwd}/ddgs_results.json`, "utf8");
   results = JSON.parse(results);
 
+  // clean up the file
+  fs.writeFileSync(`${cwd}/ddgs_results.json`, "");
+
   return results;
 }
