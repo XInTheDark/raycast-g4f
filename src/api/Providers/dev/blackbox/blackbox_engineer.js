@@ -1,5 +1,6 @@
-import puppeteer from "puppeteer-core";
 import fetch from "node-fetch";
+
+let puppeteer;
 
 const get_js_files = async (url) => {
   const browser = await puppeteer.launch({
@@ -28,6 +29,15 @@ const get_js_files = async (url) => {
 };
 
 export const getBlackboxValidatedToken = async () => {
+  // init puppeteer
+  if (!puppeteer) {
+    try {
+      puppeteer = await import("puppeteer-core");
+    } catch (e) {
+      throw new Error("Module not found: " + e);
+    }
+  }
+
   const url = "https://blackbox.ai";
   let jsFiles = await get_js_files(url);
 
@@ -41,5 +51,6 @@ export const getBlackboxValidatedToken = async () => {
 
   // match the string: h="*" and extract the value *
   const validated = layoutJsFile.match(/h="([^"]*)"/)[1];
+  console.log(validated);
   return validated;
 };
