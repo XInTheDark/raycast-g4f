@@ -24,7 +24,9 @@ installation from source is extremely simple.
    clone the repository.
 2. Navigate to the directory, and open a Terminal window at the downloaded folder.
 3. Run `npm ci --production` to install required dependencies.
-4. Run `npm run dev` to build and import the extension.
+4. (Optional) Run `pip install -r requirements.txt` to install Python dependencies. These are required for
+   some features, e.g. web search.
+5. Run `npm run dev` to build and import the extension.
 
 The extension, and its full set of commands, should then show up in your Raycast app.
 

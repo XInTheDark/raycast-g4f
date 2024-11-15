@@ -1,7 +1,7 @@
 import { Toast, showToast } from "@raycast/api";
 import * as providers from "../providers.js";
 
-import * as DDG from "duck-duck-scrape";
+import { ddgsRequest } from "#root/src/api/tools/ddgs.js";
 import { Preferences } from "../preferences.js";
 
 export const webToken = "<|web_search|>",
@@ -68,10 +68,8 @@ export const getWebResult = async (query) => {
   await showToast(Toast.Style.Animated, "Searching the web");
 
   try {
-    const searchResults = await DDG.search(query, {
-      safeSearch: DDG.SafeSearchType.OFF,
-    });
-    return processWebResults(searchResults.results);
+    const results = await ddgsRequest(query);
+    return processWebResults(results);
   } catch (e) {
     await showToast(Toast.Style.Failure, "Web search failed");
     return "No results found.";
@@ -88,7 +86,7 @@ export const processWebResults = (results, maxResults = 15) => {
   let answer = "";
   for (let i = 0; i < Math.min(results.length, maxResults); i++) {
     let x = results[i];
-    let rst = `${i + 1}.\nURL: ${x["url"]}\nTitle: ${x["title"]}\nContent: ${x["description"]}\n\n`;
+    let rst = `${i + 1}.\nURL: ${x["href"]}\nTitle: ${x["title"]}\nContent: ${x["body"]}\n\n`;
     answer += rst;
   }
   return answer;
