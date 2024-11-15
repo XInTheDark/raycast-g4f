@@ -4,7 +4,8 @@
 
 import { exec } from "child_process";
 import { DEFAULT_ENV } from "#root/src/helpers/env.js";
-import { escapeString, getSupportPath } from "#root/src/helpers/helper.js";
+import { escapeString } from "#root/src/helpers/helper.js";
+import { getSupportPath } from "#root/src/helpers/extension_helper.js";
 import fs from "fs";
 
 // Return an array of the search results.
