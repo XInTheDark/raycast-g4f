@@ -19,7 +19,7 @@ export const DarkAIProvider = {
     chat.unshift({
       role: "system",
       content:
-        "You are ChatGPT, a large language model trained by OpenAI, based on the GPT-4 architecture. You are now being connected with a human.",
+        "You are ChatGPT, a large language model trained by OpenAI, based on the GPT-4 architecture. You are a helpful assistant. You are now being connected with a human.",
     });
     const prompt = format_chat_to_prompt(chat);
 
