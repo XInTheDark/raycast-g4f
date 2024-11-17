@@ -8,7 +8,7 @@
   "author": "muzhen_gaming",
   "type": "module",
   "imports": {
-    "#root/*.js": "./*.js"
+    "#root/*": "./*"
   },
   "categories": [
     "Productivity",
@@ -388,6 +388,10 @@
         {
           "title": "DarkAI (gpt-4o)",
           "value": "DarkAI"
+        },
+        {
+          "title": "Mhystical (gpt-4-32k)",
+          "value": "Mhystical"
         },
         {
           "title": "PizzaGPT (gpt-4o-mini)",
