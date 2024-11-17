@@ -43,6 +43,7 @@ By using the Extension, you agree to this Policy.
 | ChatgptFree   | https://chatgptfree.ai/terms-conditions/, https://chatgptfree.ai/privacy-policy/ |
 | AI4Chat       | https://www.ai4chat.co/terms, https://www.ai4chat.co/privacy                     |
 | DarkAI        | https://www.aiuncensored.info/terms, https://www.aiuncensored.info/privacy       |
+| Mhystical     | https://mhystical.cc/                                                            |
 | PizzaGPT      | https://pizzagpt.it/privacy                                                      |
 | Meta AI       | https://www.facebook.com/legal/ai-terms                                          |
 | Replicate     | https://replicate.com/terms, https://replicate.com/privacy                       |
