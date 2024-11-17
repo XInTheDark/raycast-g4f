@@ -2,7 +2,7 @@
 // Read more here: https://github.com/xtekky/gpt4free/blob/main/docs/interference.md
 
 import { exec } from "child_process";
-import fetch from "node-fetch";
+import fetch from "#root/src/api/fetch.js";
 
 import { Storage } from "../../storage.js";
 import { messages_to_json } from "../../../classes/message.js";

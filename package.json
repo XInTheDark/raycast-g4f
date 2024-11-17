@@ -467,8 +467,16 @@
       "default": "off"
     },
     {
-      "name": "smartChatNaming",
+      "name": "proxyURL",
+      "title": "Proxy URL",
+      "description": "Optional. HTTP(s) proxy URL to use for requests.",
+      "required": false,
+      "type": "textfield",
+      "default": ""
+    },
+    {
       "title": "Features",
+      "name": "smartChatNaming",
       "label": "Enable Smart Chat Naming",
       "description": "Automatically rename chat sessions based on the messages you send.",
       "required": false,
@@ -813,6 +821,7 @@
     "fetch-to-curl": "^0.6.0",
     "g4f-image": "^1.3.3",
     "gemini-g4f": "^12.3.10-beta.1",
+    "http-proxy-agent": "^7.0.2",
     "lodash.throttle": "^4.1.1",
     "node-fetch": "^3.3.2",
     "untruncate-json": "^0.0.1"

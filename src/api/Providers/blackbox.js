@@ -1,4 +1,4 @@
-import fetch from "node-fetch";
+import fetch from "#root/src/api/fetch.js";
 import { format_chat_to_prompt } from "../../classes/message.js";
 import { randomBytes, randomUUID } from "crypto";
 import { Storage } from "../storage.js";
@@ -133,8 +133,11 @@ export const BlackboxProvider = {
 
           // Update 7/11/24: if not validated properly, blackbox now returns an advertisement instead
           // of the actual response. if we detect such a message, we attempt to revalidate the token.
-          if (max_retries > 0 && (chunk.includes("BLACKBOX.AI") || chunk.includes("https://www.blackbox.ai"))) {
-            await initValidatedToken({ forceUpdate: true });
+          if (chunk.includes("BLACKBOX.AI") || chunk.includes("https://www.blackbox.ai")) {
+            if (max_retries > 0 && max_retries <= 3) {
+              // only retry once
+              await initValidatedToken({ forceUpdate: true });
+            }
             yield* this.generate(chat, options, { max_retries: max_retries - 3 });
             return;
           }

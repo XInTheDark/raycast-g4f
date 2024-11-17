@@ -1,6 +1,6 @@
 import { version } from "../../package.json";
 
-import fetch from "node-fetch";
+import fetch from "#root/src/api/fetch.js";
 import { exec } from "child_process";
 
 import { popToRoot, showToast, Toast, confirmAlert, Icon } from "@raycast/api";

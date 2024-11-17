@@ -1,5 +1,5 @@
 export const EcosiaProvider = "EcosiaProvider";
-import fetch from "node-fetch";
+import fetch from "#root/src/api/fetch.js";
 import { messages_to_json } from "../../../classes/message.js";
 
 const api_url = "https://api.ecosia.org/v2/chat/?sp=productivity";
