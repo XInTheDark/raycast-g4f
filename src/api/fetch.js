@@ -5,6 +5,8 @@ import default_fetch from "node-fetch";
 import { HttpProxyAgent } from "http-proxy-agent";
 import { Preferences } from "./preferences.js";
 
+const devMode = Preferences["devMode"] || false;
+
 /**
  * Custom fetch function with optional proxy support
  * @param {string} url - The URL to fetch
@@ -16,8 +18,19 @@ async function fetchWithProxy(url, options = {}, proxy = null) {
   if (proxy) {
     options.agent = new HttpProxyAgent(proxy);
   }
+  if (devMode) {
+    console.log(`${options.method || "GET"} : ${url}, proxy: ${proxy}`);
+  }
 
-  return default_fetch(url, options);
+  const response = await default_fetch(url, options);
+  if (devMode) {
+    console.log(`response:\n ${response}, status: ${response.status} : ${response.statusText}`);
+    if (!response.ok) {
+      console.log(`error: ${await response.text()}`);
+    }
+  }
+
+  return response;
 }
 
 async function fetch(url, options = {}) {
