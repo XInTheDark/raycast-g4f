@@ -1,9 +1,11 @@
 import fetch from "#root/src/api/fetch.js";
 import { format_chat_to_prompt, messages_to_json } from "../../classes/message.js";
+import { sleep } from "#root/src/helpers/helper.js";
 
 // Reference: https://nexra.aryahcr.cc/documentation/chatgpt/en (under ChatGPT v2)
 const api_url_stream = "https://nexra.aryahcr.cc/api/chat/complements";
 const api_url_no_stream = "https://nexra.aryahcr.cc/api/chat/gpt";
+const api_url_no_stream2 = "https://nexra.aryahcr.cc/api/chat/task";
 const headers = {
   "Content-Type": "application/json",
 };
@@ -98,5 +100,39 @@ export const getNexraResponseNoStream = async (chat, options) => {
   });
 
   const json = await response.json();
-  return json["gpt"];
+  const id = json.id;
+  if (!id) {
+    throw new Error(`No ID returned: ${json}`);
+  }
+
+  let url = `${api_url_no_stream2}/${encodeURIComponent(id)}`;
+  let ready = false;
+  let result2 = null;
+
+  while (!ready) {
+    const response2 = await fetch(url, {
+      method: "GET",
+      headers: headers,
+    });
+    result2 = await response2.json();
+
+    if (result2?.gpt && result2?.gpt?.length > 0) {
+      break;
+    }
+
+    switch (result2?.status) {
+      case "pending":
+        await sleep(500);
+        break;
+      case "error":
+        throw new Error(`Error: ${result2}`);
+      case "not_found":
+        throw new Error(`Error: Not found: ${result2}`);
+      case "completed":
+        ready = true;
+        break;
+    }
+  }
+
+  return result2?.gpt;
 };
