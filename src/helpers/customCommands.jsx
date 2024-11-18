@@ -73,7 +73,7 @@ export class CustomCommand {
 
         const command = parts.slice(1).join("|").trim();
         processed = await execShellNoStream(command);
-        console.log(processed);
+        console.log(command + "\n" + processed);
 
         await toast.hide();
         break;
