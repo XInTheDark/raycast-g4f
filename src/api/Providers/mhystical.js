@@ -1,4 +1,4 @@
-import fetch from "node-fetch";
+import fetch from "#root/src/api/fetch.js";
 import { messages_to_json } from "#root/src/classes/message.js";
 
 const api_url = "https://api.mhystical.cc/v1/completions";

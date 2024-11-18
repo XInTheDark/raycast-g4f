@@ -13,7 +13,7 @@ import {
 } from "@raycast/api";
 import { useEffect, useState } from "react";
 import fs from "fs";
-import fetch from "node-fetch";
+import fetch from "#root/src/api/fetch.js";
 
 import { Storage } from "./api/storage.js";
 import { Preferences } from "./api/preferences.js";

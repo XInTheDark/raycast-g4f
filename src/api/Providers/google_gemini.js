@@ -1,5 +1,5 @@
 import Gemini, { messageToParts } from "gemini-g4f";
-import fetch from "node-fetch";
+import fetch from "#root/src/api/fetch.js";
 
 import fs from "fs";
 import { Preferences } from "../preferences.js";

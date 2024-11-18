@@ -1,4 +1,4 @@
-import fetch from "node-fetch";
+import fetch from "#root/src/api/fetch.js";
 
 let puppeteer;
 

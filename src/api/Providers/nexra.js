@@ -1,4 +1,4 @@
-import fetch from "node-fetch";
+import fetch from "#root/src/api/fetch.js";
 import { format_chat_to_prompt, messages_to_json } from "../../classes/message.js";
 import { sleep } from "#root/src/helpers/helper.js";
 

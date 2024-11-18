@@ -1,4 +1,4 @@
-import fetch from "node-fetch";
+import fetch from "#root/src/api/fetch.js";
 import fs from "fs";
 
 import { messages_to_json } from "../../classes/message.js";

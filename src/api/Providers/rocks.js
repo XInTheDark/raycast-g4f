@@ -1,4 +1,4 @@
-import fetch from "node-fetch";
+import fetch from "#root/src/api/fetch.js";
 
 const api_url = "https://api.airforce/chat/completions";
 

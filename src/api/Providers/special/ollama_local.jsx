@@ -1,7 +1,7 @@
 // This module allows communication and requests to the local Ollama API.
 // Read more here: https://github.com/ollama/ollama/blob/main/docs/api.md
 
-import fetch from "node-fetch";
+import fetch from "#root/src/api/fetch.js";
 
 import { Storage } from "../../storage.js";
 import { messages_to_json } from "../../../classes/message.js";

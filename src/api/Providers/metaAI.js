@@ -1,4 +1,4 @@
-import fetch from "node-fetch";
+import fetch from "#root/src/api/fetch.js";
 import { randomUUID } from "crypto";
 import { format_chat_to_prompt } from "../../classes/message.js";
 import { sleep } from "../../helpers/helper.js";
