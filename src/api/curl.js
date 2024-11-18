@@ -8,24 +8,11 @@
 // It may throw an error if the request fails (curl exits with a non-zero status code).
 // 4. REQUIREMENT: The `curl` command must be available in the system PATH.
 
-import { exec } from "child_process";
+import { execShell } from "#root/src/api/shell.js";
 import { fetchToCurl } from "fetch-to-curl";
 
 export async function* curlRequest(url, options) {
   const curl_cmd = fetchToCurl(url, options) + " --silent --no-buffer";
 
-  const childProcess = exec(curl_cmd);
-
-  for await (const chunk of childProcess.stdout) {
-    yield chunk.toString().replace(/\r/g, "\n");
-  }
-
-  const exitCode = await new Promise((resolve, reject) => {
-    childProcess.on("exit", resolve);
-    childProcess.on("error", reject);
-  });
-
-  if (exitCode !== 0) {
-    throw new Error(`curl exited with code ${exitCode}`);
-  }
+  yield* execShell(curl_cmd);
 }

@@ -2,8 +2,7 @@
 // with the `ddgs` CLI to perform DuckDuckGo searches.
 // REQUIREMENT: `pip install duckduckgo-search` in order to install the `ddgs` CLI.
 
-import { exec } from "child_process";
-import { DEFAULT_ENV } from "#root/src/helpers/env.js";
+import { DEFAULT_SHELL_OPTIONS, execShellNoStream } from "#root/src/api/shell.js";
 import { escapeString } from "#root/src/helpers/helper.js";
 import { getSupportPath } from "#root/src/helpers/extension_helper.js";
 import fs from "fs";
@@ -16,19 +15,7 @@ export async function ddgsRequest(query, { maxResults = 15 } = {}) {
   const ddgs_cmd = `ddgs text -k '${query}' -s off -m ${maxResults} -o "ddgs_results.json"`;
   const cwd = getSupportPath();
 
-  const childProcess = exec(ddgs_cmd, {
-    env: DEFAULT_ENV,
-    cwd: cwd,
-  });
-
-  const exitCode = await new Promise((resolve, reject) => {
-    childProcess.on("exit", () => resolve(0));
-    childProcess.on("error", (err) => reject(err));
-  });
-
-  if (exitCode !== 0) {
-    throw new Error(`ddgs exited with code ${exitCode}`);
-  }
+  await execShellNoStream(ddgs_cmd, { ...DEFAULT_SHELL_OPTIONS, cwd });
 
   let results = fs.readFileSync(`${cwd}/ddgs_results.json`, "utf8");
   results = JSON.parse(results);

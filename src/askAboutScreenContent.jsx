@@ -1,6 +1,5 @@
 import { closeMainWindow, launchCommand, LaunchType } from "@raycast/api";
-import util from "util";
-import { exec } from "child_process";
+import { execShellNoStream } from "#root/src/api/shell.js";
 import { getAssetsPath } from "./helpers/extension_helper.js";
 import { image_supported_provider_strings } from "./api/providers.js";
 
@@ -8,10 +7,9 @@ import { image_supported_provider_strings } from "./api/providers.js";
 // which means it does not return any UI view, and instead calls askAI to handle the rendering.
 // This is because the function is async, and async functions are only permitted in no-view commands.
 export default async function AskAboutScreenContent(props) {
-  const execPromise = util.promisify(exec);
   await closeMainWindow();
   const path = `${getAssetsPath()}/screenshot.png`;
-  await execPromise(`/usr/sbin/screencapture "${path}"`);
+  await execShellNoStream(`/usr/sbin/screencapture "${path}"`);
 
   await launchCommand({
     name: "askAI",
