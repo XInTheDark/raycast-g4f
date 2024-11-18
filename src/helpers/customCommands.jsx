@@ -14,8 +14,11 @@ export class CustomCommand {
 
   async processPrompt(prompt, query, selected) {
     this.input = query ? query : selected ? selected : "";
-    const regex = /{([^}]*)}/;
+
+    // const regex = /{([^}]*)}/; // left-to-right, legacy matching method
+    const regex = /\{([^{}]*)}/; // depth-first matching method; inner placeholders are processed first
     let match;
+
     while ((match = regex.exec(prompt))) {
       const placeholder = match[1];
       const processed_placeholder = await this.process_placeholder(placeholder);
