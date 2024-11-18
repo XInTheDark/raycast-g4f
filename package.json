@@ -468,7 +468,7 @@
     },
     {
       "name": "proxyURL",
-      "title": "Proxy URL",
+      "title": "Proxy URL (Experimental)",
       "description": "Optional. HTTP(s) proxy URL to use for requests.",
       "required": false,
       "type": "textfield",
