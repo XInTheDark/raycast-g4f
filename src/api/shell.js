@@ -33,5 +33,6 @@ export async function execShellNoStream(cmd, options = { env: DEFAULT_ENV }, exe
   for await (const chunk of execShell(cmd, options, exec_options)) {
     output += chunk;
   }
+  output = output.trim();
   return output;
 }
