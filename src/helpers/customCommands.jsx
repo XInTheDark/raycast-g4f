@@ -1,7 +1,8 @@
 import { Storage } from "../api/storage.js";
 
-import { Clipboard } from "@raycast/api";
+import { Clipboard, showToast, Toast } from "@raycast/api";
 import { getBrowserTab } from "./browser.jsx";
+import { execShellNoStream } from "#root/src/api/shell.js";
 
 export class CustomCommand {
   constructor({ name = "", prompt = "", id = Date.now().toString(), options = {} }) {
@@ -67,12 +68,24 @@ export class CustomCommand {
       case "browser-tab":
         processed = await getBrowserTab();
         break;
+      case "shell": {
+        const toast = await showToast(Toast.Style.Animated, "Running shell command");
+
+        const command = parts.slice(1).join("|").trim();
+        processed = await execShellNoStream(command);
+        console.log(processed);
+
+        await toast.hide();
+        break;
+      }
       default:
         processed = t;
         break;
     }
 
-    // modifiers
+    // modifiers are applied after the main processing, except for shell commands
+    if (["shell"].includes(main)) return processed;
+
     const modifiers = parts.slice(1).map((x) => x.trim());
     for (const mod of modifiers) {
       switch (mod) {
