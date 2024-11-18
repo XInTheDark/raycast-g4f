@@ -172,6 +172,11 @@ export const BlackboxProvider = {
     } catch (e) {
       if (max_retries > 0) {
         console.log(e, "Retrying...");
+        if (max_retries <= 2) {
+          // only retry once
+          await initValidatedToken({ forceUpdate: true });
+          max_retries = 0;
+        }
         yield* this.generate(chat, options, { max_retries: max_retries - 1 });
       } else {
         throw e;
@@ -182,14 +187,14 @@ export const BlackboxProvider = {
 
 const initValidatedToken = async ({ forceUpdate = false } = {}) => {
   let validatedToken = await Storage.read("providers/blackbox/validatedToken", defaultValidatedToken);
-  const lastUpdateTime = parseInt(await Storage.read("providers/blackbox/lastUpdateTime", "0"));
-  if (forceUpdate || Date.now() - lastUpdateTime > 1000 * 60 * 60 * 24 * 5) {
+  // const lastUpdateTime = parseInt(await Storage.read("providers/blackbox/lastUpdateTime", "0"));
+  if (forceUpdate) {
     try {
       // dynamic import
       const { getBlackboxValidatedToken } = await import("#root/src/api/Providers/dev/blackbox/blackbox_engineer.js");
       validatedToken = await getBlackboxValidatedToken();
       await Storage.write("providers/blackbox/validatedToken", validatedToken);
-      await Storage.write("providers/blackbox/lastUpdateTime", Date.now().toString());
+      // await Storage.write("providers/blackbox/lastUpdateTime", Date.now().toString());
     } catch (e) {
       console.log("Failed to update validated token", e);
     }
