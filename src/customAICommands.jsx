@@ -132,7 +132,15 @@ export default function CustomAICommands() {
   const commandsToListItems = (commands) => {
     if (!commands) return [];
     return commands.map((x, idx) => {
-      return <List.Item title={x.name} subtitle={x.prompt} key={x.id} actions={<CommandActionPanel idx={idx} />} />;
+      return (
+        <List.Item
+          title={x.name}
+          subtitle={x.prompt}
+          key={x.id}
+          actions={<CommandActionPanel idx={idx} />}
+          accessories={x.shortcut ? [{ tag: x.shortcut }] : []}
+        />
+      );
     });
   };
 
