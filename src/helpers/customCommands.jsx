@@ -16,13 +16,37 @@ export class CustomCommand {
     this.input = query ? query : selected ? selected : "";
 
     // const regex = /{([^}]*)}/; // left-to-right, legacy matching method
-    const regex = /\{([^{}]*)}/; // depth-first matching method; inner placeholders are processed first
-    let match;
+    const regex = /\{([^{}]*)}/g; // depth-first matching method; inner placeholders are processed first
 
-    while ((match = regex.exec(prompt))) {
-      const placeholder = match[1];
-      const processed_placeholder = await this.process_placeholder(placeholder);
-      prompt = prompt.replace(`{${placeholder}}`, processed_placeholder);
+    // Step 1. Find the number of matches (i.e. placeholders) in the original string
+    // We do this to limit the number of regex matches and therefore prevent injections
+    let numMatches = 0;
+    let temp = prompt;
+    let _match;
+    while ((_match = temp.match(regex))) {
+      for (const __match of _match) {
+        temp = temp.replace(__match, "");
+      }
+      numMatches += _match.length;
+    }
+
+    // Step 2. Main loop
+    let cnt = 0;
+    let matches;
+
+    // use match() to search the entire string in each iteration
+    while (cnt < numMatches && (matches = prompt.match(regex))) {
+      // keep track of the number of regex matches so far, and exit if the maximum is reached.
+      // because of our incremental depth-first regex matching approach, the original placeholders will be
+      // matched first, and since there is an exact limit, injections should likely be prevented.
+      cnt += matches.length;
+      // console.log(matches);
+
+      for (const match of matches) {
+        const p = match.slice(1, -1); // get placeholder content
+        const processed = await this.process_placeholder(p);
+        prompt = prompt.replace(match, processed);
+      }
     }
     return prompt;
   }
@@ -77,7 +101,7 @@ export class CustomCommand {
 
           const command = parts.slice(1).join("|").trim();
           processed = await execShellNoStream(command);
-          console.log(command + "\n" + processed);
+          console.log("Shell exec: " + command + "\n" + processed);
 
           await toast.hide();
           break;
