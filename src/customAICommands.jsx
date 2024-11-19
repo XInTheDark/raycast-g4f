@@ -1,11 +1,15 @@
-import { CustomCommand, getCustomCommands, setCustomCommands } from "./helpers/customCommands.jsx";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Form, List, Action, ActionPanel, Icon, useNavigation, confirmAlert } from "@raycast/api";
+
+import { CustomCommand, getCustomCommands, setCustomCommands } from "./helpers/customCommands.jsx";
 import useGPT from "./api/gpt.jsx";
+
 import { help_action } from "./helpers/helpPage.jsx";
+import { stringToKeyboardShortcut } from "#root/src/helpers/helper.js";
 
 export default function CustomAICommands() {
   let [commands, setCommands] = useState(null);
+
   useEffect(() => {
     (async () => {
       const retrieved = await getCustomCommands();
@@ -37,6 +41,7 @@ export default function CustomAICommands() {
               onSubmit={async (values) => {
                 command.name = values.name;
                 command.prompt = values.prompt;
+                command.shortcut = values.shortcut.toLowerCase();
                 command.options.webSearch = values.webSearch;
                 command.options.allowUploadFiles = values.allowUploadFiles;
 
@@ -61,6 +66,13 @@ export default function CustomAICommands() {
         />
 
         <Form.Separator />
+
+        <Form.TextField
+          id="shortcut"
+          title="Keyboard Shortcut"
+          info="Example: cmd+opt+n"
+          defaultValue={command.shortcut}
+        />
 
         <Form.Checkbox
           id="webSearch"
@@ -111,14 +123,37 @@ export default function CustomAICommands() {
           style={Action.Style.Destructive}
         />
         {help_action("customAICommands")}
+
+        <ActionPanel.Section title="Command Shortcuts">{commandShortcutsComponent}</ActionPanel.Section>
       </ActionPanel>
     );
   };
 
   const commandsToListItems = (commands) => {
+    if (!commands) return [];
     return commands.map((x, idx) => {
       return <List.Item title={x.name} subtitle={x.prompt} key={x.id} actions={<CommandActionPanel idx={idx} />} />;
     });
+  };
+
+  const commandsToShortcutItems = (commands) => {
+    if (!commands) return [];
+    const children = [];
+    for (const command of commands) {
+      if (command.shortcut) {
+        const shortcut = stringToKeyboardShortcut(command.shortcut);
+        if (!shortcut) continue;
+        children.push(
+          <Action.Push
+            title={command.name}
+            shortcut={shortcut}
+            key={command.id}
+            target={<RunCommand command={command} />}
+          />
+        );
+      }
+    }
+    return children;
   };
 
   const RunCommand = (props) => {
@@ -134,6 +169,14 @@ export default function CustomAICommands() {
       }
     );
   };
+
+  // Memoized items
+  const commandShortcutsComponent = useMemo(() => {
+    return commandsToShortcutItems(commands);
+  }, [commands]);
+  const commandsListItems = useMemo(() => {
+    return commandsToListItems(commands);
+  }, [commands]);
 
   // We show a list of commands
   if (!commands || commands.length === 0) {
@@ -155,5 +198,5 @@ export default function CustomAICommands() {
         />
       </List>
     );
-  } else return <List searchBarPlaceholder="Search Custom Commands">{commandsToListItems(commands)}</List>;
+  } else return <List searchBarPlaceholder="Search Custom Commands">{commandsListItems}</List>;
 }

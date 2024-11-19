@@ -191,3 +191,20 @@ export const escapeString = (str) => {
 export const escapeObject = (obj) => {
   return escapeString(JSON.stringify(obj));
 };
+
+// Convert a string like "cmd+opt+n" to an object like { modifiers: ["cmd", "opt"], key: "n" }
+export const stringToKeyboardShortcut = (str) => {
+  str = str.toLowerCase();
+  let parts = str.split("+").map((x) => x.trim());
+  let key = parts.pop();
+  if (key.length !== 1) {
+    return null;
+  }
+
+  let modifiers = parts;
+  if (modifiers.length === 0) {
+    return null;
+  }
+
+  return { modifiers, key };
+};
