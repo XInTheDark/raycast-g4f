@@ -75,6 +75,7 @@ export const providers_info = {
   ReplicateMixtral_8x7B: { provider: ReplicateProvider, model: "mistralai/mixtral-8x7b-instruct-v0.1", stream: true },
   Phind: { provider: PhindProvider, model: "", stream: true },
   GoogleGemini: { provider: GeminiProvider, model: ["gemini-1.5-pro-002","gemini-1.5-flash-002", "gemini-1.5-flash-latest"], stream: true },
+  GoogleGeminiExperimental: { provider: GeminiProvider, model: "gemini-exp-1114", stream: true },
   ...special_providers_info,
 };
 
