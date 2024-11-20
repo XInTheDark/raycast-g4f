@@ -37,7 +37,7 @@ export const providers_info = {
   DeepInfraLlama32_90B_Vision: { provider: DeepInfraProvider, model: "meta-llama/Llama-3.2-90B-Vision-Instruct", stream: true, context_tokens: 8000 },
   DeepInfraLlama32_11B_Vision: { provider: DeepInfraProvider, model: "meta-llama/Llama-3.2-11B-Vision-Instruct", stream: true },
   DeepInfraLlama31_70B: { provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo", stream: true },
-  DeepInfraLlama31_8B: { provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3.1-8B-Instruct", stream: true },
+  DeepInfraLlama31_8B: { provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo", stream: true },
   DeepInfraLlama31_405B: { provider: DeepInfraProvider, model: "meta-llama/Meta-Llama-3.1-405B-Instruct", stream: true },
   DeepInfraQwen25_72B: { provider: DeepInfraProvider, model: "Qwen/Qwen2.5-72B-Instruct", stream: true },
   DeepInfraQwen25Coder_32B: { provider: DeepInfraProvider, model: "Qwen/Qwen2.5-Coder-32B-Instruct", stream: true },
