@@ -43,6 +43,7 @@ export const providers_info = {
   DeepInfraQwen25Coder_32B: { provider: DeepInfraProvider, model: "Qwen/Qwen2.5-Coder-32B-Instruct", stream: true },
   DeepInfraWizardLM2_8x22B: { provider: DeepInfraProvider, model: "microsoft/WizardLM-2-8x22B", stream: true },
   DeepInfraLlama31Nemotron70B: { provider: DeepInfraProvider, model: "nvidia/Llama-3.1-Nemotron-70B-Instruct", stream: true },
+  DeepInfraDeepSeek25: { provider: DeepInfraProvider, model: "deepseek-ai/DeepSeek-V2.5", stream: true },
   Blackbox: { provider: BlackboxProvider, model: "blackbox", stream: true },
   BlackboxLlama31_405B: { provider: BlackboxProvider, model: "llama-3.1-405b", stream: true },
   BlackboxLlama31_70B: { provider: BlackboxProvider, model: "llama-3.1-70b", stream: true },
@@ -74,7 +75,8 @@ export const providers_info = {
   ReplicateLlama31_405B: { provider: ReplicateProvider, model: "meta/meta-llama-3.1-405b-instruct", stream: true },
   ReplicateMixtral_8x7B: { provider: ReplicateProvider, model: "mistralai/mixtral-8x7b-instruct-v0.1", stream: true },
   Phind: { provider: PhindProvider, model: "", stream: true },
-  GoogleGemini: { provider: GeminiProvider, model: ["gemini-1.5-pro-002","gemini-1.5-flash-002", "gemini-1.5-flash-latest"], stream: true },
+  GoogleGemini: { provider: GeminiProvider, model: ["gemini-1.5-pro-002", "gemini-1.5-flash-002", "gemini-1.5-flash-latest"], stream: true },
+  GoogleGeminiFlash: { provider: GeminiProvider, model: "gemini-1.5-flash-002", stream: true },
   GoogleGeminiExperimental: { provider: GeminiProvider, model: "gemini-exp-1114", stream: true },
   ...special_providers_info,
 };
