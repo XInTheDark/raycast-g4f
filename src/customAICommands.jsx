@@ -44,6 +44,8 @@ export default function CustomAICommands() {
                 command.shortcut = values.shortcut.toLowerCase();
                 command.options.webSearch = values.webSearch;
                 command.options.allowUploadFiles = values.allowUploadFiles;
+                command.options.useSelected = values.useSelected;
+                command.options.forceShowForm = values.forceShowForm;
 
                 if (newCommand) {
                   setCommands([...commands, command]);
@@ -74,11 +76,25 @@ export default function CustomAICommands() {
           defaultValue={command.shortcut}
         />
 
+        {/* Options */}
+        {/* We place webSearch first because it doesn't have an info; otherwise it somehow messes up the layout */}
         <Form.Checkbox
-          id="webSearch"
           title="Options"
+          id="webSearch"
           label="Enable Web Search"
           defaultValue={command.options?.webSearch}
+        />
+        <Form.Checkbox
+          id="useSelected"
+          label="Use Selected Text"
+          info="Allow using selected text as input"
+          defaultValue={command.options?.useSelected ?? true}
+        />
+        <Form.Checkbox
+          id="forceShowForm"
+          label="Always Show Form"
+          info="Always show a text box to ask for input, even if text is selected"
+          defaultValue={command.options?.forceShowForm}
         />
         <Form.Checkbox
           id="allowUploadFiles"
@@ -170,10 +186,11 @@ export default function CustomAICommands() {
       {},
       {
         showFormText: "Input",
-        useSelected: true,
-        allowUploadFiles: command.options?.allowUploadFiles,
         processPrompt: command.processPromptFunction(),
+        useSelected: command.options?.useSelected ?? true,
+        forceShowForm: command.options?.forceShowForm,
         webSearchMode: command.options?.webSearch ? "always" : "off",
+        allowUploadFiles: command.options?.allowUploadFiles,
       }
     );
   };
