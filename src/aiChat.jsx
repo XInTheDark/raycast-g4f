@@ -866,7 +866,7 @@ export default function Chat({ launchContext }) {
         />
         <Action.Push icon={Icon.BlankDocument} title="Compose Message" target={<ComposeMessageComponent />} />
         <ActionPanel.Section title="Current Chat">
-          {!generationStatus.stop && (
+          {generationStatus.loading && (
             <Action
               title="Stop Response"
               icon={Icon.Pause}
@@ -976,6 +976,12 @@ export default function Chat({ launchContext }) {
             }}
             shortcut={{ modifiers: ["shift"], key: "delete" }}
           />
+          <Action.Push
+            icon={Icon.Gear}
+            title="Chat Settings"
+            target={<ChatSettingsComponent />}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "o" }}
+          />
           <Action
             icon={Icon.Tack}
             title="Pin Chat"
@@ -993,12 +999,6 @@ export default function Chat({ launchContext }) {
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "p" }}
           />
-          <Action.Push
-            icon={Icon.Gear}
-            title="Chat Settings"
-            target={<ChatSettingsComponent />}
-            shortcut={{ modifiers: ["cmd", "shift"], key: "o" }}
-          />
           <Action
             icon={Icon.Duplicate}
             title="Duplicate Chat"
@@ -1011,20 +1011,6 @@ export default function Chat({ launchContext }) {
               await toast(Toast.Style.Success, "Chat duplicated");
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "d" }}
-          />
-          <Action
-            icon={Icon.Download}
-            title="Export Chat"
-            onAction={async () => {
-              if (currentChatData.messages.length === 0) {
-                await toast(Toast.Style.Failure, "No messages in chat");
-                return;
-              }
-
-              let data = JSON.stringify(currentChatData);
-              await Clipboard.copy(data);
-              await toast(Toast.Style.Success, "Chat data copied");
-            }}
           />
         </ActionPanel.Section>
         <ActionPanel.Section title="Manage Chats">
@@ -1071,6 +1057,20 @@ export default function Chat({ launchContext }) {
             shortcut={{ modifiers: ["cmd", "shift"], key: "arrowUp" }}
           />
           <Action.Push icon={Icon.Upload} title="Import Chat" target={<ImportChatComponent />} />
+          <Action
+            icon={Icon.Download}
+            title="Export Chat"
+            onAction={async () => {
+              if (currentChatData.messages.length === 0) {
+                await toast(Toast.Style.Failure, "No messages in chat");
+                return;
+              }
+
+              let data = JSON.stringify(currentChatData);
+              await Clipboard.copy(data);
+              await toast(Toast.Style.Success, "Chat data copied");
+            }}
+          />
         </ActionPanel.Section>
         <ActionPanel.Section title="Danger zone">
           <Action
