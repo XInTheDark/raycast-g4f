@@ -980,7 +980,7 @@ export default function Chat({ launchContext }) {
             icon={Icon.Gear}
             title="Chat Settings"
             target={<ChatSettingsComponent />}
-            shortcut={{ modifiers: ["cmd", "shift"], key: "o" }}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "," }}
           />
           <Action
             icon={Icon.Tack}
