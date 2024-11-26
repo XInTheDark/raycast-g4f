@@ -208,3 +208,38 @@ export const stringToKeyboardShortcut = (str) => {
 
   return { modifiers, key };
 };
+
+// format response using some heuristics
+export const formatResponse = (response, provider = null) => {
+  // eslint-disable-next-line no-constant-condition
+  if (false && (provider.name === "Nexra" || provider.name === "BestIM")) {
+    // replace escape characters: \n with a real newline, \t with a real tab, etc.
+    response = response.replace(/\\n/g, "\n");
+    response = response.replace(/\\t/g, "\t");
+    response = response.replace(/\\r/g, "\r");
+    response = response.replace(/\\'/g, "'");
+    response = response.replace(/\\"/g, '"');
+
+    // remove all remaining backslashes
+    response = response.replace(/\\/g, "");
+
+    // remove <sup>, </sup> tags (not supported apparently)
+    response = response.replace(/<sup>/g, "");
+    response = response.replace(/<\/sup>/g, "");
+  }
+
+  if (provider.name === "Blackbox") {
+    // remove version number - example: remove $@$v=v1.13$@$ or $@$v=undefined%@$
+    response = response.replace(/\$@\$v=.{1,30}\$@\$/, "");
+
+    // remove sources - the chunk of text starting with $~~~$[ and ending with ]$~~~$
+    // as well as everything before it
+    const regex = /\$~~~\$\[[^]*]\$~~~\$/;
+    let match = response.match(regex);
+    if (match) {
+      response = response.substring(match.index + match[0].length);
+    }
+  }
+
+  return response;
+};

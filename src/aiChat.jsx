@@ -27,7 +27,7 @@ import { confirmClearData, tryRecoverJSON } from "./helpers/aiChatHelper.jsx";
 
 import { format_chat_to_prompt, MessagePair, pairs_to_messages } from "./classes/message.js";
 
-import { formatResponse, getChatResponse, getChatResponseSync } from "./api/gpt.jsx";
+import { getChatResponse, getChatResponseSync } from "./api/gpt.jsx";
 import * as providers from "./api/providers.js";
 import { ChatProvidersReact } from "./api/providers_react.jsx";
 
@@ -322,7 +322,6 @@ export default function Chat({ launchContext }) {
       const _handler = async (new_message) => {
         i++;
         response = new_message;
-        response = formatResponse(response, info.provider);
         setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, { response: response });
 
         if (generationStatus.updateCurrentResponse) {
