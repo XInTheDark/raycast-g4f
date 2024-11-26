@@ -27,7 +27,7 @@ import { confirmClearData, tryRecoverJSON } from "./helpers/aiChatHelper.jsx";
 
 import { format_chat_to_prompt, MessagePair, pairs_to_messages } from "./classes/message.js";
 
-import { formatResponse, getChatResponse, getChatResponseSync } from "./api/gpt.jsx";
+import { getChatResponse, getChatResponseSync } from "./api/gpt.jsx";
 import * as providers from "./api/providers.js";
 import { ChatProvidersReact } from "./api/providers_react.jsx";
 
