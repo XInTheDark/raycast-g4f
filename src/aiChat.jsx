@@ -322,7 +322,6 @@ export default function Chat({ launchContext }) {
       const _handler = async (new_message) => {
         i++;
         response = new_message;
-        response = formatResponse(response, info.provider);
         setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, { response: response });
 
         if (generationStatus.updateCurrentResponse) {

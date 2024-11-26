@@ -2,6 +2,7 @@ import fetch from "#root/src/api/fetch.js";
 import { format_chat_to_prompt } from "../../classes/message.js";
 import { randomBytes, randomUUID } from "crypto";
 import { Storage } from "../storage.js";
+import { formatResponse } from "#root/src/helpers/helper.js";
 
 // Implementation ported from gpt4free Blackbox provider.
 
@@ -62,6 +63,11 @@ const defaultValidatedToken = Buffer.from("MDBmMzdiMzQtYTE2Ni00ZWZiLWJjZTUtMTMxM
   "utf-8"
 );
 
+// Chunk delay - we don't yield the first few chunks of the response to allow for formatting.
+const chunkDelays = {
+  blackbox: 4,
+};
+
 export const BlackboxProvider = {
   name: "Blackbox",
   generate: async function* (chat, options, { max_retries = 5 }) {
@@ -120,8 +126,13 @@ export const BlackboxProvider = {
       }
 
       const reader = response.body;
-      let search_results = false;
       let text = "";
+
+      let search_results = false;
+      let i = 0;
+      let first = true;
+      let chunkDelay = chunkDelays[options.model] ?? 0;
+
       for await (let chunk of reader) {
         chunk = chunk.toString();
 
@@ -140,6 +151,17 @@ export const BlackboxProvider = {
             }
             yield* this.generate(chat, options, { max_retries: max_retries - 3 });
             return;
+          }
+
+          // Update 22/11/24: as part of ensuring consistent formatting, we now format the response before yielding it.
+          // this is done by delaying the first few chunks of the response.
+          if (i < chunkDelay) {
+            i++;
+            continue;
+          } else if (first) {
+            first = false;
+            yield formatResponse(text, this);
+            continue;
           }
 
           yield chunk;
