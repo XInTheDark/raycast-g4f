@@ -155,13 +155,15 @@ export const BlackboxProvider = {
 
           // Update 22/11/24: as part of ensuring consistent formatting, we now format the response before yielding it.
           // this is done by delaying the first few chunks of the response.
-          if (i < chunkDelay) {
-            i++;
-            continue;
-          } else if (first) {
-            first = false;
-            yield formatResponse(text, this);
-            continue;
+          if (first) {
+            if (i < chunkDelay) {
+              i++;
+              continue;
+            } else {
+              first = false;
+              yield formatResponse(text, this);
+              continue;
+            }
           }
 
           yield chunk;
