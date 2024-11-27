@@ -1,10 +1,14 @@
 import fetch from "#root/src/api/fetch.js";
 
-let puppeteer;
+let puppeteer = null;
+let puppeteer_info = { module_name: "" };
 
 const get_js_files = async (url) => {
   const browser = await puppeteer.launch({
-    executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    executablePath:
+      puppeteer_info.module_name === "puppeteer-core"
+        ? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        : undefined,
   });
   const page = await browser.newPage();
 
@@ -30,21 +34,21 @@ const get_js_files = async (url) => {
 
 export const getBlackboxValidatedToken = async () => {
   // init puppeteer
-  const puppeteer_modules = ["puppeteer", "puppeteer-core"];
   if (!puppeteer) {
     try {
-      for (const module of puppeteer_modules) {
-        try {
-          puppeteer = await import(module);
-          break;
-        } catch {
-          continue;
-        }
+      puppeteer = await import("puppeteer");
+      puppeteer_info.module_name = "puppeteer";
+    } catch {
+      try {
+        puppeteer = await import("puppeteer-core");
+        puppeteer_info.module_name = "puppeteer-core";
+      } catch {
+        throw new Error("Puppeteer not found");
       }
-    } catch (e) {
-      throw new Error("Module not found: " + e);
     }
   }
+
+  console.log("Using puppeteer module: ", puppeteer_info.module_name);
 
   const url = "https://blackbox.ai";
   let jsFiles = await get_js_files(url);
