@@ -21,8 +21,9 @@ import { ReplicateProvider } from "./Providers/replicate.js";
 import { PhindProvider } from "./Providers/phind.js";
 import { GeminiProvider } from "./Providers/google_gemini.js";
 
-/// Special providers
+/// Special or unused providers
 import { special_providers_info } from "./providers_special.js";
+import { OpenAIProvider } from "./Providers/openai.js";
 
 /// All providers info
 // { provider internal name, {provider object, model, stream, extra options} }
@@ -78,7 +79,12 @@ export const providers_info = {
   GoogleGemini: { provider: GeminiProvider, model: ["gemini-1.5-pro-002", "gemini-1.5-flash-002", "gemini-1.5-flash-latest"], stream: true },
   GoogleGeminiFlash: { provider: GeminiProvider, model: "gemini-1.5-flash-002", stream: true },
   GoogleGeminiExperimental: { provider: GeminiProvider, model: "gemini-exp-1121", stream: true },
+
+  // Special providers (jsx extension)
   ...special_providers_info,
+
+  // Providers unused in raycast-g4f
+  OpenAI_API: { provider: OpenAIProvider, model: "gpt-4o", stream: true, api_key: null },
 };
 
 /// Providers that support file uploads
