@@ -30,9 +30,17 @@ const get_js_files = async (url) => {
 
 export const getBlackboxValidatedToken = async () => {
   // init puppeteer
+  const puppeteer_modules = ["puppeteer", "puppeteer-core"];
   if (!puppeteer) {
     try {
-      puppeteer = await import("puppeteer-core");
+      for (const module of puppeteer_modules) {
+        try {
+          puppeteer = await import(module);
+          break;
+        } catch {
+          continue;
+        }
+      }
     } catch (e) {
       throw new Error("Module not found: " + e);
     }
