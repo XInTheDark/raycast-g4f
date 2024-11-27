@@ -100,6 +100,30 @@ export const image_supported_provider_strings = [
 /// Providers that support function calling
 export const function_supported_providers = [DeepInfraProvider];
 
+/// Model aliases
+/// Each model is aliased to an array of provider strings that support it
+// prettier-ignore
+export const model_aliases = {
+  "gpt-4o": ["NexraGPT4o", "RocksGPT4o", "DarkAI", "NexraChatGPT", "BlackboxGPT4o", "NexraBing"],
+  "gpt-4": ["RocksGPT4", "AI4Chat", "Mhystical"],
+  "gpt-4o-mini": ["DuckDuckGo_GPT4oMini", "ChatgptFree", "PizzaGPT"],
+  "claude-3.5-sonnet": ["BlackboxClaude35Sonnet", "RocksClaude35Sonnet"],
+  "claude-3-opus": ["RocksClaude3Opus"],
+  "claude-3-haiku": ["DuckDuckGo_Claude3Haiku"],
+  "gemini-1.5-pro": ["GoogleGemini", "BlackboxGeminiPro", "NexraGeminiPro"],
+  "gemini-1.5-flash": ["GoogleGeminiFlash", "BlackboxGemini15Flash"],
+  "llama-3.1-405b": ["BlackboxLlama31_405B", "RocksLlama31_405B", "MetaAI", "DeepInfraLlama31_405B"],
+  "llama-3.1-70b": ["BlackboxLlama31_70B", "DeepInfraLlama31_70B", "RocksLlama31_70B", "DuckDuckGo_Llama31_70B", "NexraLlama31", "DeepInfraLlama31Nemotron70B"],
+  "llama-3.1-8b": ["DeepInfraLlama31_8B", "ReplicateLlama3_8B"],
+  "llama-3.2-90b": ["DeepInfraLlama32_90B_Vision"],
+  "llama-3.2-11b": ["DeepInfraLlama32_11B_Vision"],
+  "qwen-2.5-72b": ["DeepInfraQwen25_72B"],
+  "qwen-2.5-coder-32b": ["DeepInfraQwen25Coder_32B"],
+  "wizardlm-2-8x22b": ["DeepInfraWizardLM2_8x22B", "RocksWizardLM2_8x22B"],
+  "deepseek-2.5": ["DeepInfraDeepSeek25"],
+  "mixtral-8x7b": ["DuckDuckGo_Mixtral_8x7B", "ReplicateMixtral_8x7B"],
+};
+
 // Additional options
 export const additional_provider_options = (provider, chatOptions = null) => {
   let options = {};
