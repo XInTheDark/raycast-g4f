@@ -209,7 +209,7 @@ export const BlackboxProvider = {
   },
 };
 
-const initValidatedToken = async ({ forceUpdate = false } = {}) => {
+const initValidatedToken = async ({ forceUpdate = true } = {}) => {
   let validatedToken = await Storage.read("providers/blackbox/validatedToken", defaultValidatedToken);
   // const lastUpdateTime = parseInt(await Storage.read("providers/blackbox/lastUpdateTime", "0"));
   if (forceUpdate) {
