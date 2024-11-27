@@ -108,8 +108,9 @@ export const getNexraResponseNoStream = async (chat, options) => {
   let url = `${api_url_no_stream2}/${encodeURIComponent(id)}`;
   let ready = false;
   let result2 = null;
+  let i = 0;
 
-  while (!ready) {
+  while (!ready && i < 60) {
     const response2 = await fetch(url, {
       method: "GET",
       headers: headers,
@@ -132,7 +133,13 @@ export const getNexraResponseNoStream = async (chat, options) => {
         ready = true;
         break;
     }
+
+    i++;
   }
 
-  return result2?.gpt;
+  if (!result2?.gpt) {
+    throw new Error(`No response returned`);
+  } else {
+    return result2.gpt;
+  }
 };

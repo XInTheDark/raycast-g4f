@@ -104,8 +104,8 @@ export const function_supported_providers = [DeepInfraProvider];
 /// Each model is aliased to an array of provider strings that support it
 // prettier-ignore
 export const model_aliases = {
-  "gpt-4o": ["NexraGPT4o", "RocksGPT4o", "DarkAI", "NexraChatGPT", "BlackboxGPT4o", "NexraBing"],
-  "gpt-4": ["RocksGPT4", "AI4Chat", "Mhystical"],
+  "gpt-4o": ["RocksGPT4o", "NexraGPT4o", "DarkAI", "BlackboxGPT4o", "NexraChatGPT", "NexraBing"],
+  "gpt-4": ["RocksGPT4", "AI4Chat", "NexraGPT4", "Mhystical"],
   "gpt-4o-mini": ["DuckDuckGo_GPT4oMini", "ChatgptFree", "PizzaGPT"],
   "claude-3.5-sonnet": ["BlackboxClaude35Sonnet", "RocksClaude35Sonnet"],
   "claude-3-opus": ["RocksClaude3Opus"],
