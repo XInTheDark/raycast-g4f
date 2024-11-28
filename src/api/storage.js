@@ -56,9 +56,10 @@ export const Storage = {
   /// As a speedup, we store each key-value pair in a separate file.
 
   // get file storage path for a key
-  // it is the user's responsibility to ensure that the key is a valid file name
+  // it is the user's responsibility to ensure that the key is a valid file name,
+  // although we URI-encode it to cover basic cases
   fileStoragePath: (key) => {
-    return `${getSupportPath()}/storage/${key}.txt`;
+    return `${getSupportPath()}/storage/${encodeURIComponent(key)}.txt`;
   },
 
   // check if item exists in file storage
