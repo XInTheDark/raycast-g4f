@@ -11,7 +11,7 @@ const headers = {
 
 export const ReplicateProvider = {
   name: "Replicate",
-  generate: async function* (chat, options, { max_retries = 10 }) {
+  generate: async function* (chat, options, { max_retries = 5 }) {
     const model = options.model;
 
     let data = {

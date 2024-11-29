@@ -22,7 +22,7 @@ export const NexraProvider = {
   },
 };
 
-export const getNexraResponseStream = async function (chat, options, stream_update, max_retries = 5) {
+export const getNexraResponseStream = async function (chat, options, stream_update, max_retries = 2) {
   if (["Bing"].includes(options.model)) {
     chat = [{ role: "user", content: format_chat_to_prompt(chat) }];
   } else {

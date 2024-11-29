@@ -39,7 +39,7 @@ const formatCookies = (cookies) => {
 
 export const MetaAIProvider = {
   name: "MetaAI",
-  generate: async function* (chat, options, { max_retries = 5 }) {
+  generate: async function* (chat, options, { max_retries = 2 }) {
     let accessToken = null;
     let lsd = null;
     let cookies = null;

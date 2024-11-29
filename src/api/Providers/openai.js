@@ -9,7 +9,7 @@ let headers = {
 export const OpenAIProvider = {
   name: "OpenAI",
   authRequired: true,
-  generate: async function* (chat, options, { max_retries = 5 }) {
+  generate: async function* (chat, options, { max_retries = 2 }) {
     let data = {
       model: options.model,
       messages: messages_to_json(chat),
