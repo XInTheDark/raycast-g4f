@@ -438,6 +438,10 @@
           "value": "GoogleGemini"
         },
         {
+          "title": "Google Gemini (Experimental) (requires API Key)",
+          "value": "GoogleGeminiExperimental"
+        },
+        {
           "title": "GPT4Free Local API",
           "value": "G4FLocal"
         },
