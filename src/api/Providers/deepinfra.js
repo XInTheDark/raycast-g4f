@@ -45,9 +45,10 @@ const function_supported_models = [
 // Models that support file uploads
 const file_supported_models = ["meta-llama/Llama-3.2-90B-Vision-Instruct", "meta-llama/Llama-3.2-11B-Vision-Instruct"];
 
-// max_tokens parameter overrides - some models have short context lengths
-const max_tokens_overrides = {
-  "google/gemma-2-27b-it": 512,
+// parameter overrides
+const overrides = {
+  "google/gemma-2-27b-it": { max_tokens: 512 },
+  "Qwen/QwQ-32B-Preview": { temperature: 0 },
 };
 
 const DeepInfraFormatChat = (chat, model) => {
@@ -112,8 +113,9 @@ export const DeepInfraProvider = {
       messages: json_chat,
       tools: tools.length > 0 ? tools : undefined,
       temperature: options.temperature,
-      max_tokens: max_tokens_overrides[model] || 100000,
+      max_tokens: 100000,
       stream: true,
+      ...overrides[model],
     };
 
     try {
