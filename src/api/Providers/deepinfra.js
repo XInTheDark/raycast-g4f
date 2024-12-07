@@ -37,6 +37,8 @@ const function_supported_models = [
   "meta-llama/Meta-Llama-3.1-70B-Instruct",
   "meta-llama/Meta-Llama-3.1-8B-Instruct",
   "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+  "meta-llama/Llama-3.3-70B-Instruct",
+  "meta-llama/Llama-3.3-70B-Instruct-Turbo",
   "nvidia/Llama-3.1-Nemotron-70B-Instruct",
 ];
 
