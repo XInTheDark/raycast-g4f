@@ -15,6 +15,12 @@ Homepage · [Privacy Policy](Privacy.md)
 
 "If you like the extension, please consider giving it a ✨star✨ tysm!" - the developer, probably
 
+### Prerequisites
+
+- Install the [Raycast app](https://raycast.com/).
+- Currently, the extension is only available for macOS, as it requires Raycast. Windows support
+  is [in progress](https://www.raycast.com/windows).
+
 ### Installation
 
 This extension is currently not available on the Raycast Extension store, but
