@@ -19,7 +19,7 @@ import { Preferences } from "./api/preferences.js";
 import { watch } from "node:fs/promises";
 import throttle from "lodash.throttle";
 
-import { current_datetime, formatDate, removePrefix } from "./helpers/helper.js";
+import { clamp, current_datetime, formatDate, removePrefix, sleep } from "./helpers/helper.js";
 import { help_action, help_action_panel } from "./helpers/helpPage.jsx";
 import { autoCheckForUpdates } from "./helpers/update.jsx";
 import { plainTextMarkdown } from "./helpers/markdown.js";
@@ -356,12 +356,32 @@ export default function Chat({ launchContext }) {
         await Storage.fileStorage_write("updateCurrentResponse", response);
       }, 300); // See ViewResponseComponent for more details
 
-      const handler = throttle(_handler, 100);
+      // Dynamically throttle updates based on response length.
+      // Assuming linear growth of processing time with length, we first set the interval to the minimum value.
+      // Then, each time the response length increases exponentially, we also increase the interval in a linear way.
+      // This is to preserve UX, while preventing the UI from freezing when processing very long responses.
+      let throttle_interval = 30,
+        throttle_length_limit = 500,
+        throttle_multiplier = 1.5;
+      let __handler = throttle(_handler, throttle_interval);
+      let handler = async (new_message) => {
+        await __handler(new_message);
+        // Determine if we should increase the interval
+        if (response.length > throttle_length_limit && throttle_interval < 5000) {
+          // console.log(`${response.length} chars, ${throttle_length_limit}, increasing interval to ${throttle_interval * throttle_multiplier}`);
+          await sleep(throttle_interval * (throttle_multiplier - 1));
+          throttle_interval *= throttle_multiplier;
+          throttle_length_limit *= throttle_multiplier;
+
+          await __handler.flush();
+          __handler = throttle(_handler, throttle_interval);
+        }
+      };
 
       // Get response
       await getChatResponse(currentChatData, query, handler, get_status);
 
-      await handler.flush();
+      await __handler.flush();
 
       if (generationStatus.updateCurrentResponse) {
         await _file_handler.flush();

@@ -243,3 +243,7 @@ export const formatResponse = (response, provider = null) => {
 
   return response;
 };
+
+export const clamp = (num, min, max) => {
+  return Math.min(Math.max(num, min), max);
+};

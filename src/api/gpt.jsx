@@ -565,6 +565,6 @@ export const processChunks = async function* (response, provider, status = null)
 // a simple stream handler. upon each chunk received, we call stream_update(new_message)
 export const processStream = async function (asyncGenerator, provider, stream_update, status = null) {
   for await (const new_message of processChunks(asyncGenerator, provider, status)) {
-    stream_update(new_message);
+    await stream_update(new_message);
   }
 };
