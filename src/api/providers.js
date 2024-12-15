@@ -95,6 +95,7 @@ export const file_supported_providers = [GeminiProvider, DeepInfraProvider];
 /// Provider strings that support image uploads
 export const image_supported_provider_strings = [
   "GoogleGemini",
+  "GoogleGeminiExperimental",
   "DeepInfraLlama32_90B_Vision",
   "DeepInfraLlama32_11B_Vision",
 ];
@@ -114,13 +115,16 @@ export const model_aliases = {
   "claude-3-haiku": ["DuckDuckGo_Claude3Haiku"],
   "gemini-1.5-pro": ["GoogleGemini", "BlackboxGeminiPro", "NexraGeminiPro"],
   "gemini-1.5-flash": ["GoogleGeminiFlash", "BlackboxGemini15Flash"],
+  "gemini-exp": ["GoogleGeminiExperimental"],
   "llama-3.1-405b": ["BlackboxLlama31_405B", "RocksLlama31_405B", "MetaAI", "DeepInfraLlama31_405B"],
   "llama-3.1-70b": ["BlackboxLlama31_70B", "DeepInfraLlama31_70B", "RocksLlama31_70B", "DuckDuckGo_Llama31_70B", "NexraLlama31", "DeepInfraLlama31Nemotron70B"],
   "llama-3.1-8b": ["DeepInfraLlama31_8B", "ReplicateLlama3_8B"],
   "llama-3.2-90b": ["DeepInfraLlama32_90B_Vision"],
   "llama-3.2-11b": ["DeepInfraLlama32_11B_Vision"],
+  "llama-3.3-70b": ["DeepInfraLlama33_70B"],
   "qwen-2.5-72b": ["DeepInfraQwen25_72B"],
   "qwen-2.5-coder-32b": ["DeepInfraQwen25Coder_32B"],
+  "qwq-32b-preview": ["DeepInfraQwQ_32B_Preview"],
   "wizardlm-2-8x22b": ["DeepInfraWizardLM2_8x22B", "RocksWizardLM2_8x22B"],
   "deepseek-2.5": ["DeepInfraDeepSeek25"],
   "mixtral-8x7b": ["DuckDuckGo_Mixtral_8x7B", "ReplicateMixtral_8x7B"],
