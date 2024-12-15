@@ -17,7 +17,7 @@ import { useEffect, useState } from "react";
 
 import * as providers from "./providers.js";
 
-import throttle from "lodash.throttle";
+import throttle, { AIChatDelayFunction } from "#root/src/helpers/throttle.js";
 
 import { help_action } from "../helpers/helpPage.jsx";
 import { autoCheckForUpdates } from "../helpers/update.jsx";
@@ -205,7 +205,7 @@ export default (
           loadingToast.message = `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`;
         };
 
-        const handler = throttle(_handler, 100);
+        const handler = throttle(_handler, { delay: 30, delayFunction: AIChatDelayFunction() });
 
         await chatCompletion(info, messages, options, handler, get_status);
 
