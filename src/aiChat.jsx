@@ -326,7 +326,7 @@ export default function Chat({ launchContext }) {
         setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, { response: response });
 
         if (generationStatus.updateCurrentResponse) {
-          await _file_handler();
+          await _file_handler(new_message);
         }
 
         if (devMode && i % 1 === 0) {
@@ -354,7 +354,7 @@ export default function Chat({ launchContext }) {
       };
 
       const _file_handler = throttle(
-        async () => {
+        async (response) => {
           await Storage.fileStorage_write("updateCurrentResponse", response);
         },
         { delay: 300, delayFunction: AIChatDelayFunction({ delay: 300 }) }

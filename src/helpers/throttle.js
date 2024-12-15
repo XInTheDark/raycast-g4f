@@ -45,7 +45,7 @@ export const AIChatDelayFunction = ({ delay = 30, max_delay = 5000, length_limit
     delay = delay_ms;
     let new_message = args[0];
     // Determine if we should increase the interval
-    if (new_message.length > length_limit && delay < max_delay) {
+    if (new_message?.length > length_limit && delay < max_delay) {
       delay *= multiplier;
       length_limit *= multiplier;
       // console.log(`${new_message.length} chars, ${length_limit}, increasing delay to ${delay}`);
