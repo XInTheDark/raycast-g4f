@@ -364,7 +364,7 @@ export default function Chat({ launchContext }) {
       // Assuming linear growth of processing time with length, we first set the interval to the minimum value.
       // Then, each time the response length increases exponentially, we also increase the interval in a linear way.
       // This is to preserve UX, while preventing the UI from freezing when processing very long responses.
-      let handler = throttle(_handler, { delay: 30, delayFunction: AIChatDelayFunction() });
+      const handler = throttle(_handler, { delay: 30, delayFunction: AIChatDelayFunction() });
 
       // Get response
       await getChatResponse(currentChatData, query, handler, get_status);
