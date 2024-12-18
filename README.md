@@ -266,7 +266,7 @@ https://github.com/raycast/extensions/tree/main/extensions/raycast-gemini) by Ev
 Third-party libraries used for generation:
 
 - [g4f-image](https://www.npmjs.com/package/g4f-image)
-- [gemini-g4f](https://www.npmjs.com/package/gemini-g4f)
+- [gemini-ai-sdk](https://www.npmjs.com/package/gemini-ai-sdk)
 
 *(Both packages are maintained by the extension author.)*
 

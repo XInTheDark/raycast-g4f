@@ -1,51 +1,52 @@
-import Gemini, { messageToParts } from "gemini-g4f";
-import fetch from "#root/src/api/fetch.js";
+import Gemini, { safetyDisabledSettings } from "gemini-ai-sdk";
 
 import fs from "fs";
 import { Preferences } from "../preferences.js";
 
 // By default, we set the most lenient safety settings
-const safetySettings = {
-  hate: Gemini.SafetyThreshold.BLOCK_NONE,
-  sexual: Gemini.SafetyThreshold.BLOCK_NONE,
-  harassment: Gemini.SafetyThreshold.BLOCK_NONE,
-  dangerous: Gemini.SafetyThreshold.BLOCK_NONE,
-};
+const safetySettings = safetyDisabledSettings;
 
 export const GeminiProvider = {
   name: "Gemini",
   customStream: true,
-  generate: async (chat, options, { stream_update = null, max_retries = 3 }) => {
+  generate: async function (chat, options, { stream_update, max_retries = 3 }) {
     let APIKeysStr = Preferences["GeminiAPIKeys"];
     let APIKeys = APIKeysStr.split(",").map((x) => x.trim());
 
+    let models = typeof options.model === "string" ? [options.model] : options.model;
+
     try {
-      for (const APIKey of APIKeys) {
-        const googleGemini = new Gemini(APIKey, { fetch: fetch });
-        let [formattedChat, query] = await GeminiFormatChat(chat, googleGemini);
+      for (const model of models) {
+        for (const APIKey of APIKeys) {
+          const googleGemini = new Gemini(APIKey, { fetch: fetch });
+          let [formattedChat, query] = await GeminiFormatChat(chat, googleGemini);
+          const geminiChat = googleGemini.createChat({
+            model: model,
+            history: formattedChat,
+            safetySettings: safetySettings,
+            generationConfig: {
+              maxOutputTokens: 8192, // maximum for v1.5 models
+              temperature: options.temperature * 1.5, // v1.5 models have temperature in [0, 2] so we scale it up
+            },
+          });
 
-        const geminiChat = googleGemini.createChat({
-          model: options.model,
-          messages: formattedChat,
-          maxOutputTokens: 8192, // maximum for v1.5 models
-          temperature: options.temperature * 1.5, // v1.5 models have temperature in [0, 2] so we scale it up
-        });
+          // Send message
+          try {
+            let response = await geminiChat.ask(query, { stream: true });
+            let text = "";
 
-        // Send message
-        try {
-          let response = "";
-          if (stream_update) {
-            const handler = (chunk) => {
-              response += chunk;
-              stream_update(response);
-            };
-            await geminiChat.ask(query, { stream: handler, safetySettings: safetySettings });
+            for await (let chunk of response.stream) {
+              chunk = chunk.text();
+              text += chunk;
+              stream_update(text);
+            }
+
+            // return when done
             return;
-          } else {
-            response = await geminiChat.ask(query, { safetySettings: safetySettings });
-            return response;
+          } catch (e) {
+            // eslint-disable-line
           }
-        } catch (e) {} // eslint-disable-line
+        }
       }
     } catch (e) {
       // if all API keys fail, we allow a few retries
@@ -85,7 +86,7 @@ export const GeminiFormatChat = async (chat, googleGemini) => {
         const fileUpload = { filePath: file, buffer: buffer };
         arr.push(fileUpload);
       }
-      geminiMessageParts = await messageToParts(arr, googleGemini);
+      geminiMessageParts = await googleGemini.messageToParts(arr);
     } else {
       geminiMessageParts = [{ text: message.content }];
     }
@@ -94,6 +95,9 @@ export const GeminiFormatChat = async (chat, googleGemini) => {
   }
 
   // remove last message and return it separately
-  const last_message = formattedChat.pop();
+  let last_message = formattedChat.pop();
+  // get only parts instead of the whole message, to pass to gemini-ai
+  last_message = last_message.parts;
+
   return [formattedChat, last_message];
 };

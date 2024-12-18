@@ -5,6 +5,14 @@ import default_fetch from "node-fetch";
 import { HttpProxyAgent } from "http-proxy-agent";
 import { Preferences } from "./preferences.js";
 
+// Polyfill for fetch globally
+// Note that fetch API in node is based on undici, so it should be suitable as a polyfill.
+import { fetch as undici_fetch, Headers, Response, Request } from "undici";
+global.fetch = undici_fetch;
+global.Headers = Headers;
+global.Response = Response;
+global.Request = Request;
+
 const devMode = Preferences["devMode"] || false;
 
 /**
