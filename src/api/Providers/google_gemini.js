@@ -1,10 +1,7 @@
-import Gemini, { safetyDisabledSettings } from "gemini-ai-sdk";
+import Gemini, { constants } from "gemini-ai-sdk";
 
 import fs from "fs";
 import { Preferences } from "../preferences.js";
-
-// By default, we set the most lenient safety settings
-const safetySettings = safetyDisabledSettings;
 
 export const GeminiProvider = {
   name: "Gemini",
@@ -15,6 +12,14 @@ export const GeminiProvider = {
 
     let models = typeof options.model === "string" ? [options.model] : options.model;
 
+    const useWebSearch = options.webSearch === "auto";
+    const useCodeInterpreter = Preferences["codeInterpreter"];
+
+    const tools = [
+      ...(useWebSearch ? [constants.defaultTools.webSearch] : []),
+      ...(useCodeInterpreter ? [constants.defaultTools.codeExecution] : []),
+    ];
+
     try {
       for (const model of models) {
         for (const APIKey of APIKeys) {
@@ -23,11 +28,12 @@ export const GeminiProvider = {
           const geminiChat = googleGemini.createChat({
             model: model,
             history: formattedChat,
-            safetySettings: safetySettings,
+            safetySettings: constants.safetyDisabledSettings,
             generationConfig: {
               maxOutputTokens: 8192, // maximum for v1.5 models
               temperature: options.temperature * 1.5, // v1.5 models have temperature in [0, 2] so we scale it up
             },
+            tools: tools,
           });
 
           // Send message
@@ -44,7 +50,7 @@ export const GeminiProvider = {
             // return when done
             return;
           } catch (e) {
-            // eslint-disable-line
+            console.log(e);
           }
         }
       }

@@ -101,7 +101,7 @@ export const image_supported_provider_strings = [
 ];
 
 /// Providers that support function calling
-export const function_supported_providers = [DeepInfraProvider];
+export const function_supported_providers = [DeepInfraProvider, GeminiProvider];
 
 /// Model aliases
 /// Each model is aliased to an array of provider strings that support it
