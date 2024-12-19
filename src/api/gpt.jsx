@@ -372,7 +372,7 @@ export default (
             />
           )}
           <Action
-            title="Regenerate Response"
+            title="Resend Message"
             icon={Icon.ArrowClockwise}
             onAction={async () => {
               if (isLoading) {
@@ -382,7 +382,7 @@ export default (
                   message: "Response is still loading. Are you sure you want to regenerate it?",
                   icon: Icon.ArrowClockwise,
                   primaryAction: {
-                    title: "Regenerate Response",
+                    title: "Resend",
                     onAction: () => {
                       userConfirmed = true;
                     },

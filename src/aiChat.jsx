@@ -682,7 +682,7 @@ export default function Chat({ launchContext }) {
               title="Edit Message"
               onSubmit={async (values) => {
                 pop();
-                await regenerateResponse(currentChatData, idx, values.message, values.files);
+                await resendMessage(currentChatData, idx, values.message, values.files);
               }}
             />
           </ActionPanel>
@@ -694,7 +694,7 @@ export default function Chat({ launchContext }) {
     );
   };
 
-  let regenerateResponse = async (currentChatData, idx, newMessage = null, newFiles = null) => {
+  let resendMessage = async (currentChatData, idx, newMessage = null, newFiles = null) => {
     if (newMessage) currentChatData.messages[idx].first.content = newMessage;
     if (newFiles) currentChatData.messages[idx].files = newFiles;
 
@@ -912,7 +912,7 @@ export default function Chat({ launchContext }) {
           />
           <Action
             icon={Icon.ArrowClockwise}
-            title="Regenerate Response"
+            title="Resend Message"
             onAction={async () => {
               if (currentChatData.messages.length === 0) {
                 await toast(Toast.Style.Failure, "No messages in chat");
@@ -928,7 +928,7 @@ export default function Chat({ launchContext }) {
                   message: "Response is still loading. Are you sure you want to regenerate it?",
                   icon: Icon.ArrowClockwise,
                   primaryAction: {
-                    title: "Regenerate Response",
+                    title: "Resend",
                     onAction: () => {
                       userConfirmed = true;
                     },
@@ -942,7 +942,7 @@ export default function Chat({ launchContext }) {
                 }
               }
 
-              await regenerateResponse(currentChatData, idx);
+              await resendMessage(currentChatData, idx);
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "r" }}
           />
