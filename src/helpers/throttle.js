@@ -20,11 +20,8 @@ export default function throttle(f, { delay = 0, delayFunction = null, ...option
       let new_delay_ms = delayFunction(delay_ms, { args, result });
 
       if (new_delay_ms !== delay_ms) {
-        // sleep to ensure throttling during the update
-        setTimeout(() => {
-          __handler.flush();
-          __handler = _throttle(f, new_delay_ms, options);
-        }, delay_ms);
+        __handler.flush();
+        __handler = _throttle(f, new_delay_ms, options);
 
         delay_ms = new_delay_ms;
       }
@@ -40,7 +37,7 @@ export default function throttle(f, { delay = 0, delayFunction = null, ...option
   return handler;
 }
 
-export const AIChatDelayFunction = ({ delay = 30, max_delay = 5000, length_limit = 500, multiplier = 1.5 } = {}) => {
+export const AIChatDelayFunction = ({ delay = 30, max_delay = 20000, length_limit = 500, multiplier = 1.5 } = {}) => {
   return function (delay_ms, { args }) {
     delay = delay_ms;
     let new_message = args[0];
