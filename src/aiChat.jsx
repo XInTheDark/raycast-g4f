@@ -700,6 +700,7 @@ export default function Chat({ launchContext }) {
 
     currentChatData.messages[idx].second.content = "";
     currentChatData.messages[idx].finished = false;
+    currentChatData.messages[idx].creationDate = new Date();
 
     setCurrentChatData(currentChatData); // important to update the UI!
 
