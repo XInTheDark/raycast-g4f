@@ -51,6 +51,7 @@ export const providers_info = {
   BlackboxLlama31_405B: { provider: BlackboxProvider, model: "llama-3.1-405b", stream: true },
   BlackboxLlama31_70B: { provider: BlackboxProvider, model: "llama-3.1-70b", stream: true },
   BlackboxGemini15Flash: { provider: BlackboxProvider, model: "gemini-1.5-flash", stream: true },
+  BlackboxQwQ32BPreview: { provider: BlackboxProvider, model: "qwq-32b-preview", stream: true },
   BlackboxGPT4o: { provider: BlackboxProvider, model: "gpt-4o", stream: true },
   BlackboxClaude35Sonnet: { provider: BlackboxProvider, model: "claude-3.5-sonnet", stream: true },
   BlackboxGeminiPro: { provider: BlackboxProvider, model: "gemini-pro", stream: true },

@@ -326,6 +326,10 @@
           "value": "BlackboxGemini15Flash"
         },
         {
+          "title": "Blackbox (qwq-32b-preview)",
+          "value": "BlackboxQwQ32BPreview"
+        },
+        {
           "title": "Blackbox (gpt-4o)",
           "value": "BlackboxGPT4o"
         },

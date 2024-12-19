@@ -32,6 +32,10 @@ const uuid4 = function () {
   return randomUUID();
 };
 
+const agentModeConfig = {
+  "qwq-32b-preview": { mode: true, id: "Qwen/QwQ-32B-Preview", name: "Qwen-QwQ-32B-Preview" },
+};
+
 const trendingAgentModeConfig = {
   blackbox: {},
   "llama-3.1-405b": { mode: true, id: "llama-3.1-405b" },
@@ -56,6 +60,9 @@ const paramOverrides = {
   },
   "gemini-pro": {
     maxTokens: 8192,
+  },
+  "qwq-32b-preview": {
+    maxTokens: 50000,
   },
 };
 
@@ -97,7 +104,7 @@ export const BlackboxProvider = {
       userId: random_user_id,
       previewToken: null,
       codeModelMode: true,
-      agentMode: {},
+      agentMode: agentModeConfig[options.model] || {},
       trendingAgentMode: trendingAgentModeConfig[options.model] || {},
       userSelectedModel: userSelectedModelConfig[options.model] || undefined,
       isMicMode: false,
