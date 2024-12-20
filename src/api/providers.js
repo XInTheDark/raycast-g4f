@@ -81,7 +81,8 @@ export const providers_info = {
   Phind: { provider: PhindProvider, model: "", stream: true },
   GoogleGemini: { provider: GeminiProvider, model: ["gemini-1.5-pro-002", "gemini-1.5-flash-002", "gemini-1.5-flash-latest"], stream: true },
   GoogleGeminiFlash: { provider: GeminiProvider, model: ["gemini-2.0-flash-exp", "gemini-1.5-flash-002"], stream: true },
-  GoogleGeminiExperimental: { provider: GeminiProvider, model: "gemini-exp-1206", stream: true },
+  GoogleGeminiExperimental: { provider: GeminiProvider, model: ["gemini-exp-1206", "gemini-2.0-flash-exp", "gemini-2.0-flash-thinking-exp-1219"], stream: true },
+  GoogleGeminiThinking: { provider: GeminiProvider, model: ["gemini-2.0-flash-thinking-exp-1219"], stream: true },
 
   // Special providers (jsx extension)
   ...special_providers_info,
