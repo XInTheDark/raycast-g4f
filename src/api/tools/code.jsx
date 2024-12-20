@@ -42,8 +42,8 @@ export const runCode = async (code) => {
 
   const cmd = `python3 "${path}"`;
 
-  return new Promise((resolve, reject) => {
-    exec(cmd, { cwd: dirPath }, (error, stdout, stderr) => {
+  return new Promise((resolve) => {
+    exec(cmd, { cwd: dirPath }, (error, stdout) => {
       if (error) {
         console.log(`exec error: ${error}`);
         resolve(`ERROR: ${error}`);

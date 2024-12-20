@@ -513,6 +513,7 @@ export const getChatResponseSync = async (currentChat, query = null) => {
 };
 
 // yield chunks incrementally from a response.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const processChunksIncrementalAsync = async function* (response, provider) {
   // default case. response must be an async generator.
   yield* response;
