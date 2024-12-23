@@ -327,7 +327,7 @@ export default function Chat({ launchContext }) {
 
       const _handler = async (new_message) => {
         i++;
-        let lengthDelta = new_message.length - response.length;
+        let lengthDelta = Math.max(new_message.length - response.length, 0);
 
         response = new_message;
         setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, { response: response });
@@ -341,14 +341,21 @@ export default function Chat({ launchContext }) {
         }
 
         // Web Search functionality
-        // We check the response every few chunks so we can possibly exit early
-        if (
-          webSearchMode === "auto" &&
-          features.webSearch &&
-          (i & 7) === 0 &&
-          response.includes(webToken) &&
-          response.includes(webTokenEnd)
-        ) {
+        // We check the response constantly so we can possibly exit early
+        const webSearchChecker = () => {
+          // a more efficient way to check for web search token. instead of checking
+          // the entire string, we just check the new characters.
+          // this brings the total checking time to O(n) instead of O(n^2).
+          let window = lengthDelta + webToken.length + 1;
+          let new_chars = new_message.slice(-window);
+          if (!new_chars.includes(webTokenEnd)) return false;
+
+          // assume at most 50 chars for query
+          let new_window = window + 50;
+          let new_response = response.slice(-new_window);
+          return new_response.includes(webToken);
+        };
+        if (webSearchMode === "auto" && features.webSearch && !generationStatus.stop && webSearchChecker()) {
           generationStatus.stop = true; // stop generating the current response
           features.webSearch = false; // prevent further web search processing
           await processWebSearchResponse(currentChatData, setCurrentChatData, messageID, response, query);
