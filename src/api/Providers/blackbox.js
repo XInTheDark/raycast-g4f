@@ -8,18 +8,18 @@ import { formatResponse } from "#root/src/helpers/helper.js";
 
 const api_url = "https://www.blackbox.ai/api/chat";
 const headers = {
-  "User-Agent":
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+  "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:133.0) Gecko/20100101 Firefox/133.0",
   Accept: "*/*",
   "Accept-Language": "en-US,en;q=0.5",
   "Accept-Encoding": "gzip, deflate, br",
-  Referer: "https://www.blackbox.ai",
+  Referer: "https://www.blackbox.ai/",
   "Content-Type": "application/json",
   Origin: "https://www.blackbox.ai",
   DNT: "1",
   "Sec-GPC": "1",
   "Alt-Used": "www.blackbox.ai",
   Connection: "keep-alive",
+  // Cookie: "sessionId=ff093090-3a22-42c2-b1b0-1515758169cb; intercom-id-jlmqxicb=7e7bd002-2467-44e0-8bf4-b4320e0a86b2; intercom-device-id-jlmqxicb=6e51596c-020d-4d27-b738-e8d3280b8e45; g_state={\"i_p\":1727506964803,\"i_l\":4}; __Secure-authjs.session-token=eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..JXOgXsww_D7XilqO.Rb2AwRPPlYjp-CnA-sElwUB7w7qxiIo40p6UtZeG3rkkJiDM6geEbn7xMbtKiceNZAkteJTDhV5IhJbBq23wTsCp2ifRDSMgxchdXOWkepLDC-ulFRriuKzySKeWTSXULGbf9_qhz6-V_QFiXgV_XMXtokR7Nu8x1GCrS5IozEJt7x7Qm8auGF078TJVlFr5zBdgco1zxJlNvxaCFJJ7EDx53-6sz_323CdRNU5TtFIsc4x9DCv3-kAhDcb7LKcSpj2BfMbHHPX1OdGFv2yWan_hRnJEthbUeV3Xk6dWiyi1Df-2DvItlb77E25RKs7vrmDGaRLJSh-Hn3hQYS_i7-DurdKNHKSlTJ4-peM9PuzO_GLKc1q2x7El-siSTHtmLChRkHdenNLcA5OJBtbTB2C3ReFCdPxj2eHrDsepOFJS4Q30_hZbSI_cENOq2AUgpi-2LglT5MpUfwKRAu-v4SpxzZmsE9JhJ1KcsJTHTnhv9ws-1dqvKn8Z0G6FbLTZ.Dhuy2X_0ATOvUii2BMIqyA; __Host-next-auth.csrf-token=39486cc914e47e099d67524c5092e1a0f9e1d04a3cd8bb432af756f9549c4044%7C2eae24fbdda8082d2f950b538ac50b8af953f44d0de97a0ab77e2eff236721a4; __Secure-next-auth.callback-url=https%3A%2F%2Fwww.blackbox.ai%2F; __Host-authjs.csrf-token=081bc8582ddb1071c610b9860396e2f87af36b78b26e08b0aa08dffe054a7b86%7Cd59a8331e8ee31b17a36463cbfc9600d4e2ca7cb59142214f44b7faf6f452d70; __Secure-authjs.callback-url=https%3A%2F%2Fwww.blackbox.ai%2F; render_session_affinity=039fb36e-aa5f-488d-8557-1e9452eebd6c"
 };
 
 const token_hex = function (nbytes) {
@@ -27,6 +27,7 @@ const token_hex = function (nbytes) {
   return randomBytes(nbytes).toString("hex");
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const uuid4 = function () {
   // python: str(uuid.uuid4())
   return randomUUID();
@@ -79,7 +80,7 @@ export const BlackboxProvider = {
   name: "Blackbox",
   generate: async function* (chat, options, { max_retries = 5 }) {
     let random_id = token_hex(16);
-    let random_user_id = uuid4();
+    // let random_user_id = uuid4();
 
     // The chat is truncated to ~4 messages by the provider, so we reformat it
     // to at most 3 messages, with the last message being the prompt.
@@ -101,24 +102,35 @@ export const BlackboxProvider = {
     let data = {
       messages: chat,
       id: random_id,
-      userId: random_user_id,
       previewToken: null,
+      userId: null,
       codeModelMode: true,
       agentMode: agentModeConfig[options.model] || {},
       trendingAgentMode: trendingAgentModeConfig[options.model] || {},
-      userSelectedModel: userSelectedModelConfig[options.model] || undefined,
       isMicMode: false,
-      isChromeExt: false,
-      githubToken: null,
-      webSearchMode: true,
       userSystemPrompt: null,
-      mobileClient: false,
       maxTokens: 100000,
       playgroundTemperature: parseFloat(options.temperature) ?? 0.7,
       playgroundTopP: 0.9,
+      // playgroundTopP: null,
+      // playgroundTemperature: null,
+      isChromeExt: false,
+      githubToken: "",
+      clickedAnswer2: false,
+      clickedAnswer3: false,
+      clickedForceWebSearch: false,
+      visitFromDelta: false,
+      mobileClient: false,
+      userSelectedModel: userSelectedModelConfig[options.model] || undefined,
       validated: validatedToken,
+      imageGenerationMode: false,
+      webSearchModePrompt: false,
+      deepSearchMode: false,
+      domains: null,
       ...paramOverrides[options.model],
     };
+
+    // console.log(data);
 
     try {
       // POST
@@ -151,7 +163,8 @@ export const BlackboxProvider = {
 
           // Update 7/11/24: if not validated properly, blackbox now returns an advertisement instead
           // of the actual response. if we detect such a message, we attempt to revalidate the token.
-          if (chunk.includes("BLACKBOX.AI") || chunk.includes("https://www.blackbox.ai")) {
+          if (chunk.includes("www.blackbox.ai")) {
+            console.log("Detected advertisement, retrying...");
             if (max_retries > 0 && max_retries <= 3) {
               // only retry once
               await initValidatedToken({ forceUpdate: true });
@@ -219,6 +232,7 @@ export const BlackboxProvider = {
 const initValidatedToken = async ({ forceUpdate = false } = {}) => {
   let validatedToken = await Storage.read("providers/blackbox/validatedToken", defaultValidatedToken);
   // const lastUpdateTime = parseInt(await Storage.read("providers/blackbox/lastUpdateTime", "0"));
+
   if (forceUpdate) {
     try {
       // dynamic import
@@ -230,5 +244,31 @@ const initValidatedToken = async ({ forceUpdate = false } = {}) => {
       console.log("Failed to update validated token", e);
     }
   }
+
+  validatedToken = await selfCorrectValidatedToken(validatedToken);
+
   return validatedToken;
+};
+
+// validatedToken should follow some certain format. If it's absurdly wrong, then we should correct it to the default.
+const selfCorrectValidatedToken = async (token) => {
+  const ok = (() => {
+    if (Math.abs(token.length - defaultValidatedToken.length) > 5) {
+      return false;
+    }
+    // count hyphens
+    if (Math.abs(token.split("-").length - defaultValidatedToken.split("-").length) > 1) {
+      return false;
+    }
+    // there should be only alphanumeric characters and hyphens
+    if (!/^[a-zA-Z0-9-]+$/.test(token)) {
+      return false;
+    }
+    return true;
+  })();
+
+  if (!ok) {
+    return defaultValidatedToken;
+  }
+  return token;
 };

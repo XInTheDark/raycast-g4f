@@ -61,8 +61,8 @@ export const getBlackboxValidatedToken = async () => {
   const response = await fetch(layoutJs, { method: "GET" });
   const layoutJsFile = await response.text();
 
-  // match the string: h="*" and extract the value *
-  const validated = layoutJsFile.match(/h="([^"]*)"/)[1];
-  console.log(validated);
+  // match the string using regex
+  const validated = layoutJsFile.match(/p="([^"]*)"/)[1];
+  console.log("validated token", validated);
   return validated;
 };
