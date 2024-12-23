@@ -11,7 +11,7 @@ export const webToken = "<web_search>",
   webResultsToken = "<web_search_results>";
 
 export const webSystemPrompt = `You are given access to make searches on the Internet. The format for making a search is:
-1. After the user sends a message, you will decide whether to make a search. If you choose to make a search, you will output a single message, starting with the word ${webToken}, followed by ONLY your web search query. After your search query, you must output the token ${webTokenEnd} to denote the end of the search query. Keep your search query concise.
+1. After the user sends a message, you will decide whether to make a search. If you choose to make a search, you will output a single message, starting with the word ${webToken}, followed by ONLY your web search query. After your search query, you must output the token ${webTokenEnd} to denote the end of the search query. Keep your search query very concise.
 2. The system will then append the web search results at the end of the user message, starting with the token ${webResultsToken}. Take note that the user CANNOT SEE the content after ${webResultsToken} - YOU should use these results appropriately to improve your response. Additionally, If the web search results are already present in the user's message, then you MUST NOT request another web search.
 
 IMPORTANT! You should choose to search the web ONLY if ANY of the following circumstances are met:

@@ -8,6 +8,9 @@ const headers = {
 };
 
 export async function blackboxSearchRequest(query) {
+  // API only allows query length <= 25
+  query = query.slice(0, 25);
+
   const data = {
     query,
     messages: [{ id: token_hex(16), content: query, role: "user" }],
