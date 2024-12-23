@@ -317,11 +317,18 @@ export default function Chat({ launchContext }) {
       chars = response.length;
       charPerSec = (chars / elapsed).toFixed(1);
     } else {
-      generationStatus = { stop: false, loading: true, updateCurrentResponse: false };
+      generationStatus = {
+        ...generationStatus,
+        stop: false,
+        loading: true,
+        updateCurrentResponse: false,
+      };
       let i = 0;
 
       const _handler = async (new_message) => {
         i++;
+        let lengthDelta = new_message.length - response.length;
+
         response = new_message;
         setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, { response: response });
 
@@ -343,8 +350,9 @@ export default function Chat({ launchContext }) {
           response.includes(webTokenEnd)
         ) {
           generationStatus.stop = true; // stop generating the current response
+          features.webSearch = false; // prevent further web search processing
           await processWebSearchResponse(currentChatData, setCurrentChatData, messageID, response, query);
-          return;
+          return; // exit the handler, not the function
         }
 
         elapsed = (Date.now() - start) / 1000;
@@ -378,7 +386,7 @@ export default function Chat({ launchContext }) {
 
     // Web Search functionality
     // Process web search response again in case streaming is false, or if it was not processed during streaming
-    // Prevent double processing by checking that generationStatus.stop is false
+    // Prevent double processing by checking some conditions
     if (webSearchMode === "auto" && features.webSearch && !generationStatus.stop && response.includes(webToken)) {
       generationStatus.stop = true;
       await processWebSearchResponse(currentChatData, setCurrentChatData, messageID, response, query);
