@@ -22,7 +22,7 @@ const headers = {
   // Cookie: "sessionId=ff093090-3a22-42c2-b1b0-1515758169cb; intercom-id-jlmqxicb=7e7bd002-2467-44e0-8bf4-b4320e0a86b2; intercom-device-id-jlmqxicb=6e51596c-020d-4d27-b738-e8d3280b8e45; g_state={\"i_p\":1727506964803,\"i_l\":4}; __Secure-authjs.session-token=eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..JXOgXsww_D7XilqO.Rb2AwRPPlYjp-CnA-sElwUB7w7qxiIo40p6UtZeG3rkkJiDM6geEbn7xMbtKiceNZAkteJTDhV5IhJbBq23wTsCp2ifRDSMgxchdXOWkepLDC-ulFRriuKzySKeWTSXULGbf9_qhz6-V_QFiXgV_XMXtokR7Nu8x1GCrS5IozEJt7x7Qm8auGF078TJVlFr5zBdgco1zxJlNvxaCFJJ7EDx53-6sz_323CdRNU5TtFIsc4x9DCv3-kAhDcb7LKcSpj2BfMbHHPX1OdGFv2yWan_hRnJEthbUeV3Xk6dWiyi1Df-2DvItlb77E25RKs7vrmDGaRLJSh-Hn3hQYS_i7-DurdKNHKSlTJ4-peM9PuzO_GLKc1q2x7El-siSTHtmLChRkHdenNLcA5OJBtbTB2C3ReFCdPxj2eHrDsepOFJS4Q30_hZbSI_cENOq2AUgpi-2LglT5MpUfwKRAu-v4SpxzZmsE9JhJ1KcsJTHTnhv9ws-1dqvKn8Z0G6FbLTZ.Dhuy2X_0ATOvUii2BMIqyA; __Host-next-auth.csrf-token=39486cc914e47e099d67524c5092e1a0f9e1d04a3cd8bb432af756f9549c4044%7C2eae24fbdda8082d2f950b538ac50b8af953f44d0de97a0ab77e2eff236721a4; __Secure-next-auth.callback-url=https%3A%2F%2Fwww.blackbox.ai%2F; __Host-authjs.csrf-token=081bc8582ddb1071c610b9860396e2f87af36b78b26e08b0aa08dffe054a7b86%7Cd59a8331e8ee31b17a36463cbfc9600d4e2ca7cb59142214f44b7faf6f452d70; __Secure-authjs.callback-url=https%3A%2F%2Fwww.blackbox.ai%2F; render_session_affinity=039fb36e-aa5f-488d-8557-1e9452eebd6c"
 };
 
-const token_hex = function (nbytes) {
+export const token_hex = function (nbytes) {
   // python: binascii.hexlify(token_bytes(nbytes)).decode('ascii')
   return randomBytes(nbytes).toString("hex");
 };

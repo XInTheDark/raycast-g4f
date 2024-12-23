@@ -1,7 +1,9 @@
-import { Toast, showToast } from "@raycast/api";
+import { showToast, Toast } from "@raycast/api";
 import * as providers from "../providers.js";
 
-import { ddgsRequest } from "#root/src/api/tools/ddgs.js";
+// import { ddgsRequest } from "#root/src/api/tools/ddgs.js";
+import { blackboxSearchRequest } from "#root/src/api/tools/blackbox_search.js";
+
 import { Preferences } from "../preferences.js";
 
 export const webToken = "<web_search>",
@@ -68,28 +70,14 @@ export const getWebResult = async (query) => {
   await showToast(Toast.Style.Animated, "Searching the web");
 
   try {
-    const results = await ddgsRequest(query);
-    return processWebResults(results);
+    // return await ddgsRequest(query);
+
+    // We've switched to Blackbox for web search
+    return await blackboxSearchRequest(query);
   } catch (e) {
     await showToast(Toast.Style.Failure, "Web search failed");
     return "No results found.";
   }
-};
-
-// Wrapper for returning web results in a readable format
-export const processWebResults = (results, maxResults = 15) => {
-  // Handle undefined results
-  if (!results || results.length === 0) {
-    return "No results found.";
-  }
-
-  let answer = "";
-  for (let i = 0; i < Math.min(results.length, maxResults); i++) {
-    let x = results[i];
-    let rst = `${i + 1}.\nURL: ${x["href"]}\nTitle: ${x["title"]}\nContent: ${x["body"]}\n\n`;
-    answer += rst;
-  }
-  return answer;
 };
 
 export const formatWebResult = (webResponse, webQuery = null) => {
