@@ -9,6 +9,7 @@ import { Preferences } from "./preferences.js";
 
 import { getSupportPath } from "../helpers/extension_helper.js";
 import fs from "fs";
+import throttle from "#root/src/helpers/throttle.js";
 
 const not_found = (x) => x === undefined || x === null;
 const found = (x) => !not_found(x);
@@ -173,5 +174,34 @@ export const Storage = {
   delete: async (key) => {
     await Storage.localStorage_delete(key);
     await Storage.fileStorage_delete(key);
+  },
+
+  // Throttled functions
+  // We offer an easy way to throttle storage writes *while guaranteeing that the last write is always executed*.
+
+  // Object storing the throttle functions for each key
+  throttledWrites: {},
+
+  // Throttled write function
+  throttledWrite: async (key, value, interval = 1000) => {
+    if (!Storage.throttledWrites[key]) {
+      Storage.throttledWrites[key] = throttle(
+        async (key, value) => {
+          await Storage.write(key, value);
+          // console.log(`Throttled write executed for key: ${key}`);
+        },
+        { delay: interval, trailing: true }
+      );
+    }
+
+    Storage.throttledWrites[key](key, value);
+  },
+
+  // Clear a throttled write function and ensure the last write is executed
+  clearThrottledWrite: async (key) => {
+    if (Storage.throttledWrites[key]) {
+      Storage.throttledWrites[key].flush();
+      delete Storage.throttledWrites[key];
+    }
   },
 };
