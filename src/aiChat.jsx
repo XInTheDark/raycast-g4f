@@ -882,6 +882,7 @@ export default function Chat({ launchContext }) {
 
     currentChatData.messages.unshift(newMessagePair);
     setCurrentChatData(currentChatData); // possibly redundant, put here for safety and consistency
+    await flushUpdateChat(currentChatData);
 
     try {
       // Note how we don't pass query here because it is already in the chat
@@ -907,8 +908,9 @@ export default function Chat({ launchContext }) {
             <Action
               title="Stop Response"
               icon={Icon.Pause}
-              onAction={() => {
+              onAction={async () => {
                 generationStatus.stop = true;
+                await flushUpdateChat(currentChatData);
               }}
               shortcut={{ modifiers: ["cmd", "shift", "opt"], key: "/" }}
             />
