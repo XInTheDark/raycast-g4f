@@ -11,8 +11,6 @@ import { getSupportPath } from "../helpers/extension_helper.js";
 import fs from "fs";
 import throttle from "#root/src/helpers/throttle.js";
 
-import { onExit } from "#root/src/helpers/onexit.js";
-
 const not_found = (x) => x === undefined || x === null;
 const found = (x) => !not_found(x);
 
@@ -207,16 +205,3 @@ export const Storage = {
     }
   },
 };
-
-// This doesn't work currently
-onExit(async () => {
-  console.log("Storage API: cleaning up");
-
-  // run sync process
-  await Storage.run_sync();
-
-  // clear all throttled writes
-  for (const key of Object.keys(Storage.throttledWrites)) {
-    await Storage.clearThrottledWrite(key);
-  }
-});
