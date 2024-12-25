@@ -128,9 +128,18 @@ export default function Chat({ launchContext }) {
   };
 
   // update chat in storage
+  // We use throttled writes, only flushing when necessary or after a certain interval
   const updateChat = async (chat, id = null) => {
     id = id ?? chat.id;
-    await Storage.write(getStorageKey(id), JSON.stringify(chat));
+    await Storage.throttledWrite(getStorageKey(id), JSON.stringify(chat), 30 * 1000);
+  };
+
+  // force the update of a chat in storage
+  // we do this when switching chats, when the response is complete, etc.
+  const flushUpdateChat = async (chat, id = null) => {
+    id = id ?? chat.id;
+    await Storage.throttledWrite(getStorageKey(id), JSON.stringify(chat));
+    await Storage.clearThrottledWrite(getStorageKey(id));
   };
 
   // change a property of a data object.
@@ -372,14 +381,14 @@ export default function Chat({ launchContext }) {
         async (response) => {
           await Storage.fileStorage_write("updateCurrentResponse", response);
         },
-        { delay: 300, delayFunction: AIChatDelayFunction({ delay: 300 }) }
+        { delayFunction: AIChatDelayFunction({ delay: 300 }) }
       );
 
       // Dynamically throttle updates based on response length.
       // Assuming linear growth of processing time with length, we first set the interval to the minimum value.
       // Then, each time the response length increases exponentially, we also increase the interval in a linear way.
       // This is to preserve UX, while preventing the UI from freezing when processing very long responses.
-      const handler = throttle(_handler, { delay: 30, delayFunction: AIChatDelayFunction() });
+      const handler = throttle(_handler, { delayFunction: AIChatDelayFunction() });
 
       // Get response
       await getChatResponse(currentChatData, query, handler, get_status);
@@ -391,6 +400,8 @@ export default function Chat({ launchContext }) {
       }
     }
 
+    /// After the response is complete:
+
     // Web Search functionality
     // Process web search response again in case streaming is false, or if it was not processed during streaming
     // Prevent double processing by checking some conditions
@@ -401,6 +412,9 @@ export default function Chat({ launchContext }) {
     }
 
     setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, { finished: true });
+
+    // Ensure the response is saved in storage
+    await flushUpdateChat(currentChatData);
 
     await toast(
       Toast.Style.Success,
@@ -1228,6 +1242,11 @@ export default function Chat({ launchContext }) {
   useEffect(() => {
     if (chatData?.currentChat && currentChatData?.id !== chatData.currentChat) {
       (async () => {
+        // Flush any pending updates
+        if (currentChatData?.id) {
+          await flushUpdateChat(currentChatData);
+        }
+
         let chat = await getChat(chatData.currentChat);
         setCurrentChatData(chat);
       })();

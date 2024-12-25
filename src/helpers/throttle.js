@@ -39,7 +39,7 @@ export default function throttle(f, { delay = 0, delayFunction = null, ...option
 
 export const AIChatDelayFunction = ({ delay = 30, max_delay = 20000, length_limit = 500, multiplier = 1.5 } = {}) => {
   return function (delay_ms, { args }) {
-    delay = delay_ms;
+    delay = Math.max(delay_ms, 30);
     let new_message = args[0];
     // Determine if we should increase the interval
     if (new_message?.length > length_limit && delay < max_delay) {

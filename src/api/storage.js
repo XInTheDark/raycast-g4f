@@ -9,6 +9,9 @@ import { Preferences } from "./preferences.js";
 
 import { getSupportPath } from "../helpers/extension_helper.js";
 import fs from "fs";
+import throttle from "#root/src/helpers/throttle.js";
+
+import { onExit } from "#root/src/helpers/onexit.js";
 
 const not_found = (x) => x === undefined || x === null;
 const found = (x) => !not_found(x);
@@ -174,4 +177,46 @@ export const Storage = {
     await Storage.localStorage_delete(key);
     await Storage.fileStorage_delete(key);
   },
+
+  // Throttled functions
+  // We offer an easy way to throttle storage writes *while guaranteeing that the last write is always executed*.
+
+  // Object storing the throttle functions for each key
+  throttledWrites: {},
+
+  // Throttled write function
+  throttledWrite: async (key, value, interval = 1000) => {
+    if (!Storage.throttledWrites[key]) {
+      Storage.throttledWrites[key] = throttle(
+        async (key, value) => {
+          await Storage.write(key, value);
+          // console.log(`Throttled write executed for key: ${key}`);
+        },
+        { delay: interval, trailing: true }
+      );
+    }
+
+    Storage.throttledWrites[key](key, value);
+  },
+
+  // Clear a throttled write function and ensure the last write is executed
+  clearThrottledWrite: async (key) => {
+    if (Storage.throttledWrites[key]) {
+      Storage.throttledWrites[key].flush();
+      delete Storage.throttledWrites[key];
+    }
+  },
 };
+
+// This doesn't work currently
+onExit(async () => {
+  console.log("Storage API: cleaning up");
+
+  // run sync process
+  await Storage.run_sync();
+
+  // clear all throttled writes
+  for (const key of Object.keys(Storage.throttledWrites)) {
+    await Storage.clearThrottledWrite(key);
+  }
+});
