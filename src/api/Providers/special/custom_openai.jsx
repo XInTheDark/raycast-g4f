@@ -17,8 +17,6 @@ export const getOpenAIModels = async (url, apiKey) => {
 export const CustomOpenAIProvider = {
   name: "CustomOpenAI",
   generate: async function* (chat, options) {
-    console.log("CustomOpenAIProvider.generate");
-    console.log(options);
     const url = options.url;
     if (!url) {
       throw new Error("No URL provided for Custom OpenAI API");
