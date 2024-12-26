@@ -1,7 +1,7 @@
 import { messages_to_json } from "../../../classes/message.js";
 import fetch from "#root/src/api/fetch.js";
 
-import { getCustomAPIInfo } from "#root/src/components/manageCustomAPIs.jsx";
+import { getCustomAPIInfo } from "#root/src/components/preferences/manageCustomAPIs.jsx";
 
 export const getOpenAIModels = async (url, apiKey) => {
   url = url + "/models";

@@ -1,39 +1,15 @@
-import { List, Action, Form, ActionPanel, useNavigation } from "@raycast/api";
+import { List } from "@raycast/api";
+import { PreferenceComponent } from "#root/src/components/preferences/base/preferenceComponent.jsx";
 
-import { ChatProvidersReact } from "#root/src/api/providers_react.jsx";
-import { Preferences, updatePreferences } from "#root/src/api/preferences.js";
-import { ManageCustomAPIs, ManageGoogleGeminiAPI } from "#root/src/components/manageCustomAPIs.jsx";
-import { ManageAIPresets } from "#root/src/components/manageAIPresets.jsx";
+import { DefaultProvider } from "#root/src/components/preferences/general/defaultProvider.jsx";
+import { DefaultLanguage } from "#root/src/components/preferences/general/defaultLanguage.jsx";
+import { AIChatOptions } from "#root/src/components/preferences/general/aiChatOptions.jsx";
+import { ManageCustomAPIs, ManageGoogleGeminiAPI } from "#root/src/components/preferences/manageCustomAPIs.jsx";
+import { ManageAIPresets } from "#root/src/components/preferences/manageAIPresets.jsx";
+import { ExperimentalOptions } from "#root/src/components/preferences/experimental/experimentalOptions.jsx";
 
 import { init } from "#root/src/api/init.js";
 import { useEffect, useState } from "react";
-
-// Section 1. Default Provider selection
-const DefaultProvider = () => {
-  const providersReact = ChatProvidersReact();
-  const { pop } = useNavigation();
-  return (
-    <>
-      <Form
-        actions={
-          <ActionPanel>
-            <Action.SubmitForm
-              title="Save"
-              onSubmit={async (values) => {
-                await updatePreferences("defaultProvider", values.defaultProvider);
-                pop();
-              }}
-            />
-          </ActionPanel>
-        }
-      >
-        <Form.Dropdown id={"defaultProvider"} title={"Default Provider"} defaultValue={Preferences["defaultProvider"]}>
-          {providersReact}
-        </Form.Dropdown>
-      </Form>
-    </>
-  );
-};
 
 export default function ManagePreferences() {
   const [initialised, setInitialised] = useState(false);
@@ -46,49 +22,33 @@ export default function ManagePreferences() {
 
   return initialised ? (
     <List>
-      <List.Section title="Defaults">
-        <List.Item
-          title={"Default Provider"}
-          actions={
-            <ActionPanel>
-              <Action.Push title="Open" target={<DefaultProvider />} />
-            </ActionPanel>
-          }
-        />
+      <List.Section title="General">
+        {/* - Default Provider */}
+        {PreferenceComponent({ title: "Default Provider", target: <DefaultProvider /> })}
+
+        {/* - Default Language */}
+        {PreferenceComponent({ title: "Default Language", target: <DefaultLanguage /> })}
+
+        {/* - AI Chat */}
+        {PreferenceComponent({ title: "AI Chat", target: <AIChatOptions /> })}
       </List.Section>
 
       <List.Section title="Manage APIs">
         {/* - OpenAI-compatible APIs */}
-        <List.Item
-          title="Custom OpenAI-compatible APIs"
-          actions={
-            <ActionPanel>
-              <Action.Push title="Open" target={<ManageCustomAPIs />} />
-            </ActionPanel>
-          }
-        />
+        {PreferenceComponent({ title: "Custom OpenAI-compatible APIs", target: <ManageCustomAPIs /> })}
 
         {/* - Google Gemini */}
-        <List.Item
-          title="Google Gemini"
-          actions={
-            <ActionPanel>
-              <Action.Push title="Open" target={<ManageGoogleGeminiAPI />} />
-            </ActionPanel>
-          }
-        />
+        {PreferenceComponent({ title: "Google Gemini", target: <ManageGoogleGeminiAPI /> })}
       </List.Section>
 
       {/* AI Presets */}
       <List.Section title="AI Presets">
-        <List.Item
-          title="Manage AI Presets"
-          actions={
-            <ActionPanel>
-              <Action.Push title="Open" target={<ManageAIPresets />} />
-            </ActionPanel>
-          }
-        />
+        {PreferenceComponent({ title: "Manage AI Presets", target: <ManageAIPresets /> })}
+      </List.Section>
+
+      {/* Experimental */}
+      <List.Section title="Experimental">
+        {PreferenceComponent({ title: "Experimental Options", target: <ExperimentalOptions /> })}
       </List.Section>
     </List>
   ) : (

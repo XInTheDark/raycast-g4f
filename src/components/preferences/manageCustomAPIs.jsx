@@ -1,7 +1,7 @@
-import { getOpenAIModels } from "../api/Providers/special/custom_openai.jsx";
+import { getOpenAIModels } from "../../api/Providers/special/custom_openai.jsx";
 
-import { Storage } from "../api/storage.js";
-import { help_action } from "../helpers/helpPage.jsx";
+import { Storage } from "../../api/storage.js";
+import { help_action } from "../../helpers/helpPage.jsx";
 
 import { Form, ActionPanel, Action, showToast, Toast, useNavigation, List } from "@raycast/api";
 
@@ -113,7 +113,7 @@ export const ManageCustomAPIs = () => {
         {Object.entries(customAPIData).map(([url, data]) => (
           <List.Item
             title={data.name || url}
-            accessories={data.name && [{ tag: url }]}
+            accessories={data.name ? [{ tag: url }] : []}
             key={url}
             actions={
               <ActionPanel>
@@ -172,7 +172,7 @@ export const ManageGoogleGeminiAPI = () => {
       }
     >
       <Form.Description text="Configure the Google Gemini API." />
-      <Form.TextField
+      <Form.TextArea
         id="apiKeys"
         title="API Keys"
         info={

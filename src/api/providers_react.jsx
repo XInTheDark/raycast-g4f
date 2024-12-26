@@ -86,5 +86,5 @@ export const ChatProvidersReact = () => {
         </Form.Dropdown.Section>
       </>
     );
-  }, []);
+  }, [chat_providers_names]);
 };

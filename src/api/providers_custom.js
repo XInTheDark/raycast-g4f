@@ -1,4 +1,4 @@
-import { getChatName, getCustomAPIInfo } from "#root/src/components/manageCustomAPIs.jsx";
+import { getChatName, getCustomAPIInfo } from "#root/src/components/preferences/manageCustomAPIs.jsx";
 import { CustomOpenAIProvider } from "#root/src/api/Providers/special/custom_openai.jsx";
 import { removePrefix } from "#root/src/helpers/helper.js";
 
