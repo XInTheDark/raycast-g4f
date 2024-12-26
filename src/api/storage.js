@@ -5,18 +5,19 @@
 // Thus, only use it when you really need to persist data across sessions. Otherwise, use local storage.
 
 import { LocalStorage } from "@raycast/api";
-import { Preferences } from "./preferences.js";
 
 import { getSupportPath } from "../helpers/extension_helper.js";
 import fs from "fs";
 import throttle from "#root/src/helpers/throttle.js";
+
+import { config } from "#root/src/api/config.js";
 
 const not_found = (x) => x === undefined || x === null;
 const found = (x) => !not_found(x);
 
 export const Storage = {
   // whether to enable persistent/combined storage
-  persistent: Preferences["persistentStorage"] || false,
+  persistent: () => config.persistentStorage,
 
   /// Local storage functions - these provide quicker access that is not critical to persist
 
@@ -139,7 +140,7 @@ export const Storage = {
     }
 
     await Storage.localStorage_write(key, value);
-    if (Storage.persistent) {
+    if (Storage.persistent()) {
       await Storage.add_to_sync_cache(key);
       await Storage.run_sync();
     }
@@ -152,11 +153,11 @@ export const Storage = {
     if (await Storage.localStorage_has(key)) {
       value = await Storage.localStorage_read(key);
       // note how we only sync here, as it only makes sense when we have a value in local storage
-      if (Storage.persistent) {
+      if (Storage.persistent()) {
         await Storage.add_to_sync_cache(key);
         await Storage.run_sync();
       }
-    } else if (Storage.persistent && (await Storage.fileStorage_has(key))) {
+    } else if (Storage.persistent() && (await Storage.fileStorage_has(key))) {
       console.log(`Reading key: ${key} from file storage`);
       value = await Storage.fileStorage_read(key);
       // write to local storage

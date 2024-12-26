@@ -1,24 +1,26 @@
-import { getCustomAPIInfo } from "./g4f_local";
-
 import { messages_to_json } from "../../../classes/message.js";
 import fetch from "#root/src/api/fetch.js";
 
-const DEFAULT_API_URL = "https://api.openai.com/v1/chat/completions";
-const DEFAULT_MODEL = "gpt-4";
-const DEFAULT_CONFIG = JSON.stringify({ model: DEFAULT_MODEL });
-const DEFAULT_INFO = JSON.stringify({ api_url: DEFAULT_API_URL, api_key: "", config: DEFAULT_CONFIG });
-
-export const getCustomOpenAiInfo = async (apiInfo) => {
-  return JSON.parse(apiInfo.openai_info || DEFAULT_INFO);
+export const getOpenAIModels = async (url, apiKey) => {
+  url = url + "/models";
+  const response = await fetch(url, {
+    method: "GET",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+  });
+  console.log(response);
+  const data = (await response.json()).data;
+  const res = data.map((x) => x.id);
+  return res;
 };
 
 export const CustomOpenAIProvider = {
   name: "CustomOpenAI",
-  generate: async function* (chat) {
-    const apiInfo = await getCustomOpenAiInfo(await getCustomAPIInfo());
-    const api_url = apiInfo.api_url;
-    const api_key = apiInfo.api_key;
-    const config = apiInfo.config;
+  generate: async function* (chat, options) {
+    const apiData = options.apiData;
+    const api_url = apiData.url + "/chat/completions";
+    const api_key = apiData.apiKey;
+    const config = apiData.config;
+    const model = options.model;
 
     let headers = {
       "Content-Type": "application/json",
@@ -29,6 +31,7 @@ export const CustomOpenAIProvider = {
     let body = {
       messages: chat,
       stream: true,
+      model: model,
       ...config,
     };
 

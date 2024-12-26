@@ -5,8 +5,10 @@ import { preferences } from "../../package.json";
 
 /// Chat providers (user-friendly names)
 // fetched from package.json for consistency and to avoid duplicate code
-const chat_providers_names = preferences.find((x) => x.name === "gptProvider").data.map((x) => [x.title, x.value]);
+/// TODO: rework this
+const chat_providers_names = preferences.find((x) => x.name === "defaultProvider").data.map((x) => [x.title, x.value]);
 
+/// TODO: rework this into a function, not a constant
 export const ChatProvidersReact = (() => {
   // Display custom APIs in a separate section for organization
   let providers = [],

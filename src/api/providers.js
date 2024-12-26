@@ -153,7 +153,7 @@ export const generate = async function (provider, chat, options, { stream_update
 
 // Utilities
 export const default_provider_string = () => {
-  return Preferences["gptProvider"];
+  return Preferences["defaultProvider"];
 };
 
 // Parse provider string

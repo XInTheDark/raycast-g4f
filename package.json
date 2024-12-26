@@ -208,6 +208,13 @@
       "mode": "view"
     },
     {
+      "name": "preferences",
+      "title": "Preferences",
+      "description": "Manage extension preferences",
+      "icon": "box-icon.png",
+      "mode": "view"
+    },
+    {
       "name": "checkForUpdates",
       "title": "Check for Updates",
       "description": "Check for extension updates from the official GitHub source",
@@ -215,23 +222,17 @@
       "mode": "view"
     },
     {
-      "name": "manageCustomAPIs",
-      "title": "Manage Custom APIs",
-      "description": "Manage custom API settings",
+      "name": "devPanel",
+      "title": "Developer Panel",
+      "description": "Developer panel for debugging and testing",
       "icon": "box-icon.png",
-      "mode": "view"
-    },
-    {
-      "name": "manageAIPresets",
-      "title": "Manage AI Presets",
-      "description": "Manage AI presets",
-      "icon": "preset-icon.png",
-      "mode": "view"
+      "mode": "view",
+      "disabledByDefault": true
     }
   ],
   "preferences": [
     {
-      "name": "gptProvider",
+      "name": "defaultProvider",
       "title": "Default Provider",
       "description": "The default provider and model used in this extension.",
       "required": false,
@@ -546,14 +547,6 @@
       "required": false,
       "type": "checkbox",
       "default": false
-    },
-    {
-      "name": "GeminiAPIKeys",
-      "title": "Google Gemini API Keys",
-      "description": "Optional. Only used if Gemini provider is selected. Multiple keys are supported - separate them with commas.",
-      "required": false,
-      "type": "password",
-      "default": ""
     },
     {
       "name": "inactiveDuration",
