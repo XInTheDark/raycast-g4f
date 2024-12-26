@@ -21,6 +21,8 @@ import { formatDate } from "./helpers/helper.js";
 import { getSupportPath } from "./helpers/extension_helper.js";
 import { help_action } from "./helpers/helpPage.jsx";
 
+import { init } from "#root/src/api/init.js";
+
 import { provider, generate } from "g4f-image";
 
 // Image Providers
@@ -596,6 +598,8 @@ export default function genImage() {
 
   useEffect(() => {
     (async () => {
+      await init();
+
       const storedChatData = await Storage.read("imageChatData");
 
       if (storedChatData) {

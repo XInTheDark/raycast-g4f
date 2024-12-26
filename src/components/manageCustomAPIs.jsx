@@ -8,6 +8,20 @@ import { Form, ActionPanel, Action, showToast, Toast, useNavigation, List } from
 import { useState, useEffect } from "react";
 import { Preferences, updatePreferences } from "#root/src/api/preferences.js";
 
+const customAPIsStorageKey = "customAPIs";
+export const getCustomAPIInfo = async (url) => {
+  const data = JSON.parse(await Storage.read(customAPIsStorageKey, "{}")) || {};
+  if (url) return data[url];
+  return data;
+};
+export const updateCustomAPIInfo = async (data) => {
+  await Storage.write(customAPIsStorageKey, JSON.stringify(data));
+};
+
+export const getChatName = (api) => {
+  return api.name || api.url;
+};
+
 const EditAPIConfig = ({ customAPIData, setCustomAPIData, url }) => {
   const APIData = customAPIData[url] || {};
   const { pop } = useNavigation();
@@ -22,7 +36,7 @@ const EditAPIConfig = ({ customAPIData, setCustomAPIData, url }) => {
               try {
                 values.config = JSON.parse(values.config);
               } catch (e) {
-                await showToast(Toast.Style.Failure, "Invalid JSON in OpenAI config");
+                await showToast(Toast.Style.Failure, "Invalid JSON in config");
                 return;
               }
 
@@ -57,8 +71,6 @@ const EditAPIConfig = ({ customAPIData, setCustomAPIData, url }) => {
 
       <Form.TextField id="name" title="API Name" defaultValue={APIData.name} />
 
-      <Form.TextField id="prefix" title="Models Prefix" defaultValue={APIData.prefix} />
-
       <Form.TextField id="apiKey" title="API Key" defaultValue={APIData.apiKey} />
 
       <Form.Checkbox
@@ -83,7 +95,7 @@ export const ManageCustomAPIs = () => {
 
   useEffect(() => {
     (async () => {
-      let data = JSON.parse(await Storage.read("customAPIs", "{}")) || {};
+      let data = await getCustomAPIInfo();
       setCustomAPIData(data);
     })();
   }, []);
@@ -91,11 +103,10 @@ export const ManageCustomAPIs = () => {
   useEffect(() => {
     (async () => {
       if (!customAPIData) return;
-      await Storage.write("customAPIs", JSON.stringify(customAPIData));
+      await updateCustomAPIInfo(customAPIData);
     })();
   }, [customAPIData]);
 
-  console.log(customAPIData);
   return customAPIData ? (
     Object.keys(customAPIData).length > 0 ? (
       <List>
@@ -113,8 +124,9 @@ export const ManageCustomAPIs = () => {
                 <Action
                   title="Delete"
                   onAction={async () => {
-                    const { [url]: _, ...rest } = customAPIData;
-                    setCustomAPIData(rest);
+                    const newData = { ...customAPIData };
+                    delete newData[url];
+                    setCustomAPIData(newData);
                   }}
                 />
               </ActionPanel>

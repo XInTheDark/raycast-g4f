@@ -34,12 +34,11 @@ export const updatePreferences = async (key, value) => {
   await savePreferencesToStorage(Preferences);
 };
 
-// Load preferences from storage upon startup
+// Load preferences from storage
 export const initPreferences = async () => {
   const prefs = await loadPreferencesFromStorage();
   Object.assign(Preferences, prefs);
 };
-initPreferences();
 
 // Load config from preferences upon startup
 export const initConfig = () => {
@@ -50,4 +49,3 @@ export const initConfig = () => {
     }
   }
 };
-initConfig();

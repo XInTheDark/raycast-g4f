@@ -1,13 +1,14 @@
 import { messages_to_json } from "../../../classes/message.js";
 import fetch from "#root/src/api/fetch.js";
 
+import { getCustomAPIInfo } from "#root/src/components/manageCustomAPIs.jsx";
+
 export const getOpenAIModels = async (url, apiKey) => {
   url = url + "/models";
   const response = await fetch(url, {
     method: "GET",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
   });
-  console.log(response);
   const data = (await response.json()).data;
   const res = data.map((x) => x.id);
   return res;
@@ -16,11 +17,18 @@ export const getOpenAIModels = async (url, apiKey) => {
 export const CustomOpenAIProvider = {
   name: "CustomOpenAI",
   generate: async function* (chat, options) {
-    const apiData = options.apiData;
-    const api_url = apiData.url + "/chat/completions";
+    console.log("CustomOpenAIProvider.generate");
+    console.log(options);
+    const url = options.url;
+    if (!url) {
+      throw new Error("No URL provided for Custom OpenAI API");
+    }
+
+    const apiData = await getCustomAPIInfo(url);
+    const api_url = url + "/chat/completions";
+    const model = options.model;
     const api_key = apiData.apiKey;
     const config = apiData.config;
-    const model = options.model;
 
     let headers = {
       "Content-Type": "application/json",

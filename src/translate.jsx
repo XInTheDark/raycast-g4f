@@ -7,6 +7,7 @@ import { Storage } from "./api/storage.js";
 import { Preferences } from "./api/preferences.js";
 
 import { preferences } from "../package.json";
+import { init } from "#root/src/api/init.js";
 
 const languages = preferences.find((x) => x.name === "defaultLanguage").data.map((x) => [x.title, x.value]);
 
@@ -19,6 +20,7 @@ export default function Translate(props) {
 
   useEffect(() => {
     (async () => {
+      await init();
       setLanguage(await Storage.read("translateLanguage", "English"));
     })();
   }, []);

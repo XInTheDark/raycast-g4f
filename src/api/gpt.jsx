@@ -22,6 +22,7 @@ import throttle, { AIChatDelayFunction } from "#root/src/helpers/throttle.js";
 import { help_action } from "../helpers/helpPage.jsx";
 import { autoCheckForUpdates } from "../helpers/update.jsx";
 
+import { init } from "../api/init.js";
 import { Message, pairs_to_messages } from "../classes/message.js";
 import { Preferences } from "./preferences.js";
 
@@ -119,12 +120,14 @@ export default (
     generationStatus.loading = true;
 
     // load provider and model
+    await init();
     const providerString =
       !allowedProviders || allowedProviders.includes(providers.default_provider_string())
         ? providers.default_provider_string()
         : allowedProviders[0];
     setProviderString(providerString);
     const info = providers.get_provider_info(providerString);
+
     // additional options
     let options = providers.get_options_from_info(info);
 

@@ -5,9 +5,12 @@ import { Preferences, updatePreferences } from "#root/src/api/preferences.js";
 import { ManageCustomAPIs, ManageGoogleGeminiAPI } from "#root/src/components/manageCustomAPIs.jsx";
 import { ManageAIPresets } from "#root/src/components/manageAIPresets.jsx";
 
+import { init } from "#root/src/api/init.js";
+import { useEffect, useState } from "react";
+
 // Section 1. Default Provider selection
 const DefaultProvider = () => {
-  const providersReact = ChatProvidersReact;
+  const providersReact = ChatProvidersReact();
   const { pop } = useNavigation();
   return (
     <>
@@ -33,7 +36,15 @@ const DefaultProvider = () => {
 };
 
 export default function ManagePreferences() {
-  return (
+  const [initialised, setInitialised] = useState(false);
+  useEffect(() => {
+    (async () => {
+      await init();
+      setInitialised(true);
+    })();
+  }, []);
+
+  return initialised ? (
     <List>
       <List.Section title="Defaults">
         <List.Item
@@ -80,5 +91,7 @@ export default function ManagePreferences() {
         />
       </List.Section>
     </List>
+  ) : (
+    <List isLoading={true} />
   );
 }

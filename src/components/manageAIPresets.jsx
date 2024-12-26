@@ -80,7 +80,7 @@ export const ManageAIPresets = () => {
         <Form.TextField id="name" title="Name" defaultValue={preset.name} />
         <Form.Description title="Provider" text="The provider and model used for this chat." />
         <Form.Dropdown id="provider" defaultValue={preset.provider}>
-          {ChatProvidersReact}
+          {ChatProvidersReact()}
         </Form.Dropdown>
 
         <Form.Description title="Web Search" text="Allow GPT to search the web for information." />
