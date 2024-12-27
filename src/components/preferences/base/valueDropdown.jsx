@@ -10,7 +10,14 @@ const legacyDataToComponent = (data) => {
   });
 };
 
-export const ValueDropdown = ({ id, title, description, dropdownComponent = null, legacyData = null }) => {
+export const ValueDropdown = ({
+  id,
+  title,
+  description,
+  dropdownComponent = null,
+  legacyData = null,
+  onPreferenceUpdate,
+}) => {
   if (!dropdownComponent) {
     dropdownComponent = legacyDataToComponent(legacyData);
   }
@@ -25,6 +32,7 @@ export const ValueDropdown = ({ id, title, description, dropdownComponent = null
               title="Save"
               onSubmit={async (values) => {
                 await updatePreferences(id, values[id]);
+                onPreferenceUpdate?.();
                 pop();
               }}
             />

@@ -6,6 +6,8 @@ import { ValueDropdown } from "#root/src/components/preferences/base/valueDropdo
 import { ValueCheckbox } from "#root/src/components/preferences/base/valueCheckbox.jsx";
 import { ValueText } from "#root/src/components/preferences/base/valueText.jsx";
 
+import { useState, useCallback, cloneElement } from "react";
+
 const switchType = (option) => {
   switch (option.type) {
     case "dropdown":
@@ -24,6 +26,13 @@ const switchType = (option) => {
 };
 
 export const OptionsComponent = ({ options }) => {
+  // Used to refresh the view when a preference is updated
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const handlePreferenceUpdate = useCallback(() => {
+    setRefreshTrigger((prev) => prev + 1);
+  }, []);
+
   return (
     <List>
       {Object.keys(options).map((key) => {
@@ -32,12 +41,20 @@ export const OptionsComponent = ({ options }) => {
           ...options[key],
         };
 
-        // Known issue: Accessories don't refresh immediately after saving
-        // This is hard to fix since Action.Push pushes as a sibling instead of a child
         const accessories = Preferences[key] !== undefined ? [{ tag: Preferences[key].toString() }] : [];
 
+        const target = switchType(option);
+        const targetWithCallback = cloneElement(target, {
+          onPreferenceUpdate: handlePreferenceUpdate,
+        });
+
         return (
-          <PreferenceComponent title={option.title} key={key} accessories={accessories} target={switchType(option)} />
+          <PreferenceComponent
+            title={option.title}
+            key={`${key}-${refreshTrigger}`}
+            accessories={accessories}
+            target={targetWithCallback}
+          />
         );
       })}
     </List>

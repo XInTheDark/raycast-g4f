@@ -11,11 +11,12 @@ let initialised = false;
 // must call init() at least once before using any of the modules. Otherwise, it's undefined behaviour.
 export async function init() {
   if (initialised) return;
+  const start = Date.now();
 
   await initPreferences();
   initConfig();
   await initCustomAPIs();
 
-  console.log("Extension initialised");
+  console.log(`Extension initialised in ${Date.now() - start}ms`);
   initialised = true;
 }

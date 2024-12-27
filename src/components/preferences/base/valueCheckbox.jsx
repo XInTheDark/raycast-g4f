@@ -1,7 +1,7 @@
 import { Action, ActionPanel, Form, useNavigation } from "@raycast/api";
 import { Preferences, updatePreferences } from "#root/src/api/preferences.js";
 
-export const ValueCheckbox = ({ id, title, description }) => {
+export const ValueCheckbox = ({ id, title, description, onPreferenceUpdate }) => {
   const { pop } = useNavigation();
   return (
     <>
@@ -12,6 +12,7 @@ export const ValueCheckbox = ({ id, title, description }) => {
               title="Save"
               onSubmit={async (values) => {
                 await updatePreferences(id, values[id]);
+                onPreferenceUpdate?.();
                 pop();
               }}
             />

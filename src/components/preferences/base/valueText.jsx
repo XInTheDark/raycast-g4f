@@ -1,7 +1,7 @@
 import { Action, ActionPanel, Form, useNavigation } from "@raycast/api";
 import { Preferences, updatePreferences } from "#root/src/api/preferences.js";
 
-export const ValueText = ({ id, title, description, type = "TextField" }) => {
+export const ValueText = ({ id, title, description, type = "TextField", onPreferenceUpdate }) => {
   const { pop } = useNavigation();
   const props = { id, title, description, defaultValue: Preferences[id] };
 
@@ -14,6 +14,7 @@ export const ValueText = ({ id, title, description, type = "TextField" }) => {
               title="Save"
               onSubmit={async (values) => {
                 await updatePreferences(id, values[id]);
+                onPreferenceUpdate?.();
                 pop();
               }}
             />
