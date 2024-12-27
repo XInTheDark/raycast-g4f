@@ -5,13 +5,11 @@ import { useEffect, useState } from "react";
 
 import { Storage } from "./api/storage.js";
 import { Preferences } from "./api/preferences.js";
-
-import { preferences } from "../package.json";
 import { init } from "#root/src/api/init.js";
 
-const languages = preferences.find((x) => x.name === "defaultLanguage").data.map((x) => [x.title, x.value]);
+import { languages } from "#root/src/config/config.json";
 
-const languagesReact = languages.map(([title, value]) => (
+const languagesReact = languages.map(({ title, value }) => (
   <Form.Dropdown.Item title={title} value={value} key={value} />
 ));
 

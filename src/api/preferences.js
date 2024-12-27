@@ -4,19 +4,9 @@
 // It is also a small speedup, as we can avoid fetching the preferences multiple times.
 
 import { getPreferenceValues } from "@raycast/api";
+import { defaultPreferences } from "#root/src/config/config.json";
 
 export const Preferences = {
-  defaultProvider: "NexraGPT4o",
-  webSearch: "off",
-  proxyURL: "",
-  smartChatNaming: false,
-  autoCheckForUpdates: true,
-  persistentStorage: false,
-  useCursorIcon: true,
-  codeInterpreter: false,
-  devMode: false,
-  GeminiAPIKeys: "",
-  inactiveDuration: 0,
-  defaultLanguage: "English",
+  ...defaultPreferences,
   ...getPreferenceValues(),
 };
