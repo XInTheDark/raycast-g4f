@@ -10,8 +10,9 @@
     "codeInterpreter": false,
     "devMode": false,
     "GeminiAPIKeys": "",
-    "inactiveDuration": 0,
-    "defaultLanguage": "English"
+    "inactiveDuration": "0",
+    "defaultLanguage": "English",
+    "fetchTimeout": "10000"
   },
   "languages": [
     {

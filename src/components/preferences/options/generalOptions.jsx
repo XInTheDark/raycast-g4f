@@ -26,6 +26,19 @@ const generalOptions = {
     required: false,
     type: "checkbox",
   },
+  fetchTimeout: {
+    title: "Fetch Timeout",
+    description: "The timeout duration for network requests.",
+    required: false,
+    type: "dropdown",
+    data: [
+      { title: "Disabled", value: "0" },
+      { title: "10s", value: "10000" },
+      { title: "30s", value: "30000" },
+      { title: "5m", value: "300000" },
+      { title: "30m", value: "1800000" },
+    ],
+  },
 };
 
 export const GeneralOptions = () => {

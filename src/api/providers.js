@@ -12,7 +12,7 @@ export * from "./providers_info.js";
 export const additional_provider_options = (provider, chatOptions = null) => {
   let options = {};
   if (chatOptions?.creativity) {
-    let temperature = parseFloat(chatOptions.creativity);
+    let temperature = Number(chatOptions.creativity);
     temperature = Math.max(0.0, temperature).toFixed(1);
     options.temperature = temperature;
   } else {
