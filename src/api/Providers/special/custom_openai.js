@@ -41,11 +41,15 @@ export const CustomOpenAIProvider = {
       ...config,
     };
 
-    let response = await fetch(api_url, {
-      method: "POST",
-      headers: headers,
-      body: JSON.stringify(body),
-    });
+    let response = await fetch(
+      api_url,
+      {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify(body),
+      },
+      { timeout: 0 } // disable timeout
+    );
 
     const reader = response.body;
 

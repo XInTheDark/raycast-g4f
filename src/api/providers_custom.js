@@ -4,7 +4,7 @@ import { Storage } from "#root/src/api/storage.js";
 import { providers_info } from "#root/src/api/providers_info.js";
 import { chat_providers_names } from "#root/src/api/providers_react.jsx";
 
-import { CustomOpenAIProvider } from "#root/src/api/Providers/special/custom_openai.jsx";
+import { CustomOpenAIProvider } from "#root/src/api/Providers/special/custom_openai.js";
 
 const customAPIsStorageKey = "customAPIs";
 export const getCustomAPIInfo = async (url) => {

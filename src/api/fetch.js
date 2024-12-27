@@ -58,7 +58,7 @@ async function fetchWithProxy(url, options = {}, fetchOptions = {}) {
 
 async function fetch(url, options = {}, { proxy, timeout } = {}) {
   proxy = proxy || Preferences["proxyURL"] || null;
-  timeout = timeout || Preferences["timeout"] || 10000;
+  timeout = timeout ?? Preferences["fetchTimeout"] ?? 10000;
   return fetchWithProxy(url, options, { proxy, timeout });
 }
 

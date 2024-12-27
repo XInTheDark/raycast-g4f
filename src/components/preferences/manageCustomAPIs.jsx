@@ -1,4 +1,4 @@
-import { getOpenAIModels } from "../../api/Providers/special/custom_openai.jsx";
+import { getOpenAIModels } from "../../api/Providers/special/custom_openai.js";
 import { getCustomAPIInfo, updateCustomAPIInfo } from "#root/src/api/providers_custom.js";
 
 import { help_action } from "../../helpers/helpPage.jsx";
