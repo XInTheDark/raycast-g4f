@@ -1,6 +1,6 @@
 import { getOpenAIModels } from "../../api/Providers/special/custom_openai.jsx";
+import { getCustomAPIInfo, updateCustomAPIInfo } from "#root/src/api/providers_custom.js";
 
-import { Storage } from "../../api/storage.js";
 import { help_action } from "../../helpers/helpPage.jsx";
 
 import { Form, ActionPanel, Action, showToast, Toast, useNavigation, List } from "@raycast/api";
@@ -9,20 +9,6 @@ import { Preferences } from "#root/src/api/preferences.js";
 import { updatePreferences } from "#root/src/helpers/preferences_helper.js";
 
 import { useState, useEffect } from "react";
-
-const customAPIsStorageKey = "customAPIs";
-export const getCustomAPIInfo = async (url) => {
-  const data = JSON.parse(await Storage.read(customAPIsStorageKey, "{}")) || {};
-  if (url) return data[url];
-  return data;
-};
-export const updateCustomAPIInfo = async (data) => {
-  await Storage.write(customAPIsStorageKey, JSON.stringify(data));
-};
-
-export const getChatName = (api) => {
-  return api.name || api.url;
-};
 
 const EditAPIConfig = ({ customAPIData, setCustomAPIData, url }) => {
   const APIData = customAPIData[url] || {};
@@ -35,6 +21,8 @@ const EditAPIConfig = ({ customAPIData, setCustomAPIData, url }) => {
           <Action.SubmitForm
             title="Save"
             onSubmit={async (values) => {
+              await showToast(Toast.Style.Animated, "Saving");
+
               try {
                 values.config = JSON.parse(values.config);
               } catch (e) {
@@ -42,11 +30,10 @@ const EditAPIConfig = ({ customAPIData, setCustomAPIData, url }) => {
                 return;
               }
 
-              if (values.refreshModels || values.url !== url) {
+              if (values.refreshModels || values.url !== url || (APIData.models || []).length === 0) {
+                // load models
                 let models;
-                // get models
                 try {
-                  await showToast(Toast.Style.Animated, "Fetching models");
                   models = await getOpenAIModels(values.url, values.apiKey);
                 } catch (e) {
                   console.log(e);

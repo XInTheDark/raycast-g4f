@@ -240,7 +240,7 @@ export default function Chat({ launchContext }) {
   const starting_messages = ({ systemPrompt = "", provider = null, webSearch = "off" } = {}) => {
     let messages = [];
 
-    provider = provider instanceof Object ? provider : providers.get_provider_info(provider).provider;
+    provider = provider instanceof Object ? provider : providers.get_provider_info(provider)?.provider;
 
     // Web Search system prompt
     if (webSearch === "always" || (webSearch === "auto" && !has_native_web_search(provider))) {

@@ -1,7 +1,7 @@
 import { messages_to_json } from "../../../classes/message.js";
 import fetch from "#root/src/api/fetch.js";
 
-import { getCustomAPIInfo } from "#root/src/components/preferences/manageCustomAPIs.jsx";
+import { getCustomAPIInfo } from "#root/src/api/providers_custom.js";
 
 export const getOpenAIModels = async (url, apiKey) => {
   url = url + "/models";
@@ -18,11 +18,11 @@ export const CustomOpenAIProvider = {
   name: "CustomOpenAI",
   generate: async function* (chat, options) {
     const url = options.url;
-    if (!url) {
-      throw new Error("No URL provided for Custom OpenAI API");
+    const apiData = await getCustomAPIInfo(url);
+    if (!apiData) {
+      throw new Error("No data found for Custom OpenAI API");
     }
 
-    const apiData = await getCustomAPIInfo(url);
     const api_url = url + "/chat/completions";
     const model = options.model;
     const api_key = apiData.apiKey;
@@ -65,8 +65,10 @@ export const CustomOpenAIProvider = {
         try {
           let json = JSON.parse(line);
           let chunk = json["choices"][0]["delta"] ?? json["choices"][0]["message"];
-          chunk = chunk["content"];
-          yield chunk;
+          chunk = chunk?.content;
+          if (chunk) {
+            yield chunk;
+          }
         } catch (e) {
           console.log(e);
         }

@@ -121,15 +121,27 @@ export default (
 
     // load provider and model
     await init();
-    const providerString =
-      !allowedProviders || allowedProviders.includes(providers.default_provider_string())
-        ? providers.default_provider_string()
-        : allowedProviders[0];
-    setProviderString(providerString);
-    const info = providers.get_provider_info(providerString);
+    let info, options;
+    try {
+      const providerString =
+        !allowedProviders ||
+        allowedProviders?.length === 0 ||
+        allowedProviders.includes(providers.default_provider_string())
+          ? providers.default_provider_string()
+          : allowedProviders[0];
+      setProviderString(providerString);
+      info = providers.get_provider_info(providerString);
 
-    // additional options
-    let options = providers.get_options_from_info(info);
+      // additional options
+      options = providers.get_options_from_info(info);
+    } catch (e) {
+      console.log(e);
+      await showToast({
+        style: Toast.Style.Failure,
+        title: "Failed to load provider",
+      });
+      return;
+    }
 
     let messages = [];
 
