@@ -3,7 +3,7 @@ import { getCustomAPIInfo, updateCustomAPIInfo } from "#root/src/api/providers_c
 
 import { help_action } from "../../helpers/helpPage.jsx";
 
-import { Form, ActionPanel, Action, showToast, Toast, useNavigation, List } from "@raycast/api";
+import { Form, ActionPanel, Action, showToast, Toast, useNavigation, List, Icon, confirmAlert } from "@raycast/api";
 
 import { Preferences } from "#root/src/api/preferences.js";
 import { updatePreferences } from "#root/src/helpers/preferences_helper.js";
@@ -116,13 +116,33 @@ export const ManageCustomAPIs = () => {
                   title="Edit"
                   target={<EditAPIConfig customAPIData={customAPIData} setCustomAPIData={setCustomAPIData} url={url} />}
                 />
+                <Action.Push
+                  title="Add API"
+                  icon={Icon.PlusCircle}
+                  target={<EditAPIConfig customAPIData={customAPIData} setCustomAPIData={setCustomAPIData} url="" />}
+                  shortcut={{ modifiers: ["cmd"], key: "n" }}
+                />
                 <Action
-                  title="Delete"
+                  title="Delete API"
+                  style={Action.Style.Destructive}
+                  icon={Icon.Trash}
                   onAction={async () => {
-                    const newData = { ...customAPIData };
-                    delete newData[url];
-                    setCustomAPIData(newData);
+                    await confirmAlert({
+                      title: "Are you sure?",
+                      message: "You cannot recover this API.",
+                      icon: Icon.Trash,
+                      primaryAction: {
+                        title: "Delete API Forever",
+                        style: Action.Style.Destructive,
+                        onAction: () => {
+                          const newData = { ...customAPIData };
+                          delete newData[url];
+                          setCustomAPIData(newData);
+                        },
+                      },
+                    });
                   }}
+                  shortcut={{ modifiers: ["cmd", "shift"], key: "delete" }}
                 />
               </ActionPanel>
             }
