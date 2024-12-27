@@ -1,5 +1,6 @@
 import { Action, ActionPanel, Form, useNavigation } from "@raycast/api";
-import { Preferences, updatePreferences } from "#root/src/api/preferences.js";
+import { Preferences } from "#root/src/api/preferences.js";
+import { updatePreferences } from "#root/src/helpers/preferences_helper.js";
 
 export const ValueText = ({ id, title, description, type = "TextField", onPreferenceUpdate }) => {
   const { pop } = useNavigation();

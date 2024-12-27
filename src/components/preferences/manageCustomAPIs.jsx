@@ -5,8 +5,10 @@ import { help_action } from "../../helpers/helpPage.jsx";
 
 import { Form, ActionPanel, Action, showToast, Toast, useNavigation, List } from "@raycast/api";
 
+import { Preferences } from "#root/src/api/preferences.js";
+import { updatePreferences } from "#root/src/helpers/preferences_helper.js";
+
 import { useState, useEffect } from "react";
-import { Preferences, updatePreferences } from "#root/src/api/preferences.js";
 
 const customAPIsStorageKey = "customAPIs";
 export const getCustomAPIInfo = async (url) => {

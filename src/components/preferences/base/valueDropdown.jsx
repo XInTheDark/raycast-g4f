@@ -1,5 +1,6 @@
 import { Action, ActionPanel, Form, useNavigation } from "@raycast/api";
-import { Preferences, updatePreferences } from "#root/src/api/preferences.js";
+import { Preferences } from "#root/src/api/preferences.js";
+import { updatePreferences } from "#root/src/helpers/preferences_helper.js";
 
 // convert legacy JSON data to react component
 // this should be reworked at some point

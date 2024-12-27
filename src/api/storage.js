@@ -5,19 +5,18 @@
 // Thus, only use it when you really need to persist data across sessions. Otherwise, use local storage.
 
 import { LocalStorage } from "@raycast/api";
+import { Preferences } from "#root/src/api/preferences.js";
 
 import { getSupportPath } from "../helpers/extension_helper.js";
 import fs from "fs";
 import throttle from "#root/src/helpers/throttle.js";
-
-import { config } from "#root/src/api/config.js";
 
 const not_found = (x) => x === undefined || x === null;
 const found = (x) => !not_found(x);
 
 export const Storage = {
   // whether to enable persistent/combined storage
-  persistent: () => config.persistentStorage,
+  persistent: () => Preferences["persistentStorage"],
 
   /// Local storage functions - these provide quicker access that is not critical to persist
 
