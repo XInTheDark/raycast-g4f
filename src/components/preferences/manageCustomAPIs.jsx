@@ -56,7 +56,12 @@ const EditAPIConfig = ({ customAPIData, setCustomAPIData, url }) => {
     >
       <Form.Description text="Configure a custom OpenAI-compatible API." />
 
-      <Form.TextField id="url" title="API Base URL" defaultValue={APIData.url} />
+      <Form.TextField
+        id="url"
+        title="API Base URL"
+        info={"Make sure to include http:// or https://"}
+        defaultValue={APIData.url}
+      />
 
       <Form.TextField id="name" title="API Name" defaultValue={APIData.name} />
 
