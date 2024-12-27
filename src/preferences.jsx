@@ -1,11 +1,14 @@
 import { List } from "@raycast/api";
 import { PreferenceComponent } from "#root/src/components/preferences/base/preferenceComponent.jsx";
 
-import { DefaultProvider } from "#root/src/components/preferences/general/defaultProvider.jsx";
-import { DefaultLanguage } from "#root/src/components/preferences/general/defaultLanguage.jsx";
-import { AIChatOptions } from "#root/src/components/preferences/general/aiChatOptions.jsx";
+// Components
+import { DefaultProvider } from "#root/src/components/preferences/options/defaultProvider.jsx";
+import { GeneralOptions } from "#root/src/components/preferences/options/generalOptions.jsx";
+import { AIChatOptions } from "#root/src/components/preferences/options/aiChatOptions.jsx";
+
 import { ManageCustomAPIs, ManageGoogleGeminiAPI } from "#root/src/components/preferences/manageCustomAPIs.jsx";
 import { ManageAIPresets } from "#root/src/components/preferences/manageAIPresets.jsx";
+
 import { ExperimentalOptions } from "#root/src/components/preferences/experimental/experimentalOptions.jsx";
 
 import { init } from "#root/src/api/init.js";
@@ -22,12 +25,12 @@ export default function ManagePreferences() {
 
   return initialised ? (
     <List>
-      <List.Section title="General">
+      <List.Section title="Options">
         {/* - Default Provider */}
         {PreferenceComponent({ title: "Default Provider", target: <DefaultProvider /> })}
 
-        {/* - Default Language */}
-        {PreferenceComponent({ title: "Default Language", target: <DefaultLanguage /> })}
+        {/* - General */}
+        {PreferenceComponent({ title: "General", target: <GeneralOptions /> })}
 
         {/* - AI Chat */}
         {PreferenceComponent({ title: "AI Chat", target: <AIChatOptions /> })}

@@ -7,6 +7,12 @@ const experimentalOptions = {
     required: false,
     type: "textfield",
   },
+  devMode: {
+    title: "Enable Developer Mode",
+    description: "Enable developer mode for more extensive logging. Do not enable this.",
+    required: false,
+    type: "checkbox",
+  },
 };
 
 export const ExperimentalOptions = () => {

@@ -52,6 +52,7 @@ export const OptionsComponent = ({ options }) => {
           <PreferenceComponent
             title={option.title}
             key={`${key}-${refreshTrigger}`}
+            subtitle={option.description}
             accessories={accessories}
             target={targetWithCallback}
           />
