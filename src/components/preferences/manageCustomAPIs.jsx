@@ -44,7 +44,8 @@ const EditAPIConfig = ({ customAPIData, setCustomAPIData, url }) => {
                 values.models = models;
               }
 
-              setCustomAPIData({ ...customAPIData, [values.url]: values });
+              // Update data
+              setCustomAPIData({ ...customAPIData, [values.url]: { ...APIData, ...values } });
 
               await showToast(Toast.Style.Success, "Configuration saved");
               pop();
