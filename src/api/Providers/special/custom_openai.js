@@ -3,11 +3,18 @@ import fetch from "#root/src/api/fetch.js";
 
 import { getCustomAPIInfo } from "#root/src/api/providers_custom.js";
 
+const getHeaders = (apiKey) => {
+  return {
+    "Content-Type": "application/json",
+    Authorization: apiKey ? `Bearer ${apiKey}` : undefined,
+  };
+};
+
 export const getOpenAIModels = async (url, apiKey) => {
   url = url + "/models";
   const response = await fetch(url, {
     method: "GET",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+    headers: getHeaders(apiKey),
   });
   const data = (await response.json()).data;
   const res = data.map((x) => x.id);
@@ -28,11 +35,6 @@ export const CustomOpenAIProvider = {
     const api_key = apiData.apiKey;
     const config = apiData.config;
 
-    let headers = {
-      "Content-Type": "application/json",
-      Authorization: api_key ? `Bearer ${api_key}` : undefined,
-    };
-
     chat = messages_to_json(chat);
     let body = {
       messages: chat,
@@ -45,7 +47,7 @@ export const CustomOpenAIProvider = {
       api_url,
       {
         method: "POST",
-        headers: headers,
+        headers: getHeaders(api_key),
         body: JSON.stringify(body),
       },
       { timeout: 0 } // disable timeout
