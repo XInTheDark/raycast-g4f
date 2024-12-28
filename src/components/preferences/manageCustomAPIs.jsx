@@ -51,7 +51,7 @@ const EditAPIConfig = ({ customAPIData, setCustomAPIData, url }) => {
               pop();
             }}
           />
-          {help_action("localAPI")}
+          {help_action("customAPI")}
         </ActionPanel>
       }
     >
@@ -144,6 +144,7 @@ export const ManageCustomAPIs = () => {
                   }}
                   shortcut={{ modifiers: ["cmd", "shift"], key: "delete" }}
                 />
+                {help_action("customAPI")}
               </ActionPanel>
             }
           />
@@ -159,6 +160,7 @@ export const ManageCustomAPIs = () => {
                 title="Add"
                 target={<EditAPIConfig customAPIData={customAPIData} setCustomAPIData={setCustomAPIData} url="" />}
               />
+              {help_action("customAPI")}
             </ActionPanel>
           }
         />
