@@ -45,9 +45,8 @@ Please open an issue if any unexpected problems occur during installation.
 #### Automatically
 
 There is built-in support for updating within the extension itself! Simply run the "Check for Updates" command in the
-extension,
-and it will take care of the update process for you. Furthermore, you can also enable the "Automatically Check for
-Updates" feature in the preferences.
+extension, and it will take care of the update process for you. Furthermore, the "Automatically Check for Updates"
+feature is available in the preferences (enabled by default).
 
 #### Manually
 
@@ -153,6 +152,10 @@ separate them with commas in the preferences.
   the upload button to get started.
 
 ## Features
+
+> [!NOTE]
+> As of v5.0, the extension preferences are now found in the "Preferences" command. Please use this command to access
+> the preferences instead of the Raycast preferences.
 
 ### Web Search
 
