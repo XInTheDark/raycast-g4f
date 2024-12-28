@@ -5,8 +5,8 @@
 
 import { Preferences } from "./preferences.js";
 
-import { providers_info } from "./providers_info.js";
-export * from "./providers_info.js";
+import { providers_info } from "./data/providers_info.js";
+export * from "./data/providers_info.js";
 
 // Additional options
 export const additional_provider_options = (provider, chatOptions = null) => {

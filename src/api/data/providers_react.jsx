@@ -1,7 +1,7 @@
 import { Form } from "@raycast/api";
 import { useMemo } from "react";
 
-import { isCustomAPI } from "./providers_custom.js";
+import { isCustomAPI } from "../providers_custom.js";
 
 /// Chat providers (user-friendly names)
 // fetched from package.json for consistency and to avoid duplicate code

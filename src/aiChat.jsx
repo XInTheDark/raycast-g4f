@@ -31,7 +31,7 @@ import { format_chat_to_prompt, MessagePair, pairs_to_messages } from "./classes
 
 import { getChatResponse, getChatResponseSync } from "./api/gpt.jsx";
 import * as providers from "./api/providers.js";
-import { ChatProvidersReact } from "./api/providers_react.jsx";
+import { ChatProvidersReact } from "./api/data/providers_react.jsx";
 
 import { getAIPresets, getPreset } from "./helpers/presets.jsx";
 

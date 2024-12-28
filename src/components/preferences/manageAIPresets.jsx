@@ -5,7 +5,7 @@ import { help_action } from "../../helpers/helpPage.jsx";
 import { AIPreset, getAIPresets, getSubtitle, setAIPresets } from "../../helpers/presets.jsx";
 
 import * as providers from "../../api/providers.js";
-import { ChatProvidersReact } from "../../api/providers_react.jsx";
+import { ChatProvidersReact } from "../../api/data/providers_react.jsx";
 import { Preferences } from "../../api/preferences.js";
 
 export const ManageAIPresets = () => {

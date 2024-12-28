@@ -1,24 +1,24 @@
 /// This module contains all the information (i.e. constants) about the providers.
 
 /// Provider modules
-import { NexraProvider } from "./Providers/nexra.js";
-import { DeepInfraProvider } from "./Providers/deepinfra.js";
-import { BlackboxProvider } from "./Providers/blackbox.js";
-import { DuckDuckGoProvider } from "./Providers/duckduckgo.js";
-import { BestIMProvider } from "./Providers/bestim.js";
-import { RocksProvider } from "./Providers/rocks.js";
-import { ChatgptFreeProvider } from "./Providers/chatgptfree.js";
-import { AI4ChatProvider } from "./Providers/ai4chat.js";
-import { DarkAIProvider } from "./Providers/darkai.js";
-import { MhysticalProvider } from "./Providers/mhystical.js";
-import { PizzaGPTProvider } from "./Providers/pizzagpt.js";
-import { MetaAIProvider } from "./Providers/metaAI.js";
-import { ReplicateProvider } from "./Providers/replicate.js";
-import { PhindProvider } from "./Providers/phind.js";
-import { GeminiProvider } from "./Providers/google_gemini.js";
+import { NexraProvider } from "../Providers/nexra.js";
+import { DeepInfraProvider } from "../Providers/deepinfra.js";
+import { BlackboxProvider } from "../Providers/blackbox.js";
+import { DuckDuckGoProvider } from "../Providers/duckduckgo.js";
+import { BestIMProvider } from "../Providers/bestim.js";
+import { RocksProvider } from "../Providers/rocks.js";
+import { ChatgptFreeProvider } from "../Providers/chatgptfree.js";
+import { AI4ChatProvider } from "../Providers/ai4chat.js";
+import { DarkAIProvider } from "../Providers/darkai.js";
+import { MhysticalProvider } from "../Providers/mhystical.js";
+import { PizzaGPTProvider } from "../Providers/pizzagpt.js";
+import { MetaAIProvider } from "../Providers/metaAI.js";
+import { ReplicateProvider } from "../Providers/replicate.js";
+import { PhindProvider } from "../Providers/phind.js";
+import { GeminiProvider } from "../Providers/google_gemini.js";
 
 /// Special or unused providers
-import { OpenAIProvider } from "./Providers/openai.js";
+import { OpenAIProvider } from "../Providers/openai.js";
 
 /// All providers info
 // { provider internal name, {provider object, model, stream, extra options} }
