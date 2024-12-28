@@ -2,7 +2,7 @@ import { List } from "@raycast/api";
 import { PreferenceComponent } from "#root/src/components/preferences/base/preferenceComponent.jsx";
 
 // Components
-import { DefaultProvider } from "#root/src/components/preferences/options/defaultProvider.jsx";
+import { DefaultModel } from "#root/src/components/preferences/options/defaultModel.jsx";
 import { GeneralOptions } from "#root/src/components/preferences/options/generalOptions.jsx";
 import { AIChatOptions } from "#root/src/components/preferences/options/aiChatOptions.jsx";
 
@@ -27,7 +27,7 @@ export default function ManagePreferences() {
     <List>
       <List.Section title="Options">
         {/* - Default Provider */}
-        {PreferenceComponent({ title: "Default Provider", target: <DefaultProvider /> })}
+        {PreferenceComponent({ title: "Default Model", target: <DefaultModel /> })}
 
         {/* - General */}
         {PreferenceComponent({ title: "General", target: <GeneralOptions /> })}
