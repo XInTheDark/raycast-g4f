@@ -3,7 +3,7 @@
   "name": "raycast-g4f",
   "version": "5.0",
   "title": "GPT4Free",
-  "description": "Use GPT, Claude, Llama, and more... all for FREE. No API Key required!",
+  "description": "Raycast extension to use GPT, Claude, Llama, and more... all for FREE! + Full support for custom APIs.",
   "icon": "gpt-icon.png",
   "author": "muzhen_gaming",
   "type": "module",
