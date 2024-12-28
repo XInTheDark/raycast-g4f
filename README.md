@@ -1,8 +1,8 @@
 # Raycast-G4F (GPT4Free)
 
-**Use the powerful GPT-4, Llama-3 and more AI models on Raycast, for FREE - no API Key required.**
+**Use the powerful GPT-4, Llama-3 and more AI models on Raycast, for FREE! + Full support for custom APIs.**
 
-Homepage · [Privacy Policy](Privacy.md)
+Homepage · [Privacy Policy](Privacy.md) · [FAQs](#FAQs) · [Discord][discord-invite]
 
 ## Screenshots
 
@@ -215,7 +215,8 @@ models.
 
 - By default, this extension comes with a number of third-party providers which you can use for free. Raycast doesn't
   like that because it's not possible to entirely verify the quality of these providers. (I do provide all the privacy
-  details [here](Privacy.md), though, and the extension is open-source.)
+  details [here](Privacy.md), though, and the extension is open-source.) ...and also because they're selling their own
+  AI.
 - Also, for me as a developer, publishing updates to the Raycast store is too slow and troublesome; I have to submit a
   PR, wait a week for it to be reviewed, and possibly have it rejected. This is not a good experience for me or for
   users.
@@ -229,13 +230,16 @@ I’ve noticed many users subscribing to Raycast AI, which is quite expensive, a
 chats a day. Honestly, that’s unnecessary.
 **Here’s my honest suggestion: Everyone should first try out raycast-g4f.** Here’s why:
 
-- **Freedom**. You get to choose whatever provider/API to use, and can even add multiple at once. OpenAI, Anthropic, Google…
+- **Freedom**. You get to choose whatever provider/API to use, and can even add multiple at once. OpenAI, Anthropic,
+  Google…
   basically any API out there. (“Can I use my OpenAI API Key in Raycast AI?” No, you can’t.) That also means your AI
   access isn’t just locked inside Raycast. (“Can I use my Raycast AI in other apps?” No, you can’t.)
-- **Price**. This extension is completely free to use if you're sticking with the built-in providers. And if you want to use
+- **Price**. This extension is completely free to use if you're sticking with the built-in providers. And if you want to
+  use
   your own API, you pay only for what you use. That’s cheaper than raycast AI. There is no fixed price - you can choose
   whatever provider you want. You can even run models locally and connect them to the extension.
-- **Privacy**. The extension is open source and it respects your privacy. Everything is stored only on your device, and you
+- **Privacy**. The extension is open source and it respects your privacy. Everything is stored only on your device, and
+  you
   choose what data you send.
 
 ### Why is the UI worse than Raycast AI?
@@ -288,4 +292,6 @@ original [gpt4free](https://github.com/xtekky/gpt4free) project (written in Pyth
 
 [unknown-badge]: https://img.shields.io/badge/Unknown-grey
 
-[local-api-help]: https://github.com/XInTheDark/raycast-g4f/wiki/Help-page:-Manage-Custom-APIs
+[local-api-help]: https://github.com/XInTheDark/raycast-g4f/wiki/Help-page:-Using-Custom-APIs
+
+[discord-invite]: https://discord.gg/u3xTX79DkJ
