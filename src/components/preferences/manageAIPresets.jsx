@@ -1,14 +1,14 @@
 import { Form, List, Action, ActionPanel, Icon, useNavigation, confirmAlert, showToast, Toast } from "@raycast/api";
 import { useEffect, useState } from "react";
 
-import { help_action } from "./helpers/helpPage.jsx";
-import { AIPreset, getAIPresets, getSubtitle, setAIPresets } from "./helpers/presets.jsx";
+import { help_action } from "../../helpers/helpPage.jsx";
+import { AIPreset, getAIPresets, getSubtitle, setAIPresets } from "../../helpers/presets.jsx";
 
-import * as providers from "./api/providers.js";
-import { ChatProvidersReact } from "./api/providers_react.jsx";
-import { Preferences } from "./api/preferences.js";
+import * as providers from "../../api/providers.js";
+import { ChatProvidersReact } from "../../api/providers_react.jsx";
+import { Preferences } from "../../api/preferences.js";
 
-export default function ManageAIPresets() {
+export const ManageAIPresets = () => {
   let [presets, setPresets] = useState(null);
   useEffect(() => {
     (async () => {
@@ -80,7 +80,7 @@ export default function ManageAIPresets() {
         <Form.TextField id="name" title="Name" defaultValue={preset.name} />
         <Form.Description title="Provider" text="The provider and model used for this chat." />
         <Form.Dropdown id="provider" defaultValue={preset.provider}>
-          {ChatProvidersReact}
+          {ChatProvidersReact()}
         </Form.Dropdown>
 
         <Form.Description title="Web Search" text="Allow GPT to search the web for information." />
@@ -170,4 +170,4 @@ export default function ManageAIPresets() {
       </List>
     );
   } else return <List searchBarPlaceholder="Search AI Presets">{presetsToListItems(presets)}</List>;
-}
+};

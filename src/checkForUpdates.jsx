@@ -8,6 +8,8 @@ import {
 } from "./helpers/update.jsx";
 import { useEffect, useState } from "react";
 
+import { init } from "#root/src/api/init.js";
+
 export default function CheckForUpdates() {
   let version = get_version();
   let default_markdown = `## Current raycast-g4f version: ${version}`;
@@ -18,6 +20,8 @@ export default function CheckForUpdates() {
     (async () => {
       if (fetched) return;
       fetched = true;
+
+      await init();
 
       // get latest release from github
       const release = await fetch_github_latest_release();

@@ -110,7 +110,7 @@ export const BlackboxProvider = {
       isMicMode: false,
       userSystemPrompt: null,
       maxTokens: 100000,
-      playgroundTemperature: parseFloat(options.temperature) ?? 0.7,
+      playgroundTemperature: Number(options.temperature) ?? 0.7,
       playgroundTopP: 0.9,
       // playgroundTopP: null,
       // playgroundTemperature: null,

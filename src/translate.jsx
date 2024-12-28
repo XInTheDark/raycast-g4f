@@ -5,12 +5,11 @@ import { useEffect, useState } from "react";
 
 import { Storage } from "./api/storage.js";
 import { Preferences } from "./api/preferences.js";
+import { init } from "#root/src/api/init.js";
 
-import { preferences } from "../package.json";
+import { languages } from "#root/src/config/config.json";
 
-const languages = preferences.find((x) => x.name === "defaultLanguage").data.map((x) => [x.title, x.value]);
-
-const languagesReact = languages.map(([title, value]) => (
+const languagesReact = languages.map(({ title, value }) => (
   <Form.Dropdown.Item title={title} value={value} key={value} />
 ));
 
@@ -19,6 +18,7 @@ export default function Translate(props) {
 
   useEffect(() => {
     (async () => {
+      await init();
       setLanguage(await Storage.read("translateLanguage", "English"));
     })();
   }, []);

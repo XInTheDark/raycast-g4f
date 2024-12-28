@@ -15,6 +15,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { Storage } from "./api/storage.js";
 import { Preferences } from "./api/preferences.js";
+import { init } from "#root/src/api/init.js";
 
 import { watch } from "node:fs/promises";
 
@@ -239,7 +240,7 @@ export default function Chat({ launchContext }) {
   const starting_messages = ({ systemPrompt = "", provider = null, webSearch = "off" } = {}) => {
     let messages = [];
 
-    provider = provider instanceof Object ? provider : providers.get_provider_info(provider).provider;
+    provider = provider instanceof Object ? provider : providers.get_provider_info(provider)?.provider;
 
     // Web Search system prompt
     if (webSearch === "always" || (webSearch === "auto" && !has_native_web_search(provider))) {
@@ -553,7 +554,7 @@ export default function Chat({ launchContext }) {
 
         <Form.Description title="Provider" text="The provider and model used for this chat." />
         <Form.Dropdown id="provider" defaultValue={chat?.provider || providers.default_provider_string()}>
-          {ChatProvidersReact}
+          {ChatProvidersReact()}
         </Form.Dropdown>
 
         <Form.Description title="Web Search" text="Allow GPT to search the web for information." />
@@ -1172,9 +1173,11 @@ export default function Chat({ launchContext }) {
   let [currentChatData, setCurrentChatData] = useState(null);
   let [AIPresets, setAIPresets] = useState([]);
 
-  // Initialize the above variables
+  // Initialise the variables
   useEffect(() => {
     (async () => {
+      await init();
+
       // initialise chatData
       const storedChatData = await Storage.read("chatData");
       try {

@@ -24,7 +24,7 @@ export const RocksProvider = {
       messages: format_messages(chat),
       model: options.model,
       max_tokens: 100000,
-      temperature: parseFloat(options.temperature) ?? 0.7,
+      temperature: Number(options.temperature) ?? 0.7,
       top_p: 0.9,
       stream: true,
     };

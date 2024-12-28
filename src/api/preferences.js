@@ -4,5 +4,9 @@
 // It is also a small speedup, as we can avoid fetching the preferences multiple times.
 
 import { getPreferenceValues } from "@raycast/api";
+import { defaultPreferences } from "#root/src/config/config.json";
 
-export const Preferences = getPreferenceValues();
+export const Preferences = {
+  ...defaultPreferences,
+  ...getPreferenceValues(),
+};
