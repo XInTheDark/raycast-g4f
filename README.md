@@ -213,22 +213,30 @@ models.
 
 ### Why is this extension not on the official Raycast store?
 
-- I submitted it when the extension was in its early stages, but since Raycast is quite conservative about adding AI
-  extensions, it was rejected because of concerns over the use of third-party APIs. I think this is a valid concern, and
-  I'd like to be very transparent about where your data is going to, so I'll be writing all the details in the project
-  homepage really soon. But do rest assured that I use safe APIs from legitimate websites; I also update the extension
-  very frequently so all the providers I use will be up-to-date.
+- By default, this extension comes with a number of third-party providers which you can use for free. Raycast doesn't
+  like that because it's not possible to entirely verify the quality of these providers. (I do provide all the privacy
+  details [here](Privacy.md), though, and the extension is open-source.)
+- Also, for me as a developer, publishing updates to the Raycast store is too slow and troublesome; I have to submit a
+  PR, wait a week for it to be reviewed, and possibly have it rejected. This is not a good experience for me or for
+  users.
 - Thus, the extension will have to be installed from source. Regarding this, I apologize as it's indeed more complicated
   than downloading it from the store. I have tried my best to make the installation process quick and streamlined -
   please do provide feedback on whether it was simple enough!
 
-### How does this extension compare to the paid Raycast AI?
+### How does this extension compare to the paid Raycast AI? Why should I use this instead?
 
-- raycast-g4f is completely free! I strongly believe that such AI features, especially in an awesome
-  productivity tool like Raycast, shouldn't be locked behind a paywall.
-- Raycast AI definitely has more model options, but the quality of AI in this extension is, in my opinion, comparable.
-  Some models available here are gpt-4, gpt-4o, Claude 3.5 Sonnet and Google Gemini, as well as capable open-source
-  models like Llama 3.1. If you still doubt it, I'd encourage you to give the extension a try! :)
+I’ve noticed many users subscribing to Raycast AI, which is quite expensive, and then only using it for a few casual
+chats a day. Honestly, that’s unnecessary.
+**Here’s my honest suggestion: Everyone should first try out raycast-g4f.** Here’s why:
+
+- **Freedom**. You get to choose whatever provider/API to use, and can even add multiple at once. OpenAI, Anthropic, Google…
+  basically any API out there. (“Can I use my OpenAI API Key in Raycast AI?” No, you can’t.) That also means your AI
+  access isn’t just locked inside Raycast. (“Can I use my Raycast AI in other apps?” No, you can’t.)
+- **Price**. This extension is completely free to use if you're sticking with the built-in providers. And if you want to use
+  your own API, you pay only for what you use. That’s cheaper than raycast AI. There is no fixed price - you can choose
+  whatever provider you want. You can even run models locally and connect them to the extension.
+- **Privacy**. The extension is open source and it respects your privacy. Everything is stored only on your device, and you
+  choose what data you send.
 
 ### Why is the UI worse than Raycast AI?
 
