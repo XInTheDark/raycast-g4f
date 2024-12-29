@@ -18,8 +18,9 @@ Homepage · [Privacy Policy](Privacy.md) · [FAQs](#FAQs) · [Discord][discord-i
 ### Prerequisites
 
 - Install the [Raycast app](https://raycast.com/).
-- Currently, the extension is only available for macOS, as it requires Raycast. Windows support
-  is [in progress](https://www.raycast.com/windows).
+    - Currently, Raycast is only available for macOS. Windows support is [in progress](https://www.raycast.com/windows).
+- Install [Node.js](https://nodejs.org/).
+    - The minimum version recommended is `v20.18.1`. If you're using an older version, you may encounter issues.
 
 ### Installation
 
