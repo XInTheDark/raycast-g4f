@@ -174,7 +174,6 @@ export const ManageCustomAPIs = () => {
 };
 
 export const ManageGoogleGeminiAPI = () => {
-  // form containing: API Key. thats it
   return (
     <Form
       actions={
@@ -183,6 +182,7 @@ export const ManageGoogleGeminiAPI = () => {
             title="Save"
             onSubmit={async (values) => {
               await updatePreferences("GeminiAPIKeys", values.apiKeys);
+              await showToast(Toast.Style.Success, "Configuration saved");
             }}
           />
         </ActionPanel>
