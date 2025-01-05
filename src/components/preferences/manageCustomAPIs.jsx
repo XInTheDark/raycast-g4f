@@ -14,6 +14,8 @@ const EditAPIConfig = ({ customAPIData, setCustomAPIData, url }) => {
   const APIData = customAPIData[url] || {};
   const { pop } = useNavigation();
 
+  const [manualSetModels, setManualSetModels] = useState(!!APIData?.manualSetModels);
+
   return (
     <Form
       actions={
@@ -30,7 +32,9 @@ const EditAPIConfig = ({ customAPIData, setCustomAPIData, url }) => {
                 return;
               }
 
-              if (values.refreshModels || values.url !== url || (APIData.models || []).length === 0) {
+              if (manualSetModels) {
+                values.models = values.manualModels.split(",").map((x) => x.trim());
+              } else if (values.refreshModels || values.url !== url || (APIData.models || []).length === 0) {
                 // load models
                 let models;
                 try {
@@ -56,25 +60,38 @@ const EditAPIConfig = ({ customAPIData, setCustomAPIData, url }) => {
       }
     >
       <Form.Description text="Configure a custom OpenAI-compatible API." />
-
       <Form.TextField
         id="url"
         title="API Base URL"
         info={"Make sure to include http:// or https://"}
         defaultValue={APIData.url}
       />
-
       <Form.TextField id="name" title="API Name" defaultValue={APIData.name} />
-
       <Form.TextField id="apiKey" title="API Key" defaultValue={APIData.apiKey} />
 
+      {/* Options */}
       <Form.Checkbox
         id="refreshModels"
+        title="Options"
         label="Refresh Models List"
         defaultValue={false}
         info="Check this to refresh the models list. This will take a few seconds."
       />
-
+      <Form.Checkbox
+        id="manualSetModels"
+        label="Manually Set Models..."
+        value={manualSetModels}
+        onChange={setManualSetModels}
+        info="Check this to manually set the models list."
+      />
+      {manualSetModels && (
+        <Form.TextField
+          id="manualModels"
+          title="Models"
+          defaultValue={(APIData.models || []).join(", ")}
+          info="Comma-separated list of models. Example: gpt-4, gpt-4o"
+        />
+      )}
       <Form.TextArea
         id="config"
         title="Config (JSON)"
