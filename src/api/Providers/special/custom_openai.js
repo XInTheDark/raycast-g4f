@@ -17,7 +17,7 @@ export const getOpenAIModels = async (url, apiKey) => {
     headers: getHeaders(apiKey),
   });
   const data = (await response.json()).data;
-  const res = data.map((x) => x.id);
+  const res = data.map((x) => x.id || x.modelId || null).filter((x) => x !== null);
   return res;
 };
 
