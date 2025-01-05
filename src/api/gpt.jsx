@@ -1,6 +1,7 @@
 import {
   Action,
   ActionPanel,
+  Clipboard,
   confirmAlert,
   Detail,
   Form,
@@ -26,7 +27,7 @@ import { init } from "../api/init.js";
 import { Message, pairs_to_messages } from "../classes/message.js";
 import { Preferences } from "./preferences.js";
 
-import { truncate_chat } from "../helpers/helper.js";
+import { getFileFromURL, truncate_chat } from "../helpers/helper.js";
 import { plainTextMarkdown } from "../helpers/markdown.js";
 import { getFormattedWebResult, systemResponse, web_search_mode, webSystemPrompt } from "./tools/web";
 
@@ -356,6 +357,12 @@ export default (
     })();
   }, []);
 
+  // Init variables for Pages.Form
+  const [input, setInput] = useState({
+    message: argQuery ? argQuery : !requireQuery && selectedState ? selectedState : "",
+    files: [],
+  });
+
   return page === Pages.Detail ? (
     <Detail
       actions={
@@ -451,15 +458,42 @@ export default (
               await getResponse(prompt, { files: files });
             }}
           />
+          <Action
+            title="Paste"
+            icon={Icon.Clipboard}
+            onAction={async () => {
+              let { text, file } = await Clipboard.read();
+              setInput((oldInput) => {
+                let newInput = structuredClone(oldInput);
+                if (allowUploadFiles && file) {
+                  file = getFileFromURL(file);
+                  newInput.files = [...(oldInput.files ?? []), file];
+                } else {
+                  // Only set the text if there is no file, otherwise it's just the file name
+                  newInput.message += text;
+                }
+                return newInput;
+              });
+            }}
+            shortcut={{ modifiers: ["cmd"], key: "v" }}
+          />
         </ActionPanel>
       }
     >
       <Form.TextArea
-        title={showFormText}
         id="query"
-        defaultValue={argQuery ? argQuery : !requireQuery && selectedState ? selectedState : ""}
+        title={showFormText}
+        value={input.message}
+        onChange={(message) => setInput({ ...input, message })}
       />
-      {allowUploadFiles && <Form.FilePicker title="Upload Files" id="files" />}
+      {allowUploadFiles && (
+        <Form.FilePicker
+          id="files"
+          title="Upload Files"
+          value={input.files}
+          onChange={(files) => setInput({ ...input, files })}
+        />
+      )}
       {otherReactComponents}
     </Form>
   );

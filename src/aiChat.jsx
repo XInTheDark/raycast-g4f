@@ -701,7 +701,7 @@ export default function Chat({ launchContext }) {
               }}
             />
             <Action
-              title="Paste from Clipboard"
+              title="Paste"
               icon={Icon.Clipboard}
               onAction={async () => {
                 let { text, file } = await Clipboard.read();
@@ -716,7 +716,6 @@ export default function Chat({ launchContext }) {
                   }
                   return newInput;
                 });
-                // await toast(Toast.Style.Success, "Pasted from clipboard");
               }}
               shortcut={{ modifiers: ["cmd"], key: "v" }}
             />
