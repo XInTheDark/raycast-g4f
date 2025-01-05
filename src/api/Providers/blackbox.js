@@ -1,5 +1,5 @@
 import fetch from "#root/src/api/fetch.js";
-import { format_chat_to_prompt } from "../../classes/message.js";
+import { messages_to_json, format_chat_to_prompt } from "../../classes/message.js";
 import { randomBytes, randomUUID } from "crypto";
 import { Storage } from "../storage.js";
 import { formatResponse } from "#root/src/helpers/helper.js";
@@ -84,6 +84,7 @@ export const BlackboxProvider = {
 
     // The chat is truncated to ~4 messages by the provider, so we reformat it
     // to at most 3 messages, with the last message being the prompt.
+    chat = messages_to_json(chat);
     let prompt = chat.pop().content; // remove last message
     if (chat.length > 0) {
       console.assert(chat.length > 1);
