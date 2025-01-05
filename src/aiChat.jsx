@@ -671,6 +671,7 @@ export default function Chat({ launchContext }) {
 
   let ComposeMessageComponent = () => {
     const { pop } = useNavigation();
+    const [input, setInput] = useState({ message: searchText, files: [] });
 
     return (
       <Form
@@ -684,11 +685,38 @@ export default function Chat({ launchContext }) {
                 await sendToGPT(values);
               }}
             />
+            <Action
+              title="Paste from Clipboard"
+              icon={Icon.Clipboard}
+              onAction={async () => {
+                let { text, file } = await Clipboard.read();
+                setInput((oldInput) => {
+                  let newInput = structuredClone(oldInput);
+                  newInput.message = text;
+                  if (file) {
+                    newInput.files = [...oldInput.files, file];
+                  }
+                  return newInput;
+                });
+                await toast(Toast.Style.Success, "Pasted from clipboard");
+              }}
+              shortcut={{ modifiers: ["cmd"], key: "v" }}
+            />
           </ActionPanel>
         }
       >
-        <Form.TextArea id="message" title="Message" defaultValue={searchText} />
-        <Form.FilePicker title="Upload Files" id="files" />
+        <Form.TextArea
+          id="message"
+          title="Message"
+          value={input.message}
+          onChange={(message) => setInput({ ...input, message })}
+        />
+        <Form.FilePicker
+          id="files"
+          title="Upload Files"
+          value={input.files}
+          onChange={(files) => setInput({ ...input, files })}
+        />
       </Form>
     );
   };
