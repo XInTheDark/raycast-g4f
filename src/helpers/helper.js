@@ -247,3 +247,7 @@ export const formatResponse = (response, provider = null) => {
 export const clamp = (num, min, max) => {
   return Math.min(Math.max(num, min), max);
 };
+
+export const getFileFromURL = (file) => {
+  return removePrefix(file, "file://");
+};

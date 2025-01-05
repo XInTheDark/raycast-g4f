@@ -19,7 +19,7 @@ import { init } from "#root/src/api/init.js";
 
 import { watch } from "node:fs/promises";
 
-import { current_datetime, formatDate, removePrefix } from "./helpers/helper.js";
+import { current_datetime, formatDate, removePrefix, getFileFromURL } from "./helpers/helper.js";
 import { plainTextMarkdown } from "./helpers/markdown.js";
 import throttle, { AIChatDelayFunction } from "#root/src/helpers/throttle.js";
 
@@ -669,8 +669,20 @@ export default function Chat({ launchContext }) {
     );
   };
 
-  let ComposeMessageComponent = () => {
+  let ComposeMessageComponent = ({ idx }) => {
+    // if idx is provided, then we are editing an existing message.
+    // otherwise, we are composing a new message.
+    const isEditing = idx !== undefined;
+    if (isEditing && currentChatData.messages.length === 0) {
+      toast(Toast.Style.Failure, "No messages in chat");
+      return;
+    }
+
     const { pop } = useNavigation();
+    const [input, setInput] = useState({
+      message: isEditing ? currentChatData.messages[idx].first.content : searchText,
+      files: isEditing ? currentChatData.messages[idx].files : [],
+    });
 
     return (
       <Form
@@ -681,52 +693,54 @@ export default function Chat({ launchContext }) {
               onSubmit={async (values) => {
                 setSearchText("");
                 pop();
-                await sendToGPT(values);
+                if (isEditing) {
+                  await resendMessage(currentChatData, idx, values);
+                } else {
+                  await sendToGPT(values);
+                }
               }}
+            />
+            <Action
+              title="Paste"
+              icon={Icon.Clipboard}
+              onAction={async () => {
+                let { text, file } = await Clipboard.read();
+                setInput((oldInput) => {
+                  let newInput = structuredClone(oldInput);
+                  if (file) {
+                    file = getFileFromURL(file);
+                    newInput.files = [...(oldInput.files ?? []), file];
+                  } else {
+                    // Only set the text if there is no file, otherwise it's just the file name
+                    newInput.message += text;
+                  }
+                  return newInput;
+                });
+              }}
+              shortcut={{ modifiers: ["cmd"], key: "v" }}
             />
           </ActionPanel>
         }
       >
-        <Form.TextArea id="message" title="Message" defaultValue={searchText} />
-        <Form.FilePicker title="Upload Files" id="files" />
+        <Form.TextArea
+          id="message"
+          title="Message"
+          value={input.message}
+          onChange={(message) => setInput({ ...input, message })}
+        />
+        <Form.FilePicker
+          id="files"
+          title="Upload Files"
+          value={input.files ?? []}
+          onChange={(files) => setInput({ ...input, files })}
+        />
       </Form>
     );
   };
 
-  let EditMessageComponent = ({ idx }) => {
-    if (currentChatData.messages.length === 0) {
-      toast(Toast.Style.Failure, "No messages in chat");
-      return;
-    }
-
-    const message = currentChatData.messages[idx].first.content;
-    const files = currentChatData.messages[idx].files;
-
-    const { pop } = useNavigation();
-
-    return (
-      <Form
-        actions={
-          <ActionPanel>
-            <Action.SubmitForm
-              title="Edit Message"
-              onSubmit={async (values) => {
-                pop();
-                await resendMessage(currentChatData, idx, values.message, values.files);
-              }}
-            />
-          </ActionPanel>
-        }
-      >
-        <Form.TextArea title="Message" id="message" defaultValue={message} />
-        <Form.FilePicker title="Upload Files" id="files" defaultValue={files} />
-      </Form>
-    );
-  };
-
-  let resendMessage = async (currentChatData, idx, newMessage = null, newFiles = null) => {
-    if (newMessage) currentChatData.messages[idx].first.content = newMessage;
-    if (newFiles) currentChatData.messages[idx].files = newFiles;
+  let resendMessage = async (currentChatData, idx, newMessage = null) => {
+    if (newMessage?.message) currentChatData.messages[idx].first.content = newMessage.message;
+    if (newMessage?.files) currentChatData.messages[idx].files = newMessage.files;
 
     currentChatData.messages[idx].second.content = "";
     currentChatData.messages[idx].finished = false;
@@ -982,7 +996,7 @@ export default function Chat({ launchContext }) {
           <Action.Push
             icon={Icon.TextCursor}
             title="Edit Message"
-            target={<EditMessageComponent idx={idx} />}
+            target={<ComposeMessageComponent idx={idx} />}
             shortcut={{ modifiers: ["cmd", "shift"], key: "e" }}
           />
           <Action
