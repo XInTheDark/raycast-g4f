@@ -1010,7 +1010,7 @@ export default function Chat({ launchContext }) {
                 primaryAction: {
                   title: "Delete Message",
                   style: Action.Style.Destructive,
-                  onAction: () => {
+                  onAction: async () => {
                     if (currentChatData.messages.length === 0) {
                       toast(Toast.Style.Failure, "No messages to delete");
                       return;
@@ -1023,7 +1023,9 @@ export default function Chat({ launchContext }) {
                       newChatData.messages = currentChatData.messages;
                       return newChatData;
                     });
-                    toast(Toast.Style.Success, "Message deleted");
+                    await flushUpdateChat(currentChatData);
+
+                    await toast(Toast.Style.Success, "Message deleted");
                   },
                 },
               });
