@@ -27,6 +27,7 @@ export const chat_providers_names = {
   Blackbox: "Blackbox (custom-model)",
   BlackboxLlama31_405B: "Blackbox (llama-3.1-405b)",
   BlackboxLlama31_70B: "Blackbox (llama-3.1-70b)",
+  BlackboxLlama33_70B: "Blackbox (llama-3.3-70b)",
   BlackboxGemini15Flash: "Blackbox (gemini-1.5-flash)",
   BlackboxQwQ32BPreview: "Blackbox (qwq-32b-preview)",
   BlackboxGPT4o: "Blackbox (gpt-4o)",
