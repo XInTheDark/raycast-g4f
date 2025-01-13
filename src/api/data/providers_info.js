@@ -6,8 +6,6 @@ import { DeepInfraProvider } from "../Providers/deepinfra.js";
 import { BlackboxProvider } from "../Providers/blackbox.js";
 import { DuckDuckGoProvider } from "../Providers/duckduckgo.js";
 import { BestIMProvider } from "../Providers/bestim.js";
-import { RocksProvider } from "../Providers/rocks.js";
-import { ChatgptFreeProvider } from "../Providers/chatgptfree.js";
 import { AI4ChatProvider } from "../Providers/ai4chat.js";
 import { DarkAIProvider } from "../Providers/darkai.js";
 import { MhysticalProvider } from "../Providers/mhystical.js";
@@ -20,10 +18,37 @@ import { GeminiProvider } from "../Providers/google_gemini.js";
 /// Special or unused providers
 import { OpenAIProvider } from "../Providers/openai.js";
 
+export const providers = [
+  NexraProvider,
+  DeepInfraProvider,
+  BlackboxProvider,
+  DuckDuckGoProvider,
+  BestIMProvider,
+  AI4ChatProvider,
+  DarkAIProvider,
+  MhysticalProvider,
+  PizzaGPTProvider,
+  MetaAIProvider,
+  ReplicateProvider,
+  PhindProvider,
+  GeminiProvider,
+];
+
+// Initialise providers_info
+const providers_info = {};
+for (let provider of providers) {
+  if (providers.enabled === false) continue;
+  for (let model of provider?.models || []) {
+    const key = `${provider.name}_${model.alias || model.model}`;
+    providers_info[key] = { provider: provider, ...model };
+  }
+}
+export { providers_info };
+
 /// All providers info
 // { provider internal name, {provider object, model, stream, extra options} }
 // prettier-ignore
-export const providers_info = {
+export const providers_info_unused = {
   NexraChatGPT: { provider: NexraProvider, model: "chatgpt", stream: true },
   NexraGPT4o: { provider: NexraProvider, model: "gpt-4o", stream: true },
   NexraGPT4: { provider: NexraProvider, model: "gpt-4-32k", stream: false },
@@ -56,18 +81,18 @@ export const providers_info = {
   DuckDuckGo_Llama31_70B: { provider: DuckDuckGoProvider, model: "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo", stream: true, context_tokens: 4096 },
   DuckDuckGo_Mixtral_8x7B: { provider: DuckDuckGoProvider, model: "mistralai/Mixtral-8x7B-Instruct-v0.1", stream: true, context_tokens: 4096 },
   BestIM_GPT4oMini: { provider: BestIMProvider, model: "", stream: true },
-  RocksClaude35Sonnet: { provider: RocksProvider, model: "claude-3-5-sonnet-20241022", stream: true },
-  RocksClaude3Opus: { provider: RocksProvider, model: "claude-3-opus-20240229", stream: true },
-  RocksChatGPT4oLatest: { provider: RocksProvider, model: "chatgpt-4o-latest", stream: true },
-  RocksGPT4o: { provider: RocksProvider, model: "gpt-4o", stream: true },
-  RocksGPT4: { provider: RocksProvider, model: "gpt-4", stream: true },
-  RocksWizardLM2_8x22B: { provider: RocksProvider, model: "WizardLM-2-8x22B", stream: true },
-  RocksLlama31_405B: { provider: RocksProvider, model: "llama-3.1-405b-turbo", stream: true },
-  RocksLlama31_70B: { provider: RocksProvider, model: "llama-3.1-70b-turbo", stream: true },
-  ChatgptFree: { provider: ChatgptFreeProvider, model: "", stream: true },
+  // RocksClaude35Sonnet: { provider: RocksProvider, model: "claude-3-5-sonnet-20241022", stream: true },
+  // RocksClaude3Opus: { provider: RocksProvider, model: "claude-3-opus-20240229", stream: true },
+  // RocksChatGPT4oLatest: { provider: RocksProvider, model: "chatgpt-4o-latest", stream: true },
+  // RocksGPT4o: { provider: RocksProvider, model: "gpt-4o", stream: true },
+  // RocksGPT4: { provider: RocksProvider, model: "gpt-4", stream: true },
+  // RocksWizardLM2_8x22B: { provider: RocksProvider, model: "WizardLM-2-8x22B", stream: true },
+  // RocksLlama31_405B: { provider: RocksProvider, model: "llama-3.1-405b-turbo", stream: true },
+  // RocksLlama31_70B: { provider: RocksProvider, model: "llama-3.1-70b-turbo", stream: true },
+  // ChatgptFree: { provider: ChatgptFreeProvider, model: "", stream: true },
   AI4Chat: { provider: AI4ChatProvider, model: "", stream: false, context_tokens: 4096 },
   DarkAI: { provider: DarkAIProvider, model: "gpt-4o", stream: true },
-  Mhystical: { provider: MhysticalProvider, model: "gpt-4-32k", stream: false },
+  Mhystical: { provider: MhysticalProvider, model: "gpt-4", stream: false },
   PizzaGPT: { provider: PizzaGPTProvider, model: "", stream: false },
   MetaAI: { provider: MetaAIProvider, model: "", stream: true },
   ReplicateLlama3_8B: { provider: ReplicateProvider, model: "meta/meta-llama-3-8b-instruct", stream: true },
@@ -99,28 +124,30 @@ export const image_supported_provider_strings = [
 export const function_supported_providers = [DeepInfraProvider, GeminiProvider];
 
 /// Model aliases
-/// Each model is aliased to an array of provider strings that support it
+/// Each model is aliased to an array of providers that support it
 // prettier-ignore
 export const model_aliases = {
-  "gpt-4o": ["NexraGPT4o", "BlackboxGPT4o", "DarkAI", "RocksGPT4o", "NexraChatGPT", "NexraBing"],
-  "gpt-4": ["AI4Chat", "NexraGPT4", "Mhystical", "RocksGPT4"],
-  "gpt-4o-mini": ["DuckDuckGo_GPT4oMini", "ChatgptFree", "PizzaGPT"],
-  "claude-3.5-sonnet": ["BlackboxClaude35Sonnet", "RocksClaude35Sonnet"],
-  "claude-3-opus": ["RocksClaude3Opus"],
-  "claude-3-haiku": ["DuckDuckGo_Claude3Haiku"],
-  "gemini-1.5-pro": ["GoogleGemini", "BlackboxGeminiPro", "NexraGeminiPro"],
-  "gemini-1.5-flash": ["GoogleGeminiFlash", "BlackboxGemini15Flash"],
-  "gemini-exp": ["GoogleGeminiExperimental"],
-  "llama-3.1-405b": ["BlackboxLlama31_405B", "ReplicateLlama31_405B", "RocksLlama31_405B", "MetaAI", "DeepInfraLlama31_405B"],
-  "llama-3.1-70b": ["BlackboxLlama31_70B", "DeepInfraLlama31_70B", "RocksLlama31_70B", "DuckDuckGo_Llama31_70B", "NexraLlama31", "DeepInfraLlama31Nemotron70B"],
-  "llama-3.1-8b": ["DeepInfraLlama31_8B", "ReplicateLlama3_8B"],
-  "llama-3.2-90b": ["DeepInfraLlama32_90B_Vision"],
-  "llama-3.2-11b": ["DeepInfraLlama32_11B_Vision"],
-  "llama-3.3-70b": ["BlackboxLlama33_70B", "DeepInfraLlama33_70B"],
-  "qwen-2.5-72b": ["DeepInfraQwen25_72B"],
-  "qwen-2.5-coder-32b": ["DeepInfraQwen25Coder_32B"],
-  "qwq-32b-preview": ["BlackboxQwQ32BPreview", "DeepInfraQwQ_32B_Preview"],
-  "wizardlm-2-8x22b": ["DeepInfraWizardLM2_8x22B", "RocksWizardLM2_8x22B"],
-  "deepseek-2.5": ["DeepInfraDeepSeek25"],
-  "mixtral-8x7b": ["DuckDuckGo_Mixtral_8x7B", "ReplicateMixtral_8x7B"],
+  "gpt-4o": [NexraProvider, BlackboxProvider, DarkAIProvider],
+  "gpt-4": [AI4ChatProvider, NexraProvider],
+  "gpt-4o-mini": [DuckDuckGoProvider, PizzaGPTProvider],
+  "claude-3.5-sonnet": [BlackboxProvider],
+  "claude-3-opus": [],
+  "claude-3-haiku": [DuckDuckGoProvider],
+  "gemini-pro": [GeminiProvider, BlackboxProvider, NexraProvider],
+  "gemini-flash": [GeminiProvider, BlackboxProvider],
+  "gemini-exp": [GeminiProvider],
+  "llama-3-8b": [ReplicateProvider],
+  "llama-3-70b": [ReplicateProvider],
+  "llama-3.1-405b": [BlackboxProvider, ReplicateProvider, MetaAIProvider, DeepInfraProvider],
+  "llama-3.1-70b": [BlackboxProvider, DeepInfraProvider, DuckDuckGoProvider, NexraProvider],
+  "llama-3.1-8b": [DeepInfraProvider],
+  "llama-3.2-90b": [DeepInfraProvider],
+  "llama-3.2-11b": [DeepInfraProvider],
+  "llama-3.3-70b": [BlackboxProvider, DeepInfraProvider],
+  "qwen-2.5-72b": [DeepInfraProvider],
+  "qwen-2.5-coder-32b": [DeepInfraProvider],
+  "qwq-32b-preview": [BlackboxProvider, DeepInfraProvider],
+  "wizardlm-2-8x22b": [DeepInfraProvider],
+  "deepseek-2.5": [DeepInfraProvider],
+  "mixtral-8x7b": [DuckDuckGoProvider, ReplicateProvider],
 };

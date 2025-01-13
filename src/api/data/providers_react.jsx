@@ -2,10 +2,20 @@ import { Form } from "@raycast/api";
 import { useMemo } from "react";
 
 import { isCustomAPI } from "../providers_custom.js";
+import { providers_info } from "#root/src/api/data/providers_info.js";
+
+// Initialize chat_providers_names
+const chat_providers_names = {};
+for (let [key, value] of Object.entries(providers_info)) {
+  console.log(key, value);
+  const provider = value.provider;
+  chat_providers_names[key] = `${provider.name} (${value.alias || value.model})`;
+}
+export { chat_providers_names };
 
 /// Chat providers (user-friendly names)
 // fetched from package.json for consistency and to avoid duplicate code
-export const chat_providers_names = {
+export const chat_providers_names_unused = {
   NexraGPT4o: "Nexra (gpt-4o)",
   NexraGPT4: "Nexra (gpt-4-32k)",
   NexraChatGPT: "Nexra (chatgpt)",

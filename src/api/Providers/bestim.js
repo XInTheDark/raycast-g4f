@@ -26,6 +26,7 @@ const headers = {
 
 export const BestIMProvider = {
   name: "BestIM",
+  models: [{ model: "gpt-4o-mini", stream: true }],
   generate: async function* (chat) {
     const payload = {
       type: "chat",

@@ -20,6 +20,7 @@ const headers = {
 export const PhindProvider = {
   name: "Phind",
   customStream: true,
+  models: [{ model: "phind-instant", stream: true }],
   generate: async function (chat, options, { stream_update }) {
     // get challenge seeds
     let stdout = "";

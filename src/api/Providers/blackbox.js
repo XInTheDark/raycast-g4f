@@ -79,6 +79,20 @@ const chunkDelays = {
 
 export const BlackboxProvider = {
   name: "Blackbox",
+  models: [
+    { model: "llama-3.1-405b", stream: true },
+    { model: "llama-3.1-70b", stream: true },
+    { model: "llama-3.3-70b", stream: true },
+    { model: "gemini-1.5-flash", stream: true },
+    { model: "qwq-32b-preview", stream: true },
+    { model: "gpt-4o", stream: true },
+    { model: "claude-3.5-sonnet", stream: true },
+    { model: "gemini-pro", stream: true },
+  ],
+  model_aliases: {
+    "gemini-flash": "gemini-1.5-flash",
+  },
+
   generate: async function* (chat, options, { max_retries = 5 }) {
     let random_id = token_hex(16);
     // let random_user_id = uuid4();
