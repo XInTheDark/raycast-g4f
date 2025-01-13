@@ -26,7 +26,7 @@ export const GeminiProvider = {
     let APIKeys = APIKeysStr.split(",").map((x) => x.trim());
 
     let model = this.model_aliases[options.model];
-    let models = typeof options.model === "string" ? [model] : model;
+    let models = Array.isArray(model) ? model : [model];
 
     const useWebSearch = options.webSearch === "auto";
     const useCodeInterpreter = Preferences["codeInterpreter"];
