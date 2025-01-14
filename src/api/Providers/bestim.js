@@ -1,5 +1,5 @@
 import { format_chat_to_prompt } from "../../classes/message.js";
-import { curlRequest } from "../curl.js";
+import { curlFetch } from "../curl.js";
 
 const api_url = "https://ai-chats.org/chat/send2/";
 const headers = {
@@ -38,7 +38,7 @@ export const BestIMProvider = {
       ],
     };
 
-    for await (const _chunk of curlRequest(api_url, {
+    for await (const _chunk of curlFetch(api_url, {
       method: "POST",
       headers: headers,
       body: JSON.stringify(payload),

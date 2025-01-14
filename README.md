@@ -71,6 +71,8 @@ updating manually also allows you to fetch and view the latest changes to the so
 
 ## Providers & Models
 
+*Note: May not be up-to-date; please refer to the extension.*
+
 | Provider                     | Model                                   | Features | Status                      | Speed          | Rating and remarks by extension author                                                      |
 |------------------------------|-----------------------------------------|----------|-----------------------------|----------------|---------------------------------------------------------------------------------------------|
 | Nexra                        | gpt-4o (default)                        | ▶️       | ![Active][active-badge]     | Very fast      | 8.5/10, the best performing model.                                                          |
@@ -105,13 +107,6 @@ updating manually also allows you to fetch and view the latest changes to the so
 | DuckDuckGo                   | meta-llama-3.1-70b                      | ▶️️      | ![Active][active-badge]     | Very fast      | 7.5/10                                                                                      |
 | DuckDuckGo                   | mixtral-8x7b                            | ▶️️      | ![Active][active-badge]     | Extremely fast | 7.5/10                                                                                      |
 | BestIM                       | gpt-4o-mini                             | ▶️       | ![Inactive][inactive-badge] | Extremely fast | 8.5/10                                                                                      |
-| Rocks                        | claude-3.5-sonnet                       | ▶️       | ![Active][active-badge]     | Fast           | 8.5/10                                                                                      |
-| Rocks                        | claude-3-opus                           | ▶️       | ![Active][active-badge]     | Fast           | 8/10                                                                                        |
-| Rocks                        | gpt-4o                                  | ▶️       | ![Active][active-badge]     | Fast           | 7.5/10                                                                                      |
-| Rocks                        | gpt-4                                   | ▶️       | ![Active][active-badge]     | Fast           | 7.5/10                                                                                      |
-| Rocks                        | llama-3.1-405b                          | ▶️       | ![Active][active-badge]     | Fast           | 7.5/10                                                                                      |
-| Rocks                        | llama-3.1-70b                           | ▶️       | ![Active][active-badge]     | Very fast      | 7/10                                                                                        |
-| ChatgptFree                  | gpt-4o-mini                             | ▶️       | ![Active][active-badge]     | Extremely fast | 8.5/10                                                                                      |
 | AI4Chat                      | gpt-4                                   |          | ![Active][active-badge]     | Very fast      | 7.5/10                                                                                      |
 | DarkAI                       | gpt-4o                                  | ▶️       | ![Active][active-badge]     | Very fast      | 8/10                                                                                        |
 | Mhystical                    | gpt-4-32k                               |          | ![Active][active-badge]     | Very fast      | 6.5/10                                                                                      |

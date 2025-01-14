@@ -7,7 +7,6 @@ import { providers_info } from "#root/src/api/data/providers_info.js";
 // Initialize chat_providers_names
 const chat_providers_names = {};
 for (let [key, value] of Object.entries(providers_info)) {
-  console.log(key, value);
   const provider = value.provider;
   chat_providers_names[key] = `${provider.name} (${value.alias || value.model})`;
 }
