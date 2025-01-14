@@ -11,8 +11,16 @@
 import { execShell } from "#root/src/api/shell.js";
 import { fetchToCurl } from "fetch-to-curl";
 
-export async function* curlRequest(url, options) {
+export async function* curlFetch(url, options) {
   const curl_cmd = fetchToCurl(url, options) + " --silent --no-buffer";
 
   yield* execShell(curl_cmd);
+}
+
+export async function curlFetchNoStream(...args) {
+  let response = "";
+  for await (const chunk of curlFetch(...args)) {
+    response += chunk;
+  }
+  return response;
 }

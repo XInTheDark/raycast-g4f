@@ -21,6 +21,7 @@ const headers = {
 
 export const PizzaGPTProvider = {
   name: "PizzaGPT",
+  models: [{ model: "gpt-4o-mini", stream: false }],
   generate: async function (chat) {
     const payload = {
       question: format_chat_to_prompt(chat),

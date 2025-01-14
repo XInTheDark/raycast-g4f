@@ -39,6 +39,10 @@ const formatCookies = (cookies) => {
 
 export const MetaAIProvider = {
   name: "MetaAI",
+  models: [{ model: "llama", stream: true }],
+  model_aliases: {
+    "llama-3.1-405b": "llama",
+  },
   generate: async function* (chat, options, { max_retries = 2 }) {
     let accessToken = null;
     let lsd = null;

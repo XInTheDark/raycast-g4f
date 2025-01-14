@@ -35,6 +35,22 @@ const get_vqd = async () => {
 
 export const DuckDuckGoProvider = {
   name: "DuckDuckGo",
+  models: [
+    { model: "gpt-4o-mini", stream: true, context_tokens: 4096 },
+    { model: "claude-3-haiku-20240307", alias: "claude-3-haiku", stream: true, context_tokens: 4096 },
+    {
+      model: "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+      alias: "llama-3.1-70b",
+      stream: true,
+      context_tokens: 4096,
+    },
+    { model: "mistralai/Mixtral-8x7B-Instruct-v0.1", alias: "mixtral-8x7b", stream: true, context_tokens: 4096 },
+  ],
+  model_aliases: {
+    "claude-3-haiku": "claude-3-haiku-20240307",
+    "llama-3.1-70b": "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+    "mixtral-8x7b": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+  },
   generate: async function* (chat, options, { max_retries = 3 }) {
     try {
       let vqd_4;

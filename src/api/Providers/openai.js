@@ -9,6 +9,8 @@ let headers = {
 export const OpenAIProvider = {
   name: "OpenAI",
   authRequired: true,
+  enabled: false,
+  models: [{ model: "gpt-4o", stream: true, api_key: null }],
   generate: async function* (chat, options, { max_retries = 2 }) {
     let data = {
       model: options.model,

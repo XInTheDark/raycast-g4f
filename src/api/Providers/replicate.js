@@ -11,6 +11,18 @@ const headers = {
 
 export const ReplicateProvider = {
   name: "Replicate",
+  models: [
+    { model: "meta/meta-llama-3-8b-instruct", alias: "llama-3-8b", stream: true },
+    { model: "meta/meta-llama-3-70b-instruct", alias: "llama-3-70b", stream: true },
+    { model: "meta/meta-llama-3.1-405b-instruct", alias: "llama-3.1-405b", stream: true },
+    { model: "mistralai/mixtral-8x7b-instruct-v0.1", alias: "mixtral-8x7b", stream: true },
+  ],
+  model_aliases: {
+    "llama-3-8b": "meta/meta-llama-3-8b-instruct",
+    "llama-3-70b": "meta/meta-llama-3-70b-instruct",
+    "llama-3.1-405b": "meta/meta-llama-3.1-405b-instruct",
+    "mixtral-8x7b": "mistralai/mixtral-8x7b-instruct-v0.1",
+  },
   generate: async function* (chat, options, { max_retries = 5 }) {
     const model = options.model;
 

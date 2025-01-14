@@ -14,6 +14,7 @@ const headers = {
 
 export const MhysticalProvider = {
   name: "Mhystical",
+  models: [{ model: "gpt-4", stream: false }],
   generate: async function (chat, options) {
     chat = messages_to_json(chat);
     const data = {

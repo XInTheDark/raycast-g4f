@@ -55,3 +55,9 @@ export const get_options_from_info = (info, chatOptions = {}) => {
     provider: undefined,
   };
 };
+
+// Get provider info from alias
+export const get_provider_info_from_alias = (provider, alias) => {
+  let model = provider.model_aliases?.[alias] || alias;
+  return provider.models.find((x) => x.model === model);
+};

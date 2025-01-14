@@ -770,7 +770,7 @@ export default function Chat({ launchContext }) {
           <ActionPanel>
             <Action.SubmitForm
               title="Save"
-              onSubmit={(values) => {
+              onSubmit={async (values) => {
                 pop();
 
                 if (values.preset) {
@@ -805,6 +805,8 @@ export default function Chat({ launchContext }) {
 
                   return newChatData;
                 });
+
+                await flushUpdateChat(currentChatData);
 
                 toast(Toast.Style.Success, "Chat settings saved");
               }}

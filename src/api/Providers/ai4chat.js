@@ -24,6 +24,7 @@ const api_url = "https://www.ai4chat.co/generate-response";
 
 export const AI4ChatProvider = {
   name: "Ai4Chat",
+  models: [{ model: "gpt-4o", stream: false, context_tokens: 4096 }],
   generate: async function (chat) {
     const payload = {
       messages: [{ role: "user", content: format_chat_to_prompt(chat) }],

@@ -1,6 +1,6 @@
-import { curlRequest } from "../curl.js";
-import { format_chat_to_prompt } from "../../classes/message.js";
-import { DEFAULT_HEADERS } from "../../helpers/headers.js";
+import { curlFetch, curlFetchNoStream } from "../../curl.js";
+import { format_chat_to_prompt } from "../../../classes/message.js";
+import { DEFAULT_HEADERS } from "../../../helpers/headers.js";
 
 const url = "https://chatgptfree.ai";
 const api_url = "https://chatgptfree.ai/wp-admin/admin-ajax.php";
@@ -27,13 +27,10 @@ export const ChatgptFreeProvider = {
   generate: async function* (chat) {
     // get nonce
     let _nonce;
-    let _response = "";
-    for await (const chunk of curlRequest(`${url}/`, {
+    let _response = await curlFetchNoStream(`${url}/`, {
       method: "GET",
       headers: headers,
-    })) {
-      _response += chunk;
-    }
+    });
 
     let result = _response.match(/data-nonce="(.*?)"/);
     if (result) {
@@ -57,7 +54,7 @@ export const ChatgptFreeProvider = {
     let buffer = "";
     let ended = false;
 
-    for await (const chunk of curlRequest(api_url, {
+    for await (const chunk of curlFetch(api_url, {
       method: "POST",
       headers: headers,
       body: new URLSearchParams(data).toString(),
