@@ -8,7 +8,6 @@ import { DuckDuckGoProvider } from "../Providers/duckduckgo.js";
 import { BestIMProvider } from "../Providers/bestim.js";
 import { AI4ChatProvider } from "../Providers/ai4chat.js";
 import { DarkAIProvider } from "../Providers/darkai.js";
-import { ChatgpttProvider } from "../Providers/chatgptt.js";
 import { MhysticalProvider } from "../Providers/mhystical.js";
 import { PizzaGPTProvider } from "../Providers/pizzagpt.js";
 import { MetaAIProvider } from "../Providers/metaAI.js";
@@ -27,7 +26,6 @@ export const providers = [
   BestIMProvider,
   AI4ChatProvider,
   DarkAIProvider,
-  ChatgpttProvider,
   MhysticalProvider,
   PizzaGPTProvider,
   MetaAIProvider,
@@ -131,7 +129,7 @@ export const function_supported_providers = [DeepInfraProvider, GeminiProvider];
 export const model_aliases = {
   "gpt-4o": [NexraProvider, BlackboxProvider, DarkAIProvider],
   "gpt-4": [AI4ChatProvider, NexraProvider],
-  "gpt-4o-mini": [DuckDuckGoProvider, PizzaGPTProvider, ChatgpttProvider],
+  "gpt-4o-mini": [DuckDuckGoProvider, PizzaGPTProvider],
   "claude-3.5-sonnet": [BlackboxProvider],
   "claude-3-opus": [],
   "claude-3-haiku": [DuckDuckGoProvider],
