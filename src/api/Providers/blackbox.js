@@ -3,6 +3,7 @@ import { messages_to_json, format_chat_to_prompt } from "../../classes/message.j
 import { randomBytes, randomUUID } from "crypto";
 import { Storage } from "../storage.js";
 import { formatResponse } from "#root/src/helpers/helper.js";
+import { Preferences } from "#root/src/api/preferences.js";
 
 // Implementation ported from gpt4free Blackbox provider.
 
@@ -115,6 +116,9 @@ export const BlackboxProvider = {
     // init validated token
     let validatedToken = await initValidatedToken();
 
+    // construct payload
+    const codeInterpreterMode = !!Preferences["codeInterpreter"];
+
     let data = {
       messages: chat,
       id: random_id,
@@ -142,6 +146,7 @@ export const BlackboxProvider = {
       imageGenerationMode: false,
       webSearchModePrompt: false,
       deepSearchMode: false,
+      codeInterpreterMode: codeInterpreterMode,
       domains: null,
       ...paramOverrides[options.model],
     };
