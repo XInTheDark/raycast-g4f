@@ -15,6 +15,7 @@ const api_url = "https://darkai.foundation/chat";
 
 export const DarkAIProvider = {
   name: "DarkAI",
+  models: [{ model: "gpt-4o", stream: true }],
   generate: async function* (chat, options) {
     chat.unshift({
       role: "system",

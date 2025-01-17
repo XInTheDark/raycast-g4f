@@ -4,13 +4,29 @@ import fs from "fs";
 import { Preferences } from "../preferences.js";
 
 export const GeminiProvider = {
-  name: "Gemini",
+  name: "Google Gemini",
   customStream: true,
+  models: [
+    { model: "default", stream: true },
+    { model: "flash", stream: true },
+    { model: "experimental", stream: true },
+    { model: "thinking", stream: true },
+  ],
+  model_aliases: {
+    default: ["gemini-1.5-pro-002", "gemini-1.5-flash-002", "gemini-1.5-flash-latest"],
+    flash: ["gemini-2.0-flash-exp", "gemini-1.5-flash-002"],
+    experimental: ["gemini-exp-1206", "gemini-2.0-flash-exp", "gemini-2.0-flash-thinking-exp-1219"],
+    thinking: ["gemini-2.0-flash-thinking-exp-1219"],
+    "gemini-pro": "default",
+    "gemini-flash": "flash",
+    "gemini-exp": "experimental",
+  },
   generate: async function (chat, options, { stream_update, max_retries = 3 }) {
     let APIKeysStr = Preferences["GeminiAPIKeys"];
     let APIKeys = APIKeysStr.split(",").map((x) => x.trim());
 
-    let models = typeof options.model === "string" ? [options.model] : options.model;
+    let model = this.model_aliases[options.model];
+    let models = Array.isArray(model) ? model : [model];
 
     const useWebSearch = options.webSearch === "auto";
     const useCodeInterpreter = Preferences["codeInterpreter"];

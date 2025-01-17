@@ -13,6 +13,19 @@ const headers = {
 export const NexraProvider = {
   name: "Nexra",
   customStream: true,
+  models: [
+    { model: "chatgpt", stream: true },
+    { model: "gpt-4o", stream: true },
+    { model: "gpt-4-32k", stream: false },
+    { model: "Bing", stream: true },
+    { model: "llama-3.1", stream: true },
+    { model: "gemini-pro", stream: true },
+  ],
+  model_aliases: {
+    "llama-3.1-70b": "llama-3.1",
+    "gpt-4": "gpt-4-32k",
+  },
+
   generate: async (chat, options, { stream_update }) => {
     if (options.stream) {
       return getNexraResponseStream(chat, options, stream_update);

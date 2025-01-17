@@ -91,6 +91,33 @@ const DeepInfraFormatChat = (chat, model) => {
 
 export const DeepInfraProvider = {
   name: "DeepInfra",
+  models: [
+    { model: "meta-llama/Llama-3.3-70B-Instruct-Turbo", alias: "meta-llama-3.3-70b", stream: true },
+    { model: "meta-llama/Llama-3.2-90B-Vision-Instruct", alias: "meta-llama-3.2-90b-vision", stream: true },
+    { model: "meta-llama/Llama-3.2-11B-Vision-Instruct", alias: "meta-llama-3.2-11b-vision", stream: true },
+    { model: "meta-llama/Meta-Llama-3.1-405B-Instruct", alias: "meta-llama-3.1-405b", stream: true },
+    { model: "meta-llama/Meta-Llama-3.1-70B-Instruct", alias: "meta-llama-3.1-70b", stream: true },
+    { model: "meta-llama/Meta-Llama-3.1-8B-Instruct", alias: "meta-llama-3.1-8b", stream: true },
+    { model: "nvidia/Llama-3.1-Nemotron-70B-Instruct", alias: "llama-3.1-nemotron-70b", stream: true },
+    { model: "microsoft/WizardLM-2-8x22B", alias: "wizardlm-2-8x22b", stream: true },
+    { model: "deepseek-ai/DeepSeek-V2.5", alias: "deepseek-v2.5", stream: true },
+    { model: "Qwen/Qwen2.5-72B-Instruct", alias: "qwen2.5-72b", stream: true },
+    { model: "Qwen/Qwen2.5-Coder-32B-Instruct", alias: "qwen2.5-coder-32b", stream: true },
+    { model: "Qwen/QwQ-32B-Preview", alias: "qwq-32b-preview", stream: true },
+  ],
+  model_aliases: {
+    "llama-3.1-405b": "meta-llama/Meta-Llama-3.1-405B-Instruct",
+    "llama-3.1-70b": "meta-llama/Meta-Llama-3.1-70B-Instruct",
+    "llama-3.1-8b": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+    "llama-3.2-90b": "meta-llama/Llama-3.2-90B-Vision-Instruct",
+    "llama-3.2-11b": "meta-llama/Llama-3.2-11B-Vision-Instruct",
+    "llama-3.3-70b": "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+    "wizardlm-2-8x22b": "microsoft/WizardLM-2-8x22B",
+    "deepseek-v2.5": "deepseek-ai/DeepSeek-V2.5",
+    "qwen2.5-72b": "Qwen/Qwen2.5-72B-Instruct",
+    "qwen2.5-coder-32b": "Qwen/Qwen2.5-Coder-32B-Instruct",
+    "qwq-32b-preview": "Qwen/QwQ-32B-Preview",
+  },
   generate: async function* (chat, options, { max_retries = 5 }) {
     const model = options.model;
     const json_chat = DeepInfraFormatChat(chat, model);

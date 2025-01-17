@@ -1,4 +1,4 @@
-import { curlRequest } from "../curl.js";
+import { curlFetch, curlFetchNoStream } from "../curl.js";
 import { DEFAULT_HEADERS } from "../../helpers/headers.js";
 import { messages_to_json } from "../../classes/message.js";
 
@@ -20,12 +20,10 @@ const headers = {
 export const PhindProvider = {
   name: "Phind",
   customStream: true,
+  models: [{ model: "phind-instant", stream: true }],
   generate: async function (chat, options, { stream_update }) {
     // get challenge seeds
-    let stdout = "";
-    for await (const chunk of curlRequest(home_url, { method: "GET", headers: headers })) {
-      stdout += chunk;
-    }
+    let stdout = await curlFetchNoStream(home_url, { method: "GET", headers: headers });
 
     const regex = /<script id="__NEXT_DATA__" type="application\/json">([\s\S]+?)<\/script>/;
     const match = stdout.match(regex);
@@ -76,7 +74,7 @@ export const PhindProvider = {
     let new_line = false;
 
     // POST
-    for await (let chunk of curlRequest(api_url, {
+    for await (let chunk of curlFetch(api_url, {
       method: "POST",
       headers: { ...headers, "Content-Type": "application/json" },
       body: JSON.stringify(data),
