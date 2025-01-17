@@ -249,5 +249,5 @@ export const clamp = (num, min, max) => {
 };
 
 export const getFileFromURL = (file) => {
-  return removePrefix(file, "file://");
+  return decodeURIComponent(removePrefix(file, "file://"));
 };
