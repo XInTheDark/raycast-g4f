@@ -79,7 +79,7 @@ export default function Chat({ launchContext }) {
   };
 
   // add chat to chatData and set it as the current chat
-  const addChatAsCurrent = (setChatData, setCurrentChatData, chat) => {
+  const addChatAsCurrent = async (setChatData, setCurrentChatData, chat) => {
     // Validate that the chat ID is unique; otherwise, we generate a new one
     if (chatData?.chats && chatData.chats.findIndex((_chat) => _chat.id === chat.id) !== -1) {
       chat.id = Date.now().toString();
@@ -92,6 +92,8 @@ export default function Chat({ launchContext }) {
       return newChatData;
     });
     setCurrentChatData(chat);
+
+    await flushUpdateChat(chat);
   };
 
   // delete chat from storage and chatData
@@ -1236,7 +1238,7 @@ export default function Chat({ launchContext }) {
           ],
           provider: launchContext.provider,
         });
-        addChatAsCurrent(setChatData, setCurrentChatData, newChat);
+        await addChatAsCurrent(setChatData, setCurrentChatData, newChat);
       }
     })();
 
