@@ -58,6 +58,10 @@ export const get_options_from_info = (info, chatOptions = {}) => {
 
 // Get provider info from alias
 export const get_provider_info_from_alias = (provider, alias) => {
-  let model = provider.model_aliases?.[alias] || alias;
-  return provider.models.find((x) => x.model === model);
+  const model = provider.model_aliases?.[alias] || alias;
+  const modelInfo = provider.models.find((x) => x.model === model);
+  if (!modelInfo) {
+    throw new Error(`Model not found: ${alias}`);
+  }
+  return { ...modelInfo, provider };
 };
