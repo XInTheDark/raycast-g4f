@@ -16,10 +16,11 @@ export const GeminiProvider = {
     default: ["gemini-1.5-pro-002", "gemini-1.5-flash-002", "gemini-1.5-flash-latest"],
     flash: ["gemini-2.0-flash-exp", "gemini-1.5-flash-002"],
     experimental: ["gemini-exp-1206", "gemini-2.0-flash-exp", "gemini-2.0-flash-thinking-exp-1219"],
-    thinking: ["gemini-2.0-flash-thinking-exp-1219"],
+    thinking: ["gemini-2.0-flash-thinking-exp-01-21"],
     "gemini-pro": "default",
     "gemini-flash": "flash",
     "gemini-exp": "experimental",
+    "gemini-thinking": "thinking",
   },
   generate: async function (chat, options, { stream_update, max_retries = 3 }) {
     let APIKeysStr = Preferences["GeminiAPIKeys"];

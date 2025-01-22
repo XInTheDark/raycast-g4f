@@ -70,6 +70,7 @@ export const model_aliases = {
   "gemini-pro": [GeminiProvider, BlackboxProvider, NexraProvider],
   "gemini-flash": [GeminiProvider, BlackboxProvider],
   "gemini-exp": [GeminiProvider],
+  "gemini-thinking": [GeminiProvider],
   "llama-3-8b": [ReplicateProvider],
   "llama-3-70b": [ReplicateProvider],
   "llama-3.1-405b": [BlackboxProvider, ReplicateProvider, MetaAIProvider, DeepInfraProvider],
