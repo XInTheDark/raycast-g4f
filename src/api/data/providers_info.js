@@ -83,6 +83,7 @@ export const model_aliases = {
   "qwen-2.5-coder-32b": [DeepInfraProvider],
   "qwq-32b-preview": [BlackboxProvider, DeepInfraProvider],
   "wizardlm-2-8x22b": [DeepInfraProvider],
-  "deepseek-2.5": [DeepInfraProvider],
+  "deepseek-v3": [DeepInfraProvider],
+  "deepseek-r1": [BlackboxProvider, DeepInfraProvider],
   "mixtral-8x7b": [DuckDuckGoProvider, ReplicateProvider],
 };

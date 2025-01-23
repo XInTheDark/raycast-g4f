@@ -37,6 +37,7 @@ const uuid4 = function () {
 const agentModeConfig = {
   "llama-3.3-70b": { mode: true, id: "Meta-Llama-3.3-70B-Instruct-Turbo", name: "Meta-Llama-3.3-70B-Instruct-Turbo" },
   "qwq-32b-preview": { mode: true, id: "Qwen/QwQ-32B-Preview", name: "Qwen-QwQ-32B-Preview" },
+  "deepseek-r1": { mode: true, id: "deepseek-reasoner", name: "DeepSeek-R1" },
 };
 
 const trendingAgentModeConfig = {
@@ -86,6 +87,7 @@ export const BlackboxProvider = {
     { model: "llama-3.3-70b", stream: true },
     { model: "gemini-1.5-flash", stream: true },
     { model: "qwq-32b-preview", stream: true },
+    { model: "deepseek-r1", stream: true },
     { model: "gpt-4o", stream: true },
     { model: "claude-3.5-sonnet", stream: true },
     { model: "gemini-pro", stream: true },
