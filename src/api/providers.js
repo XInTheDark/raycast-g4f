@@ -46,12 +46,11 @@ export const get_provider_info = (providerString) => {
 
 // Get options from info
 export const get_options_from_info = (info, chatOptions = {}) => {
-  const provider = info.provider;
   // we delete the provider key since it's not an option
   return {
-    ...info,
-    ...chatOptions,
-    ...additional_provider_options(provider, chatOptions),
+    ...(info || {}),
+    ...(chatOptions || {}),
+    ...additional_provider_options(info?.provider, chatOptions),
     provider: undefined,
   };
 };
