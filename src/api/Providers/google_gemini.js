@@ -29,7 +29,8 @@ export const GeminiProvider = {
     let model = this.model_aliases[options.model];
     let models = Array.isArray(model) ? model : [model];
 
-    const useWebSearch = options.webSearch === "auto";
+    // disable native web search for now, as Google search tool is unavailable for free users
+    const useWebSearch = options.webSearch === "auto" && false;
     const useCodeInterpreter = Preferences["codeInterpreter"];
 
     const tools = [
