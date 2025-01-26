@@ -71,7 +71,7 @@ const paramOverrides = {
     maxTokens: 50000,
   },
   "deepseek-r1": {
-    maxTokens: 8000,
+    maxTokens: 32000,
   },
 };
 
