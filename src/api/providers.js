@@ -29,7 +29,9 @@ export const generate = async function (provider, chat, options, { stream_update
 
 // Utilities
 export const default_provider_string = () => {
-  return Preferences["defaultProvider"];
+  const defaultProvider = Preferences["defaultProvider"];
+  // make sure the default provider is valid
+  return providers_info[defaultProvider] ? defaultProvider : Object.keys(providers_info)[0];
 };
 
 // Parse provider string

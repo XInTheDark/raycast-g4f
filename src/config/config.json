@@ -1,6 +1,6 @@
 {
   "defaultPreferences": {
-    "defaultProvider": "NexraGPT4o",
+    "defaultProvider": "Nexra_gpt-4o",
     "webSearch": "off",
     "proxyURL": "",
     "smartChatNaming": false,
