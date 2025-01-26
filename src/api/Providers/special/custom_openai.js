@@ -23,6 +23,7 @@ export const getOpenAIModels = async (url, apiKey) => {
 
 export const CustomOpenAIProvider = {
   name: "CustomOpenAI",
+  isCustom: true,
   generate: async function* (chat, options) {
     const url = options.url;
     const apiData = await getCustomAPIInfo(url);

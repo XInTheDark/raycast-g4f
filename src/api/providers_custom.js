@@ -34,6 +34,7 @@ export const keyToCustomAPI = (key) => {
 };
 
 // Initialize custom APIs
+// Each custom API entry uses the CustomOpenAIProvider and is identified by the url and model.
 export const initCustomAPIs = async () => {
   const customAPIData = await getCustomAPIInfo();
   for (let [url, api] of Object.entries(customAPIData)) {

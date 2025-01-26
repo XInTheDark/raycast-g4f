@@ -1,38 +1,9 @@
 import { OptionsComponent } from "#root/src/components/preferences/base/optionsComponent.jsx";
 
 const aiChatOptions = {
-  webSearch: {
-    title: "Web Search",
-    description: "Allow GPT to search the web for information.",
-    type: "dropdown",
-    data: [
-      {
-        title: "Disabled",
-        value: "off",
-      },
-      {
-        title: "Automatic",
-        value: "auto",
-      },
-      {
-        title: "Balanced",
-        value: "balanced",
-      },
-      {
-        title: "Always",
-        value: "always",
-      },
-    ],
-  },
   smartChatNaming: {
     title: "Enable Smart Chat Naming",
     description: "Automatically rename chat sessions based on the messages you send.",
-    required: false,
-    type: "checkbox",
-  },
-  codeInterpreter: {
-    title: "Enable Code Interpreter (BETA)",
-    description: "Allows GPT to interpret and run Python code locally, based on your queries. Use at your own risk!",
     required: false,
     type: "checkbox",
   },

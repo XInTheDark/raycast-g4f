@@ -5,6 +5,7 @@ import { Preferences } from "../preferences.js";
 
 export const GeminiProvider = {
   name: "Google Gemini",
+  isCustom: true,
   customStream: true,
   models: [
     { model: "default", stream: true },

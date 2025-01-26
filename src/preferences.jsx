@@ -4,6 +4,7 @@ import { PreferenceComponent } from "#root/src/components/preferences/base/prefe
 // Components
 import { DefaultModel } from "#root/src/components/preferences/options/defaultModel.jsx";
 import { GeneralOptions } from "#root/src/components/preferences/options/generalOptions.jsx";
+import { AIFeaturesOptions } from "#root/src/components/preferences/options/aiFeaturesOptions.jsx";
 import { AIChatOptions } from "#root/src/components/preferences/options/aiChatOptions.jsx";
 
 import { ManageCustomAPIs, ManageGoogleGeminiAPI } from "#root/src/components/preferences/manageCustomAPIs.jsx";
@@ -31,6 +32,9 @@ export default function ManagePreferences() {
 
         {/* - General */}
         {PreferenceComponent({ title: "General", target: <GeneralOptions /> })}
+
+        {/* - AI Features */}
+        {PreferenceComponent({ title: "AI Features", target: <AIFeaturesOptions /> })}
 
         {/* - AI Chat */}
         {PreferenceComponent({ title: "AI Chat", target: <AIChatOptions /> })}

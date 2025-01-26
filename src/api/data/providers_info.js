@@ -35,7 +35,7 @@ export const providers = [
 // { provider internal name, {provider object, model, stream, extra options} }
 const providers_info = {};
 for (let provider of providers) {
-  if (providers.enabled === false) continue;
+  if (provider?.enabled === false) continue;
   for (let model of provider?.models || []) {
     const key = `${provider.name}_${model.alias || model.model}`;
     providers_info[key] = { provider: provider, ...model };

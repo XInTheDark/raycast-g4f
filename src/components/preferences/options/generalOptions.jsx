@@ -39,6 +39,12 @@ const generalOptions = {
       { title: "30m", value: "1800000" },
     ],
   },
+  hideDefaultProviders: {
+    title: "Hide Default Providers",
+    description: "Hide all default providers, only enabling custom APIs. Useful if you only want to use custom APIs.",
+    required: false,
+    type: "checkbox",
+  },
 };
 
 export const GeneralOptions = () => {
