@@ -41,7 +41,8 @@ const generalOptions = {
   },
   hideDefaultProviders: {
     title: "Hide Default Providers",
-    description: "Hide all default providers, only enabling custom APIs. Useful if you only want to use custom APIs.",
+    description:
+      "Hide all default (built-in) providers, only enabling custom APIs. Useful if you only want to use custom APIs.",
     required: false,
     type: "checkbox",
   },

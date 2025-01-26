@@ -71,6 +71,10 @@ updating manually also allows you to fetch and view the latest changes to the so
 
 ## Providers & Models
 
+<details>
+
+<summary>List of built-in providers</summary>
+
 *Note: May not be up-to-date; please refer to the extension.*
 
 | Provider                     | Model                                   | Features | Status                      | Speed          | Rating and remarks by extension author                                                      |
@@ -128,6 +132,14 @@ updating manually also allows you to fetch and view the latest changes to the so
 **Note**: By default, all providers support basic file upload functionality for text-based files, like .txt, .md, etc.
 
 *¹: Supports images only.*
+
+</details>
+
+### Custom APIs
+
+The extension fully supports custom APIs! You can use any OpenAI-compatible API and connect it.
+
+Get started by reading the [help page][local-api-help].
 
 ### Provider-specific notes
 
