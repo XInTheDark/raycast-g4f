@@ -1,8 +1,6 @@
 import { messages_to_json } from "../../../classes/message.js";
 import fetch from "#root/src/api/fetch.js";
 
-import { getCustomAPIInfo } from "#root/src/api/providers_custom.js";
-
 const getHeaders = (apiKey) => {
   return {
     "Content-Type": "application/json",
@@ -26,15 +24,18 @@ export const CustomOpenAIProvider = {
   isCustom: true,
   generate: async function* (chat, options) {
     const url = options.url;
-    const apiData = await getCustomAPIInfo(url);
-    if (!apiData) {
-      throw new Error("No data found for Custom OpenAI API");
-    }
+
+    let apiData = {};
+    try {
+      const { getCustomAPIInfo } = await import("#root/src/api/providers_custom.js");
+      apiData = await getCustomAPIInfo(url);
+      // eslint-disable-next-line no-empty
+    } catch {}
 
     const api_url = url + "/chat/completions";
     const model = options.model;
-    const api_key = apiData.apiKey;
-    const config = apiData.config;
+    const api_key = options.apiKey || apiData.apiKey;
+    const config = apiData.config || {};
 
     chat = messages_to_json(chat);
     let body = {
