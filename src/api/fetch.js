@@ -33,7 +33,11 @@ async function fetchWithProxy(url, options = {}, fetchOptions = {}) {
   }
 
   // Handle timeout
-  const timeout = fetchOptions.timeout;
+  let timeout = fetchOptions.timeout;
+  if (timeout === 0) {
+    // set timeout to a large value to prevent default timeout
+    timeout = 24 * 60 * 60 * 1000;
+  }
   let timeoutId = null;
   if (timeout) {
     const controller = new AbortController();
