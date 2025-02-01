@@ -1001,7 +1001,7 @@ export default function Chat({ launchContext }) {
             icon={Icon.TextCursor}
             title="Edit Message"
             target={<ComposeMessageComponent idx={idx} />}
-            shortcut={{ modifiers: ["cmd", "shift"], key: "e" }}
+            shortcut={{ modifiers: ["cmd"], key: "e" }}
           />
           <Action
             icon={Icon.Trash}
