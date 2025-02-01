@@ -367,8 +367,13 @@ export default (
     <Detail
       actions={
         <ActionPanel>
+          {/* Copy/Paste Actions
+            We put paste on top or below depending on allowPaste */}
           {allowPaste && <Action.Paste content={markdown} />}
           <Action.CopyToClipboard shortcut={Keyboard.Shortcut.Common.Copy} content={markdown} />
+          {!allowPaste && <Action.Paste content={markdown} shortcut={{ modifiers: ["cmd", "shift"], key: "v" }} />}
+
+          {/* Actions */}
           {(lastQuery.text || lastQuery.files?.length > 0) && (
             <Action
               title="Continue in Chat"
