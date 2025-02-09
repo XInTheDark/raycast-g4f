@@ -25,10 +25,13 @@ export const PhindProvider = {
     // get challenge seeds
     let stdout = await curlFetchNoStream(home_url, { method: "GET", headers: headers });
 
-    const regex = /<script id="__NEXT_DATA__" type="application\/json">([\s\S]+?)<\/script>/;
-    const match = stdout.match(regex);
-    const _data = JSON.parse(match[1]);
-    const challenge_seeds = _data.props?.pageProps?.challengeSeeds;
+    // capture the object in the form {\"multiplier\":210359,\"addend\":426469,\"modulus\":100823}
+    // const regex = /(\{\\?"primes\\?":\{.*?\}\})/;
+    const regex = /\{\\"multiplier\\":(\d+),\\"addend\\":(\d+),\\"modulus\\":(\d+)\}/;
+    let match = stdout.match(regex);
+    match = match[0].replace(/\\/g, "");
+    const _data = JSON.parse(match);
+    const challenge_seeds = _data;
     if (!challenge_seeds) {
       throw new Error("Could not find challenge seeds");
     }
@@ -40,16 +43,12 @@ export const PhindProvider = {
     chat.pop();
 
     let data = {
-      context: "",
       options: {
-        allowMultiSearch: false,
-        anonUserId: "",
-        answerModel: "Phind Instant",
-        customLinks: [],
-        date: new Date().toLocaleDateString("en-GB"),
-        detailed: true,
-        language: "en-US",
+        allowMultiSearch: true,
+        answerModel: "Phind-70B",
+        enableNewFollowups: true,
         searchMode: "auto",
+        thoughtsMode: "auto",
       },
       question: prompt,
     };
@@ -105,7 +104,17 @@ export const PhindProvider = {
         }
 
         if (line) {
-          response += line;
+          try {
+            let json = JSON.parse(line);
+            if (json.type === "add_text_token" && json.payload) {
+              response += json.payload;
+            }
+            if (json.type === "end_turn") {
+              return;
+            }
+          } catch (e) {
+            continue;
+          }
         } else if (new_line) {
           response += "\n";
           new_line = false;
