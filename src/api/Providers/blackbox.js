@@ -136,6 +136,7 @@ export const BlackboxProvider = {
       agentMode: agentModeConfig[options.model] || {},
       trendingAgentMode: trendingAgentModeConfig[options.model] || {},
       isMicMode: false,
+      isMemoryEnabled: false,
       userSystemPrompt: null,
       maxTokens: 100000,
       playgroundTemperature: Number(options.temperature) ?? 0.7,
@@ -156,6 +157,7 @@ export const BlackboxProvider = {
       deepSearchMode: false,
       codeInterpreterMode: codeInterpreterMode,
       domains: null,
+      isPremium: true,
       customProfile: { name: "", occupation: "", traits: [], additionalInfo: "", enableNewChats: false },
       session: {
         user: {
