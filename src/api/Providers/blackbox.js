@@ -44,15 +44,16 @@ const trendingAgentModeConfig = {
   blackbox: {},
   "llama-3.1-405b": { mode: true, id: "llama-3.1-405b" },
   "llama-3.1-70b": { mode: true, id: "llama-3.1-70b" },
-  "gemini-1.5-flash": { mode: true, id: "Gemini" },
 };
 
 const userSelectedModelConfig = {
   "gpt-4o": "GPT-4o",
   "claude-3.5-sonnet": "Claude-Sonnet-3.5",
   "gemini-pro": "gemini-pro",
+  "gemini-flash": "Gemini-Flash-2.0",
   "deepseek-r1": "deepseek-r1",
   "deepseek-v3": "deepseek-v3",
+  "o3-mini": "o3-mini",
 };
 
 const paramOverrides = {
@@ -90,17 +91,16 @@ export const BlackboxProvider = {
     { model: "llama-3.1-405b", stream: true },
     { model: "llama-3.1-70b", stream: true },
     { model: "llama-3.3-70b", stream: true },
-    { model: "gemini-1.5-flash", stream: true },
+    { model: "gemini-flash", stream: true },
     { model: "qwq-32b-preview", stream: true },
     { model: "deepseek-v3", stream: true },
     { model: "deepseek-r1", stream: true },
     { model: "gpt-4o", stream: true },
     { model: "claude-3.5-sonnet", stream: true },
     { model: "gemini-pro", stream: true },
+    { model: "o3-mini", stream: true },
   ],
-  model_aliases: {
-    "gemini-flash": "gemini-1.5-flash",
-  },
+  model_aliases: {},
 
   generate: async function* (chat, options, { max_retries = 5 }) {
     let random_id = token_hex(16);
