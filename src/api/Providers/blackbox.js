@@ -156,6 +156,17 @@ export const BlackboxProvider = {
       deepSearchMode: false,
       codeInterpreterMode: codeInterpreterMode,
       domains: null,
+      customProfile: { name: "", occupation: "", traits: [], additionalInfo: "", enableNewChats: false },
+      session: {
+        user: {
+          name: "John Doee",
+          email: "john.doee2@gmail.com",
+          image: "https://lh3.googleusercontent.com/a/ACg8ocK9X7mNpQ2vR4jH3tY8wL5nB1xM6fDS9JW2kLpTn4Vy3hR2xN4m=s96-c",
+          subscriptionStatus: "PREMIUM",
+        },
+        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+      webSearchMode: false,
       ...paramOverrides[options.model],
     };
 
