@@ -20,7 +20,7 @@ const headers = {
 export const PhindProvider = {
   name: "Phind",
   customStream: true,
-  models: [{ model: "phind-instant", stream: true }],
+  models: [{ model: "Phind-70B", stream: true }],
   generate: async function (chat, options, { stream_update }) {
     // get challenge seeds
     let stdout = await curlFetchNoStream(home_url, { method: "GET", headers: headers });
@@ -69,8 +69,13 @@ export const PhindProvider = {
       "<PHIND_SPAN_END>",
     ];
 
+    const ignored_tags = ["image", "thinking", "icon", "citation"];
+
+    const special_tags = {};
+
+    let current_tags = [];
+
     let response = "";
-    let new_line = false;
 
     // POST
     for await (let chunk of curlFetch(api_url, {
@@ -106,20 +111,61 @@ export const PhindProvider = {
         if (line) {
           try {
             let json = JSON.parse(line);
-            if (json.type === "add_text_token" && json.payload) {
-              response += json.payload;
-            }
+            // console.log(json);
             if (json.type === "end_turn") {
               return;
+            }
+
+            if (json.type === "new_tag" && json.payload) {
+              const tag = json.payload;
+              current_tags.push(tag);
+
+              if (special_tags[tag]?.open) {
+                response += special_tags[tag].open;
+              }
+            }
+
+            if (json.type === "end_tag" && json.payload) {
+              let tag = json.payload;
+
+              if (special_tags[tag]?.close) {
+                response += special_tags[tag].close;
+              } else {
+                response += "\n";
+              }
+
+              let index = current_tags.length - 1;
+              while (index >= 0) {
+                if (current_tags[index] === tag) {
+                  current_tags.splice(index, 1);
+                  break;
+                }
+                index--;
+              }
+              continue;
+            }
+
+            if (json.type === "add_text_token" && json.payload) {
+              const payload = json.payload;
+
+              // process tags. if we see an unsupported tag, skip the token
+              let skip = false;
+              for (let tag of current_tags) {
+                if (ignored_tags.includes(tag)) {
+                  // console.log(`Skipping due to tag: ${tag}`);
+                  skip = true;
+                  break;
+                }
+              }
+              if (skip) {
+                continue;
+              }
+
+              response += payload;
             }
           } catch (e) {
             continue;
           }
-        } else if (new_line) {
-          response += "\n";
-          new_line = false;
-        } else {
-          new_line = true;
         }
 
         stream_update(response);
