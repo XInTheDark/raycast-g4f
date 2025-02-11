@@ -1,28 +1,26 @@
 // Convert markdown so that it is rendered as plain text.
 // Useful because Detail only supports markdown, and sometimes we want to show plain text.
+// The updated approach simply wraps the entire text in a code block, which is more reliable.
 export function plainTextMarkdown(text) {
-  // Escape special markdown characters
-  const escapeChars1 = ["`", "*", "_"];
-  for (const char of escapeChars1) {
-    // always escape
-    text = text.replace(new RegExp(`\\${char}`, "g"), `\\${char}`);
+  // Determine the maximum number of consecutive backticks in the text.
+  let maxConsecutive = 0;
+  let current = 0;
+
+  for (let i = 0; i < text.length; i++) {
+    if (text[i] === "`") {
+      current++;
+      if (current > maxConsecutive) {
+        maxConsecutive = current;
+      }
+    } else {
+      current = 0;
+    }
   }
 
-  const escapeChars2 = ["#", "[", "]", "(", ")", "<", ">", "-", "+", "{", "}", ".", "!"];
-  for (const char of escapeChars2) {
-    // replace only if it's surrounded by whitespace or at the beginning/end of a line
-    text = text.replace(new RegExp(`(^|\\s)\\${char}(\\s|$)`, "g"), `$1\\${char}$2`);
-  }
+  // The fence must be longer than any sequence of backticks in the text.
+  // Standard markdown requires at least three backticks to open a code block.
+  const fenceLength = Math.max(3, maxConsecutive + 1);
+  const fence = "`".repeat(fenceLength);
 
-  // If a line has no content except spaces, strip it
-  // This is useful for creating paragraphs
-  text = text.replace(/^\s+$/gm, "");
-
-  // Replace spaces with non-breaking spaces (U+00A0)
-  text = text.replace(/ /g, "\u00A0");
-
-  // Add two spaces at the end of each line for line breaks
-  text = text.replace(/(\S)(\n)(?!\n)/g, "$1  $2");
-
-  return text;
+  return `${fence}\n${text}\n${fence}`;
 }
