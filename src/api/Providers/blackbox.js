@@ -7,7 +7,7 @@ import { Preferences } from "#root/src/api/preferences.js";
 
 // Implementation ported from gpt4free Blackbox provider.
 
-const api_url = "https://www.blackbox.ai/api/chat";
+const api_url = "https://api.blackbox.ai/api/chat";
 const headers = {
   "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:133.0) Gecko/20100101 Firefox/133.0",
   Accept: "*/*",
@@ -153,6 +153,7 @@ export const BlackboxProvider = {
       userSelectedModel: userSelectedModelConfig[options.model] || undefined,
       validated: validatedToken,
       imageGenerationMode: false,
+      webSearchMode: false,
       webSearchModePrompt: false,
       deepSearchMode: false,
       codeInterpreterMode: codeInterpreterMode,
@@ -168,7 +169,11 @@ export const BlackboxProvider = {
         },
         expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       },
-      webSearchMode: false,
+      subscriptionCache: {
+        expiryTimestamp: null,
+        lastChecked: Date.now() - 20 * 1000,
+        status: "PREMIUM",
+      },
       ...paramOverrides[options.model],
     };
 
