@@ -7,7 +7,7 @@ import { Preferences } from "#root/src/api/preferences.js";
 
 // Implementation ported from gpt4free Blackbox provider.
 
-const api_url = "https://api.blackbox.ai/api/chat";
+const api_url = "https://www.blackbox.ai/api/chat";
 const headers = {
   "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:133.0) Gecko/20100101 Firefox/133.0",
   Accept: "*/*",
