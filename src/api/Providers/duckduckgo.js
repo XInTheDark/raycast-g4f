@@ -44,6 +44,7 @@ export const DuckDuckGoProvider = {
       stream: true,
       context_tokens: 4096,
     },
+    { model: "o3-mini", stream: true },
     { model: "mistralai/Mixtral-8x7B-Instruct-v0.1", alias: "mixtral-8x7b", stream: true, context_tokens: 4096 },
   ],
   model_aliases: {
