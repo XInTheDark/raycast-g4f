@@ -39,8 +39,8 @@ export const DuckDuckGoProvider = {
     { model: "gpt-4o-mini", stream: true, context_tokens: 4096 },
     { model: "claude-3-haiku-20240307", alias: "claude-3-haiku", stream: true, context_tokens: 4096 },
     {
-      model: "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
-      alias: "llama-3.1-70b",
+      model: "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+      alias: "llama-3.3-70b",
       stream: true,
       context_tokens: 4096,
     },
