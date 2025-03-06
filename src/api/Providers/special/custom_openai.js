@@ -4,6 +4,7 @@ import fetch from "#root/src/api/fetch.js";
 const getHeaders = (apiKey) => {
   return {
     "Content-Type": "application/json",
+    "Accept": "*/*",
     Authorization: apiKey ? `Bearer ${apiKey}` : undefined,
   };
 };
@@ -32,12 +33,20 @@ export const CustomOpenAIProvider = {
       // eslint-disable-next-line no-empty
     } catch {}
 
-    const api_url = url + "/chat/completions";
+    const api_url = url.endsWith("/chat/completions") ? url : url + "/chat/completions";
     const model = options.model;
     const api_key = options.apiKey || apiData.apiKey;
     const config = apiData.config || {};
 
     chat = messages_to_json(chat);
+
+    let headers = {
+      ...getHeaders(api_key),
+      ...config?.HEADERS,
+    };
+
+    delete config.HEADERS;
+
     let body = {
       messages: chat,
       stream: true,
@@ -49,7 +58,7 @@ export const CustomOpenAIProvider = {
       api_url,
       {
         method: "POST",
-        headers: getHeaders(api_key),
+        headers: headers,
         body: JSON.stringify(body),
       },
       { timeout: 0 } // disable timeout
