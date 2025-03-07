@@ -34,25 +34,28 @@ export const CustomOpenAIProvider = {
       // eslint-disable-next-line no-empty
     } catch {}
 
+    // Initialize
     const api_url = url.endsWith("/chat/completions") ? url : url + "/chat/completions";
-    const model = options.model;
-    const api_key = options.apiKey || apiData.apiKey;
+    let { model, apiKey, ...reqBody } = options;
+    apiKey = apiKey || apiData.apiKey;
     const config = { ...this.config, ...apiData.config };
 
     chat = messages_to_json(chat);
 
     let headers = {
-      ...getHeaders(api_key),
+      ...getHeaders(apiKey),
       ...config?.HEADERS,
     };
 
     delete config.HEADERS;
 
+    // Prepare the request body
     let body = {
       messages: chat,
       stream: true,
       model: model,
       ...config,
+      ...reqBody,
     };
 
     let response = await fetch(
