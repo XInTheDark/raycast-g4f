@@ -4,7 +4,7 @@ import fetch from "#root/src/api/fetch.js";
 const getHeaders = (apiKey) => {
   return {
     "Content-Type": "application/json",
-    "Accept": "*/*",
+    Accept: "*/*",
     Authorization: apiKey ? `Bearer ${apiKey}` : undefined,
   };
 };
@@ -23,6 +23,7 @@ export const getOpenAIModels = async (url, apiKey) => {
 export const CustomOpenAIProvider = {
   name: "CustomOpenAI",
   isCustom: true,
+  config: {},
   generate: async function* (chat, options) {
     const url = options.url;
 
@@ -36,7 +37,7 @@ export const CustomOpenAIProvider = {
     const api_url = url.endsWith("/chat/completions") ? url : url + "/chat/completions";
     const model = options.model;
     const api_key = options.apiKey || apiData.apiKey;
-    const config = apiData.config || {};
+    const config = { ...this.config, ...apiData.config };
 
     chat = messages_to_json(chat);
 
