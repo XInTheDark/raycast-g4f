@@ -141,7 +141,7 @@ export const DeepInfraProvider = {
       model: model,
       messages: json_chat,
       tools: tools.length > 0 ? tools : undefined,
-      temperature: options.temperature,
+      temperature: options.temperature ?? 0.7,
       max_tokens: 100000,
       stream: true,
       ...overrides[model],

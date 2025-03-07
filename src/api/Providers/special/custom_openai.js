@@ -25,7 +25,8 @@ export const CustomOpenAIProvider = {
   isCustom: true,
   config: {},
   generate: async function* (chat, options) {
-    const url = options.url;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    let { url, model, apiKey, config: _, ...reqBody } = options;
 
     let apiData = {};
     try {
@@ -36,7 +37,6 @@ export const CustomOpenAIProvider = {
 
     // Initialize
     const api_url = url.endsWith("/chat/completions") ? url : url + "/chat/completions";
-    let { model, apiKey, ...reqBody } = options;
     apiKey = apiKey || apiData.apiKey;
     const config = { ...this.config, ...apiData.config };
 
@@ -54,8 +54,8 @@ export const CustomOpenAIProvider = {
       messages: chat,
       stream: true,
       model: model,
-      ...config,
       ...reqBody,
+      ...config, // config overrides reqBody
     };
 
     let response = await fetch(

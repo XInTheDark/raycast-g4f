@@ -13,7 +13,7 @@ export const additional_provider_options = (provider, chatOptions = null) => {
   let options = {};
   if (chatOptions?.creativity) {
     let temperature = Number(chatOptions.creativity);
-    temperature = Math.max(0.0, temperature).toFixed(1);
+    temperature = Math.max(0.0, temperature);
     options.temperature = temperature;
   } else {
     options.temperature = 0.7;
@@ -48,13 +48,14 @@ export const get_provider_info = (providerString) => {
 
 // Get options from info
 export const get_options_from_info = (info, chatOptions = {}) => {
-  // we delete the provider key since it's not an option
-  return {
+  let o = {
     ...(info || {}),
-    ...(chatOptions || {}),
+    config: { ...(chatOptions || {}) },
     ...additional_provider_options(info?.provider, chatOptions),
-    provider: undefined,
   };
+  // we delete the provider key since it's not an option
+  delete o.provider;
+  return o;
 };
 
 // Get provider info from alias
