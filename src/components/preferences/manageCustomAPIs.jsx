@@ -69,6 +69,16 @@ const EditAPIConfig = ({ customAPIData, setCustomAPIData, url }) => {
       <Form.TextField id="name" title="API Name" defaultValue={APIData.name} />
       <Form.TextField id="apiKey" title="API Key" defaultValue={APIData.apiKey} />
 
+      <Form.Dropdown
+        id="type"
+        title="Type"
+        defaultValue={APIData.type}
+        options={[
+          { label: "OpenAI", value: "OpenAI" },
+          { label: "Anthropic", value: "Anthropic" },
+        ]}
+      />
+
       {/* Options */}
       <Form.Checkbox
         id="refreshModels"

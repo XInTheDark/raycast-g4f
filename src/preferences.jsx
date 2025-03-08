@@ -42,7 +42,7 @@ export default function ManagePreferences() {
 
       <List.Section title="Manage APIs">
         {/* - OpenAI-compatible APIs */}
-        {PreferenceComponent({ title: "Custom OpenAI-compatible APIs", target: <ManageCustomAPIs /> })}
+        {PreferenceComponent({ title: "Custom APIs", target: <ManageCustomAPIs /> })}
 
         {/* - Google Gemini */}
         {PreferenceComponent({ title: "Google Gemini", target: <ManageGoogleGeminiAPI /> })}

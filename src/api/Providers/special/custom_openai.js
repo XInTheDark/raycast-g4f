@@ -20,6 +20,19 @@ export const getOpenAIModels = async (url, apiKey) => {
   return res;
 };
 
+export const getChatCompletionsURL = async (url, type) => {
+  const suffix = (() => {
+    switch (type) {
+      case "OpenAI":
+      default:
+        return "/chat/completions";
+      case "Anthropic":
+        return "/messages";
+    }
+  })();
+  return url.endsWith(suffix) ? url : url + suffix;
+};
+
 export const CustomOpenAIProvider = {
   name: "CustomOpenAI",
   isCustom: true,
@@ -37,7 +50,8 @@ export const CustomOpenAIProvider = {
     } catch {}
 
     // Initialize
-    const api_url = url.endsWith("/chat/completions") ? url : url + "/chat/completions";
+    const api_url = getChatCompletionsURL(url, apiData.type);
+
     apiKey = apiKey || apiData.apiKey;
     // The order for applying configs: reqBody -> apiData.config -> reqConfig
     const config = { ...reqBody, ...apiData.config, ...reqConfig };
