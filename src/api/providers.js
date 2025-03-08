@@ -15,8 +15,6 @@ export const additional_provider_options = (provider, chatOptions = null) => {
     let temperature = Number(chatOptions.creativity);
     temperature = Math.max(0.0, temperature);
     options.temperature = temperature;
-  } else {
-    options.temperature = 0.7;
   }
   return options;
 };
@@ -50,7 +48,7 @@ export const get_provider_info = (providerString) => {
 export const get_options_from_info = (info, chatOptions = {}) => {
   let o = {
     ...(info || {}),
-    config: { ...(chatOptions || {}) },
+    ...(chatOptions || {}),
     ...additional_provider_options(info?.provider, chatOptions),
   };
   // we delete the provider key since it's not an option

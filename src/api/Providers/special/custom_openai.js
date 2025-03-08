@@ -23,11 +23,12 @@ export const getOpenAIModels = async (url, apiKey) => {
 export const CustomOpenAIProvider = {
   name: "CustomOpenAI",
   isCustom: true,
-  config: {},
   generate: async function* (chat, options) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    let { url, model, apiKey, config: _, ...reqBody } = options;
+    let { url, model, apiKey, config: reqConfig, ...reqBody } = options;
 
+    // raycast-g4f exclusive implementation.
+    // TODO: merge this into options.config
     let apiData = {};
     try {
       const { getCustomAPIInfo } = await import("#root/src/api/providers_custom.js");
@@ -38,7 +39,8 @@ export const CustomOpenAIProvider = {
     // Initialize
     const api_url = url.endsWith("/chat/completions") ? url : url + "/chat/completions";
     apiKey = apiKey || apiData.apiKey;
-    const config = { ...this.config, ...apiData.config, ...options.config };
+    // The order for applying configs: reqBody -> apiData.config -> reqConfig
+    const config = { ...reqBody, ...apiData.config, ...reqConfig };
 
     chat = messages_to_json(chat);
 
@@ -54,8 +56,7 @@ export const CustomOpenAIProvider = {
       messages: chat,
       stream: true,
       model: model,
-      ...reqBody,
-      ...config, // config overrides reqBody
+      ...config,
     };
 
     let response = await fetch(
