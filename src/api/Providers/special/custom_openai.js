@@ -38,7 +38,7 @@ export const CustomOpenAIProvider = {
     // Initialize
     const api_url = url.endsWith("/chat/completions") ? url : url + "/chat/completions";
     apiKey = apiKey || apiData.apiKey;
-    const config = { ...this.config, ...apiData.config };
+    const config = { ...this.config, ...apiData.config, ...options.config };
 
     chat = messages_to_json(chat);
 
