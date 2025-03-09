@@ -128,7 +128,7 @@ export const CustomOpenAIProvider = {
         if (json["delta"]["text"]) {
           if (this.isThinking) {
             this.isThinking = false;
-            chunk += "\n</thinking>\n";
+            chunk += "\n</thinking>\n\n";
           }
           chunk += json["delta"]["text"];
         }
