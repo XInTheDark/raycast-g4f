@@ -73,11 +73,10 @@ const EditAPIConfig = ({ customAPIData, setCustomAPIData, url }) => {
         id="type"
         title="Type"
         defaultValue={APIData.type}
-        options={[
-          { label: "OpenAI", value: "OpenAI" },
-          { label: "Anthropic", value: "Anthropic" },
-        ]}
-      />
+      >
+        <Form.Dropdown.Item title="OpenAI" value="OpenAI"  />
+        <Form.Dropdown.Item title="Anthropic"  value="Anthropic"  />
+      </Form.Dropdown>
 
       {/* Options */}
       <Form.Checkbox

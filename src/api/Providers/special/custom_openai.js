@@ -20,7 +20,7 @@ export const getOpenAIModels = async (url, apiKey) => {
   return res;
 };
 
-export const getChatCompletionsURL = async (url, type) => {
+export const getChatCompletionsURL = (url, type) => {
   const suffix = (() => {
     switch (type) {
       case "OpenAI":
@@ -36,6 +36,9 @@ export const getChatCompletionsURL = async (url, type) => {
 export const CustomOpenAIProvider = {
   name: "CustomOpenAI",
   isCustom: true,
+  info: {
+    type: "OpenAI",
+  },
   generate: async function* (chat, options) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let { url, model, apiKey, config: reqConfig, ...reqBody } = options;
@@ -50,7 +53,7 @@ export const CustomOpenAIProvider = {
     } catch {}
 
     // Initialize
-    const api_url = getChatCompletionsURL(url, apiData.type);
+    const api_url = getChatCompletionsURL(url, this.info.type ?? apiData.type);
 
     apiKey = apiKey || apiData.apiKey;
     // The order for applying configs: reqBody -> apiData.config -> reqConfig
