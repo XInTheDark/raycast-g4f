@@ -53,7 +53,7 @@ export const CustomOpenAIProvider = {
     } catch {}
 
     // Initialize
-    const api_url = getChatCompletionsURL(url, this.info.type ?? apiData.type);
+    const api_url = getChatCompletionsURL(url, this.info?.type ?? apiData.type);
 
     apiKey = apiKey || apiData.apiKey;
     // The order for applying configs: reqBody -> apiData.config -> reqConfig

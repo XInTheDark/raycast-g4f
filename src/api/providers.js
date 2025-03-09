@@ -48,7 +48,7 @@ export const get_provider_info = (providerString) => {
 export const get_options_from_info = (info, chatOptions = {}) => {
   let o = {
     ...(info || {}),
-    ...(chatOptions || {}),
+    // ...(chatOptions || {}), // disabled since this is a bad way of passing options
     ...additional_provider_options(info?.provider, chatOptions),
   };
   // we delete the provider key since it's not an option
