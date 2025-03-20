@@ -9,15 +9,70 @@ export const RaycastAIProvider = {
     const { AI } = await import("@raycast/api");
 
     const prompt = format_chat_to_prompt(chat);
-    const askOptions = { model: AI.Model[options.model], creativity: options.temperature * 2 + Number.EPSILON || 1.0 };
+    const askOptions = {
+      model: AI.Model[options.model],
+      creativity: options.temperature * 2 + Number.EPSILON || 1.0,
+    };
+
     try {
-      const answer = await AI.ask(prompt, askOptions);
-      yield answer;
+      const answerStream = AI.ask(prompt, askOptions);
+      yield* eventEmitterToAsyncIterator(answerStream, answerStream);
+      await answerStream;
     } catch (error) {
-      console.log("Raycast AI error:", error);
+      console.error("Raycast AI error:", error);
     }
   },
 };
+
+/**
+ * Converts an event emitter (using "data" and "error" events) into an async iterator.
+ * It also takes a finishPromise which will resolve when the stream is complete.
+ */
+async function* eventEmitterToAsyncIterator(emitter, finishPromise) {
+  const dataQueue = [];
+  let error;
+
+  // Set up listeners.
+  emitter.on("data", (data) => {
+    dataQueue.push(data);
+    if (waitingResolve) {
+      waitingResolve();
+      waitingResolve = null;
+    }
+  });
+
+  emitter.on("error", (err) => {
+    error = err;
+    if (waitingResolve) {
+      waitingResolve();
+      waitingResolve = null;
+    }
+  });
+
+  let waitingResolve = null;
+
+  while (true) {
+    while (dataQueue.length) {
+      yield dataQueue.shift();
+    }
+
+    const finished = await Promise.race([
+      new Promise((resolve) => {
+        waitingResolve = resolve;
+      }),
+      finishPromise,
+    ]);
+    if (finished !== undefined) {
+      break;
+    }
+    if (error) {
+      throw error;
+    }
+  }
+  while (dataQueue.length) {
+    yield dataQueue.shift();
+  }
+}
 
 export const RaycastAIModels = [
   "OpenAI_GPT4",
