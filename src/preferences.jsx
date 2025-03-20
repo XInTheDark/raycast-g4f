@@ -7,7 +7,11 @@ import { GeneralOptions } from "#root/src/components/preferences/options/general
 import { AIFeaturesOptions } from "#root/src/components/preferences/options/aiFeaturesOptions.jsx";
 import { AIChatOptions } from "#root/src/components/preferences/options/aiChatOptions.jsx";
 
-import { ManageCustomAPIs, ManageGoogleGeminiAPI } from "#root/src/components/preferences/manageCustomAPIs.jsx";
+import {
+  ManageCustomAPIs,
+  ManageGoogleGeminiAPI,
+  ManageRaycastAIAPI,
+} from "#root/src/components/preferences/manageCustomAPIs.jsx";
 import { ManageAIPresets } from "#root/src/components/preferences/manageAIPresets.jsx";
 
 import { ExperimentalOptions } from "#root/src/components/preferences/experimental/experimentalOptions.jsx";
@@ -46,6 +50,7 @@ export default function ManagePreferences() {
 
         {/* - Google Gemini */}
         {PreferenceComponent({ title: "Google Gemini", target: <ManageGoogleGeminiAPI /> })}
+        {PreferenceComponent({ title: "Raycast AI", target: <ManageRaycastAIAPI /> })}
       </List.Section>
 
       {/* AI Presets */}

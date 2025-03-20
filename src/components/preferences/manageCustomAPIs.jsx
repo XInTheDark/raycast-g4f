@@ -1,4 +1,4 @@
-import { getOpenAIModels } from "../../api/Providers/special/custom_openai.js";
+import { CustomOpenAIProvider, getOpenAIModels } from "../../api/Providers/special/custom_openai.js";
 import { getCustomAPIInfo, updateCustomAPIInfo } from "#root/src/api/providers_custom.js";
 
 import { help_action } from "../../helpers/helpPage.jsx";
@@ -127,50 +127,54 @@ export const ManageCustomAPIs = () => {
   return customAPIData ? (
     Object.keys(customAPIData).length > 0 ? (
       <List>
-        {Object.entries(customAPIData).map(([url, data]) => (
-          <List.Item
-            title={data.name || url}
-            accessories={data.name ? [{ tag: url }] : []}
-            key={url}
-            actions={
-              <ActionPanel>
-                <Action.Push
-                  title="Edit"
-                  target={<EditAPIConfig customAPIData={customAPIData} setCustomAPIData={setCustomAPIData} url={url} />}
-                />
-                <Action.Push
-                  title="Add API"
-                  icon={Icon.PlusCircle}
-                  target={<EditAPIConfig customAPIData={customAPIData} setCustomAPIData={setCustomAPIData} url="" />}
-                  shortcut={{ modifiers: ["cmd"], key: "n" }}
-                />
-                <Action
-                  title="Delete API"
-                  style={Action.Style.Destructive}
-                  icon={Icon.Trash}
-                  onAction={async () => {
-                    await confirmAlert({
-                      title: "Are you sure?",
-                      message: "You cannot recover this API.",
-                      icon: Icon.Trash,
-                      primaryAction: {
-                        title: "Delete API Forever",
-                        style: Action.Style.Destructive,
-                        onAction: () => {
-                          const newData = { ...customAPIData };
-                          delete newData[url];
-                          setCustomAPIData(newData);
+        {Object.entries(customAPIData).map(([url, data]) =>
+          data.provider && data.provider !== CustomOpenAIProvider ? null : ( // Skip if not a custom OpenAI provider
+            <List.Item
+              title={data.name || url}
+              accessories={data.name ? [{ tag: url }] : []}
+              key={url}
+              actions={
+                <ActionPanel>
+                  <Action.Push
+                    title="Edit"
+                    target={
+                      <EditAPIConfig customAPIData={customAPIData} setCustomAPIData={setCustomAPIData} url={url} />
+                    }
+                  />
+                  <Action.Push
+                    title="Add API"
+                    icon={Icon.PlusCircle}
+                    target={<EditAPIConfig customAPIData={customAPIData} setCustomAPIData={setCustomAPIData} url="" />}
+                    shortcut={{ modifiers: ["cmd"], key: "n" }}
+                  />
+                  <Action
+                    title="Delete API"
+                    style={Action.Style.Destructive}
+                    icon={Icon.Trash}
+                    onAction={async () => {
+                      await confirmAlert({
+                        title: "Are you sure?",
+                        message: "You cannot recover this API.",
+                        icon: Icon.Trash,
+                        primaryAction: {
+                          title: "Delete API Forever",
+                          style: Action.Style.Destructive,
+                          onAction: () => {
+                            const newData = { ...customAPIData };
+                            delete newData[url];
+                            setCustomAPIData(newData);
+                          },
                         },
-                      },
-                    });
-                  }}
-                  shortcut={{ modifiers: ["cmd", "shift"], key: "delete" }}
-                />
-                {help_action("customAPI")}
-              </ActionPanel>
-            }
-          />
-        ))}
+                      });
+                    }}
+                    shortcut={{ modifiers: ["cmd", "shift"], key: "delete" }}
+                  />
+                  {help_action("customAPI")}
+                </ActionPanel>
+              }
+            />
+          )
+        )}
       </List>
     ) : (
       <List actions={<ActionPanel>{help_action("localAPI")}</ActionPanel>}>
@@ -219,6 +223,51 @@ export const ManageGoogleGeminiAPI = () => {
         }
         defaultValue={Preferences["GeminiAPIKeys"]}
       />
+    </Form>
+  );
+};
+
+export const ManageRaycastAIAPI = () => {
+  return (
+    <Form
+      actions={
+        <ActionPanel>
+          <Action.SubmitForm
+            title="Save"
+            onSubmit={async (values) => {
+              await updatePreferences("RaycastAIEnabled", values.enabled);
+
+              // update custom APIs
+              const url = "raycastAI://";
+              let entry;
+              if (values.enabled) {
+                const { RaycastAIModels } = await import("#root/src/api/Providers/special/raycast_ai.js");
+                entry = {
+                  name: "Raycast AI",
+                  provider: "RaycastAI",
+                  url: url,
+                  models: RaycastAIModels,
+                };
+              } else {
+                entry = null;
+              }
+
+              const customAPIData = await getCustomAPIInfo();
+              if (entry) {
+                customAPIData[url] = entry;
+              } else {
+                delete customAPIData[url];
+              }
+              await updateCustomAPIInfo(customAPIData);
+
+              await showToast(Toast.Style.Success, "Configuration saved");
+            }}
+          />
+        </ActionPanel>
+      }
+    >
+      <Form.Description text="Configure the Raycast AI API." />
+      <Form.Checkbox id="enabled" label="Enable Raycast AI" defaultValue={Preferences["RaycastAIEnabled"] || false} />
     </Form>
   );
 };

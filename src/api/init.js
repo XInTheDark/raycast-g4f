@@ -5,6 +5,8 @@ import { initPreferences } from "#root/src/helpers/preferences_helper.js";
 import { initCustomAPIs } from "#root/src/api/providers_custom.js";
 import { initProvidersReact } from "#root/src/api/data/providers_react.jsx";
 
+import { Preferences } from "#root/src/api/preferences.js";
+
 let initialised = false;
 
 // Note: Everything in this extension, which relies on anything from the modules above,
@@ -20,4 +22,10 @@ export async function init() {
 
   console.log(`Extension initialised in ${Date.now() - start}ms`);
   initialised = true;
+
+  // Debug
+  if (Preferences.devMode) {
+    const { debugInit } = await import("#root/src/debug/debug_init.js");
+    await debugInit();
+  }
 }

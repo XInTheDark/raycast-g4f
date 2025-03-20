@@ -5,6 +5,7 @@ import { providers_info } from "#root/src/api/data/providers_info.js";
 import { chat_providers_names } from "#root/src/api/data/providers_react.jsx";
 
 import { CustomOpenAIProvider } from "#root/src/api/Providers/special/custom_openai.js";
+import { RaycastAIProvider } from "#root/src/api/Providers/special/raycast_ai.js";
 
 const customAPIsStorageKey = "customAPIs";
 export const getCustomAPIInfo = async (url) => {
@@ -33,6 +34,17 @@ export const keyToCustomAPI = (key) => {
   return JSON.parse(removePrefix(key, "customOpenAI:"));
 };
 
+const getProviderObject = (provider) => {
+  if (!provider || provider === "CustomOpenAI") {
+    return CustomOpenAIProvider;
+  }
+  if (provider === "RaycastAI") {
+    return RaycastAIProvider;
+  }
+  console.error("Unknown provider: " + provider);
+  return CustomOpenAIProvider;
+};
+
 // Initialize custom APIs
 // Each custom API entry uses the CustomOpenAIProvider and is identified by the url and model.
 export const initCustomAPIs = async () => {
@@ -41,7 +53,12 @@ export const initCustomAPIs = async () => {
     const models = api?.models ?? [];
     for (let model of models) {
       const key = customAPItoKey(api, model);
-      providers_info[key] = { provider: CustomOpenAIProvider, url: url, model: model, stream: true };
+      providers_info[key] = {
+        provider: getProviderObject(api.provider),
+        url: url,
+        model: model,
+        stream: true,
+      };
       chat_providers_names[key] = `${getChatName(api)} (${model})`;
     }
   }
