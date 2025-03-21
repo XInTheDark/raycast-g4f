@@ -103,7 +103,7 @@ export const ManageAIPresets = () => {
         </Form.Dropdown>
 
         <Form.Description title="System Prompt" text="This prompt will be sent to GPT to start the conversation." />
-        <Form.TextArea id="systemPrompt" defaultValue={preset.systemPrompt} />
+        <Form.TextArea id="systemPrompt" defaultValue={preset.systemPrompt} enableMarkdown />
 
         <Form.Checkbox id="isDefault" label="Set as Default" defaultValue={preset.isDefault} />
       </Form>

@@ -19,11 +19,12 @@ import { init } from "#root/src/api/init.js";
 
 import { watch } from "node:fs/promises";
 
-import { current_datetime, formatDate, removePrefix, getFileFromURL } from "./helpers/helper.js";
+import { current_datetime, formatDate, removePrefix } from "./helpers/helper.js";
 import { plainTextMarkdown } from "./helpers/markdown.js";
 import throttle, { AIChatDelayFunction } from "#root/src/helpers/throttle.js";
 
 import { help_action, help_action_panel } from "./helpers/helpPage.jsx";
+import { PasteAction } from "./components/actions/pasteAction.jsx";
 import { autoCheckForUpdates } from "./helpers/update.jsx";
 import { confirmClearData, tryRecoverJSON } from "./helpers/aiChatHelper.jsx";
 
@@ -579,7 +580,7 @@ export default function Chat({ launchContext }) {
         </Form.Dropdown>
 
         <Form.Description title="System Prompt" text="This prompt will be sent to GPT to start the conversation." />
-        <Form.TextArea id="systemPrompt" defaultValue={chat?.systemPrompt ?? ""} />
+        <Form.TextArea id="systemPrompt" defaultValue={chat?.systemPrompt ?? ""} enableMarkdown />
       </>
     );
   };
@@ -702,25 +703,7 @@ export default function Chat({ launchContext }) {
                 }
               }}
             />
-            <Action
-              title="Paste"
-              icon={Icon.Clipboard}
-              onAction={async () => {
-                let { text, file } = await Clipboard.read();
-                setInput((oldInput) => {
-                  let newInput = structuredClone(oldInput);
-                  if (file) {
-                    file = getFileFromURL(file);
-                    newInput.files = [...(oldInput.files ?? []), file];
-                  } else {
-                    // Only set the text if there is no file, otherwise it's just the file name
-                    newInput.message += text;
-                  }
-                  return newInput;
-                });
-              }}
-              shortcut={{ modifiers: ["cmd"], key: "v" }}
-            />
+            {PasteAction(setInput)}
           </ActionPanel>
         }
       >
@@ -729,6 +712,7 @@ export default function Chat({ launchContext }) {
           title="Message"
           value={input.message}
           onChange={(message) => setInput({ ...input, message })}
+          enableMarkdown
         />
         <Form.FilePicker
           id="files"

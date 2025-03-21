@@ -1,7 +1,6 @@
 import {
   Action,
   ActionPanel,
-  Clipboard,
   confirmAlert,
   Detail,
   Form,
@@ -21,13 +20,14 @@ import * as providers from "./providers.js";
 import throttle, { AIChatDelayFunction } from "#root/src/helpers/throttle.js";
 
 import { help_action } from "../helpers/helpPage.jsx";
+import { PasteAction } from "../components/actions/pasteAction.jsx";
 import { autoCheckForUpdates } from "../helpers/update.jsx";
 
 import { init } from "../api/init.js";
 import { Message, pairs_to_messages } from "../classes/message.js";
 import { Preferences } from "./preferences.js";
 
-import { getFileFromURL, truncate_chat } from "../helpers/helper.js";
+import { truncate_chat } from "../helpers/helper.js";
 import { plainTextMarkdown } from "../helpers/markdown.js";
 import { getFormattedWebResult, systemResponse, web_search_mode, webSystemPrompt } from "./tools/web";
 
@@ -463,25 +463,7 @@ export default (
               await getResponse(prompt, { files: files });
             }}
           />
-          <Action
-            title="Paste"
-            icon={Icon.Clipboard}
-            onAction={async () => {
-              let { text, file } = await Clipboard.read();
-              setInput((oldInput) => {
-                let newInput = structuredClone(oldInput);
-                if (allowUploadFiles && file) {
-                  file = getFileFromURL(file);
-                  newInput.files = [...(oldInput.files ?? []), file];
-                } else {
-                  // Only set the text if there is no file, otherwise it's just the file name
-                  newInput.message += text;
-                }
-                return newInput;
-              });
-            }}
-            shortcut={{ modifiers: ["cmd"], key: "v" }}
-          />
+          {PasteAction(setInput)}
         </ActionPanel>
       }
     >
@@ -490,6 +472,7 @@ export default (
         title={showFormText}
         value={input.message}
         onChange={(message) => setInput({ ...input, message })}
+        enableMarkdown
       />
       {allowUploadFiles && (
         <Form.FilePicker
