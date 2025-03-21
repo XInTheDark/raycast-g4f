@@ -28,6 +28,8 @@ import { PasteAction } from "./components/actions/pasteAction.jsx";
 import { autoCheckForUpdates } from "./helpers/update.jsx";
 import { confirmClearData, tryRecoverJSON } from "./helpers/aiChatHelper.jsx";
 
+import { SearchInChats } from "./components/aiChat/searchInChats.jsx";
+
 import { format_chat_to_prompt, MessagePair, pairs_to_messages } from "./classes/message.js";
 
 import { getChatResponse, getChatResponseSync } from "./api/gpt.jsx";
@@ -1099,6 +1101,12 @@ export default function Chat({ launchContext }) {
               }
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "arrowUp" }}
+          />
+          <Action.Push
+            icon={Icon.MagnifyingGlass}
+            title="Search in Chats"
+            target={<SearchInChats chatData={chatData} setChatData={setChatData} getChat={getChat} />}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "k" }}
           />
           <Action.Push icon={Icon.Upload} title="Import Chat" target={<ImportChatComponent />} />
           <Action
