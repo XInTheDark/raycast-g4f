@@ -252,6 +252,21 @@ export default (
     generationStatus.loading = false;
   };
 
+  // Init variables for Pages.Form
+  const [input, setInput] = useState({
+    message: "",
+    files: [],
+  });
+  const initInput = (selectedState) => {
+    setInput((prevInput) => ({
+      ...prevInput,
+      message: argQuery ? argQuery : !requireQuery && selectedState ? selectedState : "",
+    }));
+  };
+  useEffect(() => {
+    initInput(selectedState);
+  }, []);
+
   // For currently unknown reasons, this following useEffect is rendered twice, both at the same time.
   // This results in getResponse() being called twice whenever a command is called directly (i.e. the form is not shown).
   // This problem has always been present, and it's also present in the original raycast-gemini.
@@ -277,6 +292,7 @@ export default (
         if (generationStatus.loading) return;
 
         setSelected(selected);
+        initInput(selected);
 
         // Before the rest of the code, handle forceShowForm
         if (forceShowForm) {
@@ -356,12 +372,6 @@ export default (
       }
     })();
   }, []);
-
-  // Init variables for Pages.Form
-  const [input, setInput] = useState({
-    message: argQuery ? argQuery : !requireQuery && selectedState ? selectedState : "",
-    files: [],
-  });
 
   return page === Pages.Detail ? (
     <Detail
@@ -471,7 +481,7 @@ export default (
         id="query"
         title={showFormText}
         value={input.message}
-        onChange={(message) => setInput({ ...input, message })}
+        onChange={(message) => setInput((prevInput) => ({ ...prevInput, message }))}
         enableMarkdown
       />
       {allowUploadFiles && (
@@ -479,7 +489,7 @@ export default (
           id="files"
           title="Upload Files"
           value={input.files}
-          onChange={(files) => setInput({ ...input, files })}
+          onChange={(files) => setInput((prevInput) => ({ ...prevInput, files }))}
         />
       )}
       {otherReactComponents}
