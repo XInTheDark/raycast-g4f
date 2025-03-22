@@ -1,4 +1,4 @@
-import { CustomOpenAIProvider, getOpenAIModels } from "../../api/Providers/special/custom_openai.js";
+import { CustomOpenAIProvider, getModels } from "../../api/Providers/special/custom_openai.js";
 import { getCustomAPIInfo, updateCustomAPIInfo } from "#root/src/api/providers_custom.js";
 
 import { help_action } from "../../helpers/helpPage.jsx";
@@ -38,7 +38,7 @@ const EditAPIConfig = ({ customAPIData, setCustomAPIData, url }) => {
                 // load models
                 let models;
                 try {
-                  models = await getOpenAIModels(values.url, values.apiKey);
+                  models = await getModels(values.url, values.apiKey, values.type);
                 } catch (e) {
                   console.log(e);
                   await showToast(Toast.Style.Failure, "Failed to fetch models");

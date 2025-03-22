@@ -1,19 +1,37 @@
 import { messages_to_json } from "../../../classes/message.js";
 import fetch from "#root/src/api/fetch.js";
 
-const getHeaders = (apiKey) => {
+const getHeaders = (apiKey, type) => {
+  let authHeaders = {};
+  switch (type) {
+    case "Anthropic": {
+      authHeaders = {
+        "x-api-key": apiKey ? apiKey : undefined,
+        "anthropic-version": "2023-06-01",
+      };
+      break;
+    }
+    case "OpenAI":
+    default: {
+      authHeaders = {
+        Authorization: apiKey ? `Bearer ${apiKey}` : undefined,
+      };
+      break;
+    }
+  }
+
   return {
     "Content-Type": "application/json",
     Accept: "*/*",
-    Authorization: apiKey ? `Bearer ${apiKey}` : undefined,
+    ...authHeaders,
   };
 };
 
-export const getOpenAIModels = async (url, apiKey) => {
+export const getModels = async (url, apiKey, type) => {
   url = url + "/models";
   const response = await fetch(url, {
     method: "GET",
-    headers: getHeaders(apiKey),
+    headers: getHeaders(apiKey, type),
   });
   const data = (await response.json()).data;
   const res = data.map((x) => x.id || x.modelId || null).filter((x) => x !== null);
@@ -63,7 +81,7 @@ export const CustomOpenAIProvider = {
     chat = messages_to_json(chat);
 
     let headers = {
-      ...getHeaders(apiKey),
+      ...getHeaders(apiKey, this.info?.type),
       ...config?.HEADERS,
     };
 
