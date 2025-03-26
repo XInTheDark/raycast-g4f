@@ -20,63 +20,79 @@ export const generateResponse = async function* (info, chat, options = {}, statu
 
   try {
     if (provider.customStream) {
-      // For providers that use stream_update callback
+      // For providers that use stream_update callback: Use a promise-based signal.
       let response = "";
-      let resolve;
       let queue = [];
-      
-      // This promise will be resolved when stream is complete
-      const streamComplete = new Promise(r => { resolve = r; });
-
-      // Create an async generator from stream_update events
-      const generator = (async function* () {
-        while (true) {
-          if (queue.length > 0) {
-            yield queue.shift();
-          } else {
-            const result = await Promise.race([
-              new Promise(r => setTimeout(r, 10)),
-              streamComplete.then(() => null)
-            ]);
-            
-            if (result === null && queue.length === 0) {
-              return;
-            }
-          }
-          
-          // Check if we should stop
-          if (status && status()) {
-            return;
-          }
-        }
-      })();
-
-      // Start the provider's generate method
+      let signalPromiseResolve = null;
+      let signalPromise = new Promise(resolve => { signalPromiseResolve = resolve; });
+      let done = false;
+      let error = null;
+    
+      // Start the provider's generate method in the background
       provider.generate(chat, options, {
         stream_update: (new_response) => {
           if (new_response === null || new_response === undefined) return;
-          
-          // Calculate new content
+    
           const content = new_response.substring(response.length);
           response = new_response;
-          
+    
           if (content) {
             queue.push(content);
+            if (signalPromiseResolve) {
+              // Signal that new data is available
+              const resolveFunc = signalPromiseResolve;
+              signalPromiseResolve = null; // Prevent resolving multiple times before next await
+              signalPromise = new Promise(resolve => { signalPromiseResolve = resolve; }); // Create next signal promise
+              resolveFunc(); 
+            }
           }
         }
-      }).then(() => resolve()).catch(e => {
+      }).then(() => {
+        done = true;
+        if (signalPromiseResolve) signalPromiseResolve(); // Signal completion
+      }).catch(e => {
         console.error("Error in provider.generate:", e);
-        resolve();
+        error = e;
+        done = true;
+        if (signalPromiseResolve) signalPromiseResolve(); // Signal error/completion
       });
+    
+      // Async generator loop consuming the queue, waiting for signals
+      while (!done || queue.length > 0) {
+        // Check status before yielding or waiting
+        if (status && status()) {
+          console.log("Generator stopping due to status check.");
+          // TODO: Ideally, signal the provider.generate to stop if possible.
+          return;
+        }
+    
+        // Yield all currently queued chunks
+        while (queue.length > 0) {
+            yield queue.shift();
+        }
+    
+        // If not done and queue is empty, wait for the next signal (data or completion)
+        if (!done) {
+            await signalPromise; 
+        }
+      }
+    
+      if (error) {
+        console.log(error);
+      }
 
-      yield* generator;
     } else if (info.stream) {
-      // For providers using async generators
+      // For providers using async generators (standard streaming)
       const response = await provider.generate(chat, options, {});
       
+      // Yield chunks, checking status periodically
+      let i = 0;
       for await (const chunk of response) {
-        if (status && status()) return;
+        if ((i & 15) === 0 && status && status()) {
+            return;
+        }
         yield chunk;
+        i++;
       }
     } else {
       // For non-streaming providers
