@@ -273,7 +273,7 @@ export default function Chat({ launchContext }) {
     chatData.messages.push(...newMessages);
   };
 
-  const setCurrentChatMessage = (currentChatData, setCurrentChatData, messageID, { query, response, finished }) => {
+  const setCurrentChatMessage = (currentChatData, setCurrentChatData, messageID, { query, response, ...args }) => {
     setCurrentChatData((oldData) => {
       let newChatData = structuredClone(oldData);
       let messages = newChatData.messages;
@@ -281,7 +281,11 @@ export default function Chat({ launchContext }) {
         if (messages[i].id === messageID) {
           if (query !== undefined) messages[i].first.content = query;
           if (response !== undefined) messages[i].second.content = response;
-          if (finished !== undefined) messages[i].finished = finished;
+          if (args) {
+            for (const key in args) {
+              messages[i][key] = args[key];
+            }
+          }
         }
       }
       return newChatData;
@@ -420,15 +424,18 @@ export default function Chat({ launchContext }) {
 
     setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, { finished: true });
 
-    // Ensure the response is saved in storage
-    await flushUpdateChat(currentChatData);
-
     await toast(
       Toast.Style.Success,
       "Response finished",
       `${chars} chars (${charPerSec} / sec) | ${elapsed.toFixed(1)} sec`
     );
     generationStatus = { stop: false, loading: false, updateCurrentResponse: false };
+
+    // Save message metadata
+    setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, { metadata: { elapsed, chars, charPerSec } });
+
+    // Ensure the response is saved in storage
+    await flushUpdateChat(currentChatData);
 
     // Smart Chat Naming functionality
     if (Preferences["smartChatNaming"] && currentChatData.messages.length <= 2) {
@@ -898,6 +905,9 @@ export default function Chat({ launchContext }) {
     }
   };
 
+  // View-specific variables
+  const [showMessageMetaData, setShowMessageMetaData] = useState(false);
+
   let GPTActionPanel = ({ idx = 0 }) => {
     return (
       <ActionPanel>
@@ -1058,6 +1068,14 @@ export default function Chat({ launchContext }) {
               await toast(Toast.Style.Success, "Chat duplicated");
             }}
             shortcut={{ modifiers: ["cmd", "shift"], key: "d" }}
+          />
+          <Action
+            icon={Icon.Info}
+            title="Show Metadata"
+            onAction={() => {
+              setShowMessageMetaData(!showMessageMetaData);
+            }}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "i" }}
           />
         </ActionPanel.Section>
         <ActionPanel.Section title="Manage Chats">
@@ -1313,14 +1331,39 @@ export default function Chat({ launchContext }) {
                     markdown={x.second.content}
                     // show metadata if files were uploaded
                     metadata={
-                      x.files && x.files.length > 0 ? (
-                        <List.Item.Detail.Metadata>
-                          <List.Item.Detail.Metadata.Label title="Files" />
-                          {x.files.map((file, i) => (
-                            <List.Item.Detail.Metadata.Label title="" text={file} key={i} />
-                          ))}
-                        </List.Item.Detail.Metadata>
-                      ) : null
+                      showMessageMetaData && (
+                        <>
+                          <List.Item.Detail.Metadata>
+                            {
+                              <>
+                                {x.files && x.files.length > 0 ? (
+                                  <>
+                                    <List.Item.Detail.Metadata.Label title="Files" />
+                                    {x.files.map((file, i) => (
+                                      <List.Item.Detail.Metadata.Label title="" text={file} key={i} />
+                                    ))}
+                                  </>
+                                ) : null}
+                                {x.metadata && Object.keys(x.metadata)?.length > 0 ? (
+                                  <>
+                                    <List.Item.Detail.Metadata.Label title="Metadata" />
+                                    {Object.entries(x.metadata).map(
+                                      ([key, value]) =>
+                                        value && (
+                                          <List.Item.Detail.Metadata.Label
+                                            title={key.toUpperCase()}
+                                            text={value.toString()}
+                                            key={key}
+                                          />
+                                        )
+                                    )}
+                                  </>
+                                ) : null}
+                              </>
+                            }
+                          </List.Item.Detail.Metadata>
+                        </>
+                      )
                     }
                   />
                 }
