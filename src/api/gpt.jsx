@@ -25,10 +25,9 @@ import { PasteAction } from "../components/actions/pasteAction.jsx";
 import { autoCheckForUpdates } from "../helpers/update.jsx";
 
 import { init } from "../api/init.js";
-import { Message, pairs_to_messages } from "../classes/message.js";
+import { Message } from "../classes/message.js";
 import { Preferences } from "./preferences.js";
 
-import { truncate_chat } from "../helpers/helper.js";
 import { plainTextMarkdown } from "../helpers/markdown.js";
 import { getFormattedWebResult, systemResponse, web_search_mode, webSystemPrompt } from "./tools/web";
 
@@ -505,7 +504,7 @@ export const getChatResponse = async (currentChat, query = null, stream_update =
     // If no stream_update is provided, return the async generator
     return generateChatResponse(currentChat, query, {}, status);
   }
-  
+
   // If stream_update is provided, process the stream
   await processStream(generateChatResponse(currentChat, query, {}, status), null, stream_update, status);
 };
