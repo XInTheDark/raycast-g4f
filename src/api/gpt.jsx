@@ -16,6 +16,7 @@ import {
 import { useEffect, useState } from "react";
 
 import * as providers from "./providers.js";
+import { generateResponse, generateResponseSync, generateChatResponse, generateChatResponseSync } from "./response.js";
 
 import throttle, { AIChatDelayFunction } from "#root/src/helpers/throttle.js";
 
@@ -24,10 +25,9 @@ import { PasteAction } from "../components/actions/pasteAction.jsx";
 import { autoCheckForUpdates } from "../helpers/update.jsx";
 
 import { init } from "../api/init.js";
-import { Message, pairs_to_messages } from "../classes/message.js";
+import { Message } from "../classes/message.js";
 import { Preferences } from "./preferences.js";
 
-import { truncate_chat } from "../helpers/helper.js";
 import { plainTextMarkdown } from "../helpers/markdown.js";
 import { getFormattedWebResult, systemResponse, web_search_mode, webSystemPrompt } from "./tools/web";
 
@@ -200,7 +200,7 @@ export default (
       let start = Date.now();
 
       if (!info.stream) {
-        response = await chatCompletion(info, messages, options);
+        response = await generateResponseSync(info, messages, options);
         setMarkdown(response);
 
         elapsed = (Date.now() - start) / 1000;
@@ -223,7 +223,7 @@ export default (
 
         const handler = throttle(_handler, { delay: 30, delayFunction: AIChatDelayFunction() });
 
-        await chatCompletion(info, messages, options, handler, get_status);
+        await processStream(generateResponse(info, messages, options, get_status), info.provider, handler);
 
         handler.flush();
       }
@@ -497,66 +497,21 @@ export default (
   );
 };
 
-// Generate response using a chat context (array of Messages, NOT MessagePairs - conversion should be done before this)
-// and options. This is the core function of the extension.
-//
-// if stream_update is passed, we will call it with stream_update(new_message) every time a chunk is received
-// otherwise, this function returns an async generator (if stream = true) or a string (if stream = false)
-// if status is passed, we will stop generating when status() is true
-//
-// also note that the chat parameter is an array of Message objects, and how it is handled is up to the provider modules.
-// for most providers it is first converted into JSON format before being used.
-export const chatCompletion = async (info, chat, options, stream_update = null, status = null) => {
-  const provider = info.provider; // provider object
-  // additional options
-  options = providers.get_options_from_info(info, options);
-
-  let response = await providers.generate(provider, chat, options, { stream_update });
-
-  // stream = false
-  if (typeof response === "string") {
-    // will not be a string if stream is enabled
-    return response;
-  }
-
-  // streaming related handling
-  if (provider.customStream) return; // handled in the provider
-  if (stream_update) {
-    await processStream(response, provider, stream_update, status);
-    return;
-  }
-  return response;
-};
-
 // generate response. input: currentChat is a chat object from AI Chat; query (string) is optional
 // see the documentation of chatCompletion for details on the other parameters
 export const getChatResponse = async (currentChat, query = null, stream_update = null, status = null) => {
-  // load provider and model
-  const info = providers.get_provider_info(currentChat.provider);
-  // additional options
-  let options = providers.get_options_from_info(info, currentChat.options);
+  if (!stream_update) {
+    // If no stream_update is provided, return the async generator
+    return generateChatResponse(currentChat, query, {}, status);
+  }
 
-  // format chat
-  let chat = pairs_to_messages(currentChat.messages, query);
-  chat = truncate_chat(chat, info);
-
-  // generate response
-  return await chatCompletion(info, chat, options, stream_update, status);
+  // If stream_update is provided, process the stream
+  await processStream(generateChatResponse(currentChat, query, {}, status), null, stream_update, status);
 };
 
 // generate response using a chat context and a query, while forcing stream = false
 export const getChatResponseSync = async (currentChat, query = null) => {
-  let r = await getChatResponse(currentChat, query);
-  if (typeof r === "string") {
-    return r;
-  }
-
-  const info = providers.get_provider_info(currentChat.provider);
-  let response = "";
-  for await (const chunk of processChunks(r, info.provider)) {
-    response = chunk;
-  }
-  return response;
+  return await generateChatResponseSync(currentChat, query);
 };
 
 // yield chunks incrementally from a response.
