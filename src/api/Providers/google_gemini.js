@@ -16,8 +16,8 @@ export const GeminiProvider = {
   model_aliases: {
     default: ["gemini-2.0-flash", "gemini-1.5-pro-latest", "gemini-1.5-flash-latest"],
     flash: ["gemini-2.0-flash", "gemini-1.5-flash-latest"],
-    experimental: ["gemini-2.0-pro-exp-02-05", "gemini-2.0-flash-thinking-exp-01-21"],
-    thinking: ["gemini-2.0-flash-thinking-exp-01-21"],
+    experimental: ["gemini-2.5-pro-exp-03-25", "gemini-2.0-pro-exp-02-05", "gemini-2.0-flash-thinking-exp-01-21"],
+    thinking: ["gemini-2.5-pro-exp-03-25", "gemini-2.0-flash-thinking-exp-01-21"],
     "gemini-pro": "default",
     "gemini-flash": "flash",
     "gemini-exp": "experimental",
