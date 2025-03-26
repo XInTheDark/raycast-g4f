@@ -325,7 +325,8 @@ export default function Chat({ launchContext }) {
     const devMode = Preferences["devMode"];
 
     if (!info.stream) {
-      response = await getChatResponse(currentChatData, query);
+      // Use getChatResponseSync for non-streaming providers to get the complete string directly
+      response = await getChatResponseSync(currentChatData, query);
       setCurrentChatMessage(currentChatData, setCurrentChatData, messageID, { response: response });
 
       elapsed = (Date.now() - start) / 1000;
