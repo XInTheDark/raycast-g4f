@@ -23,6 +23,10 @@ export const GeminiProvider = {
     "gemini-exp": "experimental",
     "gemini-thinking": "thinking",
   },
+  maxOutputTokens: {
+    default: 8192,
+    "gemini-2.5-pro-exp-03-25": 64000,
+  },
   generate: async function (chat, options, { stream_update, max_retries = 3 }) {
     let APIKeysStr = Preferences["GeminiAPIKeys"];
     let APIKeys = APIKeysStr.split(",").map((x) => x.trim());
@@ -49,7 +53,7 @@ export const GeminiProvider = {
             history: formattedChat,
             safetySettings: constants.safetyDisabledSettings,
             generationConfig: {
-              maxOutputTokens: 8192, // maximum for v1.5 models
+              maxOutputTokens: this.maxOutputTokens[model] || this.maxOutputTokens.default,
               temperature: options.temperature * 1.5, // v1.5 models have temperature in [0, 2] so we scale it up
             },
             tools: tools,
