@@ -19,12 +19,6 @@ export const additional_provider_options = (provider, chatOptions = null) => {
   return options;
 };
 
-/// Main function for generation
-// note that provider is the provider object, not the provider string
-export const generate = async function (provider, chat, options, { stream_update = null, max_retries = 5 }) {
-  return provider.generate(chat, options, { stream_update, max_retries });
-};
-
 // Utilities
 export const default_provider_string = () => {
   const defaultProvider = Preferences["defaultProvider"];
