@@ -2,6 +2,7 @@ import useGPT from "./api/gpt.jsx";
 
 export default function Professional(props) {
   return useGPT(props, {
+    commandId: "professional",
     context:
       "In the following text, change it to use advanced vocabulary but do not overuse it. Make sure to use proper grammar and spell check thoroughly. " +
       "Show expertise in the subject provided, but do not add any extra information. " +

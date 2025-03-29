@@ -6,5 +6,11 @@ export default function FindSynonyms(props) {
     "Only return the synonyms, and add nothing else. " +
     "Keep the casing of the word/phrase the same. Your response should only return the BULLET POINTS of the synonyms.\n";
 
-  return useGPT(props, { context: prompt, useSelected: true, showFormText: "Word/phrase", allowPaste: true });
+  return useGPT(props, {
+    commandId: "synonyms",
+    context: prompt,
+    useSelected: true,
+    showFormText: "Word/phrase",
+    allowPaste: true,
+  });
 }

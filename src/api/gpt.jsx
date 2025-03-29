@@ -37,6 +37,7 @@ let get_status = () => generationStatus.stop;
 export default (
   props,
   {
+    commandId = "",
     context = undefined,
     allowPaste = false,
     useSelected = false,
@@ -54,40 +55,40 @@ export default (
   } = {}
 ) => {
   // The parameters are documented here:
-  // 1. props: We mostly use this parameter for the query value, which is obtained using props.arguments.query.
+  // - commandId: The command ID, which is used to identify the command.
+  // - props: We mostly use this parameter for the query value, which is obtained using props.arguments.query.
   // For example, the `Ask AI` command shows a "Query" box when the user types the command.
-  // 2. context: A string to be added before the query value. This is usually a default prompt specific to each command.
+  // - context: A string to be added before the query value. This is usually a default prompt specific to each command.
   // For example, the `Summary` command has a context of "Summarize the given text."
-  // 3. allowPaste: A boolean to allow pasting the response to the clipboard.
-  // 4. useSelected: A boolean to use the selected text as the query. If we fail to get selected text,
+  // - allowPaste: A boolean to allow pasting the response to the clipboard.
+  // - useSelected: A boolean to use the selected text as the query. If we fail to get selected text,
   // either of the three following scenarios will happen depending on the query value and showFormText parameter:
   //    a. If query is provided, we will get response based on the query value.
   //    b. If showFormText string is provided, a Form will be shown with the showFormText parameter as the field title.
   //    c. If showFormText is not provided, an error will be shown and the command quits.
-  // 5. requireQuery: A boolean to require a query, separate from selected text. Explanation:
+  // - requireQuery: A boolean to require a query, separate from selected text. Explanation:
   // By default, the selected text is taken to be the query. For example, the `Continue`, `Fix Code`... commands.
   // But other commands, like `Ask About Selected Text`, may want to use a query in addition to the selected text.
-  // 6. showFormText: A string to be shown as the field title in the Form. If true, either of the three following
+  // - showFormText: A string to be shown as the field title in the Form. If true, either of the three following
   // scenarios will happen depending on the query value and useSelected parameter:
   //    a. If useSelected is true, see useSelected documentation above.
   //    b. If useSelected is false, and query is provided, we will get response based on the query value.
   //    c. If useSelected is false, and query is not provided, a Form will be shown with the showFormText parameter as the field title.
-
-  // 7. forceShowForm: Even if selected text is available, still show the form. In this case the default value
+  // - forceShowForm: Even if selected text is available, still show the form. In this case the default value
   // for the first field in the form will be the selected text. For example, `Translate` command has this set to true
   // because the user needs to select the target language in the form.
-  // 8. otherReactComponents: An array of additional React components to be shown in the Form.
+  // - otherReactComponents: An array of additional React components to be shown in the Form.
   // For example, `Translate` command has a dropdown to select the target language.
-  // 9. processPrompt: A function to be called to get the final prompt. The usage is
+  // - processPrompt: A function to be called to get the final prompt. The usage is
   // processPrompt({context: context, query: query, selected: selected, values: otherReactComponents.values - if any}).
   // Both async and non-async functions are supported - in particular, we just always `await` the function.
-  // 10. allowUploadFiles: A boolean to allow uploading files in the Form. If true, a file upload field will be shown.
-  // 11. defaultFiles: Files to always include in the prompt. This is an array of file paths.
-  // 12. useDefaultLanguage: A boolean to use the default language. If true, the default language will be used in the response.
-  // 13. webSearchMode: A string to allow web search. If "always", we will always search.
+  // - allowUploadFiles: A boolean to allow uploading files in the Form. If true, a file upload field will be shown.
+  // - defaultFiles: Files to always include in the prompt. This is an array of file paths.
+  // - useDefaultLanguage: A boolean to use the default language. If true, the default language will be used in the response.
+  // - webSearchMode: A string to allow web search. If "always", we will always search.
   // Otherwise, if "auto", the extension preferences are followed.
-  // 14. displayPlainText: A boolean to display the response as plain text. If true, we attempt to convert the markdown to plain text.
-  // 15. allowedProviders: An array of allowed provider strings. If provided, only the providers in the array will be used.
+  // - displayPlainText: A boolean to display the response as plain text. If true, we attempt to convert the markdown to plain text.
+  // - allowedProviders: An array of allowed provider strings. If provided, only the providers in the array will be used.
 
   /// Init
   const Pages = {
@@ -124,12 +125,13 @@ export default (
     await init();
     let info, options;
     try {
-      const providerString =
-        !allowedProviders ||
-        allowedProviders?.length === 0 ||
-        allowedProviders.includes(providers.default_provider_string())
-          ? providers.default_provider_string()
-          : allowedProviders[0];
+      let providerString = providers.default_provider_string();
+      if (commandId && Preferences["commandOptions"]?.[commandId]?.commandProvider) {
+        providerString = Preferences["commandOptions"][commandId].commandProvider;
+      }
+      if (allowedProviders && allowedProviders.length > 0 && !allowedProviders.includes(providerString)) {
+        providerString = allowedProviders[0];
+      }
       setProviderString(providerString);
       info = providers.get_provider_info(providerString);
 

@@ -6,6 +6,7 @@ import { DefaultModel } from "#root/src/components/preferences/options/defaultMo
 import { GeneralOptions } from "#root/src/components/preferences/options/generalOptions.jsx";
 import { AIFeaturesOptions } from "#root/src/components/preferences/options/aiFeaturesOptions.jsx";
 import { AIChatOptions } from "#root/src/components/preferences/options/aiChatOptions.jsx";
+import { DefaultCommandOptions } from "#root/src/components/preferences/options/commandOptions.jsx";
 
 import {
   ManageCustomAPIs,
@@ -33,6 +34,9 @@ export default function ManagePreferences() {
       <List.Section title="Options">
         {/* - Default Provider */}
         {PreferenceComponent({ title: "Default Model", target: <DefaultModel /> })}
+
+        {/* - Default Commands */}
+        {PreferenceComponent({ title: "Default Commands", target: <DefaultCommandOptions /> })}
 
         {/* - General */}
         {PreferenceComponent({ title: "General", target: <GeneralOptions /> })}

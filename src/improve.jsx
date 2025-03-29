@@ -2,6 +2,7 @@ import useGPT from "./api/gpt.jsx";
 
 export default function Improve(props) {
   return useGPT(props, {
+    commandId: "improve",
     context: `Act as a spelling corrector, content editor, and text improver. ONLY return the rewritten text and nothing else.
 
 Strictly follow these rules:
