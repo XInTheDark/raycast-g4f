@@ -51,8 +51,8 @@ export default function ManagePreferences() {
       </List.Section>
 
       <List.Section title="Manage Commands">
-      {/* - Default Commands */}
-      {PreferenceComponent({ title: "Default AI Commands", target: <DefaultCommandOptions /> })}
+        {/* - Default Commands */}
+        {PreferenceComponent({ title: "Default AI Commands", target: <DefaultCommandOptions /> })}
       </List.Section>
 
       {/* - Command Options */}

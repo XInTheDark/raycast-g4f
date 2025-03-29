@@ -12,7 +12,13 @@ const switchType = (option) => {
   switch (option.type) {
     case "dropdown":
       return (
-        <ValueDropdown id={option.id} title={option.title} description={option.description} dropdownComponent={option.dropdownComponent} legacyData={option.data} />
+        <ValueDropdown
+          id={option.id}
+          title={option.title}
+          description={option.description}
+          dropdownComponent={option.dropdownComponent}
+          legacyData={option.data}
+        />
       );
     case "checkbox":
       return <ValueCheckbox id={option.id} title={option.title} description={option.description} />;
