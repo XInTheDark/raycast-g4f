@@ -5,12 +5,13 @@ import { getBrowserTab } from "./browser.jsx";
 import { execShellNoStream } from "#root/src/api/shell.js";
 
 export class CustomCommand {
-  constructor({ name = "", prompt = "", id = Date.now().toString(), options = {}, shortcut = "" }) {
+  constructor({ name = "", prompt = "", id = Date.now().toString(), options = {}, shortcut = "", model = "" }) {
     this.name = name;
     this.prompt = prompt;
     this.id = id;
     this.options = options;
     this.shortcut = shortcut;
+    this.model = model;
   }
 
   async processPrompt(prompt, query, selected) {

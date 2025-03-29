@@ -2,10 +2,10 @@ import { List } from "@raycast/api";
 import { PreferenceComponent } from "#root/src/components/preferences/base/preferenceComponent.jsx";
 
 // Components
-import { DefaultModel } from "#root/src/components/preferences/options/defaultModel.jsx";
 import { GeneralOptions } from "#root/src/components/preferences/options/generalOptions.jsx";
 import { AIFeaturesOptions } from "#root/src/components/preferences/options/aiFeaturesOptions.jsx";
 import { AIChatOptions } from "#root/src/components/preferences/options/aiChatOptions.jsx";
+import { DefaultCommandOptions } from "#root/src/components/preferences/options/commandOptions.jsx";
 
 import {
   ManageCustomAPIs,
@@ -30,10 +30,7 @@ export default function ManagePreferences() {
 
   return initialised ? (
     <List>
-      <List.Section title="Options">
-        {/* - Default Provider */}
-        {PreferenceComponent({ title: "Default Model", target: <DefaultModel /> })}
-
+      <List.Section>
         {/* - General */}
         {PreferenceComponent({ title: "General", target: <GeneralOptions /> })}
 
@@ -53,6 +50,12 @@ export default function ManagePreferences() {
         {PreferenceComponent({ title: "Raycast AI", target: <ManageRaycastAIAPI /> })}
       </List.Section>
 
+      <List.Section title="Manage Commands">
+        {/* - Default Commands */}
+        {PreferenceComponent({ title: "Default AI Commands", target: <DefaultCommandOptions /> })}
+      </List.Section>
+
+      {/* - Command Options */}
       {/* AI Presets */}
       <List.Section title="AI Presets">
         {PreferenceComponent({ title: "Manage AI Presets", target: <ManageAIPresets /> })}

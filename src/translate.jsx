@@ -33,6 +33,7 @@ export default function Translate(props) {
   const useDefaultLanguage = Preferences["translateUseDefaultLanguage"];
 
   return useGPT(props, {
+    commandId: "translate",
     useSelected: true,
     showFormText: "Text to translate",
     allowPaste: true,

@@ -565,7 +565,7 @@ export default function Chat({ launchContext }) {
           ]}
         </Form.Dropdown>
 
-        <Form.Description title="Model" text="The provider and model used for this chat." />
+        <Form.Description title="Model" text="The model used for this chat." />
         <Form.Dropdown id="provider" defaultValue={chat?.provider || providers.default_provider_string()}>
           {ChatProvidersReact()}
         </Form.Dropdown>

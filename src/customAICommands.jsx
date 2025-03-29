@@ -7,6 +7,8 @@ import useGPT from "./api/gpt.jsx";
 import { help_action } from "./helpers/helpPage.jsx";
 import { stringToKeyboardShortcut } from "#root/src/helpers/helper.js";
 
+import { ChatProvidersReact } from "#root/src/api/data/providers_react.jsx";
+
 export default function CustomAICommands() {
   let [commands, setCommands] = useState(null);
 
@@ -42,6 +44,7 @@ export default function CustomAICommands() {
                 command.name = values.name;
                 command.prompt = values.prompt;
                 command.shortcut = values.shortcut.toLowerCase();
+                command.model = values.model;
                 command.options.webSearch = values.webSearch;
                 command.options.allowUploadFiles = values.allowUploadFiles;
                 command.options.useSelected = values.useSelected;
@@ -75,6 +78,16 @@ export default function CustomAICommands() {
           info="Example: cmd+opt+n"
           defaultValue={command.shortcut}
         />
+
+        <Form.Dropdown
+          id="model"
+          title="Model"
+          info="The model to use for this command"
+          defaultValue={command.model || ""}
+        >
+          <Form.Dropdown.Item title="Use Default Model" value="" />
+          {ChatProvidersReact()}
+        </Form.Dropdown>
 
         {/* Options */}
         {/* We place webSearch first because it doesn't have an info; otherwise it somehow messes up the layout */}
@@ -191,6 +204,7 @@ export default function CustomAICommands() {
         forceShowForm: command.options?.forceShowForm,
         webSearchMode: command.options?.webSearch ? "always" : "off",
         allowUploadFiles: command.options?.allowUploadFiles,
+        allowedProviders: command.model ? [command.model] : null,
       }
     );
   };

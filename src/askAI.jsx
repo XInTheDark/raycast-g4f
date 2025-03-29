@@ -7,5 +7,10 @@ export default function AskAI(props) {
     let _params = props?.launchContext?.params || {};
     return useGPT(_props, _params);
   }
-  return useGPT(props, { showFormText: "Prompt", allowUploadFiles: true, webSearchMode: "auto" });
+  return useGPT(props, {
+    commandId: "askAI",
+    showFormText: "Prompt",
+    allowUploadFiles: true,
+    webSearchMode: "auto",
+  });
 }

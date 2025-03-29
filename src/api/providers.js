@@ -19,27 +19,21 @@ export const additional_provider_options = (provider, chatOptions = null) => {
   return options;
 };
 
-/// Main function for generation
-// note that provider is the provider object, not the provider string
-export const generate = async function (provider, chat, options, { stream_update = null, max_retries = 5 }) {
-  return provider.generate(chat, options, { stream_update, max_retries });
-};
-
 // Utilities
-export const default_provider_string = () => {
-  const defaultProvider = Preferences["defaultProvider"];
-  // make sure the default provider is valid
-  return providers_info[defaultProvider] ? defaultProvider : Object.keys(providers_info)[0];
+export const get_provider_string = (providerString) => {
+  let provider = providerString || Preferences["defaultProvider"];
+  // make sure the return value is valid
+  if (!providers_info[provider]) {
+    throw new Error(`Invalid provider string: ${provider}`);
+  }
+  return provider;
 };
 
-// Parse provider string
-export const get_provider_string = (provider) => {
-  if (provider && Object.keys(providers_info).includes(provider)) return provider;
-  return default_provider_string();
+export const default_provider_string = () => {
+  return get_provider_string(Preferences["defaultProvider"]);
 };
 
 // Get provider info based on a provider STRING (i.e. the key in providers_info)
-// if providerString is not supplied or is incorrect, implicitly return the default provider
 export const get_provider_info = (providerString) => {
   return providers_info[get_provider_string(providerString)];
 };

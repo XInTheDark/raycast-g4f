@@ -42,7 +42,7 @@ export const ValueDropdown = ({
       >
         {description && <Form.Description text={description} />}
         <Form.Dropdown id={id} title={title} defaultValue={Preferences[id]}>
-          {dropdownComponent}
+          {dropdownComponent()}
         </Form.Dropdown>
       </Form>
     </>
