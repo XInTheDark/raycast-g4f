@@ -198,7 +198,6 @@ export default function CustomAICommands() {
     return useGPT(
       {},
       {
-        commandId: `custom_${command.id}`, // Use custom command ID format
         showFormText: "Input",
         processPrompt: command.processPromptFunction(),
         useSelected: command.options?.useSelected ?? true,
