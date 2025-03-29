@@ -1,7 +1,14 @@
 import { OptionsComponent } from "#root/src/components/preferences/base/optionsComponent.jsx";
 import { languages } from "#root/src/config/config.json";
+import { ChatProvidersReact } from "#root/src/api/data/providers_react.jsx";
 
 const generalOptions = {
+  defaultProvider: {
+    title: "Default Model",
+    description: "The default model used in this extension.",
+    type: "dropdown",
+    dropdownComponent: ChatProvidersReact,
+  },
   defaultLanguage: {
     title: "Default Language",
     description: "The default language used in AI responses. This does not affect the extension UI.",
