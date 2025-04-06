@@ -1,11 +1,11 @@
 import { Action, ActionPanel, List } from "@raycast/api";
 
-export const PreferenceComponent = ({ title, subtitle, target, accessories = [] }) => {
+export const PreferenceComponent = ({ title, listTitle, subtitle, listSubtitle, target, accessories = [] }) => {
   return (
     <List.Item
-      title={title}
+      title={listTitle || title}
       key={title}
-      subtitle={subtitle}
+      subtitle={listSubtitle || subtitle}
       accessories={accessories}
       actions={
         <ActionPanel>

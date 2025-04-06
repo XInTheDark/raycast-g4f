@@ -18,12 +18,15 @@ export const ValueDropdown = ({
   dropdownComponent = null,
   legacyData = null,
   onPreferenceUpdate,
+  setValue,
 }) => {
   if (!dropdownComponent) {
     dropdownComponent = () => legacyDataToComponent(legacyData);
   }
 
   const { pop } = useNavigation();
+  const defaultValue = setValue ? null : Preferences[id];
+
   return (
     <>
       <Form
@@ -32,7 +35,11 @@ export const ValueDropdown = ({
             <Action.SubmitForm
               title="Save"
               onSubmit={async (values) => {
-                await updatePreferences(id, values[id]);
+                if (setValue) {
+                  await setValue(values[id]);
+                } else {
+                  await updatePreferences(id, values[id]);
+                }
                 onPreferenceUpdate?.();
                 pop();
               }}
@@ -41,7 +48,7 @@ export const ValueDropdown = ({
         }
       >
         {description && <Form.Description text={description} />}
-        <Form.Dropdown id={id} title={title} defaultValue={Preferences[id]}>
+        <Form.Dropdown id={id} title={title} defaultValue={defaultValue}>
           {dropdownComponent()}
         </Form.Dropdown>
       </Form>

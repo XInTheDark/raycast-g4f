@@ -31,7 +31,7 @@ const switchType = (option) => {
   }
 };
 
-export const OptionsComponent = ({ options }) => {
+export const OptionsComponent = ({ options, description }) => {
   // Used to refresh the view when a preference is updated
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
@@ -41,24 +41,29 @@ export const OptionsComponent = ({ options }) => {
 
   return (
     <List>
+      {description && <List.Section title={description} />}
       {Object.keys(options).map((key) => {
         const option = {
           id: key,
           ...options[key],
         };
 
-        const accessories = Preferences[key] !== undefined ? [{ tag: Preferences[key].toString() }] : [];
+        // Use custom getValue if provided, otherwise use standard Preferences lookup
+        const value = option.getValue ? option.getValue() : Preferences[key];
+        const accessories = value !== undefined ? [{ tag: value.toString() }] : [];
 
         const target = switchType(option);
         const targetWithCallback = cloneElement(target, {
           onPreferenceUpdate: handlePreferenceUpdate,
+          setValue: option.setValue,
         });
 
         return (
           <PreferenceComponent
             title={option.title}
+            listTitle={option.listTitle}
             key={`${key}-${refreshTrigger}`}
-            subtitle={option.description}
+            subtitle={option.listDescription || option.description}
             accessories={accessories}
             target={targetWithCallback}
           />
