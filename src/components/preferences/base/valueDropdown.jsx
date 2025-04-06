@@ -20,7 +20,7 @@ export const ValueDropdown = ({
   onPreferenceUpdate,
 }) => {
   if (!dropdownComponent) {
-    dropdownComponent = legacyDataToComponent(legacyData);
+    dropdownComponent = () => legacyDataToComponent(legacyData);
   }
 
   const { pop } = useNavigation();
