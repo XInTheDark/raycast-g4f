@@ -125,10 +125,7 @@ export default (
     await init();
     let info, options;
     try {
-      let providerString = providers.default_provider_string();
-      if (commandId && Preferences["commandOptions"]?.[commandId]?.commandProvider) {
-        providerString = Preferences["commandOptions"][commandId].commandProvider;
-      }
+      let providerString = providers.default_provider_string(commandId);
       if (allowedProviders && allowedProviders.length > 0 && !allowedProviders.includes(providerString)) {
         providerString = allowedProviders[0];
       }

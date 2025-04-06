@@ -226,7 +226,7 @@ export default function Chat({ launchContext }) {
     name = "New Chat",
     creationDate = new Date(),
     id = Date.now().toString(), // toString() is important because Raycast expects a string for value
-    provider = providers.default_provider_string(),
+    provider = providers.default_provider_string("aiChat"),
     options = { creativity: "0.7", webSearch: web_search_mode("chat") },
     systemPrompt = "",
     messages = [],
@@ -566,7 +566,7 @@ export default function Chat({ launchContext }) {
         </Form.Dropdown>
 
         <Form.Description title="Model" text="The model used for this chat." />
-        <Form.Dropdown id="provider" defaultValue={chat?.provider || providers.default_provider_string()}>
+        <Form.Dropdown id="provider" defaultValue={chat?.provider || providers.default_provider_string("aiChat")}>
           {ChatProvidersReact()}
         </Form.Dropdown>
 

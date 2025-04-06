@@ -29,7 +29,11 @@ export const get_provider_string = (providerString) => {
   return provider;
 };
 
-export const default_provider_string = () => {
+// Get the default provider string. If the commandId is provided, it will be used to get the default provider for that command.
+export const default_provider_string = (commandId) => {
+  if (commandId && Preferences["commandOptions"]?.[commandId]?.commandProvider) {
+    return get_provider_string(Preferences["commandOptions"][commandId].commandProvider);
+  }
   return get_provider_string(Preferences["defaultProvider"]);
 };
 
