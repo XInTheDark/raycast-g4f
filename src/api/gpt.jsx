@@ -149,7 +149,17 @@ export default (
     if (!regenerate) {
       // handle processPrompt
       if (processPrompt) {
-        query = await processPrompt({ context: context, query: query, selected: selectedState });
+        // The 'values' parameter is tricky. When calling getResponse directly (not from form submission),
+        // there are no form values. We pass an empty object. processPrompt should handle missing values.
+        query = await processPrompt({ context: context, query: query, selected: selectedState, values: {} }); // Pass selectedState and empty values
+      } else if (context || (requireQuery && selectedState)) {
+        // Default handling if no processPrompt: prepend context and/or append selected text if required.
+        let finalQuery = context ? `${context}\n\n${query}` : query;
+        if (requireQuery && selectedState) {
+          // If query is required AND selected text exists, append selected text.
+          finalQuery += `\n\n${selectedState}`;
+        }
+        query = finalQuery;
       }
 
       // handle files: we combine files (files that the user uploads)
@@ -262,111 +272,91 @@ export default (
       message: argQuery ? argQuery : !requireQuery && selectedState ? selectedState : "",
     }));
   };
-  useEffect(() => {
-    initInput(selectedState);
-  }, []);
 
   // For currently unknown reasons, this following useEffect is rendered twice, both at the same time.
   // This results in getResponse() being called twice whenever a command is called directly (i.e. the form is not shown).
   // This problem has always been present, and it's also present in the original raycast-gemini.
   // We work around this by preventing any generation when the generationStatus.loading flag is set to true.
+  // UPDATE: This is due to React.StrictMode, which renders components twice in development mode.
   useEffect(() => {
     (async () => {
+      // 1. Fetch selected text if needed
+      let selected = null;
       if (useSelected) {
-        let systemPrompt = (context ? `${context}\n\n` : "") + (argQuery ? argQuery : "");
-
-        let selected;
         try {
           selected = await getSelectedText();
+          console.log("Selected text:", selected);
         } catch (e) {
-          selected = null;
+          /* ignore error */
         }
         if (selected && !selected.trim()) selected = null;
+        setSelected(selected); // Update state for potential later use elsewhere (e.g., processPrompt)
+      }
 
-        // This is also part of the workaround for the double rendering issue. If we are currently generating a response
-        // then we should not attempt to generate another response, or set the page to a Form.
-        // We do this check here instead of at the beginning, because getSelectedText() is sequential and the two calls to it
-        // will always complete one after the other. On the other hand, we can't check at the beginning because the two calls
-        // are started at the exact same time.
-        if (generationStatus.loading) return;
+      // 2. Prevent double generation if already loading
+      // This check should happen regardless of whether selected text was fetched successfully or not.
+      // If the effect runs twice, this check helps prevent double generation.
+      if (generationStatus.loading) return;
 
-        setSelected(selected);
-        initInput(selected);
+      // 3. Initialize form input state (message field)
+      // Prioritizes argQuery, then selected text (if !requireQuery), then empty string.
+      initInput(selected); // Pass fetched selected text (or null)
 
-        // Before the rest of the code, handle forceShowForm
-        if (forceShowForm) {
-          setPage(Pages.Form);
-          return;
-        }
+      // 4. Handle forced form display
+      if (forceShowForm) {
+        setPage(Pages.Form);
+        setIsLoading(false);
+        return;
+      }
 
-        // if not requireQuery, we use the selected text as the query
+      // 5. Decide whether to call API directly or show the form based on available inputs & flags
+
+      // Determine the primary query based on flags and available text
+      // This is the query part that will be passed to getResponse or used in processPrompt.
+      // getResponse will handle adding context, language instructions, web results etc.
+      let primaryQuery = argQuery || ""; // Default to argQuery
+      if (useSelected && !requireQuery && selected) {
+        primaryQuery = selected; // If using selected, it's the primary query
+      }
+
+      // Determine if we have enough input to call the API directly
+      let callAPI = false;
+      if (useSelected) {
         if (!requireQuery) {
-          // handle the case where we don't use selected text: if we already have a context & query. e.g. "Find Synonyms" command.
-          // This is in fact not completely optimized, as we didn't have to get the selected text in the first place,
-          // but it's a niche case and the branching is already complex enough.
-          if (context && argQuery) {
-            await getResponse(`${systemPrompt}`);
-            return;
-          }
-
-          // if we need selected as query but it is not available, we will try to show a Form
-          if (!selected) {
-            if (showFormText) {
-              setPage(Pages.Form);
-            } else {
-              // if no selected text is available and showing a form is not allowed, we will show an error
-              await popToRoot();
-              await showToast({
-                style: Toast.Style.Failure,
-                title: "Could not get selected text",
-              });
-            }
-          } else {
-            await getResponse(`${systemPrompt}\n\n${selected}`);
+          // Selected is the query. Call API if selected exists OR if context+argQuery override exists.
+          if (selected || (context && argQuery)) {
+            callAPI = true;
+            // If context+argQuery override, primaryQuery should be argQuery for getResponse
+            if (context && argQuery && !selected) primaryQuery = argQuery;
           }
         } else {
-          // requireQuery - we need a separate query
-          // if a query is provided, then we use it as system prompt, and selected text as "query"
+          // Require separate query (argQuery). Call API if argQuery exists.
           if (argQuery) {
-            await getResponse(`${systemPrompt}\n\n${selected}`);
-          }
-
-          // if no query is provided, we will need to obtain a separate query by showing a form
-          else if (showFormText) {
-            setPage(Pages.Form);
-          }
-
-          // if no query is provided and showing a form is not allowed, we will show an error
-          else {
-            await popToRoot();
-            await showToast({
-              style: Toast.Style.Failure,
-              title: "No query provided",
-            });
+            callAPI = true;
+            primaryQuery = argQuery; // Primary query is argQuery
           }
         }
       } else {
-        // !useSelected
-
-        // Before the rest of the code, handle forceShowForm
-        if (forceShowForm) {
-          setPage(Pages.Form);
-          return;
-        }
-
+        // Not using selected text. Call API if argQuery exists.
         if (argQuery) {
-          await getResponse(argQuery);
+          callAPI = true;
+          primaryQuery = argQuery;
+        }
+      }
+
+      // 6. Execute action: Call API or show form/error
+      if (callAPI) {
+        await getResponse(primaryQuery); // Pass the determined primary query
+      } else {
+        // Conditions met to show form or error
+        if (showFormText) {
+          setPage(Pages.Form);
+          setIsLoading(false); // Stop loading indicator
         } else {
-          if (showFormText) {
-            setPage(Pages.Form);
-          } else {
-            // if no query is provided and showing a form is not allowed, we will show an error
-            await popToRoot();
-            await showToast({
-              style: Toast.Style.Failure,
-              title: "No query provided",
-            });
-          }
+          // Error: Missing required input and form not allowed
+          const errorTitle = useSelected ? "Could not get selected text" : "No query provided";
+          await popToRoot();
+          await showToast({ style: Toast.Style.Failure, title: errorTitle });
         }
       }
     })();
