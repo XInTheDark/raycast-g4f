@@ -4,9 +4,19 @@ import { ChatProvidersReact } from "#root/src/api/data/providers_react.jsx";
 import { OptionsComponent } from "#root/src/components/preferences/base/optionsComponent.jsx";
 import { Preferences } from "#root/src/api/preferences.js";
 import { updatePreferences } from "#root/src/helpers/preferences_helper.js";
+import { Form } from "@raycast/api";
 
 export const DefaultCommandOptions = () => {
   const [commandOptionsConfig, setCommandOptionsConfig] = useState({});
+
+  const ChatProvidersDropdown = () => {
+    return (
+      <>
+        <Form.Dropdown.Item title="Use default model" value="Default" />
+        {ChatProvidersReact()}
+      </>
+    );
+  };
 
   useEffect(() => {
     const buildCommandOptions = async () => {
@@ -21,7 +31,7 @@ export const DefaultCommandOptions = () => {
           title: "Model",
           description: `Set the default model for "${command.title}"`,
           type: "dropdown",
-          dropdownComponent: ChatProvidersReact,
+          dropdownComponent: ChatProvidersDropdown,
           // Custom handler
           getValue: () => {
             return Preferences.commandOptions?.[commandId]?.commandProvider || "Default";

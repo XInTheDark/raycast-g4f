@@ -18,6 +18,8 @@ const switchType = (option) => {
           description={option.description}
           dropdownComponent={option.dropdownComponent}
           legacyData={option.data}
+          getValue={option.getValue}
+          setValue={option.setValue}
         />
       );
     case "checkbox":

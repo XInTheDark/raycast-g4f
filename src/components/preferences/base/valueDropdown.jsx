@@ -18,6 +18,7 @@ export const ValueDropdown = ({
   dropdownComponent = null,
   legacyData = null,
   onPreferenceUpdate,
+  getValue,
   setValue,
 }) => {
   if (!dropdownComponent) {
@@ -25,7 +26,7 @@ export const ValueDropdown = ({
   }
 
   const { pop } = useNavigation();
-  const defaultValue = setValue ? null : Preferences[id];
+  const defaultValue = getValue ? getValue() : Preferences[id];
 
   return (
     <>
