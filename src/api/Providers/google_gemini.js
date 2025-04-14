@@ -36,16 +36,16 @@ export const GeminiProvider = {
     let model = this.model_aliases[options.model];
     let models = Array.isArray(model) ? model : [model];
 
-    // disable native web search for now, as Google search tool is unavailable for free users
-    const useWebSearch = options.webSearch === "auto" && false;
+    const useWebSearch = max_retries >= 2 && ["auto", "balanced"].includes(Preferences["webSearch"]);
     const useCodeInterpreter = Preferences["codeInterpreter"];
 
     const tools = [
-      ...(useWebSearch ? [constants.defaultTools.webSearch] : []),
-      ...(useCodeInterpreter ? [constants.defaultTools.codeExecution] : []),
+      ...(useWebSearch ? [{ googleSearch: {} }] : []),
+      ...(useCodeInterpreter ? [{ codeExecution: {} }] : []),
     ];
 
     try {
+      let ok = false;
       for (const model of models) {
         for (const APIKey of APIKeys) {
           const googleGemini = new Gemini(APIKey, { fetch: fetch });
@@ -73,11 +73,15 @@ export const GeminiProvider = {
             }
 
             // return when done
+            ok = true;
             return;
           } catch (e) {
             console.log(e);
           }
         }
+      }
+      if (!ok) {
+        throw new Error("All API keys failed");
       }
     } catch (e) {
       // if all API keys fail, we allow a few retries
