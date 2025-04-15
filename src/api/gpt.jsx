@@ -4,7 +4,6 @@ import {
   confirmAlert,
   Detail,
   Form,
-  getSelectedText,
   Icon,
   Keyboard,
   launchCommand,
@@ -14,6 +13,8 @@ import {
   Toast,
 } from "@raycast/api";
 import { useEffect, useState } from "react";
+
+import { getSelectedText } from "#root/src/helpers/accessibility.jsx";
 
 import * as providers from "./providers.js";
 import { generateResponse, generateResponseSync, generateChatResponse, generateChatResponseSync } from "./response.js";
@@ -98,7 +99,7 @@ export default (
   const [page, setPage] = useState(Pages.Detail);
   const [markdown, _setMarkdown] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedState, setSelected] = useState("");
+  const [selectedState, setSelected] = useState(null);
   const [lastQuery, setLastQuery] = useState({ text: "", files: [] });
   const [lastResponse, setLastResponse] = useState("");
   const [providerString, setProviderString] = useState(""); // global variable since it may be used outside the main function
@@ -262,98 +263,64 @@ export default (
   };
 
   // Init variables for Pages.Form
-  const [input, setInput] = useState({
+  let [input, setInput] = useState({
     message: "",
     files: [],
   });
-  const initInput = (selectedState) => {
-    setInput((prevInput) => ({
-      ...prevInput,
-      message: argQuery ? argQuery : !requireQuery && selectedState ? selectedState : "",
-    }));
-  };
+  let [primaryQuery, setPrimaryQuery] = useState("");
 
-  // For currently unknown reasons, this following useEffect is rendered twice, both at the same time.
-  // This results in getResponse() being called twice whenever a command is called directly (i.e. the form is not shown).
-  // This problem has always been present, and it's also present in the original raycast-gemini.
-  // We work around this by preventing any generation when the generationStatus.loading flag is set to true.
-  // UPDATE: This is due to React.StrictMode, which renders components twice in development mode.
   useEffect(() => {
     (async () => {
-      // 1. Fetch selected text if needed
       let selected = null;
       if (useSelected) {
         try {
           selected = await getSelectedText();
-          console.log("Selected text:", selected);
         } catch (e) {
-          /* ignore error */
+          console.log(e);
         }
         if (selected && !selected.trim()) selected = null;
-        setSelected(selected); // Update state for potential later use elsewhere (e.g., processPrompt)
+        console.log("Selected text:", selected);
+        setSelected(selected);
       }
 
-      // 2. Prevent double generation if already loading
-      // This check should happen regardless of whether selected text was fetched successfully or not.
-      // If the effect runs twice, this check helps prevent double generation.
-      if (generationStatus.loading) return;
-
-      // 3. Initialize form input state (message field)
-      // Prioritizes argQuery, then selected text (if !requireQuery), then empty string.
-      initInput(selected); // Pass fetched selected text (or null)
+      // Calculate primary query based on context, selected text and args
+      const initPrimaryQuery = () => {
+        let m = "";
+        if (context) m += `${context}\n\n`;
+        if (selected) m += `${selected}\n\n`;
+        if (argQuery) m += `${argQuery}\n\n`;
+        return m;
+      };
+      primaryQuery = initPrimaryQuery();
+      setPrimaryQuery(primaryQuery);
 
       // 4. Handle forced form display
       if (forceShowForm) {
+        setInput((prevInput) => ({ ...prevInput, message: primaryQuery }));
         setPage(Pages.Form);
         setIsLoading(false);
         return;
       }
 
       // 5. Decide whether to call API directly or show the form based on available inputs & flags
-
-      // Determine the primary query based on flags and available text
-      // This is the query part that will be passed to getResponse or used in processPrompt.
-      // getResponse will handle adding context, language instructions, web results etc.
-      let primaryQuery = argQuery || ""; // Default to argQuery
-      if (useSelected && !requireQuery && selected) {
-        primaryQuery = selected; // If using selected, it's the primary query
-      }
-
-      // Determine if we have enough input to call the API directly
       let callAPI = false;
-      if (useSelected) {
-        if (!requireQuery) {
-          // Selected is the query. Call API if selected exists OR if context+argQuery override exists.
-          if (selected || (context && argQuery)) {
-            callAPI = true;
-            // If context+argQuery override, primaryQuery should be argQuery for getResponse
-            if (context && argQuery && !selected) primaryQuery = argQuery;
-          }
-        } else {
-          // Require separate query (argQuery). Call API if argQuery exists.
-          if (argQuery) {
-            callAPI = true;
-            primaryQuery = argQuery; // Primary query is argQuery
-          }
-        }
-      } else {
-        // Not using selected text. Call API if argQuery exists.
-        if (argQuery) {
-          callAPI = true;
-          primaryQuery = argQuery;
-        }
+      if (useSelected && selected) {
+        if (!requireQuery) callAPI = true; // Selected text is enough
+        else if (argQuery) callAPI = true; // Selected text + argQuery needed and present
+      } else if (argQuery) {
+        callAPI = true;
       }
 
       // 6. Execute action: Call API or show form/error
       if (callAPI) {
-        await getResponse(primaryQuery); // Pass the determined primary query
+        await getResponse(primaryQuery);
       } else {
-        // Conditions met to show form or error
         if (showFormText) {
+          setInput((prevInput) => ({ ...prevInput, message: primaryQuery }));
           setPage(Pages.Form);
-          setIsLoading(false); // Stop loading indicator
+          setIsLoading(false);
         } else {
-          // Error: Missing required input and form not allowed
+          // Error: Missing required input (selected/argQuery) and form not allowed
           const errorTitle = useSelected ? "Could not get selected text" : "No query provided";
           await popToRoot();
           await showToast({ style: Toast.Style.Failure, title: errorTitle });
@@ -441,7 +408,6 @@ export default (
               setMarkdown("");
 
               let prompt;
-              let systemPrompt = (context ? `${context}\n\n` : "") + (values.query ? values.query : "");
               let files = values.files || [];
 
               if (processPrompt) {
@@ -453,10 +419,8 @@ export default (
                   values: values,
                 });
                 processPrompt = null; // only call once
-              } else if (useSelected && selectedState) {
-                prompt = `${systemPrompt}\n\n${selectedState}`;
               } else {
-                prompt = `${systemPrompt}`;
+                prompt = primaryQuery + "\n\n" + values.query;
               }
 
               await getResponse(prompt, { files: files });

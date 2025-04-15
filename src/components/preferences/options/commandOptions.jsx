@@ -12,7 +12,7 @@ export const DefaultCommandOptions = () => {
   const ChatProvidersDropdown = () => {
     return (
       <>
-        <Form.Dropdown.Item title="Use default model" value="Default" />
+        <Form.Dropdown.Item title="Use default model" value="" />
         {ChatProvidersReact()}
       </>
     );
@@ -34,7 +34,7 @@ export const DefaultCommandOptions = () => {
           dropdownComponent: ChatProvidersDropdown,
           // Custom handler
           getValue: () => {
-            return Preferences.commandOptions?.[commandId]?.commandProvider || "Default";
+            return Preferences.commandOptions?.[commandId]?.commandProvider || "";
           },
           setValue: async (value) => {
             const currentCommandOptions = Preferences.commandOptions || {};
