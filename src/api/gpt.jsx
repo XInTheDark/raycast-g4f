@@ -121,6 +121,7 @@ export default (
     // This is a workaround for multiple generation calls - see the comment above the useEffect.
     if (generationStatus.loading) return;
     generationStatus.loading = true;
+    console.log("getResponse called");
 
     // load provider and model
     await init();
@@ -282,6 +283,11 @@ export default (
         console.log("Selected text:", selected);
         setSelected(selected);
       }
+
+      // Prevent double generation if already loading
+      // This check should happen regardless of whether selected text was fetched successfully or not.
+      // If the effect runs twice, this check helps prevent double generation.
+      if (generationStatus.loading) return;
 
       // Calculate primary query based on context, selected text and args
       const initPrimaryQuery = () => {
