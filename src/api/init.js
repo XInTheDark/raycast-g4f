@@ -2,6 +2,7 @@
 /// All modules should be calling this function.
 
 import { initPreferences } from "#root/src/helpers/preferences_helper.js";
+import { initProviders } from "#root/src/api/providers.js";
 import { initCustomAPIs } from "#root/src/api/providers_custom.js";
 import { initProvidersReact } from "#root/src/api/data/providers_react.jsx";
 
@@ -17,8 +18,13 @@ export async function init() {
 
   // Order matters here, as some modules depend on others.
   await initPreferences();
+  console.log("Initialised preferences");
+  await initProviders();
+  console.log("Initialised providers");
   await initCustomAPIs();
+  console.log("Initialised custom APIs");
   await initProvidersReact();
+  console.log("Initialised providers react");
 
   console.log(`Extension initialised in ${Date.now() - start}ms`);
   initialised = true;

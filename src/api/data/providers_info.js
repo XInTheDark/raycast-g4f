@@ -31,17 +31,9 @@ export const providers = [
   GeminiProvider,
 ];
 
-// Initialise all providers info
 // { provider internal name, {provider object, model, stream, extra options} }
-const providers_info = {};
-for (let provider of providers) {
-  if (provider?.enabled === false) continue;
-  for (let model of provider?.models || []) {
-    const key = `${provider.name}_${model.alias || model.model}`;
-    providers_info[key] = { provider: provider, ...model };
-  }
-}
-export { providers_info };
+// to be initialised in init.js
+export const providers_info = {};
 
 /// Providers that support file uploads
 export const file_supported_providers = [GeminiProvider, DeepInfraProvider];

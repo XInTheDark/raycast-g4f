@@ -4,9 +4,48 @@
 /// Any function that needs to interact with a provider must import this module, directly or indirectly.
 
 import { Preferences } from "./preferences.js";
+import { updatePreferences } from "#root/src/helpers/preferences_helper.js";
 
-import { providers_info } from "./data/providers_info.js";
+import { providers, providers_info } from "./data/providers_info.js";
 export * from "./data/providers_info.js";
+
+// Initialise providers function
+const providersInfoCacheTimeout = 1000 * 60 * 60 * 24;
+export async function initProviders() {
+  for (let provider of providers) {
+    if (!provider) continue;
+    if (provider.enabled === false) continue;
+
+    let models = provider?.models || [];
+    if (provider.getModels) {
+      // Fetch from cache
+      let cache = {};
+      try {
+        cache = JSON.parse(Preferences.providersInfoCache || "{}");
+        if (cache?.[provider.name] && Date.now() - cache[provider.name]?.cacheTime < providersInfoCacheTimeout) {
+          models = cache[provider.name].models;
+        } else throw new Error("Cache expired");
+      } catch (e) {
+        try {
+          models = await provider.getModels();
+          console.log(`Fetched models for ${provider.name}:`, models);
+          cache[provider.name] = {
+            cacheTime: Date.now(),
+            models: models,
+          };
+          await updatePreferences("providersInfoCache", JSON.stringify(cache));
+        } catch (e) {
+          console.error(`Error fetching models for ${provider.name}:`, e);
+          continue;
+        }
+      }
+    }
+    for (let model of models) {
+      const key = `${provider.name}_${model.alias || model.model}`;
+      providers_info[key] = { provider: provider, ...model };
+    }
+  }
+}
 
 // Additional options
 export const additional_provider_options = (provider, chatOptions = null) => {

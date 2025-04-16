@@ -247,6 +247,7 @@
     "http-proxy-agent": "^7.0.2",
     "lodash.throttle": "^4.1.1",
     "node-fetch": "^3.3.2",
+    "ulid": "^3.0.0",
     "undici": "^7.1.1",
     "untruncate-json": "^0.0.1"
   },
