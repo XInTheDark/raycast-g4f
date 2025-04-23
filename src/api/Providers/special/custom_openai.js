@@ -106,14 +106,17 @@ export const CustomOpenAIProvider = {
     );
 
     const reader = response.body;
+    let buffer = "";
 
-    for await (let chunk of reader) {
-      const str = chunk.toString();
-      let lines = str.split("\n");
+    for await (const chunk of reader) {
+      buffer += chunk.toString();
 
-      for (let line of lines) {
-        // Although this is not technically OpenAI compatible, we handle the
-        // APIs that return chunks starting with "data: " as well.
+      let lines = buffer.split("\n");
+
+      // Process all complete lines except the last one (which may be partial)
+      for (let i = 0; i < lines.length - 1; i++) {
+        let line = lines[i].trim();
+
         if (line.startsWith("data: ")) {
           line = line.substring(6);
         }
@@ -129,6 +132,26 @@ export const CustomOpenAIProvider = {
         } catch (e) {
           console.log(e);
         }
+      }
+
+      // Save the last line (partial or complete) back to buffer for next chunk
+      buffer = lines[lines.length - 1];
+    }
+
+    // After the loop ends, parse leftover buffer if any
+    if (buffer.trim() && buffer !== "[DONE]") {
+      try {
+        let line = buffer.trim();
+        if (line.startsWith("data: ")) {
+          line = line.substring(6);
+        }
+        let json = JSON.parse(line);
+        let chunk = this.getChunk(json);
+        if (chunk) {
+          yield chunk;
+        }
+      } catch (e) {
+        console.log("JSON parse error in leftover buffer:", e);
       }
     }
   },
