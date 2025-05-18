@@ -49,7 +49,7 @@ const EditAPIConfig = ({ customAPIData, setCustomAPIData, url }) => {
               }
 
               // Update data
-              setCustomAPIData({ ...customAPIData, [values.url]: { ...APIData, ...values } });
+              setCustomAPIData({ ...customAPIData, [url]: undefined, [values.url]: { ...APIData, ...values } });
 
               await showToast(Toast.Style.Success, "Configuration saved");
               pop();
@@ -128,7 +128,7 @@ export const ManageCustomAPIs = () => {
     Object.keys(customAPIData).length > 0 ? (
       <List>
         {Object.entries(customAPIData).map(([url, data]) =>
-          data.provider && data.provider !== CustomOpenAIProvider ? null : ( // Skip if not a custom OpenAI provider
+          !data || (data.provider && data.provider !== CustomOpenAIProvider) ? null : ( // Skip if not a custom OpenAI provider
             <List.Item
               title={data.name || url}
               accessories={data.name ? [{ tag: url }] : []}
