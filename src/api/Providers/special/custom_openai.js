@@ -108,52 +108,40 @@ export const CustomOpenAIProvider = {
     const reader = response.body;
     let buffer = "";
 
-    for await (const chunk of reader) {
-      buffer += chunk.toString();
+    const processBuffer = (buffer) => {
+      const lines = buffer.split("\n");
+      const leftover = lines.pop();
+      const chunks = [];
 
-      let lines = buffer.split("\n");
-
-      // Process all complete lines except the last one (which may be partial)
-      for (let i = 0; i < lines.length - 1; i++) {
-        let line = lines[i].trim();
-
+      for (let raw of lines) {
+        let line = raw.trim();
         if (line.startsWith("data: ")) {
-          line = line.substring(6);
+          line = line.slice(6);
         }
-        if (!line) continue;
-        if (line.slice(0, 6) === "[DONE]") return;
-
+        if (!line || line === "[DONE]") continue;
         try {
-          let json = JSON.parse(line);
-          let chunk = this.getChunk(json);
-          if (chunk) {
-            yield chunk;
-          }
+          const json = JSON.parse(line);
+          const chunk = this.getChunk(json);
+          if (chunk) chunks.push(chunk);
         } catch (e) {
-          console.log(e);
+          console.log("parse error:", e);
         }
       }
 
-      // Save the last line (partial or complete) back to buffer for next chunk
-      buffer = lines[lines.length - 1];
+      return { leftover, chunks };
+    };
+
+    // stream loop
+    for await (const part of reader) {
+      buffer += part.toString();
+      const { leftover, chunks } = processBuffer(buffer);
+      buffer = leftover;
+      for (const c of chunks) yield c;
     }
 
-    // After the loop ends, parse leftover buffer if any
-    if (buffer.trim() && buffer !== "[DONE]") {
-      try {
-        let line = buffer.trim();
-        if (line.startsWith("data: ")) {
-          line = line.substring(6);
-        }
-        let json = JSON.parse(line);
-        let chunk = this.getChunk(json);
-        if (chunk) {
-          yield chunk;
-        }
-      } catch (e) {
-        console.log("JSON parse error in leftover buffer:", e);
-      }
-    }
+    // final leftover
+    const { chunks } = processBuffer(buffer);
+    for (const c of chunks) yield c;
   },
   getChunk: function (json) {
     switch (this.info?.type) {
