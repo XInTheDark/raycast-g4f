@@ -1,6 +1,6 @@
 import fetch from "#root/src/api/fetch.js";
 import { format_chat_to_prompt, messages_to_json } from "../../classes/message.js";
-import { sleep } from "#root/src/helpers/helper.js";
+import { sleep, removePrefix } from "#root/src/helpers/helper.js";
 
 // Reference: https://nexra.aryahcr.cc/documentation/chatgpt/en (under ChatGPT v2)
 const api_url_stream = "https://nexra.aryahcr.cc/api/chat/complements";
@@ -59,6 +59,20 @@ export const getNexraResponseStream = async function (chat, options, stream_upda
 
     const reader = response.body;
 
+    let buffer = "",
+      bufferCnt = 0;
+    let prefixBuffer = null;
+
+    const findPrefix = (str, maxLen = 15) => {
+      for (let i = Math.min(maxLen, Math.floor(str.length / 2)); i >= 1; i--) {
+        const prefix = str.substring(0, i);
+        if (str.substring(i, i * 2) === prefix) {
+          return prefix;
+        }
+      }
+      return "";
+    };
+
     for await (let chunk of reader) {
       let chunkStr = chunk.toString();
       if (!chunkStr) continue;
@@ -79,10 +93,26 @@ export const getNexraResponseStream = async function (chat, options, stream_upda
         // if (chunkJson["error"]) throw new Error();
 
         let chunk = chunkJson["message"];
+        if (chunkJson["finish"]) bufferCnt = Infinity;
+
         if (chunk) {
           // note that the chunk from the API is the full response, not incremental updates!
-          stream_update(chunk);
+          chunk = chunk.trimStart();
+
+          if (bufferCnt < 3) {
+            buffer = chunk;
+            bufferCnt++;
+          } else {
+            if (buffer !== null) {
+              // remove the repeated first chunk
+              prefixBuffer = findPrefix(buffer);
+              buffer = null;
+            }
+            chunk = removePrefix(chunk, prefixBuffer);
+            stream_update(chunk);
+          }
         }
+
         if (chunkJson["finish"]) break;
       }
     }
