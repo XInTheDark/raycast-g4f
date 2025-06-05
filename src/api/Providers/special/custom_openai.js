@@ -106,31 +106,42 @@ export const CustomOpenAIProvider = {
     );
 
     const reader = response.body;
+    let buffer = "";
 
-    for await (let chunk of reader) {
-      const str = chunk.toString();
-      let lines = str.split("\n");
+    const processBuffer = (buffer) => {
+      const lines = buffer.split("\n");
+      const leftover = lines.pop();
+      const chunks = [];
 
-      for (let line of lines) {
-        // Although this is not technically OpenAI compatible, we handle the
-        // APIs that return chunks starting with "data: " as well.
+      for (let raw of lines) {
+        let line = raw.trim();
         if (line.startsWith("data: ")) {
-          line = line.substring(6);
+          line = line.slice(6);
         }
-        if (!line) continue;
-        if (line.slice(0, 6) === "[DONE]") return;
-
+        if (!line || line === "[DONE]") continue;
         try {
-          let json = JSON.parse(line);
-          let chunk = this.getChunk(json);
-          if (chunk) {
-            yield chunk;
-          }
+          const json = JSON.parse(line);
+          const chunk = this.getChunk(json);
+          if (chunk) chunks.push(chunk);
         } catch (e) {
-          console.log(e);
+          console.log("parse error:", e);
         }
       }
+
+      return { leftover, chunks };
+    };
+
+    // stream loop
+    for await (const part of reader) {
+      buffer += part.toString();
+      const { leftover, chunks } = processBuffer(buffer);
+      buffer = leftover;
+      for (const c of chunks) yield c;
     }
+
+    // final leftover
+    const { chunks } = processBuffer(buffer);
+    for (const c of chunks) yield c;
   },
   getChunk: function (json) {
     switch (this.info?.type) {
