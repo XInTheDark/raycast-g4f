@@ -230,6 +230,7 @@ export default function Chat({ launchContext }) {
     options = { creativity: "0.7", webSearch: web_search_mode("chat") },
     systemPrompt = "",
     messages = [],
+    draft = "",
   }) => {
     return {
       name: name,
@@ -239,6 +240,7 @@ export default function Chat({ launchContext }) {
       options: options,
       systemPrompt: systemPrompt,
       messages: [...messages, ...starting_messages({ systemPrompt, provider, webSearch: options.webSearch })],
+      draft: draft,
     };
   };
 
@@ -682,6 +684,18 @@ export default function Chat({ launchContext }) {
     );
   };
 
+  // Drafts feature
+  const setCurrentChatDraft = throttle(
+    (message) => {
+      setCurrentChatData((oldData) => {
+        let newChatData = structuredClone(oldData);
+        newChatData.draft = message;
+        return newChatData;
+      });
+    },
+    { delay: 100, delayFunction: (...args) => AIChatDelayFunction({ delay: 100, max_delay: 20000 })(...args) }
+  );
+
   let ComposeMessageComponent = ({ idx }) => {
     // if idx is provided, then we are editing an existing message.
     // otherwise, we are composing a new message.
@@ -693,11 +707,30 @@ export default function Chat({ launchContext }) {
 
     const { pop } = useNavigation();
     const [input, setInput] = useState({
-      message: isEditing ? currentChatData.messages[idx].first.content : searchText,
-      files: isEditing ? currentChatData.messages[idx].files : [],
-    });
+      message: searchText || currentChatData.draft || "",
+      files: [],
+      isLoaded: !isEditing,
+    }); // default values for new message
 
-    return (
+    if (isEditing) {
+      useEffect(() => {
+        setInput({
+          message: currentChatData.messages[idx].first.content,
+          files: currentChatData.messages[idx].files,
+          isLoaded: true,
+        });
+      }, []);
+    }
+
+    const handleMessageChange = (message) => {
+      setInput({ ...input, message });
+      if (!isEditing && message) {
+        // Drafts feature: if we're composing a new message, also store the current draft in currentChatData.
+        setCurrentChatDraft(message);
+      }
+    };
+
+    return input.isLoaded ? (
       <Form
         actions={
           <ActionPanel>
@@ -721,7 +754,7 @@ export default function Chat({ launchContext }) {
           id="message"
           title="Message"
           value={input.message}
-          onChange={(message) => setInput({ ...input, message })}
+          onChange={handleMessageChange}
           enableMarkdown={Preferences["useMarkdownEditor"]}
         />
         <Form.FilePicker
@@ -731,6 +764,8 @@ export default function Chat({ launchContext }) {
           onChange={(files) => setInput({ ...input, files })}
         />
       </Form>
+    ) : (
+      <Form isLoading />
     );
   };
 
@@ -896,6 +931,9 @@ export default function Chat({ launchContext }) {
     currentChatData.messages.unshift(newMessagePair);
     setCurrentChatData(currentChatData); // possibly redundant, put here for safety and consistency
     await flushUpdateChat(currentChatData);
+
+    // Drafts feature: Clear current draft
+    setCurrentChatDraft("");
 
     try {
       // Note how we don't pass query here because it is already in the chat
