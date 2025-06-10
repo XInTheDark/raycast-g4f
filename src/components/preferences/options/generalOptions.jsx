@@ -33,6 +33,13 @@ const generalOptions = {
     required: false,
     type: "checkbox",
   },
+  useMarkdownEditor: {
+    title: "Use Markdown Editor",
+    description:
+      "Use a Markdown editor for messages. Disable if the message input lags.\nNote: Responses are always rendered as Markdown.",
+    required: false,
+    type: "checkbox",
+  },
   fetchTimeout: {
     title: "Fetch Timeout",
     description: "The timeout duration for network requests.",

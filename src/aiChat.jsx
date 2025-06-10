@@ -590,7 +590,7 @@ export default function Chat({ launchContext }) {
         </Form.Dropdown>
 
         <Form.Description title="System Prompt" text="This prompt will be sent to GPT to start the conversation." />
-        <Form.TextArea id="systemPrompt" defaultValue={chat?.systemPrompt ?? ""} enableMarkdown />
+        <Form.TextArea id="systemPrompt" defaultValue={chat?.systemPrompt ?? ""} />
       </>
     );
   };
@@ -722,7 +722,7 @@ export default function Chat({ launchContext }) {
           title="Message"
           value={input.message}
           onChange={(message) => setInput({ ...input, message })}
-          enableMarkdown
+          enableMarkdown={Preferences["useMarkdownEditor"]}
         />
         <Form.FilePicker
           id="files"

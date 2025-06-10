@@ -441,7 +441,7 @@ export default (
         title={showFormText}
         value={input.message}
         onChange={(message) => setInput((prevInput) => ({ ...prevInput, message }))}
-        enableMarkdown
+        enableMarkdown={Preferences["useMarkdownEditor"]}
       />
       {allowUploadFiles && (
         <Form.FilePicker

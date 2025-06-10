@@ -7,6 +7,7 @@
     "autoCheckForUpdates": true,
     "persistentStorage": false,
     "useCursorIcon": true,
+    "useMarkdownEditor": true,
     "codeInterpreter": false,
     "devMode": false,
     "GeminiAPIKeys": "",

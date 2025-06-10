@@ -9,7 +9,7 @@ export default function AskAboutBrowserTab(props) {
     showFormText: "Query",
     processPrompt: async ({ query }) => {
       const browserTab = await getBrowserTab();
-      return `Browser tab content: ${browserTab}\n\n${query}`;
+      return `Browser tab content:\n${browserTab}\n\n${query}`;
     },
   });
 }
