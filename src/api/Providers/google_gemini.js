@@ -15,19 +15,31 @@ export const GeminiProvider = {
     { model: "2.5", stream: true },
   ],
   model_aliases: {
-    default: ["gemini-2.0-flash", "gemini-1.5-pro-latest", "gemini-1.5-flash-latest"],
-    flash: ["gemini-2.5-flash-preview-04-17", "gemini-2.0-flash", "gemini-1.5-flash-latest"],
-    experimental: ["gemini-2.5-flash-preview-04-17", "gemini-2.5-pro-exp-03-25"],
-    thinking: ["gemini-2.5-pro-exp-03-25", "gemini-2.5-flash-preview-04-17"],
-    2.5: ["gemini-2.5-pro-exp-03-25", "gemini-2.5-flash-preview-04-17"],
+    default: ["gemini-2.5-flash-preview-05-20"],
+    flash: ["gemini-2.5-flash-preview-05-20", "gemini-2.0-flash"],
+    experimental: ["gemini-2.5-flash-preview-05-20", "gemini-2.5-pro-preview-06-05"],
+    thinking: ["gemini-2.5-flash-preview-05-20", "gemini-2.5-pro-preview-06-05"],
+    2.5: ["gemini-2.5-pro-preview-06-05", "gemini-2.5-flash-preview-05-20"],
     "gemini-pro": "default",
     "gemini-flash": "flash",
     "gemini-exp": "experimental",
     "gemini-thinking": "thinking",
   },
   maxOutputTokens: {
-    default: 8192,
-    "gemini-2.5-pro-exp-03-25": 64000,
+    default: 64000,
+    "gemini-2.0-flash": 8192,
+  },
+  thinkingConfig: {
+    default: {
+      thinkingBudget: 24576,
+    },
+    "gemini-2.5-flash-preview-05-20": {
+      thinkingBudget: 24576,
+    },
+    "gemini-2.5-pro-preview-06-05": {
+      thinkingBudget: 32768,
+    },
+    "gemini-2.0-flash": undefined,
   },
   generate: async function (chat, options, { stream_update, max_retries = 3 }) {
     let APIKeysStr = Preferences["GeminiAPIKeys"];
@@ -56,7 +68,8 @@ export const GeminiProvider = {
             safetySettings: constants.safetyDisabledSettings,
             generationConfig: {
               maxOutputTokens: this.maxOutputTokens[model] || this.maxOutputTokens.default,
-              temperature: options.temperature * 1.5, // v1.5 models have temperature in [0, 2] so we scale it up
+              thinkingConfig: this.thinkingConfig[model] || this.thinkingConfig.default,
+              temperature: options.temperature * 1.5, // models have temperature in [0, 2] so we scale it up
             },
             tools: tools,
           });
