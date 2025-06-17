@@ -52,7 +52,7 @@ export const GeminiProvider = {
     const useCodeInterpreter = Preferences["codeInterpreter"];
 
     const tools = [
-      ...(useWebSearch ? [{ googleSearch: {} }] : []),
+      ...(useWebSearch ? [{ googleSearch: {} }, { urlContext: {} }] : []),
       ...(useCodeInterpreter ? [{ codeExecution: {} }] : []),
     ];
 
