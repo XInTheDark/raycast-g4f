@@ -3,6 +3,7 @@ import { Storage } from "../api/storage.js";
 import { Clipboard, showToast, Toast } from "@raycast/api";
 import { getBrowserTab } from "./browser.jsx";
 import { execShellNoStream } from "#root/src/api/shell.js";
+import escapeString from "js-string-escape";
 
 export class CustomCommand {
   constructor({ name = "", prompt = "", id = Date.now().toString(), options = {}, shortcut = "", model = "" }) {
@@ -14,43 +15,105 @@ export class CustomCommand {
     this.model = model;
   }
 
+  valid_modifiers = ["uppercase", "lowercase", "trim", "percent-encode", "json-stringify", "escape"];
+
   async processPrompt(prompt, query, selected) {
     this.input = query ? query : selected ? selected : "";
+    // 1. Parse the prompt into a tree structure
+    const placeholderTree = this.parsePlaceholderTree(prompt);
 
-    // const regex = /{([^}]*)}/; // left-to-right, legacy matching method
-    const regex = /\{([^{}]*)}/g; // depth-first matching method; inner placeholders are processed first
+    // 2. Process the tree depth-first
+    return await this.processPlaceholderTree(placeholderTree);
+  }
 
-    // Step 1. Find the number of matches (i.e. placeholders) in the original string
-    // We do this to limit the number of regex matches and therefore prevent injections
-    let numMatches = 0;
-    let temp = prompt;
-    let _match;
-    while ((_match = temp.match(regex))) {
-      for (const __match of _match) {
-        temp = temp.replace(__match, "");
+  // Parse prompt into a tree structure representing placeholders
+  parsePlaceholderTree(text) {
+    const result = [];
+    let current = "";
+    let i = 0;
+
+    while (i < text.length) {
+      if (text[i] === "{") {
+        // Save any text before this placeholder
+        if (current) {
+          result.push({ type: "text", value: current });
+          current = "";
+        }
+
+        // Find the matching closing brace
+        const placeholder = this.extractPlaceholder(text, i);
+        if (placeholder) {
+          // Parse the inner content recursively
+          const subtree = this.parsePlaceholderTree(placeholder.content);
+          result.push({
+            type: "placeholder",
+            content: placeholder.content,
+            subtree: subtree,
+            start: i,
+            end: placeholder.end,
+          });
+          i = placeholder.end;
+        } else {
+          // No matching brace, treat as text
+          current += text[i];
+          i++;
+        }
+      } else {
+        current += text[i];
+        i++;
       }
-      numMatches += _match.length;
     }
 
-    // Step 2. Main loop
-    let cnt = 0;
-    let matches;
+    if (current) {
+      result.push({ type: "text", value: current });
+    }
 
-    // use match() to search the entire string in each iteration
-    while (cnt < numMatches && (matches = prompt.match(regex))) {
-      // keep track of the number of regex matches so far, and exit if the maximum is reached.
-      // because of our incremental depth-first regex matching approach, the original placeholders will be
-      // matched first, and since there is an exact limit, injections should likely be prevented.
-      cnt += matches.length;
-      // console.log(matches);
+    return result;
+  }
 
-      for (const match of matches) {
-        const p = match.slice(1, -1); // get placeholder content
-        const processed = await this.process_placeholder(p);
-        prompt = prompt.replace(match, processed);
+  // Extract a complete placeholder starting at position
+  extractPlaceholder(text, start) {
+    if (text[start] !== "{") return null;
+
+    let depth = 0;
+    let i = start;
+
+    while (i < text.length) {
+      if (text[i] === "{") depth++;
+      else if (text[i] === "}") {
+        depth--;
+        if (depth === 0) {
+          return {
+            content: text.substring(start + 1, i),
+            end: i + 1,
+          };
+        }
+      }
+      i++;
+    }
+
+    return null; // Unclosed placeholder
+  }
+
+  // Process the tree structure
+  async processPlaceholderTree(tree) {
+    let result = "";
+
+    for (const node of tree) {
+      if (node.type === "text") {
+        result += node.value;
+      } else if (node.type === "placeholder") {
+        // First process the subtree
+        const res = await this.processPlaceholderTree(node.subtree);
+
+        // Then process this placeholder
+        const processed = await this.process_placeholder(res);
+
+        result += processed;
       }
     }
-    return prompt;
+
+    return result;
   }
 
   // returns a function that can be passed to the processPrompt parameter of useGPT
@@ -66,6 +129,7 @@ export class CustomCommand {
     const parts = t.split("|");
     const main = parts[0].trim();
     let processed;
+    let success = true;
 
     try {
       switch (main) {
@@ -102,20 +166,36 @@ export class CustomCommand {
           const toast = await showToast(Toast.Style.Animated, "Running shell command");
 
           const command = parts.slice(1).join("|").trim();
+          console.log("Shell exec: " + command);
           processed = await execShellNoStream(command);
-          console.log("Shell exec: " + command + "\n" + processed);
+          console.log("Result: " + processed);
 
           await toast.hide();
           break;
         }
+        case "echo": {
+          // special case - just return the input (except modifiers)
+          processed = parts
+            .slice(1)
+            .filter((x) => !this.valid_modifiers.includes(x.trim()))
+            .join("|")
+            .trim();
+          const cmd = "echo " + '"' + escapeString(processed) + '"';
+          console.log("Echo command:", cmd);
+          processed = await execShellNoStream(cmd);
+          console.log("Echo result: " + processed);
+          break;
+        }
         default:
-          processed = t;
+          success = false;
           break;
       }
     } catch (e) {
       console.log(e);
       processed = t;
     }
+
+    if (!success) return t;
 
     // modifiers are applied after the main processing, except for shell commands
     if (["shell"].includes(main)) return processed;
@@ -138,6 +218,9 @@ export class CustomCommand {
             break;
           case "json-stringify":
             processed = JSON.stringify(processed);
+            break;
+          case "escape":
+            processed = escapeString(processed);
             break;
         }
       }

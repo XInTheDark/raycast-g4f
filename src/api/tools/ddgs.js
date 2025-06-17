@@ -3,7 +3,7 @@
 // REQUIREMENT: `pip install duckduckgo-search` in order to install the `ddgs` CLI.
 
 import { DEFAULT_SHELL_OPTIONS, execShellNoStream } from "#root/src/api/shell.js";
-import { escapeString } from "#root/src/helpers/helper.js";
+import escapeString from "js-string-escape";
 import { getSupportPath } from "#root/src/helpers/extension_helper.js";
 import fs from "fs";
 

@@ -245,6 +245,7 @@
     "g4f-image": "^1.3.3",
     "gemini-ai-sdk": "^1.0.2",
     "http-proxy-agent": "^7.0.2",
+    "js-string-escape": "^1.0.1",
     "lodash.throttle": "^4.1.1",
     "node-fetch": "^3.3.2",
     "ulid": "^3.0.0",
