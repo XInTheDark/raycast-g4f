@@ -15,11 +15,11 @@ export const GeminiProvider = {
     { model: "2.5", stream: true },
   ],
   model_aliases: {
-    default: ["gemini-2.5-flash-preview-05-20"],
-    flash: ["gemini-2.5-flash-preview-05-20", "gemini-2.0-flash"],
-    experimental: ["gemini-2.5-flash-preview-05-20", "gemini-2.5-pro-preview-06-05"],
-    thinking: ["gemini-2.5-flash-preview-05-20", "gemini-2.5-pro-preview-06-05"],
-    2.5: ["gemini-2.5-pro-preview-06-05", "gemini-2.5-flash-preview-05-20"],
+    default: ["gemini-2.5-flash"],
+    flash: ["gemini-2.5-flash", "gemini-2.0-flash"],
+    experimental: ["gemini-2.5-flash", "gemini-2.5-pro"],
+    thinking: ["gemini-2.5-flash", "gemini-2.5-pro"],
+    2.5: ["gemini-2.5-pro", "gemini-2.5-flash"],
     "gemini-pro": "default",
     "gemini-flash": "flash",
     "gemini-exp": "experimental",
@@ -33,10 +33,10 @@ export const GeminiProvider = {
     default: {
       thinkingBudget: 24576,
     },
-    "gemini-2.5-flash-preview-05-20": {
+    "gemini-2.5-flash": {
       thinkingBudget: 24576,
     },
-    "gemini-2.5-pro-preview-06-05": {
+    "gemini-2.5-pro": {
       thinkingBudget: 32768,
     },
     "gemini-2.0-flash": undefined,
