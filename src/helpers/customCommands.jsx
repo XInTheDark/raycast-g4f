@@ -133,7 +133,8 @@ export class CustomCommand {
 
     try {
       switch (main) {
-        case "input" || "selection":
+        case "input":
+        case "selection":
           processed = this.input;
           break;
         case "clipboard":
