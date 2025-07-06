@@ -92,19 +92,10 @@ const DeepInfraFormatChat = (chat, model) => {
 export const DeepInfraProvider = {
   name: "DeepInfra",
   models: [
-    { model: "meta-llama/Llama-3.3-70B-Instruct-Turbo", alias: "meta-llama-3.3-70b", stream: true },
-    { model: "meta-llama/Llama-3.2-90B-Vision-Instruct", alias: "meta-llama-3.2-90b-vision", stream: true },
-    { model: "meta-llama/Llama-3.2-11B-Vision-Instruct", alias: "meta-llama-3.2-11b-vision", stream: true },
-    { model: "meta-llama/Meta-Llama-3.1-405B-Instruct", alias: "meta-llama-3.1-405b", stream: true },
-    { model: "meta-llama/Meta-Llama-3.1-70B-Instruct", alias: "meta-llama-3.1-70b", stream: true },
-    { model: "meta-llama/Meta-Llama-3.1-8B-Instruct", alias: "meta-llama-3.1-8b", stream: true },
-    { model: "nvidia/Llama-3.1-Nemotron-70B-Instruct", alias: "llama-3.1-nemotron-70b", stream: true },
-    { model: "microsoft/WizardLM-2-8x22B", alias: "wizardlm-2-8x22b", stream: true },
-    { model: "deepseek-ai/DeepSeek-V3", alias: "deepseek-v3", stream: true },
-    { model: "deepseek-ai/DeepSeek-R1-Turbo", alias: "deepseek-r1", stream: true },
-    { model: "Qwen/Qwen2.5-72B-Instruct", alias: "qwen2.5-72b", stream: true },
-    { model: "Qwen/Qwen2.5-Coder-32B-Instruct", alias: "qwen2.5-coder-32b", stream: true },
-    { model: "Qwen/QwQ-32B-Preview", alias: "qwq-32b-preview", stream: true },
+    { model: "Qwen/Qwen3-235B-A22B", alias: "qwen3-235b-a22b", stream: true },
+    { model: "meta-llama/Llama-4-Maverick-17B-128E-Instruct-Turbo", alias: "llama-4-maverick", stream: true },
+    { model: "deepseek-ai/DeepSeek-V3-0324", alias: "deepseek-v3", stream: true },
+    { model: "deepseek-ai/DeepSeek-R1-0528", alias: "deepseek-r1", stream: true },
   ],
   model_aliases: {
     "llama-3.1-405b": "meta-llama/Meta-Llama-3.1-405B-Instruct",
