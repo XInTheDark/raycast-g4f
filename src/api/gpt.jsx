@@ -154,14 +154,6 @@ export default (
         // The 'values' parameter is tricky. When calling getResponse directly (not from form submission),
         // there are no form values. We pass an empty object. processPrompt should handle missing values.
         query = await processPrompt({ context: context, query: query, selected: selectedState, values: {} }); // Pass selectedState and empty values
-      } else if (context || (requireQuery && selectedState)) {
-        // Default handling if no processPrompt: prepend context and/or append selected text if required.
-        let finalQuery = context ? `${context}\n\n${query}` : query;
-        if (requireQuery && selectedState) {
-          // If query is required AND selected text exists, append selected text.
-          finalQuery += `\n\n${selectedState}`;
-        }
-        query = finalQuery;
       }
 
       // handle files: we combine files (files that the user uploads)
