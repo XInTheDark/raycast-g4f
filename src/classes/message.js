@@ -9,36 +9,7 @@
 //
 // Note how we currently don't have a Chat class, and instead we just use an array of messages.
 
-import fs from "fs";
-
-// Extract and format text content from a file
-export const extractTextFromFile = (filePath) => {
-  try {
-    const content = fs.readFileSync(filePath, "utf8");
-    const formattedContent = `---\nFile: ${filePath}\n\n${content}`;
-    return { path: filePath, content: formattedContent };
-  } catch (error) {
-    console.error(`Error reading file ${filePath}:`, error);
-    return { path: filePath, content: `---\nFile: ${filePath}\n\n[Error reading file: ${error.message}]` };
-  }
-};
-
-// Convert file paths to file objects with memoized content
-export const processFiles = (files) => {
-  if (!files || files.length === 0) return [];
-  
-  return files.map(file => {
-    // If already a file object, return as-is
-    if (typeof file === 'object' && file.path && file.content) {
-      return file;
-    }
-    // If it's a file path, convert it to a file object
-    if (typeof file === 'string') {
-      return extractTextFromFile(file);
-    }
-    return file; // fallback
-  });
-};
+import { extractTextFromFile, processFiles } from "../helpers/fileProcessor.js";
 
 export class Message {
   // Files should be an array of objects with {path: string, content: string}
