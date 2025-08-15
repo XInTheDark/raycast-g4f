@@ -11,12 +11,43 @@
 
 import fs from "fs";
 
+// Extract and format text content from a file
+export const extractTextFromFile = (filePath) => {
+  try {
+    const content = fs.readFileSync(filePath, "utf8");
+    const formattedContent = `---\nFile: ${filePath}\n\n${content}`;
+    return { path: filePath, content: formattedContent };
+  } catch (error) {
+    console.error(`Error reading file ${filePath}:`, error);
+    return { path: filePath, content: `---\nFile: ${filePath}\n\n[Error reading file: ${error.message}]` };
+  }
+};
+
+// Convert file paths to file objects with memoized content
+export const processFiles = (files) => {
+  if (!files || files.length === 0) return [];
+  
+  return files.map(file => {
+    // If already a file object, return as-is
+    if (typeof file === 'object' && file.path && file.content) {
+      return file;
+    }
+    // If it's a file path, convert it to a file object
+    if (typeof file === 'string') {
+      return extractTextFromFile(file);
+    }
+    return file; // fallback
+  });
+};
+
 export class Message {
+  // Files should be an array of objects with {path: string, content: string}
+  // For backward compatibility, file paths (strings) are also supported and will be processed
   constructor({ role = "", content = "", files = [] } = {}) {
     this.role = role;
     this.content = content;
     if (files && files.length > 0) {
-      this.files = files;
+      this.files = processFiles(files);
     }
   }
 }
@@ -33,6 +64,7 @@ export class MessagePair {
   // When initialising, we can pass in either prompt and answer, or first and second.
   // prompt and answer are just shortcuts to initialise the user/assistant roles; don't ever access them.
   // When accessing, always strictly use the first and second properties. e.g. messagePair.first.content for the user message.
+  // Files should be an array of objects with {path: string, content: string}
   constructor({
     prompt = "",
     answer = "",
@@ -54,7 +86,7 @@ export class MessagePair {
     this.finished = finished;
     this.visible = visible;
     if (files && files.length > 0) {
-      this.files = files;
+      this.files = processFiles(files);
     }
   }
 }
@@ -128,7 +160,7 @@ export const format_chat_to_prompt = (chat, { model = null, assistant = true } =
 // and occasionally other properties (e.g. tool call info). this is used in many OpenAI-based APIs.
 //
 // Modifications:
-// - read files if any, and add them to the message. (unless the provider doesn't want us to include files)
+// - include file content if any, and add them to the message. (unless the provider doesn't want us to include files)
 // - remove the files property
 
 export const messages_to_json = (chat, { readFiles = true } = {}) => {
@@ -140,12 +172,11 @@ export const messages_to_json = (chat, { readFiles = true } = {}) => {
     if (readFiles && msg.files && msg.files.length > 0) {
       console.assert(msg.role === "user", "Only user messages can have files");
       for (const file of msg.files) {
-        // read text
-        let text = fs.readFileSync(file, "utf8");
-        text = `---\nFile: ${file}\n\n${text}`;
-
+        // use stored content from file object
+        const content = file.content || file; // backward compatibility: handle both {path, content} and plain strings
+        
         // push as new message
-        json.push({ role: "user", content: text });
+        json.push({ role: "user", content: content });
         json.push({ role: "assistant", content: "[system: file uploaded]" });
       }
     }
