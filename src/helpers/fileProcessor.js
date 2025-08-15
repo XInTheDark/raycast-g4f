@@ -40,15 +40,6 @@ export const getBackendForFile = (filePath) => {
   return FileBackend.SIMPLE;
 };
 
-// Check if a tool is available in PATH
-const isToolAvailable = (tool) => {
-  try {
-    execSync(`which ${tool}`, { stdio: 'ignore' });
-    return true;
-  } catch {
-    return false;
-  }
-};
 
 // Simple text file reader
 const processWithSimple = (filePath) => {
@@ -72,10 +63,6 @@ const processWithSimple = (filePath) => {
 // Process file using markitdown
 const processWithMarkitdown = (filePath) => {
   try {
-    if (!isToolAvailable('markitdown')) {
-      throw new Error('markitdown is not installed. Install it with: pip install markitdown');
-    }
-    
     // Use markitdown to convert to markdown
     const result = execSync(`markitdown "${filePath}"`, {
       encoding: 'utf8',
@@ -90,11 +77,6 @@ const processWithMarkitdown = (filePath) => {
     };
   } catch (error) {
     console.error(`Markitdown failed for ${filePath}:`, error.message);
-    // Fallback to simple processing for text-like files
-    const ext = path.extname(filePath).toLowerCase();
-    if (BACKEND_SUPPORT[FileBackend.SIMPLE].includes(ext)) {
-      return processWithSimple(filePath);
-    }
     return {
       content: `[Error processing with markitdown: ${error.message}]`,
       backend: FileBackend.MARKITDOWN,
@@ -107,10 +89,6 @@ const processWithMarkitdown = (filePath) => {
 // Process file using docling
 const processWithDocling = (filePath) => {
   try {
-    if (!isToolAvailable('docling')) {
-      throw new Error('docling is not installed. Install it with: pip install docling');
-    }
-    
     // Use docling to convert to markdown
     const result = execSync(`docling "${filePath}" --to md --output /dev/stdout`, {
       encoding: 'utf8',
@@ -125,15 +103,6 @@ const processWithDocling = (filePath) => {
     };
   } catch (error) {
     console.error(`Docling failed for ${filePath}:`, error.message);
-    // Try markitdown as fallback
-    if (BACKEND_SUPPORT[FileBackend.MARKITDOWN].includes(path.extname(filePath).toLowerCase())) {
-      return processWithMarkitdown(filePath);
-    }
-    // Then try simple as final fallback
-    const ext = path.extname(filePath).toLowerCase();
-    if (BACKEND_SUPPORT[FileBackend.SIMPLE].includes(ext)) {
-      return processWithSimple(filePath);
-    }
     return {
       content: `[Error processing with docling: ${error.message}]`,
       backend: FileBackend.DOCLING,
