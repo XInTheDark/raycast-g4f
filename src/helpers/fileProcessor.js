@@ -59,7 +59,6 @@ export const getBackendForFile = (filePath) => {
   // Check user preference for backend
   const preferredBackend = Preferences["fileProcessingBackend"] || FileBackend.SIMPLE;
 
-  // If preferred backend supports the file, use it
   if (BACKEND_SUPPORT[preferredBackend]?.includes(ext)) {
     return preferredBackend;
   }
@@ -71,8 +70,7 @@ export const getBackendForFile = (filePath) => {
     }
   }
 
-  // Fallback to simple backend for unknown extensions
-  return FileBackend.SIMPLE;
+  return preferredBackend;
 };
 
 // Simple text file reader
@@ -207,8 +205,6 @@ export const extractTextFromFile = (filePath) => {
     // Format the content with file metadata
     const formattedContent = `---
 File: ${filePath}
-Backend: ${result.backend}
-Success: ${result.success}${result.error ? `\nError: ${result.error}` : ""}
 
 ${result.content}`;
 
@@ -246,29 +242,4 @@ export const processFiles = (files) => {
     }
     return file; // fallback
   });
-};
-
-// Get file processing statistics
-export const getProcessingStats = (files) => {
-  if (!Array.isArray(files)) return null;
-
-  const stats = {
-    total: files.length,
-    successful: 0,
-    failed: 0,
-    backends: {},
-  };
-
-  files.forEach((file) => {
-    if (file.success) {
-      stats.successful++;
-    } else {
-      stats.failed++;
-    }
-
-    const backend = file.backend || "unknown";
-    stats.backends[backend] = (stats.backends[backend] || 0) + 1;
-  });
-
-  return stats;
 };

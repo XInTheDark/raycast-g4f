@@ -9,7 +9,7 @@
 //
 // Note how we currently don't have a Chat class, and instead we just use an array of messages.
 
-import { extractTextFromFile, processFiles } from "../helpers/fileProcessor.js";
+import { processFiles } from "../helpers/fileProcessor.js";
 
 export class Message {
   // Files should be an array of objects with {path: string, content: string}
