@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { execSync } from "child_process";
+import { showToast, Toast } from "@raycast/api";
 import { Preferences } from "../api/preferences.js";
 
 // File processing backends
@@ -44,13 +45,22 @@ export const getBackendForFile = (filePath) => {
 // Simple text file reader
 const processWithSimple = (filePath) => {
   try {
+    let toast;
+    showToast({
+      style: Toast.Style.Animated,
+      title: `Reading ${path.basename(filePath)}`,
+      message: `Using Simple Reader...`
+    }
+    ).then(t => { toast = t; });
     const content = fs.readFileSync(filePath, "utf8");
+    if (toast) toast.hide();
     return {
       content,
       backend: FileBackend.SIMPLE,
       success: true
     };
   } catch (error) {
+    if (toast) toast.hide();
     return {
       content: `[Error reading file: ${error.message}]`,
       backend: FileBackend.SIMPLE,
@@ -62,7 +72,16 @@ const processWithSimple = (filePath) => {
 
 // Process file using markitdown
 const processWithMarkitdown = (filePath) => {
+  const fileName = path.basename(filePath);
+  let toast;
+  
   try {
+    showToast({
+      style: Toast.Style.Animated,
+      title: `Processing ${fileName}`,
+      message: `Using MarkItDown...`
+    }).then(t => { toast = t; });
+    
     // Use markitdown to convert to markdown
     const result = execSync(`markitdown "${filePath}"`, {
       encoding: 'utf8',
@@ -70,12 +89,16 @@ const processWithMarkitdown = (filePath) => {
       env: { ...process.env, PATH: `${process.env.PATH}:/opt/homebrew/bin/:/usr/local/bin/` }
     });
     
+    if (toast) toast.hide();
+    
     return {
       content: result.trim(),
       backend: FileBackend.MARKITDOWN,
       success: true
     };
   } catch (error) {
+    if (toast) toast.hide();
+    
     console.error(`Markitdown failed for ${filePath}:`, error.message);
     return {
       content: `[Error processing with markitdown: ${error.message}]`,
@@ -88,7 +111,16 @@ const processWithMarkitdown = (filePath) => {
 
 // Process file using docling
 const processWithDocling = (filePath) => {
+  const fileName = path.basename(filePath);
+  let toast;
+  
   try {
+    showToast({
+      style: Toast.Style.Animated,
+      title: `Processing ${fileName}`,
+      message: `Using Docling...`
+    }).then(t => { toast = t; });
+    
     // Use docling to convert to markdown
     const result = execSync(`docling "${filePath}" --to md --output /dev/stdout`, {
       encoding: 'utf8',
@@ -96,12 +128,16 @@ const processWithDocling = (filePath) => {
       env: { ...process.env, PATH: `${process.env.PATH}:/opt/homebrew/bin/:/usr/local/bin/` }
     });
     
+    if (toast) toast.hide();
+    
     return {
       content: result.trim(),
       backend: FileBackend.DOCLING,
       success: true
     };
   } catch (error) {
+    if (toast) toast.hide();
+    
     console.error(`Docling failed for ${filePath}:`, error.message);
     return {
       content: `[Error processing with docling: ${error.message}]`,
