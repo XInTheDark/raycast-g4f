@@ -53,7 +53,7 @@ const overrides = {
 
 const DeepInfraFormatChat = (chat, model) => {
   if (!file_supported_models.includes(model)) {
-    return messages_to_json(chat);
+    return messages_to_json(chat, { provider: "deepinfra" });
   } else {
     let formattedChat = [];
     for (let i = 0; i < chat.length; i++) {

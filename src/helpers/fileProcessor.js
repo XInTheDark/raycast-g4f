@@ -1,8 +1,21 @@
 import fs from "fs";
 import path from "path";
+import os from "os";
+import crypto from "crypto";
 import { execSync } from "child_process";
 import { showToast, Toast } from "@raycast/api";
 import { Preferences } from "../api/preferences.js";
+
+// Simple shell escape function (alternative to shell-escape package)
+const shellEscape = (args) => {
+  return args
+    .map((arg) => {
+      if (typeof arg !== "string") return arg;
+      if (/^[\w\-./]+$/.test(arg)) return arg; // Safe characters, no escaping needed
+      return `"${arg.replace(/"/g, '\\"')}"`; // Escape quotes and wrap in quotes
+    })
+    .join(" ");
+};
 
 // File processing backends
 export const FileBackend = {
@@ -116,7 +129,11 @@ const processWithMarkitdown = (filePath) => {
     });
 
     // Use markitdown to convert to markdown
-    const result = execSync(`markitdown "${filePath}"`, {
+    const args = [filePath];
+    const escapedArgs = shellEscape(args);
+    const command = `markitdown ${escapedArgs}`;
+
+    const result = execSync(command, {
       encoding: "utf8",
       timeout: 60000, // 60 second timeout
       env: { ...process.env, PATH: `${process.env.PATH}:/opt/homebrew/bin/:/usr/local/bin/` },
@@ -142,10 +159,22 @@ const processWithMarkitdown = (filePath) => {
   }
 };
 
+// Create a temporary folder for docling output
+const createTempFolder = () => {
+  const tempDir = path.join(os.tmpdir(), `docling-${crypto.randomBytes(6).toString("hex")}`);
+
+  if (!fs.existsSync(tempDir)) {
+    fs.mkdirSync(tempDir, { recursive: true });
+  }
+
+  return tempDir;
+};
+
 // Process file using docling
 const processWithDocling = (filePath) => {
   const fileName = path.basename(filePath);
   let toast;
+  let tempFolder = null;
 
   try {
     showToast({
@@ -156,22 +185,76 @@ const processWithDocling = (filePath) => {
       toast = t;
     });
 
-    // Use docling to convert to markdown
-    const result = execSync(`docling "${filePath}" --to md --output /dev/stdout`, {
-      encoding: "utf8",
+    // Set up temp folder
+    tempFolder = createTempFolder();
+
+    const args = [
+      filePath,
+      "--to",
+      "md",
+      "--output",
+      tempFolder,
+      "--pdf-backend",
+      "dlparse_v4",
+      "--ocr-engine",
+      "ocrmac",
+      "--image-export-mode",
+      "placeholder",
+    ];
+
+    const escapedArgs = shellEscape(args);
+    const command = `docling ${escapedArgs}`;
+    console.log(`Executing: ${command}`);
+
+    execSync(command, {
       timeout: 120000, // 2 minute timeout
       env: { ...process.env, PATH: `${process.env.PATH}:/opt/homebrew/bin/:/usr/local/bin/` },
+      stdio: "inherit",
     });
+
+    // Find the output file
+    const files = fs.readdirSync(tempFolder).filter((file) => fs.statSync(path.join(tempFolder, file)).isFile());
+
+    // Look for .md file first
+    let outputFile = files.find((file) => file.endsWith(".md"));
+
+    if (!outputFile && files.length > 0) {
+      // Use the largest file if no .md found
+      outputFile = files.reduce((a, b) =>
+        fs.statSync(path.join(tempFolder, a)).size > fs.statSync(path.join(tempFolder, b)).size ? a : b
+      );
+      console.log(`No .md file found, using largest file: ${outputFile}`);
+    }
+
+    if (!outputFile) {
+      throw new Error("No output file found in temp folder");
+    }
+
+    // Read the converted content
+    const outputPath = path.join(tempFolder, outputFile);
+    const content = fs.readFileSync(outputPath, "utf8");
+
+    // Clean up temp folder
+    fs.rmSync(tempFolder, { recursive: true, force: true });
 
     if (toast) toast.hide();
 
     return {
-      content: result.trim(),
+      content: content.trim(),
       backend: FileBackend.DOCLING,
       success: true,
     };
   } catch (error) {
     if (toast) toast.hide();
+
+    // Clean up temp folder on error
+    if (tempFolder && fs.existsSync(tempFolder)) {
+      try {
+        fs.rmSync(tempFolder, { recursive: true, force: true });
+      } catch (cleanupError) {
+        console.warn(`Failed to cleanup temp folder: ${cleanupError.message}`);
+      }
+    }
 
     console.error(`Docling failed for ${filePath}:`, error.message);
     return {

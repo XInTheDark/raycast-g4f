@@ -12,13 +12,13 @@
 import { processFiles } from "../helpers/fileProcessor.js";
 
 export class Message {
-  // Files should be an array of objects with {path: string, content: string}
-  // For backward compatibility, file paths (strings) are also supported and will be processed
+  // Files should be an array of file paths (strings) or file objects {path: string, content: string}
+  // Files are processed lazily when needed, not in constructor
   constructor({ role = "", content = "", files = [] } = {}) {
     this.role = role;
     this.content = content;
     if (files && files.length > 0) {
-      this.files = processFiles(files);
+      this.files = files; // Store raw files, process only when needed
     }
   }
 }
@@ -57,7 +57,7 @@ export class MessagePair {
     this.finished = finished;
     this.visible = visible;
     if (files && files.length > 0) {
-      this.files = processFiles(files);
+      this.files = files;
     }
   }
 }
@@ -95,7 +95,7 @@ export const pairs_to_messages = (pairs, query = null) => {
 // model: Model string
 // assistant: Whether to include the additional "Assistant:" prompt
 export const format_chat_to_prompt = (chat, { model = null, assistant = true } = {}) => {
-  chat = messages_to_json(chat);
+  chat = messages_to_json(chat, { readFiles: false});
 
   model = model?.toLowerCase() || "";
   let prompt = "";
@@ -134,25 +134,39 @@ export const format_chat_to_prompt = (chat, { model = null, assistant = true } =
 // - include file content if any, and add them to the message. (unless the provider doesn't want us to include files)
 // - remove the files property
 
-export const messages_to_json = (chat, { readFiles = true } = {}) => {
+// Providers that handle files natively (don't need text processing)
+const NATIVE_FILE_PROVIDERS = ["google_gemini", "deepinfra"];
+
+export const messages_to_json = (chat, { readFiles = true, provider = null } = {}) => {
   let json = [];
+
+  // Skip file processing for providers that handle files natively
+  const shouldProcessFiles = readFiles && (!provider || !NATIVE_FILE_PROVIDERS.includes(provider));
 
   for (let i = 0; i < chat.length; i++) {
     let msg = structuredClone(chat[i]);
 
-    if (readFiles && msg.files && msg.files.length > 0) {
+    if (shouldProcessFiles && msg.files && msg.files.length > 0) {
       console.assert(msg.role === "user", "Only user messages can have files");
-      for (const file of msg.files) {
-        // use stored content from file object
-        const content = file.content || file; // backward compatibility: handle both {path, content} and plain strings
+
+      const processedFiles = processFiles(msg.files);
+
+      for (const file of processedFiles) {
+        const content = file.content || file; // backward compatibility
 
         // push as new message
         json.push({ role: "user", content: content });
-        json.push({ role: "assistant", content: "[system: file uploaded]" });
+        json.push({ role: "assistant", content: "" });
       }
     }
 
-    delete msg.files;
+    // For native file providers, keep the files property for the provider to handle
+    if (!shouldProcessFiles && msg.files && msg.files.length > 0) {
+      // Keep files as-is for native file handling providers
+    } else {
+      delete msg.files;
+    }
+
     json.push(msg);
   }
   return json;
