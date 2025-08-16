@@ -269,6 +269,10 @@ const processWithDocling = (filePath) => {
 // Extract and format text content from a file
 export const extractTextFromFile = (filePath) => {
   try {
+    // Get file mtime for caching
+    const stats = fs.statSync(filePath);
+    const mtime = stats.mtime.getTime();
+
     const backend = getBackendForFile(filePath);
     let result;
 
@@ -297,6 +301,7 @@ ${result.content}`;
       backend: result.backend,
       success: result.success,
       error: result.error,
+      mtime: mtime,
     };
   } catch (error) {
     console.error(`Error processing file ${filePath}:`, error);
@@ -306,6 +311,7 @@ ${result.content}`;
       backend: "error",
       success: false,
       error: error.message,
+      mtime: 0,
     };
   }
 };
@@ -315,14 +321,97 @@ export const processFiles = (files) => {
   if (!files || files.length === 0) return [];
 
   return files.map((file) => {
-    // If already a file object, return as-is
-    if (typeof file === "object" && file.path && file.content) {
-      return file;
-    }
-    // If it's a file path, convert it to a file object
+    // If it's a file path string, convert it to a file object
     if (typeof file === "string") {
       return extractTextFromFile(file);
     }
-    return file; // fallback
+
+    // If already a file object, check if we need to refresh
+    if (typeof file === "object" && file.path && file.content) {
+      try {
+        // Check if file has been modified since last processing
+        const stats = fs.statSync(file.path);
+        const currentMtime = stats.mtime.getTime();
+
+        // If mtime has changed, reprocess the file
+        if (file.mtime && currentMtime !== file.mtime) {
+          console.log(`File ${file.path} has been modified, reprocessing...`);
+          return extractTextFromFile(file.path);
+        }
+
+        // File hasn't changed, return cached version
+        return file;
+      } catch (error) {
+        // File might not exist anymore, mark as error
+        console.warn(`Error checking file ${file.path}:`, error.message);
+        return {
+          ...file,
+          content: `---\nFile: ${file.path}\nError: File no longer accessible (${error.message})`,
+          success: false,
+          error: error.message,
+        };
+      }
+    }
+
+    return file; // fallback for unknown format
   });
+};
+
+// Check if any files in the array need processing (are still raw paths or have been modified)
+export const needsProcessing = (files) => {
+  if (!files || files.length === 0) return false;
+
+  return files.some((file) => {
+    // If it's a string path, it needs processing
+    if (typeof file === "string") return true;
+
+    // If it's an object, check if file has been modified
+    if (typeof file === "object" && file.path && file.content && file.mtime) {
+      try {
+        const stats = fs.statSync(file.path);
+        return stats.mtime.getTime() !== file.mtime;
+      } catch {
+        return false; // If file doesn't exist, consider it processed (will show error)
+      }
+    }
+
+    return false;
+  });
+};
+
+// Get file processing statistics
+export const getProcessingStats = (files) => {
+  if (!Array.isArray(files)) return null;
+
+  const stats = {
+    total: files.length,
+    successful: 0,
+    failed: 0,
+    backends: {},
+    cached: 0,
+    needsProcessing: needsProcessing(files),
+  };
+
+  files.forEach((file) => {
+    if (typeof file === "string") {
+      // Raw path, not yet processed
+      return;
+    }
+
+    if (file.success) {
+      stats.successful++;
+    } else {
+      stats.failed++;
+    }
+
+    const backend = file.backend || "unknown";
+    stats.backends[backend] = (stats.backends[backend] || 0) + 1;
+
+    // Count cached files (those with mtime)
+    if (file.mtime) {
+      stats.cached++;
+    }
+  });
+
+  return stats;
 };

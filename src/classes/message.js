@@ -12,13 +12,19 @@
 import { processFiles } from "../helpers/fileProcessor.js";
 
 export class Message {
-  // Files should be an array of file paths (strings) or file objects {path: string, content: string}
+  // Files should be an array of file paths (strings) or file objects {path: string, content: string, mtime: number}
   // Files are processed lazily when needed, not in constructor
   constructor({ role = "", content = "", files = [] } = {}) {
     this.role = role;
     this.content = content;
     if (files && files.length > 0) {
       this.files = files; // Store raw files, process only when needed
+    }
+  }
+
+  processAndCacheFiles() {
+    if (this.files && this.files.length > 0) {
+      this.files = processFiles(this.files);
     }
   }
 }
@@ -35,7 +41,7 @@ export class MessagePair {
   // When initialising, we can pass in either prompt and answer, or first and second.
   // prompt and answer are just shortcuts to initialise the user/assistant roles; don't ever access them.
   // When accessing, always strictly use the first and second properties. e.g. messagePair.first.content for the user message.
-  // Files should be an array of objects with {path: string, content: string}
+  // Files should be an array of file paths (strings) or file objects {path: string, content: string, mtime: number}
   constructor({
     prompt = "",
     answer = "",
@@ -60,6 +66,12 @@ export class MessagePair {
       this.files = files;
     }
   }
+
+  processAndCacheFiles() {
+    if (this.files && this.files.length > 0) {
+      this.files = processFiles(this.files);
+    }
+  }
 }
 
 // Utilities
@@ -72,6 +84,12 @@ export const pairs_to_messages = (pairs, query = null) => {
     // reverse order, index 0 is latest message
     let messagePair = pairs[i];
     if (!messagePair.first.content && !messagePair.files) continue;
+
+    // Process and cache files in the original MessagePair if needed
+    if (messagePair.files && messagePair.processAndCacheFiles) {
+      messagePair.processAndCacheFiles();
+    }
+
     chat.push(
       messagePair.files
         ? new Message({
@@ -95,7 +113,7 @@ export const pairs_to_messages = (pairs, query = null) => {
 // model: Model string
 // assistant: Whether to include the additional "Assistant:" prompt
 export const format_chat_to_prompt = (chat, { model = null, assistant = true } = {}) => {
-  chat = messages_to_json(chat, { readFiles: false});
+  chat = messages_to_json(chat, { readFiles: false });
 
   model = model?.toLowerCase() || "";
   let prompt = "";
@@ -149,9 +167,18 @@ export const messages_to_json = (chat, { readFiles = true, provider = null } = {
     if (shouldProcessFiles && msg.files && msg.files.length > 0) {
       console.assert(msg.role === "user", "Only user messages can have files");
 
-      const processedFiles = processFiles(msg.files);
+      // Process and cache files in the original chat object for memoization
+      if (chat[i].processAndCacheFiles) {
+        chat[i].processAndCacheFiles();
+        // Update our copy with the processed files
+        msg.files = chat[i].files;
+      } else {
+        // Fallback for plain objects that aren't Message instances
+        // TODO: deprecate soon.
+        msg.files = processFiles(msg.files);
+      }
 
-      for (const file of processedFiles) {
+      for (const file of msg.files) {
         const content = file.content || file; // backward compatibility
 
         // push as new message
