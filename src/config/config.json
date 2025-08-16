@@ -13,7 +13,8 @@
     "GeminiAPIKeys": "",
     "inactiveDuration": "0",
     "defaultLanguage": "English",
-    "fetchTimeout": "10000"
+    "fetchTimeout": "10000",
+    "fileProcessingBackend": "simple"
   },
   "languages": [
     {
