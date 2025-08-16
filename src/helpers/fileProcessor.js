@@ -268,6 +268,7 @@ const processWithDocling = (filePath) => {
 
 // Extract and format text content from a file
 export const extractTextFromFile = (filePath) => {
+  console.log(`Extracting text from file: ${filePath}`);
   try {
     // Get file mtime for caching
     const stats = fs.statSync(filePath);
@@ -319,10 +320,13 @@ ${result.content}`;
 // Convert file paths to file objects with memoized content
 export const processFiles = (files) => {
   if (!files || files.length === 0) return [];
+  
+  console.log(`Processing ${files.length} files:`, files.map(f => typeof f === 'string' ? f : f.path || 'unknown'));
 
   return files.map((file) => {
     // If it's a file path string, convert it to a file object
     if (typeof file === "string") {
+      console.warn(`Processing raw file path: ${file}`);
       return extractTextFromFile(file);
     }
 
@@ -340,6 +344,7 @@ export const processFiles = (files) => {
         }
 
         // File hasn't changed, return cached version
+        console.log(`Using cached file ${file.path}`);
         return file;
       } catch (error) {
         // File might not exist anymore, mark as error
@@ -353,6 +358,8 @@ export const processFiles = (files) => {
       }
     }
 
+    // Handle unknown file format - log warning and return as-is
+    console.warn(`Unknown file format:`, typeof file, file);
     return file; // fallback for unknown format
   });
 };

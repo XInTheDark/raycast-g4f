@@ -761,7 +761,16 @@ export default function Chat({ launchContext }) {
           id="files"
           title="Upload Files"
           value={(input.files ?? []).map((file) => (typeof file === "string" ? file : file.path)).filter(Boolean)}
-          onChange={(files) => setInput({ ...input, files })}
+          onChange={(filePaths) => {
+            // If we already have processed file objects, preserve them if the path matches
+            const processedFiles = input.files.filter(file => typeof file === 'object' && file.path && file.content);
+            const newFiles = filePaths.map(path => {
+              // Check if we already have this file processed
+              const existing = processedFiles.find(file => file.path === path);
+              return existing || path; // Use processed object if available, otherwise keep as string path
+            });
+            setInput({ ...input, files: newFiles });
+          }}
         />
       </Form>
     ) : (
@@ -771,7 +780,9 @@ export default function Chat({ launchContext }) {
 
   let resendMessage = async (currentChatData, idx, newMessage = null) => {
     if (newMessage?.message) currentChatData.messages[idx].first.content = newMessage.message;
-    if (newMessage?.files) currentChatData.messages[idx].files = newMessage.files;
+    if (newMessage?.files) {
+      currentChatData.messages[idx].files = newMessage.files;
+    }
 
     currentChatData.messages[idx].second.content = "";
     currentChatData.messages[idx].finished = false;
@@ -1275,16 +1286,16 @@ export default function Chat({ launchContext }) {
 
       if (launchContext?.query) {
         let newChatName = `From Quick AI at ${current_datetime()}`;
+        let launchMessagePair = new MessagePair({
+          prompt: launchContext.query.text,
+          answer: launchContext.response,
+          finished: true,
+          files: launchContext.query.files,
+        });
+
         let newChat = chat_data({
           name: newChatName,
-          messages: [
-            new MessagePair({
-              prompt: launchContext.query.text,
-              answer: launchContext.response,
-              finished: true,
-              files: launchContext.query.files,
-            }),
-          ],
+          messages: [launchMessagePair],
           provider: launchContext.provider,
         });
         await addChatAsCurrent(setChatData, setCurrentChatData, newChat);
