@@ -65,7 +65,7 @@ const DeepInfraFormatChat = (chat, model) => {
 
       if (message.files && message.files.length > 0) {
         for (const file of message.files) {
-          const filePath = typeof file === 'string' ? file : file.path;
+          const filePath = typeof file === "string" ? file : file.path;
           let base64 = fs.readFileSync(filePath, { encoding: "base64" });
           let ext = filePath.split(".").pop();
           base64 = `data:image/${ext};base64,${base64}`;

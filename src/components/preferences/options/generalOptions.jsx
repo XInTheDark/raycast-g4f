@@ -62,7 +62,8 @@ const generalOptions = {
   },
   fileProcessingBackend: {
     title: "File Processing Backend",
-    description: "Backend to use for processing uploaded files. Simple: basic text files only. MarkItDown: PDF, Office files. Docling: Advanced document processing.",
+    description:
+      "Backend to use for processing uploaded files. Simple: basic text files only. MarkItDown: PDF, Office files. Docling: Advanced document processing.",
     required: false,
     type: "dropdown",
     data: [

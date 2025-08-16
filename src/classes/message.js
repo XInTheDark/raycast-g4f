@@ -145,7 +145,7 @@ export const messages_to_json = (chat, { readFiles = true } = {}) => {
       for (const file of msg.files) {
         // use stored content from file object
         const content = file.content || file; // backward compatibility: handle both {path, content} and plain strings
-        
+
         // push as new message
         json.push({ role: "user", content: content });
         json.push({ role: "assistant", content: "[system: file uploaded]" });

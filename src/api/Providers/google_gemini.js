@@ -132,7 +132,7 @@ export const GeminiFormatChat = async (chat, googleGemini) => {
     if (message.files && message.files.length > 0) {
       let arr = [message.content];
       for (const file of message.files) {
-        const filePath = typeof file === 'string' ? file : file.path;
+        const filePath = typeof file === "string" ? file : file.path;
         const buffer = fs.readFileSync(filePath);
         const fileUpload = { filePath: filePath, buffer: buffer };
         arr.push(fileUpload);
