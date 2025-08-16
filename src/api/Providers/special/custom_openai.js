@@ -75,8 +75,8 @@ export const CustomOpenAIProvider = {
     const api_url = getChatCompletionsURL(url, this.info?.type);
 
     apiKey = apiKey || apiData.apiKey;
-    // The order for applying configs: reqBody -> apiData.config -> reqConfig
-    const config = { ...reqBody, ...apiData.config, ...reqConfig };
+    // The order for applying configs: reqBody -> apiData.config -> apiData.models_config -> reqConfig
+    const config = { ...reqBody, ...apiData.config, ...apiData.models_config?.[model], ...reqConfig };
 
     chat = messages_to_json(chat);
 
