@@ -760,7 +760,7 @@ export default function Chat({ launchContext }) {
         <Form.FilePicker
           id="files"
           title="Upload Files"
-          value={input.files ?? []}
+          value={(input.files ?? []).map(file => typeof file === 'string' ? file : file.path).filter(Boolean)}
           onChange={(files) => setInput({ ...input, files })}
         />
       </Form>
@@ -1377,9 +1377,11 @@ export default function Chat({ launchContext }) {
                                 {x.files && x.files.length > 0 ? (
                                   <>
                                     <List.Item.Detail.Metadata.Label title="Files" />
-                                    {x.files.map((file, i) => (
-                                      <List.Item.Detail.Metadata.Label title="" text={file} key={i} />
-                                    ))}
+                                    {x.files.map((file, i) => {
+                                      const fileName = typeof file === 'string' ? file : file.path;
+                                      const displayName = fileName ? fileName.split('/').pop() : 'Unknown file';
+                                      return <List.Item.Detail.Metadata.Label title="" text={displayName} key={i} />;
+                                    })}
                                   </>
                                 ) : null}
                                 {x.metadata && Object.keys(x.metadata)?.length > 0 ? (
