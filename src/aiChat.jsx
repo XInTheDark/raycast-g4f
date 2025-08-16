@@ -782,6 +782,8 @@ export default function Chat({ launchContext }) {
     if (newMessage?.message) currentChatData.messages[idx].first.content = newMessage.message;
     if (newMessage?.files) {
       currentChatData.messages[idx].files = newMessage.files;
+      // Process and cache files immediately after assignment
+      currentChatData.messages[idx].processAndCacheFiles();
     }
 
     currentChatData.messages[idx].second.content = "";
@@ -940,6 +942,10 @@ export default function Chat({ launchContext }) {
     let newMessageID = newMessagePair.id;
 
     currentChatData.messages.unshift(newMessagePair);
+    
+    // Process and cache files in the message that's now in the chat
+    currentChatData.messages[0].processAndCacheFiles();
+
     setCurrentChatData(currentChatData); // possibly redundant, put here for safety and consistency
     await flushUpdateChat(currentChatData);
 

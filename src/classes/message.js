@@ -24,6 +24,7 @@ export class Message {
 
   processAndCacheFiles() {
     if (this.files && this.files.length > 0) {
+      console.log(`Message processAndCacheFiles: Processing ${this.files.length} files`);
       this.files = processFiles(this.files);
     }
   }
@@ -69,7 +70,11 @@ export class MessagePair {
 
   processAndCacheFiles() {
     if (this.files && this.files.length > 0) {
+      console.log(`MessagePair processAndCacheFiles: Processing ${this.files.length} files`);
+      const beforeTypes = this.files.map(f => typeof f === 'string' ? 'string' : 'object');
       this.files = processFiles(this.files);
+      const afterTypes = this.files.map(f => typeof f === 'string' ? 'string' : 'object');
+      console.log(`MessagePair processAndCacheFiles: Before types: ${beforeTypes}, After types: ${afterTypes}`);
     }
   }
 }
@@ -174,8 +179,11 @@ export const messages_to_json = (chat, { readFiles = true, provider = null } = {
         msg.files = chat[i].files;
       } else {
         // Fallback for plain objects that aren't Message instances
-        // TODO: deprecate soon.
-        msg.files = processFiles(msg.files);
+        // Process files and update both the original object and our copy for memoization
+        console.log(`Processing files for plain object (no processAndCacheFiles method)`);
+        const processedFiles = processFiles(msg.files);
+        chat[i].files = processedFiles; // Update original for memoization
+        msg.files = processedFiles; // Update copy for current use
       }
 
       for (const file of msg.files) {
