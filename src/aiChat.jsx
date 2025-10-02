@@ -763,10 +763,10 @@ export default function Chat({ launchContext }) {
           value={(input.files ?? []).map((file) => (typeof file === "string" ? file : file.path)).filter(Boolean)}
           onChange={(filePaths) => {
             // If we already have processed file objects, preserve them if the path matches
-            const processedFiles = input.files.filter(file => typeof file === 'object' && file.path && file.content);
-            const newFiles = filePaths.map(path => {
+            const processedFiles = input.files.filter((file) => typeof file === "object" && file.path && file.content);
+            const newFiles = filePaths.map((path) => {
               // Check if we already have this file processed
-              const existing = processedFiles.find(file => file.path === path);
+              const existing = processedFiles.find((file) => file.path === path);
               return existing || path; // Use processed object if available, otherwise keep as string path
             });
             setInput({ ...input, files: newFiles });
@@ -942,7 +942,7 @@ export default function Chat({ launchContext }) {
     let newMessageID = newMessagePair.id;
 
     currentChatData.messages.unshift(newMessagePair);
-    
+
     // Process and cache files in the message that's now in the chat
     currentChatData.messages[0].processAndCacheFiles();
 

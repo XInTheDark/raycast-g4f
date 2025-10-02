@@ -320,8 +320,11 @@ ${result.content}`;
 // Convert file paths to file objects with memoized content
 export const processFiles = (files) => {
   if (!files || files.length === 0) return [];
-  
-  console.log(`Processing ${files.length} files:`, files.map(f => typeof f === 'string' ? f : f.path || 'unknown'));
+
+  console.log(
+    `Processing ${files.length} files:`,
+    files.map((f) => (typeof f === "string" ? f : f.path || "unknown"))
+  );
 
   return files.map((file) => {
     // If it's a file path string, convert it to a file object

@@ -71,9 +71,9 @@ export class MessagePair {
   processAndCacheFiles() {
     if (this.files && this.files.length > 0) {
       console.log(`MessagePair processAndCacheFiles: Processing ${this.files.length} files`);
-      const beforeTypes = this.files.map(f => typeof f === 'string' ? 'string' : 'object');
+      const beforeTypes = this.files.map((f) => (typeof f === "string" ? "string" : "object"));
       this.files = processFiles(this.files);
-      const afterTypes = this.files.map(f => typeof f === 'string' ? 'string' : 'object');
+      const afterTypes = this.files.map((f) => (typeof f === "string" ? "string" : "object"));
       console.log(`MessagePair processAndCacheFiles: Before types: ${beforeTypes}, After types: ${afterTypes}`);
     }
   }
