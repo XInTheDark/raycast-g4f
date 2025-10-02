@@ -27,6 +27,7 @@ const EditAPIConfig = ({ customAPIData, setCustomAPIData, url }) => {
 
               try {
                 values.config = JSON.parse(values.config);
+                values.models_config = JSON.parse(values.models_config);
               } catch (e) {
                 await showToast(Toast.Style.Failure, "Invalid JSON in config");
                 return;
@@ -102,6 +103,12 @@ const EditAPIConfig = ({ customAPIData, setCustomAPIData, url }) => {
         title="Config (JSON)"
         defaultValue={JSON.stringify(APIData.config || {}, null, 4)}
         info="Must be a valid JSON object. Example: { 'max_tokens': 4096, 'temperature': 0.7 }"
+      />
+      <Form.TextArea
+        id="models_config"
+        title="Models Config (JSON)"
+        defaultValue={JSON.stringify(APIData.models_config || {}, null, 4)}
+        info="Model-specific config. Must be a valid JSON object. Example: { 'gpt-4': { 'max_tokens': 8192 }, 'gpt-3.5-turbo': { 'max_tokens': 4096 } }"
       />
     </Form>
   );
