@@ -10,6 +10,7 @@ export const GeminiProvider = {
   models: [
     { model: "default", stream: true },
     { model: "flash", stream: true },
+    { model: "pro", stream: true },
     { model: "experimental", stream: true },
     { model: "thinking", stream: true },
     { model: "2.5", stream: true },
@@ -18,9 +19,10 @@ export const GeminiProvider = {
     default: ["gemini-2.5-flash"],
     flash: ["gemini-2.5-flash", "gemini-2.0-flash"],
     experimental: ["gemini-2.5-flash", "gemini-2.5-pro"],
+    pro: ["gemini-2.5-pro"],
     thinking: ["gemini-2.5-flash", "gemini-2.5-pro"],
     2.5: ["gemini-2.5-pro", "gemini-2.5-flash"],
-    "gemini-pro": "default",
+    "gemini-pro": "pro",
     "gemini-flash": "flash",
     "gemini-exp": "experimental",
     "gemini-thinking": "thinking",
@@ -130,8 +132,9 @@ export const GeminiFormatChat = async (chat, googleGemini) => {
     if (message.files && message.files.length > 0) {
       let arr = [message.content];
       for (const file of message.files) {
-        const buffer = fs.readFileSync(file);
-        const fileUpload = { filePath: file, buffer: buffer };
+        const filePath = typeof file === "string" ? file : file.path;
+        const buffer = fs.readFileSync(filePath);
+        const fileUpload = { filePath: filePath, buffer: buffer };
         arr.push(fileUpload);
       }
       geminiMessageParts = await googleGemini.messageToParts(arr);

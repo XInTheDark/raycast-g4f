@@ -160,6 +160,18 @@ separate them with commas in the preferences.
   To upload a file in AI Chat, press Command-Enter or select "Compose Message" from the actions. Then, simply click on
   the upload button to get started.
 
+### File Processing Backends
+
+The extension supports multiple backends for processing uploaded files:
+
+- **Simple**: Basic text file processing for .txt, .md, .js, .py and other text-based files
+- **MarkItDown**: Advanced processing for PDF, Word, Excel, PowerPoint and other document formats
+  - Requires: `pip install markitdown`
+- **Docling**: State-of-the-art document processing with OCR support
+  - Requires: `pip install docling`
+
+You can configure the file processing backend in Preferences → General → File Processing Backend.
+
 ## Features
 
 > [!NOTE]

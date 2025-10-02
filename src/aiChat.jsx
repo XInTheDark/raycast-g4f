@@ -760,8 +760,17 @@ export default function Chat({ launchContext }) {
         <Form.FilePicker
           id="files"
           title="Upload Files"
-          value={input.files ?? []}
-          onChange={(files) => setInput({ ...input, files })}
+          value={(input.files ?? []).map((file) => (typeof file === "string" ? file : file.path)).filter(Boolean)}
+          onChange={(filePaths) => {
+            // If we already have processed file objects, preserve them if the path matches
+            const processedFiles = input.files.filter((file) => typeof file === "object" && file.path && file.content);
+            const newFiles = filePaths.map((path) => {
+              // Check if we already have this file processed
+              const existing = processedFiles.find((file) => file.path === path);
+              return existing || path; // Use processed object if available, otherwise keep as string path
+            });
+            setInput({ ...input, files: newFiles });
+          }}
         />
       </Form>
     ) : (
@@ -771,7 +780,11 @@ export default function Chat({ launchContext }) {
 
   let resendMessage = async (currentChatData, idx, newMessage = null) => {
     if (newMessage?.message) currentChatData.messages[idx].first.content = newMessage.message;
-    if (newMessage?.files) currentChatData.messages[idx].files = newMessage.files;
+    if (newMessage?.files) {
+      currentChatData.messages[idx].files = newMessage.files;
+      // Process and cache files immediately after assignment
+      currentChatData.messages[idx].processAndCacheFiles();
+    }
 
     currentChatData.messages[idx].second.content = "";
     currentChatData.messages[idx].finished = false;
@@ -929,6 +942,10 @@ export default function Chat({ launchContext }) {
     let newMessageID = newMessagePair.id;
 
     currentChatData.messages.unshift(newMessagePair);
+
+    // Process and cache files in the message that's now in the chat
+    currentChatData.messages[0].processAndCacheFiles();
+
     setCurrentChatData(currentChatData); // possibly redundant, put here for safety and consistency
     await flushUpdateChat(currentChatData);
 
@@ -1275,16 +1292,16 @@ export default function Chat({ launchContext }) {
 
       if (launchContext?.query) {
         let newChatName = `From Quick AI at ${current_datetime()}`;
+        let launchMessagePair = new MessagePair({
+          prompt: launchContext.query.text,
+          answer: launchContext.response,
+          finished: true,
+          files: launchContext.query.files,
+        });
+
         let newChat = chat_data({
           name: newChatName,
-          messages: [
-            new MessagePair({
-              prompt: launchContext.query.text,
-              answer: launchContext.response,
-              finished: true,
-              files: launchContext.query.files,
-            }),
-          ],
+          messages: [launchMessagePair],
           provider: launchContext.provider,
         });
         await addChatAsCurrent(setChatData, setCurrentChatData, newChat);
@@ -1377,9 +1394,11 @@ export default function Chat({ launchContext }) {
                                 {x.files && x.files.length > 0 ? (
                                   <>
                                     <List.Item.Detail.Metadata.Label title="Files" />
-                                    {x.files.map((file, i) => (
-                                      <List.Item.Detail.Metadata.Label title="" text={file} key={i} />
-                                    ))}
+                                    {x.files.map((file, i) => {
+                                      const fileName = typeof file === "string" ? file : file.path;
+                                      const displayName = fileName ? fileName.split("/").pop() : "Unknown file";
+                                      return <List.Item.Detail.Metadata.Label title="" text={displayName} key={i} />;
+                                    })}
                                   </>
                                 ) : null}
                                 {x.metadata && Object.keys(x.metadata)?.length > 0 ? (

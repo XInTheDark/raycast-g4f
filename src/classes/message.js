@@ -9,14 +9,23 @@
 //
 // Note how we currently don't have a Chat class, and instead we just use an array of messages.
 
-import fs from "fs";
+import { processFiles } from "../helpers/fileProcessor.js";
 
 export class Message {
+  // Files should be an array of file paths (strings) or file objects {path: string, content: string, mtime: number}
+  // Files are processed lazily when needed, not in constructor
   constructor({ role = "", content = "", files = [] } = {}) {
     this.role = role;
     this.content = content;
     if (files && files.length > 0) {
-      this.files = files;
+      this.files = files; // Store raw files, process only when needed
+    }
+  }
+
+  processAndCacheFiles() {
+    if (this.files && this.files.length > 0) {
+      console.log(`Message processAndCacheFiles: Processing ${this.files.length} files`);
+      this.files = processFiles(this.files);
     }
   }
 }
@@ -33,6 +42,7 @@ export class MessagePair {
   // When initialising, we can pass in either prompt and answer, or first and second.
   // prompt and answer are just shortcuts to initialise the user/assistant roles; don't ever access them.
   // When accessing, always strictly use the first and second properties. e.g. messagePair.first.content for the user message.
+  // Files should be an array of file paths (strings) or file objects {path: string, content: string, mtime: number}
   constructor({
     prompt = "",
     answer = "",
@@ -57,6 +67,16 @@ export class MessagePair {
       this.files = files;
     }
   }
+
+  processAndCacheFiles() {
+    if (this.files && this.files.length > 0) {
+      console.log(`MessagePair processAndCacheFiles: Processing ${this.files.length} files`);
+      const beforeTypes = this.files.map((f) => (typeof f === "string" ? "string" : "object"));
+      this.files = processFiles(this.files);
+      const afterTypes = this.files.map((f) => (typeof f === "string" ? "string" : "object"));
+      console.log(`MessagePair processAndCacheFiles: Before types: ${beforeTypes}, After types: ${afterTypes}`);
+    }
+  }
 }
 
 // Utilities
@@ -69,6 +89,12 @@ export const pairs_to_messages = (pairs, query = null) => {
     // reverse order, index 0 is latest message
     let messagePair = pairs[i];
     if (!messagePair.first.content && !messagePair.files) continue;
+
+    // Process and cache files in the original MessagePair if needed
+    if (messagePair.files && messagePair.processAndCacheFiles) {
+      messagePair.processAndCacheFiles();
+    }
+
     chat.push(
       messagePair.files
         ? new Message({
@@ -92,7 +118,7 @@ export const pairs_to_messages = (pairs, query = null) => {
 // model: Model string
 // assistant: Whether to include the additional "Assistant:" prompt
 export const format_chat_to_prompt = (chat, { model = null, assistant = true } = {}) => {
-  chat = messages_to_json(chat);
+  chat = messages_to_json(chat, { readFiles: false });
 
   model = model?.toLowerCase() || "";
   let prompt = "";
@@ -128,29 +154,54 @@ export const format_chat_to_prompt = (chat, { model = null, assistant = true } =
 // and occasionally other properties (e.g. tool call info). this is used in many OpenAI-based APIs.
 //
 // Modifications:
-// - read files if any, and add them to the message. (unless the provider doesn't want us to include files)
+// - include file content if any, and add them to the message. (unless the provider doesn't want us to include files)
 // - remove the files property
 
-export const messages_to_json = (chat, { readFiles = true } = {}) => {
+// Providers that handle files natively (don't need text processing)
+const NATIVE_FILE_PROVIDERS = ["google_gemini", "deepinfra"];
+
+export const messages_to_json = (chat, { readFiles = true, provider = null } = {}) => {
   let json = [];
+
+  // Skip file processing for providers that handle files natively
+  const shouldProcessFiles = readFiles && (!provider || !NATIVE_FILE_PROVIDERS.includes(provider));
 
   for (let i = 0; i < chat.length; i++) {
     let msg = structuredClone(chat[i]);
 
-    if (readFiles && msg.files && msg.files.length > 0) {
+    if (shouldProcessFiles && msg.files && msg.files.length > 0) {
       console.assert(msg.role === "user", "Only user messages can have files");
+
+      // Process and cache files in the original chat object for memoization
+      if (chat[i].processAndCacheFiles) {
+        chat[i].processAndCacheFiles();
+        // Update our copy with the processed files
+        msg.files = chat[i].files;
+      } else {
+        // Fallback for plain objects that aren't Message instances
+        // Process files and update both the original object and our copy for memoization
+        console.log(`Processing files for plain object (no processAndCacheFiles method)`);
+        const processedFiles = processFiles(msg.files);
+        chat[i].files = processedFiles; // Update original for memoization
+        msg.files = processedFiles; // Update copy for current use
+      }
+
       for (const file of msg.files) {
-        // read text
-        let text = fs.readFileSync(file, "utf8");
-        text = `---\nFile: ${file}\n\n${text}`;
+        const content = file.content || file; // backward compatibility
 
         // push as new message
-        json.push({ role: "user", content: text });
-        json.push({ role: "assistant", content: "[system: file uploaded]" });
+        json.push({ role: "user", content: content });
+        json.push({ role: "assistant", content: "" });
       }
     }
 
-    delete msg.files;
+    // For native file providers, keep the files property for the provider to handle
+    if (!shouldProcessFiles && msg.files && msg.files.length > 0) {
+      // Keep files as-is for native file handling providers
+    } else {
+      delete msg.files;
+    }
+
     json.push(msg);
   }
   return json;

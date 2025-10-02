@@ -60,6 +60,18 @@ const generalOptions = {
     required: false,
     type: "checkbox",
   },
+  fileProcessingBackend: {
+    title: "File Processing Backend",
+    description:
+      "Backend to use for processing uploaded files. Simple: basic text files only. MarkItDown: PDF, Office files. Docling: Advanced document processing.",
+    required: false,
+    type: "dropdown",
+    data: [
+      { title: "Simple (text files only)", value: "simple" },
+      { title: "MarkItDown (PDF, Office, etc.)", value: "markitdown" },
+      { title: "Docling (advanced processing)", value: "docling" },
+    ],
+  },
 };
 
 export const GeneralOptions = () => {
