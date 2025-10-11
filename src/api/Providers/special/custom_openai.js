@@ -105,6 +105,12 @@ export const CustomOpenAIProvider = {
       { timeout: 0 } // disable timeout
     );
 
+    if (!response.ok) {
+      const errorText = await response.text();
+      yield `Error: ${response.status} ${response.statusText}\n${errorText}`;
+      return;
+    }
+
     const reader = response.body;
     let buffer = "";
 
