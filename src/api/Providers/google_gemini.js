@@ -11,6 +11,8 @@ export const GeminiProvider = {
     { model: "default", stream: true },
     { model: "flash", stream: true },
     { model: "pro", stream: true },
+    { model: "gemini-3-flash-preview", alias: "gemini-3-flash", stream: true },
+    { model: "gemini-3-pro-preview", alias: "gemini-3-pro", stream: true },
     { model: "experimental", stream: true },
   ],
   model_aliases: {
@@ -42,8 +44,24 @@ export const GeminiProvider = {
     let APIKeysStr = Preferences["GeminiAPIKeys"];
     let APIKeys = APIKeysStr.split(",").map((x) => x.trim());
 
-    let model = this.model_aliases[options.model];
-    let models = Array.isArray(model) ? model : [model];
+    const resolveModels = (modelKey) => {
+      const firstPass = this.model_aliases?.[modelKey] ?? modelKey;
+      const candidates = Array.isArray(firstPass) ? firstPass : [firstPass];
+
+      const resolved = [];
+      for (const candidate of candidates) {
+        const secondPass = this.model_aliases?.[candidate] ?? candidate;
+        if (Array.isArray(secondPass)) {
+          resolved.push(...secondPass);
+        } else {
+          resolved.push(secondPass);
+        }
+      }
+
+      return Array.from(new Set(resolved)).filter(Boolean);
+    };
+
+    const models = resolveModels(options.model);
 
     const useWebSearch = max_retries >= 2 && ["auto", "balanced"].includes(Preferences["webSearch"]);
     const useCodeInterpreter = Preferences["codeInterpreter"];

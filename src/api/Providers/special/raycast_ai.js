@@ -105,5 +105,8 @@ export const RaycastAIModels = [
   "Google_Gemini_1.5_Pro",
   "Google_Gemini_2.0_Flash",
   "Google_Gemini_2.0_Flash_Thinking",
+  "Google_Gemini_2.5_Flash",
+  "Google_Gemini_2.5_Pro",
+  "Google_Gemini_3_Pro",
   "xAI_Grok_2",
 ];
